@@ -1,0 +1,37 @@
+• add normalization to expression/summary options?
+• support part names in fic extracts (and send them) DONE
+• fix html results (batch?)  PARTLY DONE
+• Make single page download base class DONE
+• Fix AO3 category picker delay DONE
+• add a download and display first part.
+• combined new section and item count?
+• final message should not be halt if we complete okay.
+• Add way to prevent multiple copies of the program running.
+• Improve ‘starting’ dialog (add logo/animation).
+• Increase text size in HTML results
+• combine filters and categories ?
+• delete directory that can handle symlinks
+• directory sync that checks for case problems
+• fix error in fic updater when writing files  DONE
+• implement update mode to ffn cat download  DONE
+• fix NOT STARTED when done with downloading fic  DONE
+• add ao3 category grouping and crossover test that uses it.
+
+
+• finish fic downloaders DONE
+• re-enable global filters DONE
+• ao3 categories DONE
+• testing...
+
+• make multi-category downloader  DONE
+• ao3 search/download DONE
+• ffn categories DONE
+• test ffn categories  DONE
+• ffn search/download DONE
+• fic update  NOT TESTED
+• ffn saved results
+• update ffn saved results
+• download quantity tracking
+• directory sync  DONE
+
+fim character picker that has bold for commonly used characters

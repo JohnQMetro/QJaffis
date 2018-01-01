@@ -1,0 +1,32 @@
+Expressions
+===============
+
+operators:
+
+&       AND
+|       OR
+~       NOT
+%       XOR
+
+grouping
+
+()
+
+Token Types:
+-Embedded filters
+-Substring Literals         s
+-Tokens To match            m
+-Search Title substring     t
+-Match Tokenized title      q
+
+Pseudo operands
+---------------
+a u 
+
+Embedded filters :
+--------------------
+3 types: local references, global references, and literals
+
+<local_reference> = '@'<filter_name>'@'
+<global_reference> = '@'<map_name>';'<filter_name>'@'
+<literal>         = '#'<filter_type>';'<filter data...>'#'
