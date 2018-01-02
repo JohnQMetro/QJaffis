@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Fanfic object for fimfiction.net
 Created :   May 8, 2012
 Conversion to QT started : April 20, 2013
-Updated :   June15, 2017 (fixing more breaking changes caused by 'Fimfiction 4.0')
+Updated :   January 2, 2018
 ******************************************************************************/
 #ifndef FIM_FICOBJ_H_INCLUDED
   #include "fim_ficobj.h"
@@ -37,6 +37,11 @@ jfFIM_Fanfic::jfFIM_Fanfic(const jfFIM_Fanfic& src):jfGenericFanfic3(src) {
   thumbsup = src.thumbsup;
   thumbsdown = src.thumbsdown;
   rating = src.rating;
+  pubdate = src.pubdate;
+  compact_summary = src.compact_summary;
+  warnings = src.warnings;
+  content_types = src.content_types;
+
   xparser = NULL;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -137,15 +142,24 @@ bool jfFIM_Fanfic::SetFromString(const QString& inval, QString& parse_err, bool 
       if (!xparser->GetMovePast("\"",buffer)) return ParseError(parse_err,"Could not get tag type!");
       if (!xparser->GetDelimited(">","</a>",buffer2)) return ParseError(parse_err,"missing genre link");
       // converting it to the internal format...
-      if (buffer!="character") {
+      if (buffer=="character") {
+          if (!characters.isEmpty()) characters += ", ";
+          characters += buffer2.trimmed();
+      }
+      else if (buffer=="content") {
+          if (!content_types.isEmpty()) content_types += ", ";
+          content_types += buffer2.trimmed();
+      }
+      else if (buffer=="warning") {
+          if (!warnings.isEmpty()) warnings += ", ";
+          warnings += buffer2.trimmed();
+      }
+      // series will be treated as a genre for now
+      else {
         if (!genres.isEmpty()) genres += ", ";
         genres += buffer2.trimmed();
       }
-      // The old method of using pictures for characters seems to be gone...
-      else {
-        if (!characters.isEmpty()) characters += ", ";
-        characters += buffer2.trimmed();
-      }
+
   }
   // getting the description
   if (!xparser->GetDelimited(startdesc,enddesc,buffer)) {
@@ -170,10 +184,11 @@ bool jfFIM_Fanfic::SetFromString(const QString& inval, QString& parse_err, bool 
     if (currdate > latedate) latedate = currdate;
   }
   if (findwhich==0) {
-      included = false; // this actually happens, sot not really a parsing error
+      included = false; // this actually happens, so not really a parsing error
       return ParseError(parse_err,"No chapters found!");
   }
   else part_count = findwhich;
+  /**/JDEBUGLOG(fname,1)
   // status
   if (!xparser->MovePast("<span class=\"completed-status")) {
     return ParseError(parse_err,"No status span found!");
@@ -181,38 +196,44 @@ bool jfFIM_Fanfic::SetFromString(const QString& inval, QString& parse_err, bool 
   if (!xparser->GetDelimited(">","</span>",buffer)) return ParseError(parse_err,"Status not found!");
   buffer = buffer.trimmed();
   completed = (buffer=="Complete");
-  // word count
-  if (!xparser->MovePast("<div class=\"word_count\">")) return ParseError(parse_err,"Missing wordcount");
-  if (!xparser->GetDelimitedULong("<b>","</b>",qval,oerr)) {
-    return ParseError(parse_err,"Could not parse wordcount! : " + oerr);
-  }
-  word_count = qval;
+  /**/JDEBUGLOGS(fname,2,xparser->GetBlock(2000))
   // published date
   tfrag = "<span class=\"desktop\"><b>Published:</b> </span><";
   // this is more complicated than it used to be
   if (!xparser->MovePast(tfrag)) {
+      /**/JDEBUGLOG(fname,3)
       /* since I've come cross a case of a story with no pubdate, I have to deal with
       it, instead of assuming a parsing error */
       haspubdate = false;
   }
   else {
-      if (!xparser->GetDelimitedULong("data-time=\"","\">",qval,buffer)) {
+      /**/JDEBUGLOG(fname,4)
+      if (!xparser->GetDelimitedULong("data-time=\"","\"",qval,buffer)) {
+          /**/JDEBUGLOG(fname,5)
         haspubdate = false;
       }
       else haspubdate = true;
   }
+  /**/JDEBUGLOG(fname,6)
   if (haspubdate) {
     // the extracted date is in Unix TimeStamp format
     QDateTime temppubdate;
     temppubdate.setTime_t(qval);
     if (!temppubdate.isValid()) return ParseError(parse_err,"Could not parse published date!");
     pubdate = temppubdate.date();
+    /**/JDEBUGLOG(fname,7)
     // annoyingly, with fimfiction 4 there is no modified/updated date anymore!
     // so I use a date built while scanning the list of chapters
     if (latedate > pubdate) updated_date = latedate;
     else updated_date = pubdate;
   }
   else updated_date = latedate;
+  // word count
+  if (!xparser->MovePast("<div class=\"word_count\">")) return ParseError(parse_err,"Missing wordcount");
+  if (!xparser->GetDelimitedULong("<b>","</b>",qval,oerr)) {
+    return ParseError(parse_err,"Could not parse wordcount! : " + oerr);
+  }
+  word_count = qval;
 
   // finishing touches
   validdata = true;
@@ -318,6 +339,14 @@ QString jfFIM_Fanfic::GetCharacters() const {
   return characters;
 }
 //-----------------------------------------------------------------------
+QString jfFIM_Fanfic::GetContentTypes() const {
+    return content_types;
+}
+//-----------------------------------------------------------------------
+QString jfFIM_Fanfic::GetWarnings() const {
+    return warnings;
+}
+//-----------------------------------------------------------------------
 size_t jfFIM_Fanfic::GetThumbs(bool down) const {
   if (down) return thumbsdown;
   else return thumbsup;
@@ -357,16 +386,31 @@ QString jfFIM_Fanfic::ToText() const {
   // part count and word count
   result += " - Parts: " + QString::number(part_count);
   result += " - Words: " + QString::number(word_count) + "\n";
-  // final info,
-  if (!genres.isEmpty()) {
+  // first of 2 possible lines
+  bool hasGenre = !genres.isEmpty();
+  bool hasCT = !content_types.isEmpty();
+  bool hasWarn = !warnings.isEmpty();
+  if (hasGenre) {
     result += "Genres: " + genres;
   }
+  if (hasCT) {
+      if (hasGenre) result += " - ";
+      result += "Types: " + content_types;
+  }
+  if (hasWarn) {
+      if (hasGenre || hasCT) result += " - ";
+      result += "Warnings: " + warnings;
+  }
+  // second of 2 possible lines
+  bool hasChar = !characters.isEmpty();
+  if (hasChar || completed) result += "\n";
   // character data
-  if (!genres.isEmpty()) {
-    result += " - Characters Specified: " + characters;
+  if (hasChar) {
+    result += "Characters Specified: " + characters;
   }
   if (completed) {
-    result += " - Complete";
+      if (hasChar) result += " - ";
+      result += "Complete";
   }
   // finishing off
   result += "\n";
@@ -412,17 +456,39 @@ QString jfFIM_Fanfic::ToDisplayHTML() const {
   // thumbs up and down
   result += " - Thumbs Up: " + QString::number(thumbsup);
   result += " - Thumbs Down: " + QString::number(thumbsdown) + "</font><br>\n";
+  // genres and content type...
+  bool hasGenre = !genres.isEmpty();
+  bool hasCT = !content_types.isEmpty();
+  bool hasWarn = !warnings.isEmpty();
   // final info,
-  result += "<font color=gray>";
-  if (!genres.isEmpty()) {
-    result += "Genres: " + genres;
+  if (hasGenre) {
+      result += "<font color=green><b>Genres:</b> ";
+      result += genres + "</font>";
   }
-  // character data
-  if (!genres.isEmpty()) {
-    result += " - Characters: " + characters;
+  if (hasCT) {
+      if (hasGenre) result += " &middot; ";
+      result += "<font color=gray><b>Types:</b> ";
+      result += content_types + "</font>";
   }
-  if (completed) {
-    result += " - Complete";
+  // warnings
+  if (hasWarn) {
+      if (hasGenre || hasCT) result += " &middot; ";
+      result += "<font color=red><b>Warnings:</b> ";
+      result += warnings + "</font>";
+  }
+  if (hasGenre || hasCT || hasWarn) result += "<br>\n";
+  // characters and completion status
+  bool hasChar = !characters.isEmpty();
+  if (hasChar || completed) {
+      result += "<font color=blue>";
+      if (hasChar) {
+          result += "<b>Characters:</b> " + characters;
+      }
+      if (completed) {
+          if (hasChar) result += " &middot; ";
+          result += "<b>Complete</b>";
+      }
+      result += "</font>";
   }
   // finishing off
   result += "</font></td></tr>\n</table>";
@@ -438,6 +504,8 @@ bool jfFIM_Fanfic::LoadValues(jfSkeletonParser* inparser) const {
   LoadMoreValues2(inparser);
   inparser->AddText("ITEMF_GENRES",genres);
   inparser->AddText("ITEMF_CHARDATA",characters);
+  inparser->AddText("ITEMF_CONTENTTYPES",content_types);
+  inparser->AddText("ITEMF_WARNINGS",warnings);
   inparser->AddUInt("ITEMF_AUTHORID",author_id);
   inparser->AddText("ITEMF_RATING",rating);
   inparser->AddUInt("THUMBSUP",thumbsup);
@@ -551,6 +619,10 @@ bool jfFIM_Fanfic::AddExtraStuff(QTextStream* outfile) const {
   xresult << characters;
   (*outfile) << xresult << "\n";
   xresult.clear();
+  // content type and warnings
+  xresult << content_types << warnings;
+  (*outfile) << xresult << "\n";
+  xresult.clear();
   // line after that is more complicated
   xresult << rating << thumbsup << thumbsdown << pubdate;
   (*outfile) << xresult << "\n";
@@ -567,6 +639,10 @@ bool jfFIM_Fanfic::ReadExtraStuff(jfFileReader* infile) {
   // the line with characters
   assert(infile!=NULL);
   if (!infile->ReadUnEsc(characters,funcname)) return false;
+  // content type and warnings
+  if (!infile->ReadParseLine(2,funcname)) return false;
+  content_types = (infile->lp).UnEscStr(0);
+  warnings = (infile->lp).UnEscStr(1);
   // the next line
   if (!infile->ReadParseLine(3,4,funcname)) return false;
   rating = infile->lp.UnEscStr(0);

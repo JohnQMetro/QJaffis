@@ -34,7 +34,7 @@ void jfFIMCompactParser::ParseDownloadedPage(const QString& inPage, size_t pagei
   parsed_data = NULL;
   /**/lpt->tLog(fname,2);
   // moving past much of the pure gunk
-  if (!xparser.MovePast("<div class=\"content_box desktop\"")) {
+  if (!xparser.MovePast("<div class=\"two-columns\"")) {
     parseErrorMessage = "Search Results Count not found!";
     /**/lpt->tLog(fname,3);
     return;
