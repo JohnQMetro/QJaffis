@@ -45,6 +45,7 @@ jfFIMSearch::jfFIMSearch():jfSearchCore() {
   rating = 'A';
   order = 0;
   viewmature = true;
+  eg_status = jfts_NONE;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // setting data
@@ -80,7 +81,13 @@ void jfFIMSearch::SetCompleted(bool invalue) {
 void jfFIMSearch::SetMature(bool inval) {
   viewmature = inval;
 }
-
+//------------------------------
+// for including, excluding, or ignoring Equestria Girls
+bool jfFIMSearch::SetEGStatus(jfTAG_STATUS new_status) {
+    if (new_status == jfts_ALTERNATE) return false; // only used for multi-possibility filtering
+    eg_status = new_status;
+    return true;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented method for sending category data
 void jfFIMSearch::DispatchCategory() {
@@ -175,6 +182,10 @@ size_t jfFIMSearch::GetOrder() const {
 bool jfFIMSearch::GetMature() const {
   return viewmature;
 }
+//------------------------------------------
+jfTAG_STATUS jfFIMSearch::GetEGStatus() const {
+    return eg_status;
+}
 //-------------------------------------------
 jfTagListing* jfFIMSearch::GetGenres() {
   if (genres_filter==NULL) MakeEmptyTags(FIMT_genre);
@@ -246,6 +257,13 @@ QString jfFIMSearch::GetUrl(size_t index, bool is_iscompact) const {
 
     // content type
     Result += MakeTagQuery(FIMT_content,contentt_filter);
+
+    // series: for now, Equestria Girls only
+    if (eg_status != jfts_NONE) {
+        if (eg_status == jfts_INCLUDE) Result += "+%23";
+        else Result += "+-%23";
+        Result += "equestria-girls";
+    }
 
     // the rating is also a tag, but for now, I'll treat it the same way I used to
     if (rating != 'A') {
@@ -330,7 +348,7 @@ bool jfFIMSearch::AddMiddleToFile(QTextStream* outfile) const {
   (*outfile) << resline << "\n";
   resline.clear();
   // second output line
-  resline << min_wc << max_wc << viewmature;
+  resline << min_wc << max_wc << viewmature << ((size_t)eg_status);
   (*outfile) << resline << "\n";
   resline.clear();
   // third output line
@@ -377,8 +395,9 @@ bool jfFIMSearch::ReadMiddleFromFile(jfFileReader* infile) {
   if (!infile->lp.SIntVal(2,order)) return infile->BuildError("The Order Field is malformed!");
   ssearch = infile->lp.UnEscStr(3);
   SetSString(ssearch);
+
   // line 2, word counts, view mature
-  if (!infile->ReadParseLine(2,3,funcname)) return false;
+  if (!infile->ReadParseLine(4,funcname)) return false;
   // getting the values
   if (!infile->lp.SIntVal(0,min_wc)) return infile->BuildError("The minimum word count is not a number!");
   if (!infile->lp.SIntVal(1,max_wc)) return infile->BuildError("The maximum word count is not a number!");
@@ -386,10 +405,15 @@ bool jfFIMSearch::ReadMiddleFromFile(jfFileReader* infile) {
     if (max_wc<min_wc) return infile->BuildError("The max wordcount is less than the min wordcount!");
   }
   // mature settings
-  if ((infile->lp.Num())==3) {
-      if (!infile->lp.BoolVal(2,viewmature)) return infile->BuildError("The third (viewmature) item is not boolean!");
+  if (!infile->lp.BoolVal(2,viewmature)) return infile->BuildError("The third (viewmature) item is not boolean!");
+  // Equestria Girls status
+  size_t temp_egint;  QString egoerr;
+  if (!infile->lp.SBoundVal(3,4,temp_egint,egoerr)) {
+      return infile->BuildError("The Equestria Girls item is invalid: " + egoerr);
   }
-  else viewmature = true;
+  jfTAG_STATUS temp_status = (jfTAG_STATUS)temp_egint;
+  if (temp_status == jfts_ALTERNATE) return infile->BuildError("Equestia Girls tag status cannot be alternate!");
+  eg_status = temp_status;
   // genres line
   if (!ReadTagListing(genres_filter,"Genres",infile)) return false;
   // characters line

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Search Object for fimfiction.net
 Created :   May 22, 2012
 Conversion to Qt Started Nov 7, 2013
-Updated :   December 30, 2017 (new tag search)
+Updated :   January 5, 2018 (new tag search)
 ******************************************************************************/
 #ifndef FIM_SEARCH_H_INCLUDED
 #define FIM_SEARCH_H_INCLUDED
@@ -32,6 +32,7 @@ class jfFIMSearch : public jfSearchCore {
     bool SetMinor(size_t inorder, QChar inrating);
     void SetCompleted(bool invalue);
     void SetMature(bool inval);
+    bool SetEGStatus(jfTAG_STATUS new_status); // the only series important enough to include or exclude directly
     // implemented method for sending category data
     virtual void DispatchCategory();
     // implemeted virtual methods
@@ -51,6 +52,7 @@ class jfFIMSearch : public jfSearchCore {
     QChar GetRating() const;
     size_t GetOrder() const;
     bool GetMature() const;
+    jfTAG_STATUS GetEGStatus() const;
     jfTagListing* GetGenres();
     jfTagListing* GetCharacters();
     jfTagListing* GetWarnings();
@@ -74,6 +76,7 @@ class jfFIMSearch : public jfSearchCore {
     jfTagListing* contentt_filter;
     QString ssearch, esc_search;
     size_t min_wc, max_wc;
+    jfTAG_STATUS eg_status;
     bool completed;
     QChar rating;
     size_t order;

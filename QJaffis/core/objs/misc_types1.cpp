@@ -23,20 +23,20 @@
 #include <vector>
 //*****************************************************************************
 QString jfTagListing::ToString() const {
-	// local variables
-  QString result,buf;
+    // local variables
+    QString result,buf;
 	jfTagListing::const_iterator indexer;
 	// we start...
 	if (!empty()) {
 		// the loop
 		for (indexer = begin(); indexer != end(); indexer++) {
 			buf = EscapeString(indexer->first,IO_DELIMS);
-      result += buf + ";";
-      result += QString::number((size_t)(indexer->second));
-      result += ";";
+            result += buf + ";";
+            result += QString::number((size_t)(indexer->second));
+            result += ";";
 		}
 		// removing the trailing ;
-    result.chop(1);
+        result.chop(1);
 	}
 	return result;
 }
@@ -67,7 +67,7 @@ bool jfTagListing::FromString(const QString& instr) {
 	for (ncount = 0; ncount <numtags; ncount++ ) {
 		// get and check the tag string
 		intag = parser->UnEscStr(ncount*2);
-    if (intag.isEmpty()) {
+        if (intag.isEmpty()) {
 			delete parser;
 			return false;
 		}

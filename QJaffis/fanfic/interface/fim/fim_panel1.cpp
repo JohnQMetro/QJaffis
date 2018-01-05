@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines the custom first panel for fimfiction.net searching
 Created :   June 23, 2012
 Conversion to Qt started February 3, 2014
-Updated :   December 30, 2017
+Updated :   January 5, 2018
 ******************************************************************************/
 #ifndef FIM_PANEL1_H_INCLUDED
   #include "fim_panel1.h"
@@ -118,6 +118,7 @@ jfFIM_SearchOptions::jfFIM_SearchOptions(QWidget* parent):jfSearchOptionsBase(pa
   CreateWidgets();
   ArrangeWidgets();
   setLayout(stack);
+  egcbChanged(0);
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -158,6 +159,13 @@ bool jfFIM_SearchOptions::LoadFrom(jfSearchCore* insearch) {
   // other
   matures->setChecked(typed_insearch->GetMature());
   warnings_entry->SetOrChangeTags(typed_insearch->GetWarnings());
+  // equestria girld tristate cb
+  jfTAG_STATUS egstatus = typed_insearch->GetEGStatus();
+  if (egstatus == jfts_NONE) equestria_girls_cb->setCheckState(Qt::Unchecked);
+  else if (egstatus == jfts_EXCLUDE) equestria_girls_cb->setCheckState(Qt::PartiallyChecked);
+  else if (egstatus == jfts_INCLUDE) equestria_girls_cb->setCheckState(Qt::Checked);
+  else assert(false);
+  egcbChanged(0);
   // done
   return true;
 }
@@ -190,6 +198,11 @@ bool jfFIM_SearchOptions::StoreTo(jfSearchCore* outsearch) {
   typed_outsearch->SetMinor(oindex,rchar);
   // other
   typed_outsearch->SetMature(matures->isChecked());
+  // equestria girld tristate cb
+  Qt::CheckState egcheck = equestria_girls_cb->checkState();
+  if (egcheck == Qt::Unchecked) typed_outsearch->SetEGStatus(jfts_NONE);
+  else if (egcheck == Qt::PartiallyChecked) typed_outsearch->SetEGStatus(jfts_EXCLUDE);
+  else typed_outsearch->SetEGStatus(jfts_INCLUDE);
   // save tag listings from the specialist widgets
   char_sentry->SaveAndGetTagData();
   genres_entry->GetTagList();
@@ -198,7 +211,15 @@ bool jfFIM_SearchOptions::StoreTo(jfSearchCore* outsearch) {
   // done
   return true;
 }
-
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void jfFIM_SearchOptions::egcbChanged(int state) {
+    QString eglabel = "Equestria Girls (";
+    Qt::CheckState egstate = equestria_girls_cb->checkState();
+    if (egstate == Qt::Unchecked) eglabel += "Ignored)";
+    else if (egstate == Qt::PartiallyChecked) eglabel += "Excluded)";
+    else eglabel += "Required)";
+    equestria_girls_cb->setText(eglabel);
+}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // helper methods
 //---------------------------
@@ -227,6 +248,9 @@ void jfFIM_SearchOptions::CreateWidgets() {
   order_picker = new QComboBox();
   LoadCBoxFromArray(order_picker,fimcon::orderlabel,fimcon::ordercount);
   matures = new QCheckBox("Include Mature Rated");
+  equestria_girls_cb = new QCheckBox("Equestria Girls");
+  equestria_girls_cb->setTristate(true);
+  connect(equestria_girls_cb,SIGNAL(stateChanged(int)),this,SLOT(egcbChanged(int)));
   // warnings
   warnings_entry = new jfTagStatusPicker("Warnings",false);
 
@@ -247,16 +271,18 @@ void jfFIM_SearchOptions::ArrangeWidgets() {
   pre_sidebar->addSpacing(6);
   pre_sidebar->addWidget(content_entry,2);
 
+  sidebar->addWidget(order_label,0,Qt::AlignTop);
+  sidebar->addWidget(order_picker,0,Qt::AlignTop);
+  sidebar->addSpacing(6);
   sidebar->addWidget(wcount,0,Qt::AlignTop);
   sidebar->addSpacing(6);
   sidebar->addWidget(cbox,0,Qt::AlignTop);
   sidebar->addSpacing(6);
   sidebar->addWidget(rat_label,0,Qt::AlignTop);
   sidebar->addWidget(rating_picker,0,Qt::AlignTop);
-  sidebar->addSpacing(6);
-  sidebar->addWidget(order_label,0,Qt::AlignTop);
-  sidebar->addWidget(order_picker,0,Qt::AlignTop);
   sidebar->addWidget(matures,0,Qt::AlignTop);
+  sidebar->addSpacing(6);
+  sidebar->addWidget(equestria_girls_cb,0,Qt::AlignTop);
   sidebar->addSpacing(6);
   sidebar->addWidget(warnings_entry,2);
   // sidebar->addStretch(1);

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares the custom first panel for fimfiction.net searching
 Created :   June 23, 2012
 Conversion to Qt started February 3, 2014
-Updated :   December 30, 2017 (tag change)
+Updated :   January 5, 2018 (tag change)
 ******************************************************************************/
 #ifndef FIM_PANEL1_H_INCLUDED
 #define FIM_PANEL1_H_INCLUDED
@@ -64,16 +64,20 @@ class jfFIM_DFE : public jfDefaultFilterEditorBase {
 };
 //=============================================================================
 class jfFIM_SearchOptions : public jfSearchOptionsBase {
+    Q_OBJECT
   public:
     // constructor
     jfFIM_SearchOptions(QWidget* parent = NULL);
     // methods
     virtual bool LoadFrom(jfSearchCore* insearch);
     virtual bool StoreTo(jfSearchCore* outsearch);
+  public slots:
+    void egcbChanged(int state);
   protected:
     // helper methods
     void CreateWidgets();
     void ArrangeWidgets();
+
     // gui entry data
     QLabel* search_label;
     QLineEdit* search_edit;
@@ -89,6 +93,7 @@ class jfFIM_SearchOptions : public jfSearchOptionsBase {
     QLabel* order_label;
     QComboBox* order_picker;
     QCheckBox* matures;
+    QCheckBox* equestria_girls_cb;
     jfTagStatusPicker* warnings_entry;
     // the sizers
     QGroupBox *char_wrap;
