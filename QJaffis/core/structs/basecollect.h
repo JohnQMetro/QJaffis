@@ -4,7 +4,7 @@
 // Purpose :    Declares core item collection classes
 // Created:     March 19, 2009
 // Conversion to QT Started April 8, 2013
-// Updated:     June 21, 2016
+// Updated:     January 18, 2018 (added the isEmpty method to jfFilterMap)
 ******************************************************************************/
 #ifndef BASECOLLECT_H_INCLUDED
   #define BASECOLLECT_H_INCLUDED
@@ -87,6 +87,7 @@ class jfFilterMap : public jfBaseCollection {
     stl_FilterMap::iterator RenameElem(bool& ok, const QString& oldname, const QString& newname);
     jfBaseFilter* GetItem(const QString& itemname);
     bool MatchAll(const jfBasePD* inval) const;
+    bool isEmpty() const;
     // some additonal methods
     bool AddFilter(jfBaseFilter* infilter, size_t& outindex);
     bool GetIndexByName(const QString& findname, size_t& outindex) const;

@@ -4,17 +4,20 @@ Author  :   John Q Metro
 Purpose :   Group Search Object for fimfiction.net
 Created :   August 7, 2013
 Started conversion to Qt August 3, 2015
-Updated :   June 8, 2017 (Fimfiction.Net 4)
+Updated :   January 7, 2018 (Fimfiction.net has added group searching...)
 ******************************************************************************/
 #ifndef FIM_GROUPSEARCH_H_INCLUDED
   #include "fim_groupsearch.h"
 #endif // FIM_GROUPSEARCH_H_INCLUDED
+#ifndef FIM_CONSTANTS_H
+  #include "fim_constants.h"
+#endif // FIM_CONSTANTS_H
 #ifndef FIM_GROUPOBJ_H_INCLUDED
   #include "fim_groupobj.h"
 #endif // FIM_GROUPOBJ_H_INCLUDED
-#ifndef INITEND_H_INCLUDED
-  #include "../../../initend.h"
-#endif // INITEND_H_INCLUDED
+#ifndef UTILS3_H_INCLUDED
+  #include "../../../core/utils/utils3.h"
+#endif // UTILS3_H_INCLUDED
 
 #ifndef SKELCOLL_H_INCLUDED
   #include "../../../core/structs/skelcoll.h"
@@ -24,28 +27,17 @@ Updated :   June 8, 2017 (Fimfiction.Net 4)
 // constructors
 jfFIMGroupSearch::jfFIMGroupSearch():jfSearchCore() {
   pagelimit = 4000000;
-  min_group1 = jglobal::settings.fimlimits[1];
-  max_group1 = jglobal::settings.fimlimits[2];
-  min_group2 = jglobal::settings.fimlimits[3];
-  max_group2 = jglobal::settings.fimlimits[4];
-  nofirst = false;
+  order = 0;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // setting data
 //----------------------------
-bool jfFIMGroupSearch::SetLimits(bool first, size_t fmin_in,size_t fmax_in) {
-  if (fmax_in < fmin_in) return false;
-  if (fmax_in > pagelimit) return false;
-  if (first) {
-    min_group1 = fmin_in;
-    max_group1 = fmax_in;
-    nofirst = ((min_group1==0) && (max_group1==0));
-  }
-  else {
-    min_group2 = fmin_in;
-    max_group2 = fmax_in;
-  }
-  return true;
+bool jfFIMGroupSearch::SetSearchString(const QString& valin, size_t inorder) {
+    if (inorder >= fimcon::group_ordercount) return false;
+    order = inorder;
+    sstring = valin;
+    esc_string = QueryEncode(valin);
+    return true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented method for sending category data
@@ -73,8 +65,11 @@ QString jfFIMGroupSearch::GetCatHeader() const {
 }
 //----------------------------
 QString jfFIMGroupSearch::GetIndexUrl(size_t inp_index) const {
-  QString qres = "https://www.fimfiction.net/group/";
-  return (qres + QString::number(inp_index)) + "/";
+  QString qres = "https://www.fimfiction.net/groups?q=";
+  qres += esc_string;
+  qres += "&order=" + fimcon::group_ordername[order];
+  if (inp_index > 1) qres += "&page=" + QString::number(inp_index);
+  return qres;
 }
 //----------------------------
 QString jfFIMGroupSearch::GetHTMLHeader(size_t result_category) const  {
@@ -107,24 +102,13 @@ void jfFIMGroupSearch::LoadValues(jfSkeletonParser* inparser, size_t result_cate
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // returning data data
 //-------------------------------------------
-size_t jfFIMGroupSearch::GetMinGroup(bool first) const {
-  return (first)?(min_group1):(min_group2);
+// returning data data
+QString jfFIMGroupSearch::GetSearchString() const {
+    return sstring;
 }
 //-------------------------------------------
-size_t jfFIMGroupSearch::GetMaxGroup(bool first) const {
-  return (first)?(max_group1):(max_group2);
-}
-//----------------------------------------------
-bool jfFIMGroupSearch::NoFirst() const {
-  return nofirst;
-}
-//----------------------------------------------
-size_t jfFIMGroupSearch::GroupsToSearch(bool first) const {
-  if (first) {
-    if (nofirst) return 0;
-    else return (max_group1-min_group1)+1;
-  }
-  else return (max_group2-min_group2)+1;
+size_t jfFIMGroupSearch::GetOrder() const {
+    return order;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // i/o methods for google specific data
@@ -135,7 +119,7 @@ bool jfFIMGroupSearch::AddMiddleToFile(QTextStream* outfile) const {
   // checking and special conditions
   if (outfile==NULL) return false;
   // building the first output line
-  resline << min_group1 << max_group1 << min_group2 << max_group2;
+  resline << sstring << order;
   (*outfile) << resline << '\n';
   resline.clear();
   // done
@@ -145,17 +129,16 @@ bool jfFIMGroupSearch::AddMiddleToFile(QTextStream* outfile) const {
 bool jfFIMGroupSearch::ReadMiddleFromFile(jfFileReader* infile) {
   const QString funcname = "jfFIMGroupSearch::ReadMiddleFromFile";
   // local variables
-  QString buffer;
   assert(infile!=NULL);
   // line 1, word counts
-  if (!infile->ReadParseLine(4,funcname)) return false;
+  if (!infile->ReadParseLine(2,funcname)) return false;
   // getting the values
-  if (!infile->lp.SIntVal(0,min_group1)) return infile->BuildError("The minimum group index 1 is not a number!");
-  if (!infile->lp.SIntVal(1,max_group1)) return infile->BuildError("The maximum group index 1 is not a number!");
-  if (!infile->lp.SIntVal(2,min_group2)) return infile->BuildError("The minimum group index 2 is not a number!");
-  if (!infile->lp.SIntVal(3,max_group2)) return infile->BuildError("The maximum group index 2 is not a number!");
-  if (max_group1<min_group1) return infile->BuildError("The max index group is less than the min group index!");
-  nofirst = ((min_group1==0) && (max_group1==0));
+  sstring = (infile->lp).UnEscStr(0);
+  esc_string = QueryEncode(sstring);
+  QString oerr;
+  if (!infile->lp.SBoundVal(1,3,order,oerr)) {
+      return infile->BuildError("Search Results Order Wrong: " + oerr);
+  }
   // done
   return true;
 }

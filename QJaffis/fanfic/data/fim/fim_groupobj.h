@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Group object for fimfiction.net
 Created :   July 31, 2013
 Started conversion to Qt August 3, 2015
-Updated :   July 12, 2017
+Updated :   January 6, 2018 (SetFromCardString())
 ******************************************************************************/
 #ifndef FIM_GROUPOBJ_H_INCLUDED
 #define FIM_GROUPOBJ_H_INCLUDED
@@ -25,6 +25,7 @@ class jfFIMGroup : public jfBasePD {
     jfFIMGroup();
     // data setting
     bool SetFromString(const QString& inval, QString& parse_err);
+    bool SetFromCardString(const QString& inval, QString& parse_err);
     // data getting
     size_t GetFicCount() const;
     size_t GetMemCount() const;
@@ -39,6 +40,7 @@ class jfFIMGroup : public jfBasePD {
     virtual QString GetTypeID() const;
   protected:
     bool ParseDateSet(const QString& invalue);
+    bool ParseLinkExtract(jfStringParser& xparser, QString& perr_out);
     // file i/o output
     virtual bool AddMiddleToFile(QTextStream* outfile) const;
     virtual bool AddRestToFile(QTextStream* outfile) const;

@@ -55,7 +55,6 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     QColor xcolour = modelptr->getColorAtModelIndex(index);
     /**/JDEBUGLOGB(fname,1,xcolour.isValid());
     if (xcolour.isValid()) {
-        /**/JDEBUGLOG(fname,2);
         ctx.palette.setColor(QPalette::Window,xcolour);
     }
     // Highlighting text if item is selected

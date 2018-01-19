@@ -45,6 +45,8 @@ class jfSearchCore : public QObject, public jfBaseObj {
     jfSearchCore();
     // checks the startup set for validity
     bool Check() const;
+    // checks if the filters are empty
+    bool NoFilters() const;
     // makes a set of empty maps and categories
     void MakeEmpty();
     size_t GetPagelimit() const;

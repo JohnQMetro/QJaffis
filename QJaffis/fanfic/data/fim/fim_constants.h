@@ -3,7 +3,7 @@ Name    :   fim_constants.h
 Author  :   John Q Metro
 Purpose :   I've decided to isolate the various FIM String and things here
 Created :   May 2, 2013 (Qt)
-Updated :   December 31, 2017 (replacing things with the new tag structure)
+Updated :   January 7, 2018 (fim group order constants)
 ******************************************************************************/
 #ifndef FIM_CONSTANTS_H
     #define FIM_CONSTANTS_H
@@ -27,6 +27,9 @@ namespace fimcon {
   extern const size_t ordercount;
   extern const QString ordername[];
   extern const QString orderlabel[];
+  extern const size_t group_ordercount;
+  extern const QString group_ordername[];
+  extern const QString group_orderlabel[];
 
   // Fimfiction.net tags
   extern jfFIMTag_Collection* tags;

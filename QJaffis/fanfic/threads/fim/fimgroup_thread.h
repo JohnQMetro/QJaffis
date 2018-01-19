@@ -3,7 +3,7 @@ Name    :   fimgroup_thread.h
 Author  :   John Q Metro
 Purpose :   FIM Groups search thread
 Created :   August 4, 2015
-Updated :   June 24, 2016
+Updated :   January 17, 2018
 ******************************************************************************/
 #ifndef FIMGROUP_THREAD_H
 #define FIMGROUP_THREAD_H
@@ -22,6 +22,16 @@ Updated :   June 24, 2016
 // the 'check if a page is okay'  method
 bool FIMGroup_PageCheck(const QString* ival);
 //==========================================================================
+/* for the late Jan 2018 revision, we do a two phase process (which is kind of awkward).
+~ Phase 1 : Do a card search using the new parser, but unlike the usual, do NOT
+Process the results (override the method). Instead we split the jfResultUnitVector*
+into jfResultUnitVector* with only one item (this is because we download one result at a
+time during phase 2). For phase 2, we download the individual group page for each
+result, parse it, and merge the data into the original result data, and then possibly filter it.
+Only then (if not filtered), do we call the ProcessResult(...) of the parent class.
+extra detail: if do_card is true, we skip phase 2, and phase 1 gets it's results sent to
+the display.
+*/
 
 class jfFIMGroup_DownThread : public jfBaseItemDownloader {
   public:
@@ -29,20 +39,25 @@ class jfFIMGroup_DownThread : public jfBaseItemDownloader {
     jfFIMGroup_DownThread(size_t in_max_threads);
   public slots:
     virtual void StartProcessing();
-  protected:    
+  protected:
+    // special methods
+    size_t StoreCardResults(jfResultUnitVector* in_vector);
+    void DeleteCardStore();
     // custom virtual methods
     virtual jfItemsPageParserBase* makeItemParser();
     virtual void makeFirstPageInfo();
     virtual void ProcessFirstPageResults(void* resultdata);
-    // helper method
-    size_t CalculateURLOffset(const size_t& in_index) const;
+    // overriden methods
+    virtual bool ProcessResults(void* resultdata);
+    virtual void DisposeResults(void* resultdata);
     // implemented virtual methods
     virtual QString* makeURLforPage(size_t index) const;
     virtual void PrepareItemInfo(size_t pageIndex);
     // internal data
     jfFIMGroupSearch* search;
-    // special offsets and indexes
-    int pageoffset1, pageoffset2;
-    size_t count1, count2;
+    // phase
+    bool card_phase;
+    bool do_card;
+    std::vector<jfResultUnitVector*> card_store;
 };
 /*****************************************************************************/

@@ -77,31 +77,22 @@ bool jfBaseItemDownloader::ProcessResults(void* resultdata) {
   assert(resultdata!=NULL);
   jfResultUnitVector* res_vector = static_cast<jfResultUnitVector*>(resultdata);
   // insering the results in the collection
-  /**/tLog(fname,1);
   // we still might have to filter for duplicates
   if ((current_collection->hasIDFiltering()) && ((res_vector->size())>0)) {
-    /**/tLog(fname,2);
     size_t filtered_out = current_collection->IDFilterMarkResults(res_vector);
-    /**/tLogS(fname,3,filtered_out);
     if (filtered_out>0) {
-      /**/tLog(fname,4);
       jfResultUnitVector* new_vector = new jfResultUnitVector();
       new_vector->stotal = res_vector->stotal;
       jfBasePD* curr_item = NULL;
-      /**/tLog(fname,5);
       // looping through the results, transferring those we keep
       for (size_t old_index = 0; old_index < res_vector->size() ; old_index++) {
-        /**/tLogL(fname,6,old_index);
         curr_item = const_cast<jfBasePD*>((*res_vector)[old_index]->Sourcelink());
         if (curr_item->included) {
-          /**/tLog(fname,7);
           new_vector->push_back((*res_vector)[old_index]);
         }
         else {
-          /**/tLog(fname,8);
           delete curr_item;
           delete ((*res_vector)[old_index]);
-          /**/tLog(fname,9);
           (*res_vector)[old_index] = NULL;
         }
       }
@@ -109,16 +100,13 @@ bool jfBaseItemDownloader::ProcessResults(void* resultdata) {
       res_vector->clear();
       delete res_vector;
       res_vector = new_vector;
-      /**/tLog(fname,10);
     }
   }
-  /**/tLog(fname,11);
   // finishing
   if (!SendResults(res_vector)) {
     delete res_vector;
   }
   else WaitAfterSend();
-  /**/tLog(fname,12);
   // done
   return true;
 }

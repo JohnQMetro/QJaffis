@@ -4,13 +4,15 @@ Author  :   John Q Metro
 Purpose :   Declares the custom first panel for fimfiction.net group searching
 Created :   August 10, 2013
 Conversion to Qt Started August 3, 2015
-Updated :   August 3, 2015
+Updated :   January 7, 2018 (changing to the new fimfiction.net group search).
 ******************************************************************************/
 #ifndef FIMGROUP_PANEL1_H_INCLUDED
 #define FIMGROUP_PANEL1_H_INCLUDED
 #endif // FIMGROUP_PANEL1_H_INCLUDED
 //--------------------------------------
 #include <QString>
+#include <QLineEdit>
+#include <QComboBox>
 //--------------------------------------
 #ifndef DISPLAY_PARTS_H
   #include "../../../interface/display/display_parts.h"
@@ -50,17 +52,17 @@ class jfFIMGroup_SearchOptions : public jfSearchOptionsBase {
     // methods
     virtual bool LoadFrom(jfSearchCore* insearch);
     virtual bool StoreTo(jfSearchCore* outsearch);
-  public slots:
-    void HandleCheck(int newval);
   protected:
     // helper methods
     void CreateWidgets();
     void ArrangeWidgets();
     // gui entry data
-    jfGenMinMaxEditor* range_edit1;
-    jfGenMinMaxEditor* range_edit2;
-    QLabel* main_range_label;
-    QCheckBox* disable_first;
+    // jfGenMinMaxEditor* range_edit1;
+    // jfGenMinMaxEditor* range_edit2;
+    QLabel* main_label;
+    QLineEdit* search_term_entry;
+    QLabel* result_order_label;
+    QComboBox* search_result_order;
     // the sizers
     QGridLayout* main_layout;
 

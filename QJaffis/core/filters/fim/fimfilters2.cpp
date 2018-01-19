@@ -127,6 +127,7 @@ jfBaseFilter* jfFIMGroupSCFilter::GenCopy() const {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
 bool jfFIMGroupSCFilter::CoreMatch(const jfBasePD* testelem) const {
+  const QString fname = "jfFIMGroupSCFilter::CoreMatch";
   // variables
   const jfFIMGroup* rvalue;
   size_t cvalue;
@@ -134,9 +135,13 @@ bool jfFIMGroupSCFilter::CoreMatch(const jfBasePD* testelem) const {
   assert(testelem!=NULL);
   // determining the type
   rvalue = dynamic_cast<const jfFIMGroup*>(testelem);
+  /**/JDEBUGLOGS(fname,1,rvalue->GetName())
   cvalue = rvalue->GetFicCount();
+  /**/JDEBUGLOGST(fname,2,cvalue)
   // checking the wordcount
-  return TestMatch(cvalue);
+  bool tmatch = TestMatch(cvalue);
+  /**/JDEBUGLOGB(fname,3,cvalue)
+  return tmatch;
 }
 //========================================================================
 // constructors

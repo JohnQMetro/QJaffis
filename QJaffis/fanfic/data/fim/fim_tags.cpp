@@ -500,7 +500,6 @@ bool jfFIMTag_Collection::ReadFromFileReader(jfFileReader* infile) {
             delete newtag;
             return false;
         }
-        /**/JDEBUGLOGS(fname,5,newtag->getName());
         tagstore.push_back(newtag);
         addTag(newtag);
     }

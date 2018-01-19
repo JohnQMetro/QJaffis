@@ -124,20 +124,15 @@ bool jfFIMItemDownloader::ProcessResults(void* resultdata) {
   /**/tLog(fname,1);
   // in the compact phase, we integrate short summaries
   if (compact_phase) {
-    /**/tLog(fname,2);
     jfIDStringStore* stuff_to_add = static_cast<jfIDStringStore*>(resultdata);
-    /**/tLog(fname,3);
     assert(stuff_to_add != NULL);
     est_itemcount = stuff_to_add->est_itemcount;
-    /**/tLogS(fname,4,est_itemcount);
     AddToSummaryStore(stuff_to_add);
     delete stuff_to_add;
-    /**/tLog(fname,5);
     return true;
   }
   // otherwise, we insert and dispatch items...
   else {
-    /**/tLog(fname,5);
     return jfBaseItemDownloader::ProcessResults(resultdata);
   }
 }

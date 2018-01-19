@@ -84,7 +84,7 @@ bool jfFetchPage::StartDownload() {
   // building the request
   req = new QNetworkRequest(fetch_this);
   // for the request, there are some default values we have to overriden
-  req->setRawHeader("User-Agent", "qjaffis-agent/1.0");
+  req->setRawHeader("User-Agent", "qjaffis-agent/1.1");
   req->setAttribute(QNetworkRequest::CacheSaveControlAttribute,false);
   req->setAttribute(QNetworkRequest::CookieSaveControlAttribute,true);
   // adding a cookie if needed
@@ -260,7 +260,7 @@ jfFetchPage::~jfFetchPage() {
   delete intermediary;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++
-// --- [ PROTECTED METHODS for jfFtechPage ] ---
+// --- [ PROTECTED METHODS for jfFetchPage ] ---
 //--------------------------
 // internal methods
 //--------------------------

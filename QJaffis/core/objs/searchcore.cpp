@@ -37,6 +37,16 @@ bool jfSearchCore::Check() const {
   return true;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfSearchCore::NoFilters() const {
+    bool emptyDef;
+    bool emptyLocal;
+    if (def_filtermap == NULL) emptyDef = true;
+    else emptyDef = def_filtermap->isEmpty();
+    if (local_map == NULL) emptyLocal = true;
+    else emptyLocal = local_map->isEmpty();
+    return (emptyDef && emptyLocal);
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // makes a set of empty maps and categories
 void jfSearchCore::MakeEmpty() {
   if (def_filtermap==NULL) def_filtermap = new jfFilterMap();

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Group object for fimfiction.net
 Created :   July 31, 2013
 Started conversion to Qt August 3, 2015
-Updated :   July 12, 2017
+Updated :   January 6, 2018 (SetFromCardString)
 ******************************************************************************/
 #ifndef FIM_GROUPOBJ_H_INCLUDED
   #include "fim_groupobj.h"
@@ -35,20 +35,7 @@ bool jfFIMGroup::SetFromString(const QString& inval, QString& parse_err) {
   mparser.ChangeData(inval);
   /**/JDEBUGLOG(fname,1)
   // here. we assume we have skipped past the <!--Content--> tag
-  // getting link data
-  if (!mparser.GetDelimitedULong("<a href=\"/group/","/",tval, parse_err)) {
-    parse_err += " While getting the group link";
-    return false;
-  }
-  num_id = tval;
-  if (!mparser.GetMovePast("\"",buffer)) {
-    parse_err = "Cannot find end of group link";
-    return false;
-  }
-  // creating the link
-  primarylink = "https://www.fimfiction.net/group/" + QString::number(num_id);
-  primarylink += "/" + buffer;
-  forumlink = primarylink + "/forum";
+  if (!ParseLinkExtract(mparser,parse_err)) return false;
   // looking for the name
   if (!mparser.MovePast("<a class=\"group_name\"")) {
     parse_err = "Cannot find group name";
@@ -120,6 +107,57 @@ bool jfFIMGroup::SetFromString(const QString& inval, QString& parse_err) {
   validdata = true;
   return true;
 }
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfFIMGroup::SetFromCardString(const QString& inval, QString& parse_err) {
+    const QString fname = "jfFIMGroup::SetFromCardString";
+    // variables
+    jfStringParser mparser(inval);
+    // starting up...
+    validdata = false;
+    // link data
+    if (!ParseLinkExtract(mparser,parse_err)) return false;
+    // group name
+    QString buffer;
+    if (!mparser.GetDelimited("<div class=\"group-name\">","</div>",buffer)) {
+        parse_err = "Unable to extract group name!";
+        return false;
+    }
+    name = buffer.trimmed();
+    if (name.isEmpty()) name = "{EMPTY NAME}";
+    // name of the founder
+    if (!mparser.GetDelimited("<div class=\"group-info\">","<b>",buffer)) {
+        parse_err = "Could not extract founder name!";
+        return false;
+    }
+    founder = buffer.trimmed();
+    // creation date...
+    if (!mparser.GetDelimited("data-time=\"","\"",buffer)) {
+        parse_err = "Could not extract creation date!";
+        return false;
+    }
+    // member count
+    ulong tval;
+    if (!mparser.GetDelimitedULong("<b>","</b> members",tval,parse_err)) {
+        parse_err += " : Could not extract member count!";
+        return false;
+    }
+    memcount = tval;
+    // moving
+    if (!mparser.MovePast("<div class=\"bottom-links\"")) {
+        parse_err = "Could not find count divider!";
+        return false;
+    }
+    // story count
+    if (!mparser.GetDelimitedULong("<span class=\"number\">","</span>",tval,parse_err)) {
+        parse_err += " : Could not extract story count!";
+        return false;
+    }
+    ficcount = tval;
+    // the cards do not includes description or date of last comment, so this is it...
+    validdata = true;
+    return true;
+}
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // data getting
 //------------------------------
@@ -233,6 +271,28 @@ bool jfFIMGroup::ParseDateSet(const QString& invalue) {
     datelabel = last_comment.toString("d MMMM yyyy");
     return true;
 }
+//---------------------------------------------------------
+bool jfFIMGroup::ParseLinkExtract(jfStringParser& xparser, QString& perr_out) {
+    // getting link data
+    ulong tval;
+    if (!xparser.GetDelimitedULong("<a href=\"/group/","/",tval, perr_out)) {
+      perr_out += " While getting the group link";
+      return false;
+    }
+    num_id = tval;
+    QString buffer;
+    if (!xparser.GetMovePast("\"",buffer)) {
+      perr_out = "Cannot find end of group link";
+      return false;
+    }
+    // creating the link
+    primarylink = "https://www.fimfiction.net/group/" + QString::number(num_id);
+    primarylink += "/" + buffer;
+    forumlink = primarylink + "/forum";
+    // done
+    return true;
+}
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // file i/o output
 //------------------------------

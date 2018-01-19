@@ -4,7 +4,8 @@ Author  :   John Q Metro
 Purpose :   Group Search Object for fimfiction.net
 Created :   August 7, 2013
 Started conversion to Qt August 3, 2015
-Updated :   June 21, 2016
+Updated :   January 7, 2018 : A complete change, since FimFiction.net now has
+        a search front end to the groups (a very simple one).
 ******************************************************************************/
 #ifndef FIM_GROUPSEARCH_H_INCLUDED
 #define FIM_GROUPSEARCH_H_INCLUDED
@@ -22,7 +23,7 @@ class jfFIMGroupSearch : public jfSearchCore {
     // constructors
     jfFIMGroupSearch();
     // setting data
-    bool SetLimits(bool first,size_t fmin_in,size_t fmax_in);
+    bool SetSearchString(const QString& valin, size_t inorder);
     // implemented method for sending category data
     virtual void DispatchCategory();
     // implemeted virtual methods
@@ -34,18 +35,16 @@ class jfFIMGroupSearch : public jfSearchCore {
     virtual void MakeLocalSkeleton(jfSkeletonBase* src);
     void LoadValues(jfSkeletonParser* inparser, size_t result_categ);
     // returning data data
-    size_t GetMinGroup(bool first) const;
-    size_t GetMaxGroup(bool first) const;
-    bool NoFirst() const;
-    size_t GroupsToSearch(bool first) const;
+    QString GetSearchString() const;
+    size_t GetOrder() const;
   private:
     // i/o methods for fim group specific data
     virtual bool AddMiddleToFile(QTextStream* outfile) const;
     virtual bool ReadMiddleFromFile(jfFileReader* infile);
     // search data
-    size_t min_group1, max_group1;
-    size_t min_group2, max_group2;
-    bool nofirst;
+    QString sstring;
+    QString esc_string;
+    size_t order;
 
 };
 //===========================================================================

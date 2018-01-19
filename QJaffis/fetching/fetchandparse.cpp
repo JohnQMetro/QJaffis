@@ -152,8 +152,12 @@ void jfFetchAndParsePage::StartProcessing() {
 //++++++++++++++++++++++++++++++++++++++++++++++
 // bundles a few downloading related lines
 bool jfFetchAndParsePage::DownloadPage() {
+    const QString fname = "jfFetchAndParsePage::DownloadPage";
+    /**/tLog(fname,1);
   downloader->SetURL(urlToGet);
+  /**/tLog(fname,2);
   downloader->StartDownload();
+  /**/tLog(fname,3);
   return downloader->PrepareResults();
 }
 //--------------------------------------------
@@ -165,20 +169,25 @@ jfFETCH_ERROR jfFetchAndParsePage::DownloadMethod() {
   bool download_okay = false;
   QString *ures;
   jfFETCH_ERROR currError = jff_NOERROR;
+  /**/tLog(fname,1);
   // download
   while (retry_count < 5) {
+      /**/tLogS(fname,2,retry_count);
     download_okay = DownloadPage();
     // if the download is fine, we get the page and exit the loop
     if (download_okay) {
+        /**/tLog(fname,3);
       fetched_page = downloader->GetResult();
       downloader->Reset();
       break;
     }
     // handling a non-okay attempt at downloading
     else {
+        /**/tLog(fname,4);
       currError = downloader->GetError();
       // redirection is the cause...
       if (currError == jff_REDIRECTION) {
+          /**/tLog(fname,5);
         redirectionResult = downloader->GetRedirectTarget();
         ures = parser->makeRedirectedURL(redirectionResult);
         downloader->Reset();
@@ -190,17 +199,20 @@ jfFETCH_ERROR jfFetchAndParsePage::DownloadMethod() {
       }
       // hard download error, trying gain means nothing
       else if (currError != jff_TRYAGAIN){
+          /**/tLog(fname,6);
         downloader->Reset();
         break;
       }
       // here, if we try again, it might work!
       else downloader->Reset();
     }
+    /**/tLog(fname,7);
     // if we get here, we are retrying for the next loop
     retry_count++;
     jfSleepThread::msleep(1000);
     QCoreApplication::processEvents();
   }
+  /**/tLogB(fname,8,download_okay);
   if (download_okay) return jff_NOERROR;
   else return currError;
 }

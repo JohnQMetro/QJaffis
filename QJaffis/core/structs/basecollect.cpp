@@ -4,7 +4,7 @@
 // Purpose :    Defines core item collection classes
 // Created:     March 19, 2009
 // Conversion to QT Started April 8, 2013
-// Updated:     June 21, 2016
+// Updated:     January 18, 2018 (added isEmpty to jfFilterMap)
 ******************************************************************************/
 #ifndef BASECOLLECT_H_INCLUDED
   #include "basecollect.h"
@@ -214,6 +214,22 @@ bool jfFilterMap::MatchAll(const jfBasePD* inval) const {
     if (!iresult) return false;
   }
   return true;
+}
+//---------------------------------------------------------------------
+/* Returns true if there are no filters, or all of the filters have isEmpty
+ * methods that also return true. */
+bool jfFilterMap::isEmpty() const {
+    // local variables
+    stl_FilterMap::const_iterator findex;
+    const jfBaseFilter* cfilter;
+    // a check
+    if (coredata.empty()) return true;
+    // the loop
+    for (findex = coredata.begin(); findex!=coredata.end(); findex++) {
+      cfilter = findex->second;
+      if (!(cfilter->isEmpty())) return false;
+    }
+    return true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // some additonal methods

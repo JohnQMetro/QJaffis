@@ -3,7 +3,7 @@ Name    :   fim_constants.cpp
 Author  :   John Q Metro
 Purpose :   I've decided to isolate the various FIM String and things here
 Created :   May 2, 2013 (Qt)
-Updated :   December 31, 2017 (replacing things with the new tag structure)
+Updated :   January 7, 2018 (Fim group ordering)
 ******************************************************************************/
 #ifndef FIM_CONSTANTS_H
   #include "fim_constants.h"
@@ -47,6 +47,10 @@ const QString fimcon::ordername[fimcon::ordercount] = { "latest", "updated", "to
 const QString fimcon::orderlabel[fimcon::ordercount] = { QString("First Posted Date"), QString("Update Date"),
   QString("Rating"), QString("Views"), QString("Word Count"), QString("Comments"),
   QString("Hot")};
+//---------------------------------------------
+const size_t fimcon::group_ordercount = 3;
+const QString fimcon::group_ordername[fimcon::group_ordercount] = {"members","stories","date_created"};
+const QString fimcon::group_orderlabel[fimcon::group_ordercount] = {"Members","Stories","Date Created"};
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Fimfiction.net tags
 QMutex fimlock;

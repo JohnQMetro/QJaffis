@@ -19,6 +19,9 @@ Updated :   August 4, 2015
 #ifndef INITEND_H_INCLUDED
   #include "../../../initend.h"
 #endif // INITEND_H_INCLUDED
+#ifndef FIM_CONSTANTS_H
+  #include "../../data/fim/fim_constants.h"
+#endif // FIM_CONSTANTS_H
 
 #include <assert.h>
 
@@ -68,7 +71,6 @@ jfFIMGroup_SearchOptions::jfFIMGroup_SearchOptions(QWidget* parent):jfSearchOpti
   CreateWidgets();
   ArrangeWidgets();
   setLayout(main_layout);
-  connect(disable_first, SIGNAL(stateChanged(int)), this, SLOT(HandleCheck(int)));
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // methods
@@ -78,18 +80,8 @@ bool jfFIMGroup_SearchOptions::LoadFrom(jfSearchCore* insearch) {
   if (insearch==NULL) return false;
   // getting values
   tval = dynamic_cast<jfFIMGroupSearch*>(insearch);
-  size_t min1, max1, min2, max2;
-  min1 = tval->GetMinGroup(true);
-  min2 = tval->GetMinGroup(false);
-  max1 = tval->GetMaxGroup(true);
-  max2 = tval->GetMaxGroup(false);
-  // setting the gui values
-  if ((min1==0) && (max1==0)) {
-    range_edit1->setEnabled(false);
-    disable_first->setChecked(false);
-  }
-  else range_edit1->SetMinMax(min1,max1);
-  range_edit2->SetMinMax(min2,max2);
+  search_term_entry->setText(tval->GetSearchString());
+  search_result_order->setCurrentIndex(tval->GetOrder());
   // done
   return true;
 }
@@ -100,49 +92,33 @@ bool jfFIMGroup_SearchOptions::StoreTo(jfSearchCore* outsearch) {
   if (outsearch==NULL) return false;
   tval = dynamic_cast<jfFIMGroupSearch*>(outsearch);
   // gathering the values
-  size_t min1, max1, min2, max2;
-  if (disable_first->isChecked()) min1 = max1 = 0;
-  else {
-    min1 = range_edit1->GetMin();
-    max1 = range_edit1->GetMax();
-  }
-  min2 = range_edit2->GetMin();
-  max2 = range_edit2->GetMax();
-  // checking
-  if (min2<=max1) return false;
-  // storing
-  tval->SetLimits(true,min1,max1);
-  tval->SetLimits(false,min2,max2);
+  QString sstring = (search_term_entry->text()).trimmed();
+  size_t xorder = search_result_order->currentIndex();
+  tval->SetSearchString(sstring,xorder);
   return true;
 }
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfFIMGroup_SearchOptions::HandleCheck(int newval) {
-  if (newval==Qt::Checked) range_edit1->setEnabled(false);
-  else if (newval==Qt::Unchecked) range_edit1->setEnabled(true);
-  else assert(false);
-}
-
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // helper methods
 //-----------------------------------------
 void jfFIMGroup_SearchOptions::CreateWidgets() {
-  range_edit1 = new jfGenMinMaxEditor("First Group Range",true,true);
-  range_edit1->SetValueRange(jglobal::settings.fimlimits[1],jglobal::settings.fimlimits[2]);
-  range_edit2 = new jfGenMinMaxEditor("Second Group Range",true,true);
-  range_edit2->SetValueRange(jglobal::settings.fimlimits[3],jglobal::settings.fimlimits[4]);
-  disable_first = new QCheckBox("No First Range");
-  main_range_label = new QLabel("Pick the range of Group ID's to Search :");
+  main_label = new QLabel("Enter the search term :");
+  search_term_entry = new QLineEdit();
+  result_order_label = new QLabel("Result Order");
+  search_result_order = new QComboBox();
+  for (size_t cbindex = 0; cbindex < fimcon::group_ordercount; cbindex++) {
+      search_result_order->addItem(fimcon::group_orderlabel[cbindex]);
+  }
+  search_result_order->setCurrentIndex(0);
 }
-
 //-----------------------------------------
 void jfFIMGroup_SearchOptions::ArrangeWidgets() {
   main_layout = new QGridLayout();
-  main_layout->addWidget(main_range_label,0,0,1,2,Qt::AlignHCenter);
-  main_layout->addWidget(range_edit1,1,0);
-  main_layout->addWidget(range_edit2,1,1);
-  main_layout->addWidget(disable_first,2,0);
-  main_layout->setColumnStretch(0,2);
-  main_layout->setColumnStretch(1,2);
+  main_layout->addWidget(main_label,0,0);
+  main_layout->addWidget(result_order_label,0,1);
+  main_layout->addWidget(search_term_entry,1,0);
+  main_layout->addWidget(search_result_order,1,1);
+  main_layout->setColumnStretch(0,5);
+  main_layout->setColumnStretch(1,1);
 }
 //===============================================================================
 // the constructor
