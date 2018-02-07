@@ -148,7 +148,7 @@ bool jfFilterMap::SetMapPtr(jfFilterMap* nval) {
 bool jfFilterMap::NameExists(const QString& lookfor) const {
   stl_FilterMap::const_iterator findex;
   // we do it
-  if (!isEmpty()) {
+  if (!noFilters()) {
     findex = coredata.find(lookfor);
     if (findex!=(coredata.end())) return true;
     else return false;
@@ -190,7 +190,7 @@ jfBaseFilter* jfFilterMap::GetItem(const QString& itemname) {
   // variables
   stl_FilterMap::iterator findex;
   // starting
-  if (isEmpty()) return NULL;
+  if (noFilters()) return NULL;
   // we get an iterator
   findex = coredata.find(itemname);
   if (findex==coredata.end()) return NULL;
@@ -230,6 +230,10 @@ bool jfFilterMap::isEmpty() const {
       if (!(cfilter->isEmpty())) return false;
     }
     return true;
+}
+//---------------------------------------------------------------------
+bool jfFilterMap::noFilters() const {
+    return coredata.empty();
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // some additonal methods
@@ -281,7 +285,7 @@ jfBaseFilter* jfFilterMap::GetItem(const size_t& findex) {
 bool jfFilterMap::DeleteByName(const QString& findname) {
   stl_FilterMap::iterator findex;
   // if empty, return false
-  if (isEmpty()) return false;
+  if (noFilters()) return false;
   // we try to get an iterator
   findex = coredata.find(findname);
   if (findex==coredata.end()) return false;

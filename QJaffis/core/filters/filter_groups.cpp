@@ -4,7 +4,7 @@
 // Purpose :    Defines global filter map groupings and associated stuff
 // Created:     01.08.06
 // Started conversion to Qt June 23, 2013
-// Updated:     August 8, 2015
+// Updated:     January 21, 2018
 /////////////////////////////////////////////////////////////////////////////
 // headers
 // ----------------------------------------------------------------------------
@@ -43,6 +43,9 @@
 #ifndef FIMFILTERS2_H_INCLUDED
   #include "fim/fimfilters2.h"
 #endif // FIMFILTERS2_H_INCLUDED
+#ifndef FIMFILTERS3_H
+    #include "fim/fimfilters3.h"
+#endif // FIMFILTERS3_H
 #ifndef AO3_STRINGFILTERS_H_INCLUDED
   #include "ao3/ao3_stringfilters.h"
 #endif // AO3_STRINGFILTERS_H_INCLUDED
@@ -74,6 +77,8 @@ jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname) {
   jfFFNGenresFilter* itag_result;
   jfFIMGenreFilter* gtag_result;
   jfFIMCharacterFilter* ctag_result;
+  jfFIMContentTypeFilter* xtag_result;
+  jfFIMWarningsFilter* wtag_result;
 
   // the multiple types
   if (typestring=="UrlFilter") result = new jfUrlFilter();
@@ -106,6 +111,16 @@ jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname) {
     ctag_result = new jfFIMCharacterFilter();
     ctag_result->SetToEmpty();
     result = ctag_result;
+  }
+  else if (typestring=="FIMContentTypeFilte") {
+    xtag_result = new jfFIMContentTypeFilter();
+    xtag_result->SetToEmpty();
+    result = xtag_result;
+  }
+  else if (typestring=="FIMWarningFilter") {
+    wtag_result = new jfFIMWarningsFilter();
+    wtag_result->SetToEmpty();
+    result = wtag_result;
   }
   else if (typestring=="FimRatingFilter") result = new jfFimRatingFilter();
   else if (typestring=="ExtraTagFilter") result = new jfExtraTagFilter();

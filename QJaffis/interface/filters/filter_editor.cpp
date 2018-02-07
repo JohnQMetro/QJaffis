@@ -252,7 +252,7 @@ bool jfFilterMapEditor::ChangeMap(jfFilterMap* inlink) {
   picker->SetContents(fdata);
   fcounty = fdata->GetCount();
   // if the filter map is empty, we remove the editing panel and use a blank
-  if (fdata->isEmpty()) SetNoFilter();
+  if (fdata->noFilters()) SetNoFilter();
   // the filter map is not empty, we have to change the filter to the first one
   else {
     ChangeFilter(0);
@@ -264,14 +264,22 @@ bool jfFilterMapEditor::ChangeMap(jfFilterMap* inlink) {
 //------------------------------------------------------------------------
 // changes the filter to one at a particular index
 bool jfFilterMapEditor::ChangeFilter(size_t findex) {
+    const QString fname = "jfFilterMapEditor::ChangeFilter";
   // things that make us return false
-  if (fdata->isEmpty()) return false;
+    /**/JDEBUGLOGB(fname,1,fdata==NULL);
+  if (fdata->noFilters()) return false;
+  /**/JDEBUGLOG(fname,2);
   if ((fdata->GetCount())<=findex) return false;
+  /**/JDEBUGLOG(fname,3);
   // doing the thing, then returning true
   bool cs_res = picker->ChangeSelected(findex);
+  /**/JDEBUGLOG(fname,4);
   assert(cs_res);
+  /**/JDEBUGLOG(fname,5);
   selindex = findex;
+  /**/JDEBUGLOG(fname,6);
   LoadSelected();
+  /**/JDEBUGLOG(fname,7);
   return true;
 }
 //--------------------------------------------------------------------------
@@ -343,7 +351,6 @@ void jfFilterMapEditor::NewPressed(bool checked) {
     assert(tresult<(pflist->count()));
     // we create the filter
     newf1 = MakeFilter((*pflist)[tresult],newname);
-    /**/JDEBUGLOGS(fname,0,newf1->GetName());
     // insert the filter
     QString oname = newf1->GetName();
     bool atest = fdata->AddFilter(newf1,oindex);
@@ -355,7 +362,7 @@ void jfFilterMapEditor::NewPressed(bool checked) {
     // we change the current filter to the inserted one
     atest = ChangeFilter(oindex);
     assert(atest);
-    /**/JDEBUGLOG(fname,3);
+    /**/JDEBUGLOG(fname,4);
     BtnEnable(true);
   }
   delete newdialog;
@@ -438,34 +445,47 @@ bool jfFilterMapEditor::LoadSelected() {
   QString tfiltype;
   jfBaseFilterEditor* eholder;
   // checks
+  /**/JDEBUGLOG(fname,1)
   assert(picker->IsFilterSelected());
+  /**/JDEBUGLOGS(fname,2,picker->SelectedName())
   // we get the filter in question
   tfilter = fdata->GetItem(picker->SelectedName());
+  /**/JDEBUGLOG(fname,3)
   assert(tfilter!=NULL);
+  /**/JDEBUGLOG(fname,4)
   // we get the type in question
   tfiltype = tfilter->GetTypeID();
+  /**/JDEBUGLOG(fname,4)
   // we do not need to change the panel
   if (tfiltype==oldtype) {
+    /**/JDEBUGLOG(fname,6)
     editing_panel->LoadFilter(tfilter);
+    /**/JDEBUGLOG(fname,7)
   }
   // we do need to change the panel
   else {
+    /**/JDEBUGLOG(fname,8)
     // making the editor
     eholder = MakeFilterEditor(tfiltype,this,fdata,tfilter,is_inglobal);
+    /**/JDEBUGLOG(fname,9)
     eholder->setEnabled(!disablec);
+    /**/JDEBUGLOG(fname,10)
     // how we replace it depends on whether it is blank
     if (isblank) {
+      /**/JDEBUGLOG(fname,11)
       top_sizer->removeWidget(blank_panel);
       blank_panel->hide();
       top_sizer->addWidget(eholder,local_ratio);
       isblank = false;
     }
     else {
+      /**/JDEBUGLOG(fname,12)
       top_sizer->removeWidget(editing_panel);
       top_sizer->addWidget(eholder,local_ratio);
       delete editing_panel;
     }
     // finializing steps
+   /**/JDEBUGLOG(fname,13)
     editing_panel = eholder;
     oldtype = tfiltype;
   }

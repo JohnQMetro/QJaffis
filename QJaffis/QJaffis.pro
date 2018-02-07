@@ -191,7 +191,9 @@ SOURCES += main.cpp\
     fetching/onepage.cpp \
     fanfic/threads/fim/fimtag_parse.cpp \
     fanfic/interface/fim/fimtagdown_dialog.cpp \
-    fanfic/threads/fim/newfimgroup_parser.cpp
+    fanfic/threads/fim/newfimgroup_parser.cpp \
+    core/filters/fim/fimfilters3.cpp \
+    interface/filters/fim/fim3_filedit.cpp
 
 HEADERS  += mainwindow.h \
     initend.h \
@@ -371,7 +373,9 @@ HEADERS  += mainwindow.h \
     fetching/onepage.h \
     fanfic/threads/fim/fimtag_parse.h \
     fanfic/interface/fim/fimtagdown_dialog.h \
-    fanfic/threads/fim/newfimgroup_parser.h
+    fanfic/threads/fim/newfimgroup_parser.h \
+    core/filters/fim/fimfilters3.h \
+    interface/filters/fim/fim3_filedit.h
 
 OTHER_FILES += \
     todo.txt

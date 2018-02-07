@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   A filter editor creator, and anything else that comes to mind
 Created :   December 27, 2010
 Conversion to Qt Started Oct 24, 2013
-Updated :   August 8, 2015
+Updated :   January 21, 2018
 ******************************************************************************/
 #ifndef FILTER_UTILS_H_INCLUDED
   #include "filter_utils.h"
@@ -71,8 +71,11 @@ Updated :   August 8, 2015
 
 
 #ifndef FIM2_FILEDIT_H
-#include "fim/fim2_filedit.h"
+    #include "fim/fim2_filedit.h"
 #endif // FIM2_FILEDIT_H
+#ifndef FIM3_FILEDIT_H
+    #include "fim/fim3_filedit.h"
+#endif // FIM3_FILEDIT_H
 #ifndef FFN_FILTEREDIT1_H
   #include "ffn/ffn_filteredit1.h"
 #endif // FFN_FILTEREDIT1_H
@@ -129,6 +132,9 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
   jfFIMGroupMCFilter* a30;
   jfFIM_ShortDesc_ExprFilter*  a31;
   jfFIM_DualDesc_ExprFilter*   a32;
+
+  jfFIMContentTypeFilter* a33;
+  jfFIMWarningsFilter* a34;
 
 
   // filter link
@@ -206,6 +212,14 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
   else if (in_typeid=="FIMCharacterFilter") {
     a18 = dynamic_cast<jfFIMCharacterFilter*>(input_filter);
     result = new jfFimCharacterFilterEditor(containing_map,a18,parent);
+  }
+  else if (in_typeid=="FIMContentTypeFilter") {
+    a33 = dynamic_cast<jfFIMContentTypeFilter*>(input_filter);
+    result = new jfFimContentTypeFilterEditor(containing_map,a33,parent);
+  }
+  else if (in_typeid=="FIMWarningFilter") {
+    a34 = dynamic_cast<jfFIMWarningsFilter*>(input_filter);
+    result = new jfFimWarningsFilterEditor(containing_map,a34,parent);
   }
   else if (in_typeid=="FimRatingFilter") {
     a19 = dynamic_cast<jfFimRatingFilter*>(input_filter);

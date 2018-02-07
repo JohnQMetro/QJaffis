@@ -88,6 +88,7 @@ class jfFilterMap : public jfBaseCollection {
     jfBaseFilter* GetItem(const QString& itemname);
     bool MatchAll(const jfBasePD* inval) const;
     bool isEmpty() const;
+    bool noFilters() const;
     // some additonal methods
     bool AddFilter(jfBaseFilter* infilter, size_t& outindex);
     bool GetIndexByName(const QString& findname, size_t& outindex) const;
