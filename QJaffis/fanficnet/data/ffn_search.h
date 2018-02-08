@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net search
 // Created:     June 9, 2010
 // Conversion to Qt Started July 10, 2014
-// Updated:     August 15, 2015
+// Updated:     February 8, 2018 (exclude genres)
 
 /////////////////////////////////////////////////////////////////////////////
 #define JF_FFNSEARCH
@@ -33,7 +33,7 @@ class jfFFNSearch : public jfSearchCore {
     // setting data
     bool SetData(jfFFN_Categories* cat_datain, size_t search_indexin);
     void ApplySelection();
-    bool SetSearchValues(size_t frin, size_t genin, size_t wcin, size_t lanin, size_t compin);
+    bool SetSearchValues(size_t frin, size_t genin, size_t wcin, size_t lanin, size_t exlgenin, size_t compin);
     int GetSearchValue(size_t pindex) const;
     // getting data
     jfFFN_CatP_SelCat* GetSelector();
@@ -74,6 +74,6 @@ class jfFFNSearch : public jfSearchCore {
     // selection data from the interface
     jfFFN_CatP_SelCat* selector;
     // search values used in building the url
-    size_t sv[5];
+    size_t sv[6];
 };
 //**************************************************************************

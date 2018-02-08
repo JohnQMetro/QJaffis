@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net search
 // Created:     June 9, 2010
 // Conversion to Qt Started July 10, 2014
-// Updated:     August 26, 2014
+// Updated:     February 8, 2018 (exclude genres)
 //***************************************************************************
 #ifndef JF_FFNSEARCH
   #include "ffn_search.h"
@@ -34,6 +34,7 @@ jfFFNSearch::jfFFNSearch():jfSearchCore() {
   list_to_search = NULL;
   pagelimit = 100000;
   sv[0] = 10; sv[1] = 0; sv[2] = 0; sv[3] = 0; sv[4] = 0;
+  sv[5] = 0;
 }
 //-----------------------------------------------------
 jfFFNSearch::jfFFNSearch(jfFFN_Categories* cat_datain, size_t search_indexin):jfSearchCore() {
@@ -42,6 +43,7 @@ jfFFNSearch::jfFFNSearch(jfFFN_Categories* cat_datain, size_t search_indexin):jf
   selector = NULL;
   SetData(cat_datain,search_indexin);
   sv[0] = 10; sv[1] = 0; sv[2] = 0; sv[3] = 0; sv[4] = 0;
+  sv[5] = 0;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // setting data
@@ -93,10 +95,11 @@ void jfFFNSearch::ApplySelection() {
 //-----------------------------------------------------------
 /* sets the search values. The inputs are indexes into the values list.
 We use that to look up the id values that are stored */
-bool jfFFNSearch::SetSearchValues(size_t frin, size_t genin, size_t wcin, size_t lanin, size_t compin) {
+bool jfFFNSearch::SetSearchValues(size_t frin, size_t genin, size_t wcin, size_t lanin, size_t exlgenin, size_t compin) {
   // out of bounds checks
   if (frin>=ffn_consts::frcount) return false;
   if (genin>=ffn_consts::gencount) return false;
+  if (exlgenin>=ffn_consts::gencount) return false;
   if (wcin>=ffn_consts::wccount) return false;
   if (lanin>=ffn_consts::lancount) return false;
   if (compin>=3) return false;
@@ -106,13 +109,14 @@ bool jfFFNSearch::SetSearchValues(size_t frin, size_t genin, size_t wcin, size_t
   sv[2] = ffn_consts::wc_idlist[wcin];
   sv[3] = ffn_consts::lan_idlist[lanin];
   sv[4] = compin;
+  sv[5] = ffn_consts::gen_idlist[exlgenin];
   // done
   return true;
 }
 //-------------------------------------------------------
 // translates id values to list indexes when getting the result
 int jfFFNSearch::GetSearchValue(size_t pindex) const {
-  if (pindex>=5) return -1;
+  if (pindex> 5) return -1;
   size_t revval;
   if (ffn_consts::ReverseLookup(pindex,sv[pindex],revval)) return revval;
   else return -1;
@@ -313,7 +317,7 @@ bool jfFFNSearch::AddMiddleToFile(QTextStream* outfile) const {
   if (outfile==NULL) return false;
   assert(selector!=NULL);
   // adding the search values...
-  ostring << sv[0] << sv[1] << sv[2] << sv[3] << sv[4];
+  ostring << sv[0] << sv[1] << sv[2] << sv[3] << sv[4] << sv[5];
   (*outfile) << QString(ostring) << "\n";
   // the only other thing we really need to add is the selector
   return selector->AddToFile(outfile);
@@ -327,12 +331,15 @@ bool jfFFNSearch::ReadMiddleFromFile(jfFileReader* infile) {
   assert(infile!=NULL);
   /**/JDEBUGLOG(fname,2)
   /* the first part to check is the search values*/
-  if (!infile->ReadParseLine(5,fname)) return infile->BuildError("The FFN Search Parameters line is bad!");
+  if (!infile->ReadParseLine(5,6,fname)) return infile->BuildError("The FFN Search Parameters line is bad!");
   if (!(infile->lp).SIntVal(0,sv[0])) return infile->BuildError("FFN Search Param 0 failed!");
   if (!(infile->lp).SIntVal(1,sv[1])) return infile->BuildError("FFN Search Param 1 failed!");
   if (!(infile->lp).SIntVal(2,sv[2])) return infile->BuildError("FFN Search Param 2 failed!");
   if (!(infile->lp).SIntVal(3,sv[3])) return infile->BuildError("FFN Search Param 3 failed!");
   if (!(infile->lp).SIntVal(4,sv[4])) return infile->BuildError("FFN Search Param 4 failed!");
+  if ((infile->lp).Num() == 6) {
+      if (!(infile->lp).SIntVal(5,sv[5])) return infile->BuildError("FFN Search Param 5 failed!");
+  }
   /**/JDEBUGLOG(fname,3)
   // reading the selector
   if (selector==NULL) selector = new jfFFN_CatP_SelCat();

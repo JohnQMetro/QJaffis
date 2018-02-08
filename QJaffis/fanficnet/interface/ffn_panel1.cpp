@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net search, first panel
 // Created:     June 25, 2010
 // conversion to Qt started July 27, 2014
-// Updated:     July 25, 2016
+// Updated:     February 8, 2018 (exclude genre built-in Fanfiction.Net filter)
 //**************************************************************************
 #ifndef FFN_PANEL1
   #include "ffn_panel1.h"
@@ -248,7 +248,7 @@ bool jfFFN_ESearchOptions::SaveToSearch(jfFFNSearch* outsearch) const {
   // variables
   Qt::CheckState cboxst;
   size_t cval;
-  int rv[4];
+  int rv[5];
   // the completed value
   cboxst = completed->checkState();
   if (cboxst==Qt::PartiallyChecked) cval = 0;
@@ -259,12 +259,14 @@ bool jfFFN_ESearchOptions::SaveToSearch(jfFFNSearch* outsearch) const {
   if (rv[0]<0) return false;
   rv[1] = genres->currentIndex();
   if (rv[1]<0) return false;
+  rv[4] = excl_genres->currentIndex();
+  if (rv[4]<0) return false;
   rv[2] = wordcount->currentIndex();
   if (rv[2]<0) return false;
   rv[3] = languages->currentIndex();
   if (rv[3]<0) return false;
   // setting the value
-  return outsearch->SetSearchValues(rv[0],rv[1],rv[2],rv[3],cval);
+  return outsearch->SetSearchValues(rv[0],rv[1],rv[2],rv[3],rv[4],cval);
 }
 //------------------------------
 bool jfFFN_ESearchOptions::LoadFromSearch(jfFFNSearch* insearch) {
@@ -273,10 +275,14 @@ bool jfFFN_ESearchOptions::LoadFromSearch(jfFFNSearch* insearch) {
   int gvalue = insearch->GetSearchValue(0);
   if (gvalue==-1) return false;
   ratings->setCurrentIndex(gvalue);
-  // genres
+  // include genres
   gvalue = insearch->GetSearchValue(1);
   if (gvalue==-1) return false;
   genres->setCurrentIndex(gvalue);
+  // exclude genres
+  gvalue = insearch->GetSearchValue(5);
+  if (gvalue==-1) return false;
+  excl_genres->setCurrentIndex(gvalue);
   // wordcount
   gvalue = insearch->GetSearchValue(2);
   if (gvalue==-1) return false;
@@ -299,6 +305,7 @@ void jfFFN_ESearchOptions::SetDefaults() {
   completed->setCheckState(Qt::PartiallyChecked);
   ratings->setCurrentIndex(0);
   genres->setCurrentIndex(0);
+  excl_genres->setCurrentIndex(0);
   wordcount->setCurrentIndex(0);
   languages->setCurrentIndex(0);
 }
@@ -308,6 +315,7 @@ void jfFFN_ESearchOptions::Disable(bool dis) {
   completed->setEnabled(!dis);
   ratings->setEnabled(!dis);
   genres->setEnabled(!dis);
+  excl_genres->setEnabled(!dis);
   wordcount->setEnabled(!dis);
   languages->setEnabled(!dis);
 }
@@ -337,7 +345,7 @@ void jfFFN_ESearchOptions::MakeControls() {
    rat_label = new QLabel("Ratings : ");
    ratings = new QComboBox();
    ratings->addItems(*ffn_consts::fr_list);
-   gen_label = new QLabel("Genres  : ");
+   gen_label = new QLabel("Include Genre : ");
    genres = new QComboBox();
    genres->addItems(*ffn_consts::gen_list);
    wc_label  = new QLabel("Wordcount : ");
@@ -346,6 +354,11 @@ void jfFFN_ESearchOptions::MakeControls() {
    lan_label = new QLabel("Languages : ");
    languages = new QComboBox();
    languages->addItems(*ffn_consts::lan_list);
+   excl_gen_label = new QLabel("Exclude Genre : ");
+   excl_genres = new QComboBox();
+   excl_genres->addItems(*ffn_consts::gen_list);
+   excl_genres->setItemText(0,"None");
+
    completed = new QCheckBox("Completed");
    completed->setTristate(true);
 }
@@ -356,11 +369,13 @@ void jfFFN_ESearchOptions::ArrangeControls() {
   mainsizer->addWidget(ratings,0,1);
   mainsizer->addWidget(wc_label,0,2,Qt::AlignRight);
   mainsizer->addWidget(wordcount,0,3);
-  mainsizer->addWidget(completed,0,4);
+  mainsizer->addWidget(lan_label,0,4,Qt::AlignRight);
+  mainsizer->addWidget(languages,0,5);
   mainsizer->addWidget(gen_label,1,0,Qt::AlignRight);
   mainsizer->addWidget(genres,1,1);
-  mainsizer->addWidget(lan_label,1,2,Qt::AlignRight);
-  mainsizer->addWidget(languages,1,3);
+  mainsizer->addWidget(excl_gen_label,1,2,Qt::AlignRight);
+  mainsizer->addWidget(excl_genres,1,3);
+  mainsizer->addWidget(completed,1,5);
 }
 //=========================================================================
 // constructor

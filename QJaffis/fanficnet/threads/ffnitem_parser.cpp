@@ -96,9 +96,14 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
   }
   /**/lpt->tLog(fname,8);
   // done with the items
-  firstid = (*page_results)[0]->GetID();
-  // post page processing and getting the result
-  PostPageProcessing();
+  if (!(page_results->empty())) {
+    firstid = (*page_results)[0]->GetID();
+    // post page processing and getting the result
+    PostPageProcessing();
+  }
+  else {
+      firstid = 0;
+  }
   page_parsed = true;
   /**/lpt->tLog(fname,9);
 }

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Constants used to help build a Fanfiction.Net url
 Created :   October 26, 2012
 // Conversion to Qt Started July 10, 2014
-Updated :   July 29, 2016
+Updated :   February 8, 2018
 ******************************************************************************/
 #ifndef FFN_LINKDATA_H_INCLUDED
   #include "ffn_linkdata.h"
@@ -46,11 +46,15 @@ QString ffn_consts::MakeURLPart(const size_t invalues[]) {
   result += "&len=" + QString::number(invalues[2]);
   result += "&lan=" + QString::number(invalues[3]);
   result += "&s="   + QString::number(invalues[4]);
+  if (invalues[5] != 0) {
+      result += "&_g1=" + QString::number(invalues[5]);
+  }
   return result;
 }
 //---------------------------------------------------------------------------
 bool ffn_consts::ReverseLookup(size_t ipart, size_t inid, size_t& outidx) {
   size_t qval;
+  if (ipart == 5) ipart = 1;
   if (ipart>=5) return false;
   if (ipart==0) {
     for (qval=0;qval<frcount;qval++) {

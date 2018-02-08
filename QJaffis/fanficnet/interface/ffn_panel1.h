@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net search, first panel
 // Created:     June 25, 2010
 // conversion to Qt started July 27, 2014
-// Updated:     July 25, 2016 (adding Favs filter)
+// Updated:     February 8, 2018 (exclude genre built-in-filter)
 //**************************************************************************
 #define FFN_PANEL1
 
@@ -98,6 +98,8 @@ class jfFFN_ESearchOptions : public QWidget {
    QComboBox* wordcount;
    QLabel* lan_label;
    QComboBox* languages;
+   QLabel* excl_gen_label;
+   QComboBox* excl_genres;
    QCheckBox* completed;
    // sizers
    QGroupBox* sbwrapper;
