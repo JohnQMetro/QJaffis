@@ -107,11 +107,14 @@ jfFFNSearchOnePanel::jfFFNSearchOnePanel(jfFFNSearch* searchin, jfFFNMain* thold
   }
   typed_search->SetData(ffn_catorganizer::main_manager->GetHolder(), sval);
   typed_search->GetSelector()->SetCatLink(ffn_catorganizer::main_manager->GetHolder());
+    /**/JDEBUGLOG(fname,8)
   // making panel 1
   panel1 = MakeFirstPanel();
+    /**/JDEBUGLOG(fname,9)
   custinit = true;
   // finishing off
   FinishConstruction();
+  /**/JDEBUGLOG(fname,10)
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // custom  methods
@@ -154,15 +157,16 @@ jfFFNMain::jfFFNMain(jfSearchCore* searchin, bool notebook, QWidget* parent):
   else container = NULL;
   /**/JDEBUGLOGB(fname,2,searchin==NULL);
   p_search = MakeSearchGroup(searchin,threepanel);
+  JDEBUGLOG(fname,3)
   ConsStepTwo(filterglobals::fclist[5]);
-  JDEBUGLOGS(fname,3,GSearchName())
+  JDEBUGLOGS(fname,4,GSearchName())
   TopArranger();
-  JDEBUGLOG(fname,4);
-  rc_menu = new jfFanficPopupMenu();
   JDEBUGLOG(fname,5);
+  rc_menu = new jfFanficPopupMenu();
+  JDEBUGLOG(fname,6);
   connect(rc_menu,SIGNAL(sendDescription(QString)),this,SLOT(HandleAppendText(QString)));
   r_panel->SetPopupMenu(rc_menu);
-  JDEBUGLOG(fname,6);
+  JDEBUGLOG(fname,7);
   ConnectResult();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

@@ -66,15 +66,19 @@ bool jfSimpleExpr::FromString(const QString& sourcedata) {
     delete theparser;
     return valid = false;
   }
+  /**/JDEBUGLOG(fname,3)
   // parsed okay
   parsedinfo = theparser->GetResult();
   assert(parsedinfo!=NULL);
   delete theparser;
+  /**/JDEBUGLOG(fname,4)
   // next, we postfixize it
   pfix = MakeExprPostfix(parsedinfo,oerr);
+  /**/JDEBUGLOG(fname,5)
   delete parsedinfo;
+  /**/JDEBUGLOG(fname,6)
   if (pfix==NULL) {
-    /**/JDEBUGLOGS(fname,3,oerr)
+    /**/JDEBUGLOGS(fname,7,oerr)
     parse_error = oerr;
     return valid = false;
   }
@@ -82,6 +86,7 @@ bool jfSimpleExpr::FromString(const QString& sourcedata) {
   parsedinfo = pfix;
   // done
   valid = true;
+  /**/JDEBUGLOG(fname,8)
   return true;
 }
 //--------------------------------------------------------------------------

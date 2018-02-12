@@ -3,7 +3,7 @@ Name    :   ffnitems_thread.cpp
 Author  :   John Q Metro
 Purpose :   Downloader class for FFN fic listings
 Created :   July 24, 2016
-Updated :   July 24, 2016
+Updated :   Febuary 11, 2018
 ******************************************************************************/
 #ifndef FFNITEMS_THREAD_H
   #include "ffnitems_thread.h"
@@ -22,6 +22,7 @@ jfFFNDownloader::jfFFNDownloader(size_t in_max_threads):jfMultiCatBaseDownloader
   current_category = NULL;
   ffn_search = NULL;
   tlogname = "FFNItemDownloader";
+  skip_cat_on_fail = true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // virtual category related methods

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Simple Expression editors
 Created :   December 4, 2010
 Conversion to Qt Started October 7, 2013
-Updated :   Febrary 13, 2014
+Updated :   Febrary 12, 2018 (fixes for checking)
 ******************************************************************************/
 #ifndef SEXPR_EDIT_H_INCLUDED
 #define SEXPR_EDIT_H_INCLUDED
@@ -13,6 +13,9 @@ Updated :   Febrary 13, 2014
 #ifndef SEXP_FILTERS_H_INCLUDED
   #include "../../../core/filters/base/sexp_filters.h"
 #endif // SEXP_FILTERS_H_INCLUDED
+#ifndef WIDGETS4_H
+    #include "../../misc/widgets4.h"
+#endif // WIDGETS4_H
 //----------------------------------------------
 #include <QWidget>
 #include <QPushButton>
@@ -28,29 +31,13 @@ Color coding will be used to determine errors:
 1: Black, unchecked
 2: Red, in error
 */
-class jfSimpleExprEdit : public QWidget {
+class jfSimpleExprEdit : public jfExprEditBase {
     Q_OBJECT
   public:
     jfSimpleExprEdit(bool mline_in, QWidget* parent = NULL);
     // checking method
     jfSimpleExpr* CheckFilter(QString& outmessage);
-    bool CheckExpr(const QString& inexpr,QString& outmessage) const;
-    // setting data
-    bool SetData(const QString& inexpr,QString& outmessage);
-  public slots:
-    void PressCheckFilter(bool checked);
-    void TextChanged();
+    virtual bool CheckExpr(const QString& inexpr,bool& outempty,QString& outmessage) const;
   protected:
-    // internal helper
-    void SetStatus(size_t instatus);
-    // the internal controls
-    QLineEdit* editcore1;
-    QPlainTextEdit* editcore2;
-    QPushButton* fcheck_btn;
-    // sizers (horizontal, buttons on the right)
-    QHBoxLayout* topsizer;
-    // error info
-    size_t error_code;
-    bool mline;
 };
 //****************************************************************************

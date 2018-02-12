@@ -330,16 +330,19 @@ bool jfFetchPage::ProcessResult() {
   /**/JDEBUGLOGS(fname,1,htmlcodec->name());
   thepage = new QString();
   (*thepage) = htmlcodec->toUnicode(byteresult);
+  /**/JDEBUGLOGB(fname,2,check_clientred);
   // optional ... check for client side redirection (meta version)
   if (check_clientred) {
+      /**/JDEBUGLOG(fname,3);
     if (ParseForClient()) {
+        /**/JDEBUGLOG(fname,4);
       theerror = jff_REDIRECTION;
       delete thepage;
       thepage = NULL;
       return false;
     }
   }
-  /**/JDEBUGLOG(fname,2);
+  /**/JDEBUGLOG(fname,5);
   // done
   return true;
 }

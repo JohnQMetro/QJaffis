@@ -125,14 +125,17 @@ QString* jfFFNItemParser::makeRedirectedURL(const QString& inPart) {
 
 //----------------------------------
 bool jfFFNItemParser::testMissing(const QString *page) const{
-  return true;
+    assert(page != NULL);
+    const QString errmsg = "FanFiction.Net Error Type 1<hr size=1 noshade>An error has occurred while processing your request.";
+    if (page->contains(errmsg)) return false;
+    return true;
 }
 //----------------------------------
 bool jfFFNItemParser::testIncomplete(const QString *page) const {
   assert(page!=NULL);
   const QString footer1= "<a href='/tos/'>Terms of Service</a>";
   const QString footer2 = "<!-- BEGIN footer -->";
-  return true;
+  return page->contains(footer1);
 }
 //----------------------------------
 QString jfFFNItemParser::getCookie() const {

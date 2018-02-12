@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Editors for jfExpressionFiler, and also jfUrlFilter
 Created :   March 26, 2009
 Conversion to Qt Started Oct 3, 2013
-Updated :   July 8, 2016 (removed jfUrlFilEdit)
+Updated :   February 12, 2018 (Filter Check fixes)
 ******************************************************************************/
 #ifndef EXPR_EDITOR_H_INCLUDED
 #define EXPR_EDITOR_H_INCLUDED
@@ -20,6 +20,9 @@ Updated :   July 8, 2016 (removed jfUrlFilEdit)
 #ifndef JFBASEFILTER
   #include "../../../core/filters/base/filterbase.h"
 #endif
+#ifndef WIDGETS4_H
+    #include "../../misc/widgets4.h"
+#endif // WIDGETS4_H
 //------------------------------------------------------------------
 #include <QWidget>
 #include <QLineEdit>
@@ -40,37 +43,25 @@ Color coding will be used to determine errors:
 1: Black, unchecked
 2: Red, in error
 */
-class jfExpressionEditor : public QWidget {
+class jfExpressionEditor : public jfExprEditBase {
     Q_OBJECT
   public:
     jfExpressionEditor(jfFilterMap* inmap, bool notinmap, const bool& multiline, bool in_global, QWidget* parent = NULL);
     // checking method
     jfExpressionFilter* CheckFilter(QString& outmessage);
-    bool CheckExpr(const QString& inexpr,QString& outmessage) const;
-    // setting data
-    bool SetData(const QString& inexpr,QString& outmessage);
+    virtual bool CheckExpr(const QString& inexpr,bool& outempty, QString& outmessage) const;
   public slots:
     // events
     void PressPickFilter(bool checked);
-    void PressCheckFilter(bool checked);
-    void TextChanged();
   protected:
-    // internal helper
-    void SetStatus(size_t instatus);
-    // the internal controls
-    QLineEdit* editcore1;
-    QPlainTextEdit* editcore2;
+    // additional internal controls
     QPushButton* finsert_btn;
-    QPushButton* fcheck_btn;
     // sizers (horizontal, buttons on the right)
-    QHBoxLayout* topsizer;
     // in multiline mode
     QVBoxLayout* rightsizer;
     // linked reference data
     jfFilterMap* local_fmap;
-    size_t error_code;
     bool map_nomap;
     bool isglobal;
-    bool mline;
 };
 //*****************************************************************************

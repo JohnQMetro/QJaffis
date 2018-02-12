@@ -4,7 +4,7 @@
 // Purpose :    Defines  the summary and title general expression filter
 // Created:     31.12.06
 // Conversion to QT Started April 11, 2013
-// Updated:     July 8, 2016 (renaming and changing header details)
+// Updated:     February 12, 2018 (fixed crash in destructor caused by dangling pointer)
 /////////////////////////////////////////////////////////////////////////////
 #ifndef EXPRESSION_H
   #include "expression.h"
@@ -102,6 +102,7 @@ bool jfExpressionFilter::FromString(const QString& sourcedata) {
   // next, we postfixize it
   pfix = MakeExprPostfix(parsedinfo,oerr);
   delete parsedinfo;
+  parsedinfo = NULL;
   if (pfix==NULL) {
     /**/JDEBUGLOGS(fname,6,oerr);
     parse_error = oerr;

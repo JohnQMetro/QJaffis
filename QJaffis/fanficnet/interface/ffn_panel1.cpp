@@ -32,12 +32,15 @@
 //**************************************************************************
 // the constructor
 jfFFN_DFE::jfFFN_DFE(jfFFNSearch* inobj, QWidget* parent):jfDefaultFilterEditorBase(inobj,1,1,parent) {
+    const QString fname = "jfFFN_DFE::jfFFN_DFE";
   // creating new filters items
+    /**/JDEBUGLOG(fname,1)
   // the genre picker, completed tag, and language filter
   genre_picker = new jfTagStatusPicker("Genres",false);
   cpicker = new jfComplFiltEdit(NULL);
   lang_fillabel = new QLabel("Language Filter :");
   lang_filedit = new jfSimpleExprEdit(false);
+  /**/JDEBUGLOG(fname,2)
   lsizer4 = new QBoxLayout(QBoxLayout::LeftToRight);
   lsizer4->addWidget(lang_fillabel,0,Qt::AlignVCenter);
   lsizer4->addWidget(lang_filedit,1);
@@ -46,6 +49,7 @@ jfFFN_DFE::jfFFN_DFE(jfFFNSearch* inobj, QWidget* parent):jfDefaultFilterEditorB
   lsizer3->addLayout(lsizer4,0);
   lsizer3->addWidget(cpicker,0);
   top_sizer->addLayout(lsizer3,1);
+  /**/JDEBUGLOG(fname,3)
   // the author and character filters
   auth_fillabel = new QLabel("Author Filter :");
   char_fillabel = new QLabel("Character Filter :");
@@ -57,12 +61,13 @@ jfFFN_DFE::jfFFN_DFE(jfFFNSearch* inobj, QWidget* parent):jfDefaultFilterEditorB
   lsizer1->addWidget(char_fillabel,1,0,Qt::AlignRight);
   lsizer1->addWidget(char_filedit,1,1);
   lsizer1->setColumnStretch(1,1);
-
+/**/JDEBUGLOG(fname,4)
   // the word count filter
   wc_picker = new jfGenMinMaxEditor("Word Count",true,false);
   wc_picker->SetValueRange(0,9999999);
   // faborites filter
   favs_filedit = new jfFavsCountPanel(true);
+  /**/JDEBUGLOG(fname,5)
   // arranging the extra filters
   lsizer2 = new QBoxLayout(QBoxLayout::LeftToRight);
   lsizer2->addLayout(lsizer1,3);
@@ -70,8 +75,10 @@ jfFFN_DFE::jfFFN_DFE(jfFFNSearch* inobj, QWidget* parent):jfDefaultFilterEditorB
   lsizer2->addWidget(favs_filedit,1);
   // adding to the main sizer
   main_sizer->addLayout(lsizer2,0);
+  /**/JDEBUGLOG(fname,6)
   // finishing off
   ChangeSearch(inobj);
+  /**/JDEBUGLOG(fname,7)
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // special methods
@@ -166,30 +173,36 @@ bool jfFFN_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   jfFFNFavsFilter* favs_filter;
   bool atest;
   IntPair* wcpair;
+  /**/JDEBUGLOG(fname,1)
   // we start with the genres filter
   test1 = embedded_filters->GetItem(DEF_genretag_name);
   tag_filter = dynamic_cast<jfFFNGenresFilter*>(test1);
   notagfil = (tag_filter==NULL);
+  /**/JDEBUGLOG(fname,2)
   // if we have no genres filter, we make a blank one
   if (notagfil) {
     tag_filter = new jfFFNGenresFilter();
     tag_filter->SetToEmpty();
   }
+  /**/JDEBUGLOG(fname,3)
   listing = tag_filter->GetTagsCopy();
   genre_picker->SetOrChangeTags(listing);
   if (notagfil) delete tag_filter;
+  /**/JDEBUGLOG(fname,4)
   // next up, the author expression filter
   author_filter = dynamic_cast<jfAuthExprFilter*>(embedded_filters->GetItem(DEF_ffnauthor_name));
   if (author_filter!=NULL) {
     atest = auth_filedit->SetData(author_filter->ToString(),omsg);
     assert(atest);
   }
+  /**/JDEBUGLOG(fname,5)
   // then, the character expression filter
   char_filter = dynamic_cast<jfCharExprFilter*>(embedded_filters->GetItem(DEF_ffnchars_name));
   if (char_filter!=NULL) {
     atest = char_filedit->SetData(char_filter->ToString(),omsg);
     assert(atest);
   }
+  /**/JDEBUGLOG(fname,6)
   // the word count filter
   wc_filter = dynamic_cast<jfWordCountFilter*>(embedded_filters->GetItem(DEF_ffnwc_name));
   if (wc_filter!=NULL) {
@@ -198,6 +211,7 @@ bool jfFFN_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
     delete wcpair;
     assert(atest);
   }
+  /**/JDEBUGLOG(fname,7)
   // the favs filter
   favs_filter = dynamic_cast<jfFFNFavsFilter*>(embedded_filters->GetItem(DEF_ffnfavs_name));
   if (favs_filter !=NULL) {
@@ -206,18 +220,21 @@ bool jfFFN_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
     delete wcpair;
     assert(atest);
   }
+  /**/JDEBUGLOG(fname,8)
   // the completed filter
   cm_filter = dynamic_cast<jfCompletedFilter*>(embedded_filters->GetItem(DEF_ffncom_name));
   if (cm_filter!=NULL) {
     atest = cpicker->LoadValue(cm_filter);
     assert(atest);
   }
+  /**/JDEBUGLOG(fname,9)
   // next up, the language expression filter
   lang_filter = dynamic_cast<jfLanguageExprFilter*>(embedded_filters->GetItem(DEF_ffnlang_name));
   if (lang_filter!=NULL) {
     atest = lang_filedit->SetData(lang_filter->ToString(),omsg);
     assert(atest);
   }
+  /**/JDEBUGLOG(fname,10)
   // done
   return true;
 }
@@ -415,13 +432,17 @@ jfFFN_Panel1::jfFFN_Panel1(jfFFNSearch* insearch, QWidget* parent):jfSearchPanel
 // constants
   const QString fname="jfFFN_Panel1::jfFFN_Panel1";
   // start
+  /**/JDEBUGLOG(fname,1)
   mpanel = new jfFFN_SearchPanel(insearch);
   SearchPanel = mpanel;
   // sizer arranging
+  /**/JDEBUGLOG(fname,2)
   filt_panel = MakeTypedFilEdit();
   ArrangePanels();
+  /**/JDEBUGLOG(fname,3)
   // finishing off
   ChangeObj(mainobj);
+  /**/JDEBUGLOG(fname,4)
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // other external methods
@@ -447,8 +468,11 @@ bool jfFFN_Panel1::ChangeObj(jfSearchCore* obj_data) {
   temp = dynamic_cast<jfFFNSearch*>(obj_data);
   mainobj = obj_data;
   // filters
+  /**/JDEBUGLOG(fname,1)
   filt_panel->ChangeSearch(obj_data);
+  /**/JDEBUGLOG(fname,2)
   mpanel->LoadFrom(temp);
+  /**/JDEBUGLOG(fname,3)
   // done
   return true;
 }

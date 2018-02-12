@@ -262,18 +262,19 @@ QString jfMainSearchGroup::GSearchName() const {
 bool jfMainSearchGroup::ConsStepTwo(const QStringList* infclist) {
   const QString fname = "jfMainSearchGroup::ConsStepTwo";
   // asserts and checks
+  /**/JDEBUGLOG(fname,1)
   assert(p_search!=NULL);
   assert(infclist);
   // assifgning search data
   search_data = p_search->GetSearchObj();
   if (noteb) {
-    /**/jfLogMessage(fname,1);
+      /**/JDEBUGLOG(fname,2)
     nedit =  new jfNameEdit("Name for this Search",search_data->GetName(),5);
     int sh = 30;
     nedit->setMinimumHeight(sh);
     /**/jfLogMessageI(fname,2,sh);
     nedit->setMinimumWidth(500);
-    /**/jfLogMessageI(fname,2,(nedit->sizeHint()).width());
+    /**/jfLogMessageI(fname,3,(nedit->sizeHint()).width());
     // nedit->setFixedWidth(300);
     QTabBar* tb = container->findChild<QTabBar *>(QLatin1String("qt_tabwidget_tabbar"));
     tb->setObjectName("SearchTopTabBar");
@@ -281,8 +282,11 @@ bool jfMainSearchGroup::ConsStepTwo(const QStringList* infclist) {
     container->setStyleSheet(ssheet);
   }
   else {
+    /**/JDEBUGLOG(fname,4)
     nedit =  new jfNameEdit("Search Name",search_data->GetName());
+      /**/JDEBUGLOG(fname,5)
   }
+  /**/JDEBUGLOG(fname,6)
   // the middle panel
   if (threepanel) panel_two = new jfPanelTwo(search_data,infclist);
   return true;

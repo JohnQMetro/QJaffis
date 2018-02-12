@@ -126,12 +126,12 @@ jf_FFN_CatPicker::jf_FFN_CatPicker(jfFFN_Categories* inmain, jfFFN_CatP_SelCat* 
   and_label = new QLabel("Catgeory must match :");
   and_edit = new jfSimpleExprEdit(false);
   atest = and_edit->SetData(inselection->GetAnd(),omsg);
-  /**/JDEBUGLOGB(fname,8,atest);
+  /**/JDEBUGLOGB(fname,3,atest);
   assert(atest);
   or_label = new QLabel("Include if Category matches :");
   or_edit = new jfSimpleExprEdit(false);
   atest = or_edit->SetData(inselection->GetOr(),omsg);
-  /**/JDEBUGLOGB(fname,9,atest);
+  /**/JDEBUGLOGB(fname,4,atest);
   assert(atest);
   // the filter sizer
   expredit_sizer = new QGridLayout();
@@ -141,6 +141,7 @@ jf_FFN_CatPicker::jf_FFN_CatPicker(jfFFN_Categories* inmain, jfFFN_CatP_SelCat* 
   expredit_sizer->addWidget(or_edit,1,1);
   expredit_sizer->setColumnStretch(1,1);
   // arranging...
+  /**/JDEBUGLOG(fname,5)
   middle_sizer = new QHBoxLayout();
   middle_sizer->addWidget(panel_holder,3);
   middle_sizer->addWidget(picked_display,1);
@@ -151,9 +152,11 @@ jf_FFN_CatPicker::jf_FFN_CatPicker(jfFFN_Categories* inmain, jfFFN_CatP_SelCat* 
   // done
   setLayout(top_sizer);
   // connecting
+  /**/JDEBUGLOG(fname,6)
   connect(section_panel,SIGNAL(sendCheckSig(bool)),this,SLOT(HandleCheck(bool)));
   connect(crossover_panel,SIGNAL(CheckSignal(bool)),this,SLOT(HandleCheck(bool)));
   connect(picked_display,SIGNAL(ItemDeleted(QString)),this,SLOT(HandleListDelete(QString)));
+  /**/JDEBUGLOG(fname,7)
 
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

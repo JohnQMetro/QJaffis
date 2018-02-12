@@ -84,23 +84,24 @@ void jfFetchAndParsePage::StartProcessing() {
     /**/tLog(fname,3);
     // getting the URL (may block)
     ures = channel->GetUrl(urlIndex);
+    /**/tLogB(fname,4,ures == NULL);
     // checking URL afterwards
     if (ures==NULL) break;
     urlToGet = *ures;
-    /**/tLog(fname,4,urlToGet);
+    /**/tLog(fname,5,urlToGet);
     currError = DownloadMethod();
     if (currError==jff_NOERROR) {
-      /**/tLog(fname,5);
+      /**/tLog(fname,6);
       // time to parse!
       parser->ParseDownloadedPage((*fetched_page),urlIndex);
       // parsing went okay
       if (parser->isPageParsed()) {
-        /**/tLog(fname,6);
+        /**/tLog(fname,7);
         res_data = parser->getResults();
         new_pagecount = parser->getPageCount();
-        /**/tLogS(fname,7,new_pagecount);
+        /**/tLogS(fname,8,new_pagecount);
         channel->ResultResultData(res_data,new_pagecount);
-        /**/tLog(fname,8);
+        /**/tLog(fname,9);
       }
       // parsing did not go okay
       else {

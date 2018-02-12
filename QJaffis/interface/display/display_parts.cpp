@@ -66,16 +66,22 @@ bool jfDefaultFilterEditorBase::ChangeSearch(jfSearchCore* obj_data) {
   jfExpressionFilter *ftemp1 = NULL;
   QString omsg;
   // testing...
+  /**/JDEBUGLOG(fname,1);
   if (obj_data==NULL) return false;
   // assigning internal links
   mainobj = obj_data;
   embedded_filters = mainobj->def_filtermap;
+  /**/JDEBUGLOG(fname,2);
   // setting the data
   ftemp1 = dynamic_cast<jfExpressionFilter*>(embedded_filters->GetItem(defexprname));
+  /**/JDEBUGLOG(fname,3);
   if (ftemp1!=NULL) {
+      /**/JDEBUGLOG(fname,4);
     ftemp1->SetFiltermapLink(obj_data->local_map);
+    /**/JDEBUGLOG(fname,5);
     if (!(main_expedit->SetData(ftemp1->ToString(),omsg))) return false;
   }
+  /**/JDEBUGLOG(fname,6);
   // calling the virtual method for the rest
   return ChangeSearchExtended(obj_data);
 }
