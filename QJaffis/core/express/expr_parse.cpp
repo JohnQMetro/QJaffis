@@ -310,7 +310,7 @@ jfOperandElem* jfExpParserClass::MakeOperand(const QString& source) {
 }
 //-------------------------------------------------------
 bool jfExpParserClass::FilterTest(QString& sourcef, QChar delimt) const {
-	size_t mlen;
+    uint mlen;
 	bool arroba;
 	// running some basic checks
 	mlen = sourcef.length();
@@ -319,7 +319,7 @@ bool jfExpParserClass::FilterTest(QString& sourcef, QChar delimt) const {
 	// we now see if things are a filter
 	arroba = (sourcef[0]==delimt);
 	if (!arroba) return false;
-	arroba = (sourcef[mlen-1]==delimt);
+    arroba = (sourcef[mlen-1]==delimt);
 	if (!arroba) return false;
 	// a final check...
 	if (mlen>=3) {

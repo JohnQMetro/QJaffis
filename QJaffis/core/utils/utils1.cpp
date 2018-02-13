@@ -58,7 +58,7 @@ bool Str2ULongC(const QString& inval, ulong& outval) {
 bool Count2ULong(const QString& inval, unsigned long& outval) {
   //local variables
   double xval;
-  size_t slen;
+  uint slen;
   bool resval;
   QString zpval;
   // we start

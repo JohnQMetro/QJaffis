@@ -171,7 +171,7 @@ bool jfFIM_Fanfic::SetFromString(const QString& inval, QString& parse_err, bool 
   /* Chapter links. Due to a lack of updated dates in fimfiction 4, we collect the dates for
    * each chapter to determine the updated date. */
   findwhich = 0;
-  latedate = QDate::QDate(1900,1,1);
+  latedate = QDate(1900,1,1);
   while (xparser->MovePast("<li data-published class=\"")) {
     findwhich++;
     if (!xparser->GetDelimitedEndPair(datestart,"<span ","</span>",buffer)) {

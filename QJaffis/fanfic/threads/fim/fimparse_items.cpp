@@ -20,7 +20,8 @@ Updated :   June 30, 2016
   #include "../../data/fim/fim_ficobj.h"
 #endif // FIM_FICOBJ_H_INCLUDED
 //--------------------------------
-#include "assert.h"
+#include <assert.h>
+#include <math.h>
 /*****************************************************************************/
 // theconstructor
 jfFIMPageParser::jfFIMPageParser():jfItemsPageParserBase() {

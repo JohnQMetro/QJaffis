@@ -741,7 +741,7 @@ bool jfStringParser::GetRestofBlockChar(QChar bstart, QChar bend, QString& outbu
             break;
         }
         // checking the current character
-        currchar = rawdata[currdex];
+        currchar = rawdata[(uint)currdex];
         if (currchar == bstart) {
             level++;
             xvalid = true;
@@ -833,7 +833,7 @@ bool jfStringParser::GetLineOrToChar(const QChar end, QString& outbuf, bool& end
     size_t chardex = mainindex;
     QChar currchar;
     while (chardex<stoppos) {
-        currchar = rawdata[chardex];
+        currchar = rawdata[(uint)chardex];
         if (currchar == end) {
             foundex = true;
             break;
@@ -869,7 +869,7 @@ bool jfStringParser::SkipWhitespace() {
     size_t currdex = mainindex;
     // incrementing loop
     while (currdex < rawdata.length()) {
-        currchar = rawdata[currdex];
+        currchar = rawdata[(uint)currdex];
         if (!currchar.isSpace()) break;
         currdex++;
     }
@@ -888,7 +888,7 @@ bool jfStringParser::GetUntilWhitespace(QString& outbuf) {
     size_t currdex = mainindex;
     // incrementing loop
     while (currdex < rawdata.length()) {
-        currchar = rawdata[currdex];
+        currchar = rawdata[(uint)currdex];
         if (currchar.isSpace()) break;
         currdex++;
     }
@@ -903,9 +903,9 @@ bool jfStringParser::GetUntilWhitespace(QString& outbuf) {
 size_t jfStringParser::CalcSkipAmount(const size_t& lpos) const {
     size_t skipamount = 1;
     assert(lpos<rawdata.length());
-    QChar nlchar = rawdata[lpos];
+    QChar nlchar = rawdata[(uint)lpos];
     if (lpos < (rawdata.length()-1)) {
-        QChar nlchar2 = rawdata[lpos+1];
+        QChar nlchar2 = rawdata[(uint)(lpos+1)];
         if ((nlchar=='\r') && (nlchar2=='\n')) skipamount = 2;
         else if ((nlchar=='\n') && (nlchar2=='\r')) skipamount = 2;
     }

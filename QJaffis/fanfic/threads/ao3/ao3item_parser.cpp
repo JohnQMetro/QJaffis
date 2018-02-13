@@ -13,6 +13,7 @@ Updated :   July 16, 2016
   #include "../../data/ao3/ao3_ficobj.h"
 #endif // AO3_FICOBJ_H_INCLUDED
 #include <assert.h>
+#include <math.h>
 /*****************************************************************************/
 // --- [ METHODS for jfAO3ItemParser ] ---------------------------------
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

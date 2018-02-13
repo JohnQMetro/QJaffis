@@ -363,35 +363,6 @@ void jfTypedCollection< Q >::ClearContents(bool destroy_too) {
   grand_total = 0;
   insert_index = 0;
 }
-//============================================================================
-// appends page_results onto maindata
-template <class Q>
-size_t jfTypedCollection< Q >::AppendPageResults() {
-  size_t loopc,res;
-  Q* copyi;
-  // special cases
-  if (page_results==NULL) return 0;
-  if (pr_size==0) {
-    delete page_results;
-    page_results = NULL;
-    return 0;
-  }
-  // general moving over
-  mainlist.resize(item_count+pr_size);
-  for (loopc=0;loopc<pr_size;loopc++) {
-    copyi = dynamic_cast<Q*>((*page_results)[loopc]);
-    mainlist[item_count+loopc] = copyi;
-  }
-  // getting rid of the old
-  delete page_results;
-  res = pr_size;
-  pr_index=-1;
-  pr_size=0;
-  page_results = NULL;
-  // finishing
-  item_count+=res;
-  return res;
-}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  implemented virtual i/o method
 //-----------------------------------------------------------------------

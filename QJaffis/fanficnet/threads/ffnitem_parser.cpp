@@ -11,6 +11,7 @@ Updated :   July 25, 2016
 //-----------------------------------
 
 #include <assert.h>
+#include <math.h>
 /*****************************************************************************/
 // --- [ METHODS for jfFFNItemParser ] ---------------------------------
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -214,7 +215,7 @@ bool jfFFNItemParser::PageAndItemCount(size_t& itemcount) {
   QString outerr;
   float tpagecount;
   bool isk;
-  size_t llen;
+  uint llen;
   // starting up things
   /**/lpt->tLog(fname,1);
   // next, numeric data

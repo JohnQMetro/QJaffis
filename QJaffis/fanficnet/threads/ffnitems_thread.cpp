@@ -10,11 +10,13 @@ Updated :   Febuary 11, 2018
 #endif // FFNITEMS_THREAD_H
 //------------------------------------
 #ifndef FFN_ITEMCOLL
-  #include "ffn_itemcoll.h"
+  #include "../data/ffn_itemcoll.h"
 #endif
 #ifndef FFNITEM_PARSER_H
   #include "ffnitem_parser.h"
 #endif // FFNITEM_PARSER_H
+//-----------------------------------
+#include <math.h>
 /*****************************************************************************/
 // --- [ Methods for jfFFNDownloader ] --------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

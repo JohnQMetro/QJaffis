@@ -38,7 +38,8 @@ jfCharCheckBoxGroup::jfCharCheckBoxGroup(QString inname, size_t icount, const QS
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfCharCheckBoxGroup::SetFromString(const QString& inval) {
   // variables
-  size_t rescount = 0, loopval;
+  size_t rescount = 0;
+  uint loopval;
   QChar tcahr;
   for (loopval=0;loopval<cbcount;loopval++) {
     tcahr = charvals[loopval];
@@ -53,7 +54,7 @@ bool jfCharCheckBoxGroup::SetFromString(const QString& inval) {
 //----------------------------------------------------
 QString jfCharCheckBoxGroup::GetStringValue() const {
   QString result;
-  for (size_t cloop=0;cloop<cbcount;cloop++) {
+  for (uint cloop=0;cloop<cbcount;cloop++) {
     if (cboxes[cloop]->isChecked()) result += charvals[cloop];
   }
   return result;

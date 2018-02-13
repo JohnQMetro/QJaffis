@@ -42,7 +42,7 @@ class jfFFNItemParser : public jfItemsPageParserBase {
   protected:
     // helper methods for parsing
     bool CheckNames();
-    bool jfFFNItemParser::CheckCrossoverName();
+    bool CheckCrossoverName();
     bool PageAndItemCount(size_t& itemcount);
     virtual bool ExitCheck(jfFFNItem* tocheck) const;
 

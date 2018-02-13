@@ -10,6 +10,7 @@ Updated : September 4, 2016
 #endif // DOWNLOAD_H
 //-------------------------------
 #include <assert.h>
+#include <math.h>
 #include <QCoreApplication>
 /*****************************************************************************/
 

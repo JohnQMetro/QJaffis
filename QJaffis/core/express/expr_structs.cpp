@@ -225,7 +225,7 @@ QString jfExprToker::GetToken() {
   int nextdelim = FindNonEscaped(source,expr_scitems,index);
 	// checking...
 	if (nextdelim == 0) {
-		result = source[index];
+        result = source[(uint)index];
 		lindex = lindex;
 		index++;
 		pastend = (index==sleng);
@@ -257,7 +257,7 @@ QString jfExprToker::GetToken() {
 QChar jfExprToker::GetTChar() {
 	assert(AtOp());
 	// we get the char
-  QChar result = source[index];
+  QChar result = source[(uint)index];
 	// incrementing the index
 	lindex = index;
 	index++;
@@ -274,7 +274,7 @@ bool jfExprToker::TokensLeft() const { return (!pastend); }
 bool jfExprToker::AtOp() const {
 	if (pastend) return false;
 	// getting the character
-  QChar tchar = source[index];
+  QChar tchar = source[(uint)index];
   return (expr_scitems.contains(tchar));
 }
 //-------------------------------------------------------------------------

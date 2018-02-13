@@ -17,6 +17,7 @@ Updated :   June 30, 2016
 #endif // FIMPARSE_COMPACT_H
 //-------------------------------------------------
 #include <assert.h>
+#include <math.h>
 /*****************************************************************************/
 // the constructor
 jfFIMItemDownloader::jfFIMItemDownloader(size_t in_max_threads):jfBaseItemDownloader(in_max_threads){

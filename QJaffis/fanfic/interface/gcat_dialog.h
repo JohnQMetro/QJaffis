@@ -18,7 +18,7 @@ Updated :   July 15, 2016
 #endif // PROGRESS_PANEL2_H
 //----------------------------------------------
 #include <QDialog>
-#include <Qthread>
+#include <QThread>
 //***************************************************************************
 class jfGenCat_DownDialog : public QDialog {
     Q_OBJECT

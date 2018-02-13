@@ -12,6 +12,8 @@ Updated :   July 17, 2016
 #ifndef AO3ITEM_PARSER_H
   #include "ao3item_parser.h"
 #endif // AO3ITEM_PARSER_H
+//------------------------------------
+#include <math.h>
 /*****************************************************************************/
 // --- [ Methods for jfAO3FandomItemDownloader ] --------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

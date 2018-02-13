@@ -33,7 +33,8 @@
 bool StripDuplicateChars(QString& delm_str) {
   // variables
   QString result;
-  size_t str_len, str_loop;
+  size_t str_len;
+  uint str_loop;
   // start
   delm_str = delm_str.trimmed();
   if (delm_str.isEmpty()) return false;
@@ -199,7 +200,8 @@ bool LookForPairSingleToken(const QStringList* lookin, QString name1, QString na
 //---------------------------------------------------------------------------------------------
 bool LookForPairString(QString lookin, QString name1, QString name2, QString inchars, jfPF_flaghold& flags) {
   // variables
-  size_t clen, cloop;
+  size_t clen;
+  uint cloop;
   bool rval;
   QString looker;
   // checks
@@ -230,7 +232,8 @@ bool LookForPairString(QString lookin, QString name1, QString name2, QString inc
 //---------------------------------------------------------------------------------------------
 bool LookForPairToken(const QStringList* lookin, QString name1, QString name2, QString inchars, jfPF_flaghold& flags) {
   // variables
-  size_t clen, cloop;
+  size_t clen;
+  uint cloop;
   bool rval;
   QString looker;
   // checks
@@ -367,14 +370,14 @@ QString jfPairStats::MakeCharResult(size_t index) const {
   QString result;
   // we build the label part first
   if (index==0) result = " null : ";
-  else if (sepchars[index]==' ') result = "space : ";
+  else if (sepchars[(uint)index]==' ') result = "space : ";
   else {
     result = "  ";
-    result += sepchars[index];
+    result += sepchars[(uint)index];
     result += "  : ";
   }
   // then we add the number
-  result += QString::number(charfcount[index]);
+  result += QString::number(charfcount[(uint)index]);
   // done
   return result;
 }

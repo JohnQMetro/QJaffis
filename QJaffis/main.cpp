@@ -8,7 +8,7 @@
 
 #ifdef _WIN32
   #define jfEXITCODE 4
-#elif
+#else
   #define jfEXITCODE 1
 #endif
 
