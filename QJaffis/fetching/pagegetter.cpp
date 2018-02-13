@@ -388,13 +388,13 @@ bool jfFetchPage::ClearObjects() {
   if (raw_result->isRunning()) return false;
   // deleting
   raw_result->close();
-  delete raw_result;
-  raw_result = NULL;
+  raw_result->deleteLater();
   delete req;
   req = NULL;
   // setting flags
   isdownloading = false;
   afterdownload = true;
+  raw_result = NULL;
   // done
   return true;
 }

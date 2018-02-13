@@ -60,6 +60,7 @@ void jfCPickerDispl::UpdateDisplay() {
       display->addItem(curr_string);
       if (curr_string==sel_string) storedindex = itmindex;
     }
+    delete newitems;
     // reselecting
     if (storedindex>=0) display->setCurrentRow(storedindex);
   }

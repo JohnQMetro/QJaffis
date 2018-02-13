@@ -94,6 +94,8 @@ void jfFetchAndParsePage::StartProcessing() {
       /**/tLog(fname,6);
       // time to parse!
       parser->ParseDownloadedPage((*fetched_page),urlIndex);
+      delete fetched_page;
+      fetched_page = NULL;
       // parsing went okay
       if (parser->isPageParsed()) {
         /**/tLog(fname,7);

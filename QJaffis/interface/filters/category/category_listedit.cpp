@@ -43,7 +43,7 @@ jfCategoryEditorsNotebook::jfCategoryEditorsNotebook(jfCategories* in_datalink, 
   for (ncloop=ccount;ncloop<32;ncloop++) catedits[ncloop] = NULL;
   // done
   for (cloop=0;cloop<ccount;cloop++) {
-    connect(catedits[cloop], SIGNAL(jfCategoryEditor::SendDelete(size_t)), this, SLOT(ProcessDelete(size_t)));
+    connect(catedits[cloop], SIGNAL(SendDelete(size_t)), this, SLOT(ProcessDelete(size_t)));
   }
   setLayout(mainsizer);
 }
