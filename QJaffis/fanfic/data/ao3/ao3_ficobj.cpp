@@ -387,12 +387,13 @@ bool jfAO3Fanfic::ParseStart() {
     author_name = "Anonymous";
   }
   // fandoms
-  if (!x_parser->GetDelimited("<h5 ","</h5>",buffer)) {
+  if (!x_parser->GetDelimited("<h5 class=\"fandoms","</h5>",buffer)) {
     return parseError("Cannot find fandoms!");
   }
   tparser = new jfStringParser(buffer);
   while (tparser->MovePast("<a class=\"tag\"")) {
     if (!tparser->GetDelimited("href=\"","\"",curl)) break;
+    curl = "http://archiveofourown.org" + curl;
     if (curl==cats[0]->GetUrl()) continue;
     temp = ao3_catdata::ao3_catmanager->GetData()->FindByUrl(curl);
     /* note that I've decided to ignore unfound fandoms after my first first
