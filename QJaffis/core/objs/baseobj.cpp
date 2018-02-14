@@ -4,7 +4,7 @@ Basic   : Defines the most basic data classes
 Author  : John Q Metro
 Started : March 17, 2009
 // Conversion to Qt started March 12, 2013
-Updated : June 12, 2016
+Updated : February 14, 2018
 Notes   :
 
 ******************************************************************************/
@@ -34,6 +34,7 @@ jfBaseObj::jfBaseObj(size_t src_id, const QString& nname) {
   validdata = true;
   SetName(nname);
 }
+jfBaseObj::~jfBaseObj() {}
 //============================================================================
 bool jfBaseObj::IsValid() const {
   return validdata;

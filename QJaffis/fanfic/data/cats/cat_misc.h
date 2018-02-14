@@ -33,7 +33,7 @@ class jfGenSecData {
     // Adding Data
     bool AddStrings(size_t INBLOCK, const QString inname[], const QString inurls[], QString intype);
     // destuctor
-    ~jfGenSecData();
+    virtual ~jfGenSecData();
   protected:
     // the data
     QStringList* secname;
@@ -69,7 +69,7 @@ class jfGenCatManager {
     int RegisterSearch(const QWidget* in_search);
     bool RemoveSearch(size_t which);
     // destructor
-    ~jfGenCatManager();
+    virtual ~jfGenCatManager();
   protected:
     jfGen_CatHolder* current;
     jfGen_CatHolder* newdata;

@@ -22,6 +22,7 @@ jfPageParserBase::jfPageParserBase() {
   page_parsed = false;
   pagecount = 0;
 }
+jfPageParserBase::~jfPageParserBase() {}
 //--------------------------------------------
 void jfPageParserBase::SetLogPointer(jfLoggBase* in_ptr) {
   lpt = in_ptr;

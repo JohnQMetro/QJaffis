@@ -30,7 +30,7 @@ class jfLoggBase : public QObject {
     Q_OBJECT
   public:
     jfLoggBase();
-    ~jfLoggBase();
+    virtual ~jfLoggBase();
   // log methods
     void tLog(const QString &funcname, size_t index) const;
     void tLog(const QString &funcname, size_t index, const QString& msg) const;

@@ -30,7 +30,7 @@ class jfFileInfo {
     QFileInfo* fileptr;
     // constructor and destructor
     jfFileInfo();
-    ~jfFileInfo();
+    virtual ~jfFileInfo();
     // methods
     QFileInfo* MakeFilePointer(QString basedir) const;
     jfFileInfo* MakeNewCopy(QString basedir, bool withptr) const;
@@ -58,7 +58,7 @@ class jfDirectoryUpdater {
     QString GetCurrentTargetAction() const;
     QString GetCurrentTargetInfo() const;
     // destructor
-    ~jfDirectoryUpdater();
+    virtual ~jfDirectoryUpdater();
   protected:
     // helper methods
     bool ClearList(bool target);

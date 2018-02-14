@@ -43,7 +43,7 @@ class jfPageTracker {
     bool RemovePage(size_t index);
     bool SetHtmlReady(QWidget* inpage, bool inval);
     // the destructor
-    ~jfPageTracker();
+    virtual ~jfPageTracker();
   protected:
     size_t num_items;
     std::vector<QWidget*>* pagelist;

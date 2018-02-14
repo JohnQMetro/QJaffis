@@ -43,6 +43,7 @@ class jfSearchCore : public QObject, public jfBaseObj {
     jfCategories* categories;
     // the constructor, just makes sure links are NULL
     jfSearchCore();
+    virtual ~jfSearchCore();
     // checks the startup set for validity
     bool Check() const;
     // checks if the filters are empty

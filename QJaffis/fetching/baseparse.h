@@ -29,6 +29,7 @@ class jfPageParserBase {
   public:
     // constructor
     jfPageParserBase();
+    virtual ~jfPageParserBase();
     void SetLogPointer(jfLoggBase* in_ptr);
     // custom parse method
     virtual void ParseDownloadedPage(const QString& inPage, size_t pageindex) = 0;

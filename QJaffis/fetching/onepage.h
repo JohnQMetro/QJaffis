@@ -23,7 +23,7 @@ class jfOnePageGetter : public jfLoggBase {
     Q_OBJECT
   public:
     jfOnePageGetter();
-    ~jfOnePageGetter();
+    virtual ~jfOnePageGetter();
     bool setParameters(const QString& url, jfPageParserBase* parser, size_t retries);
   public slots:
     void StartProcessing();

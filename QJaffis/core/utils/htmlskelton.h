@@ -49,7 +49,7 @@ class jfSkeletonParser {
     bool AddBool(QString nametag, const bool& value);
     bool AddUInt(QString nametag, const size_t& value);
     // the destructor
-    ~jfSkeletonParser();
+    virtual ~jfSkeletonParser();
   protected:
     // helper methods
     bool FindTag(QString nametag, jfsp_DATATYPE& ftype, size_t& fpos) const;

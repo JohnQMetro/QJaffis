@@ -27,6 +27,7 @@ jfSearchCore::jfSearchCore() {
   local_skel = false;
   catindex = 0;
 }
+jfSearchCore::~jfSearchCore() {}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // checks the startup set for validity
 bool jfSearchCore::Check() const {

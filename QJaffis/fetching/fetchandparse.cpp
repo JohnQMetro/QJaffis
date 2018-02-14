@@ -250,6 +250,7 @@ jfFetchAndParseHolder::~jfFetchAndParseHolder() {
     // killing the thread, this is bad (so best to delete only after ThreadFinished()).
     disconnect(thread_ptr, SIGNAL(started()), thread_object, SLOT(StartProcessing()));
     disconnect(thread_ptr,SIGNAL(finished()),this,SLOT(ThreadFinished()));
+    disconnect(thread_object,SIGNAL(processingFinished()),thread_ptr,SLOT(quit()));
     thread_ptr->terminate();
     delete channel;
     delete thread_object;
@@ -325,6 +326,7 @@ void jfFetchAndParseHolder::ThreadFinished() {
   // disconnecting signals from slots
   disconnect(thread_ptr, SIGNAL(started()), thread_object, SLOT(StartProcessing()));
   disconnect(thread_ptr,SIGNAL(finished()),this,SLOT(ThreadFinished()));
+  disconnect(thread_object,SIGNAL(processingFinished()),thread_ptr,SLOT(quit()));
   // deleting the contained objects
   thread_finished = true;
   channel->deleteLater();

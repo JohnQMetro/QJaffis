@@ -5,7 +5,7 @@
 //              jaffis_base.h
 // Created:     March 17, 2009
 // Conversion to Qt started March 12, 2013
-// Updated:     June 12, 2016
+// Updated:     February 14, 2018 (virtual destructors)
 /////////////////////////////////////////////////////////////////////////////
 // For compilers that support precompilation, includes "wx.h".
 
@@ -44,6 +44,7 @@ class jfBaseObj {
   public:
     jfBaseObj();
     jfBaseObj(size_t src_id, const QString& nname);
+    virtual ~jfBaseObj();
     // accessing the internals
     bool IsValid() const;
     QString GetName() const;
@@ -115,7 +116,7 @@ class jfBasePD : public jfUrlBase {
     virtual bool LoadValues(jfSkeletonParser* inparser) const = 0;
     virtual void ProcessDescription() = 0;
     // the destructor
-    ~jfBasePD();
+    virtual ~jfBasePD();
   protected:
     // other stuff
     void CopyOver(jfBasePD* destination) const;
