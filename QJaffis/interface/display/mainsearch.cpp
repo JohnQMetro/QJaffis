@@ -91,10 +91,13 @@ bool jfMainSearchGroup::SaveToFile(QString fname) {
   const QString ifname = "jfMainSearchGroup::SaveToFile";
   // local variables
   QTextStream* outfile;
+  QString xname;
   bool usd_res;
   // starting
   assert(search_data!=NULL);
   QApplication::setOverrideCursor(Qt::WaitCursor);
+  xname = nedit->TryGetName();
+  search_data->SetName(xname);
   usd_res = p_search->UpdateSearchData();
   assert(usd_res);
   if (threepanel) {
