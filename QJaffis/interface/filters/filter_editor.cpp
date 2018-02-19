@@ -656,20 +656,14 @@ jfGlobalFilterEditor::jfGlobalFilterEditor(jfMapOfFiltermaps* inlink, QWidget* p
   // we create the topsizer
   top_sizer = new QHBoxLayout();
   top_sizer->addLayout(side_sizer,1);
-  // what we do next depends on whether there is no maps
-  if (maindata->empty()) {
-    main_mapedit->hide();
-    top_sizer->addWidget(blank_panel,global_ratio);
-    dele_btn->setEnabled(false);
-    isblank = true;
-  }
-  else {
-    blank_panel->hide();
-    top_sizer->addWidget(main_mapedit,global_ratio);
-    ChangeMap(0);
-    isblank = false;
-  }
+  // we start with a blank panel, no maps
+  main_mapedit->hide();
+  top_sizer->addWidget(blank_panel,global_ratio);
+  dele_btn->setEnabled(false);
+  isblank = true;
   setLayout(top_sizer);
+  // then, if we have a map, we load it
+  if (!(maindata->empty())) ChangeMap(0);
   // connections
   connect(add_btn, SIGNAL(clicked(bool)), this, SLOT(NewPressed(bool)));
   connect(dele_btn, SIGNAL(clicked(bool)), this, SLOT(DeletePressed(bool)));
