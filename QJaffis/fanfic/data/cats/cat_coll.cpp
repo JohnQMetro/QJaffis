@@ -299,13 +299,14 @@ bool jfGenCat_PickData::AddMiddleToFile(QTextStream* outfile) const {
 }
 //-------------------------------------------------------------------
 bool jfGenCat_PickData::AddRestToFile(QTextStream* outfile) const {
-  QString result;
+  jfOutString result;
   // checking and special conditions
   if (outfile==NULL) return false;
   // the main loop
   for (size_t loopc=0; loopc<item_count; loopc++) {
-    result = QString::number(loopc);
-    (*outfile) << result << "\n";
+      result << sec_name[loopc] << cat_name[loopc];
+      (*outfile) << result << "\n";
+      result.clear();
   }
   return true;
 }
