@@ -55,7 +55,7 @@ bool jfAO3_Category::SetFromString(const QString& invalin, const QString& insect
   // post processing
   name = htmlparse::HTML2Text(name);
   primarylink.replace("&#x27;","'");
-  primarylink = "http://archiveofourown.org" + primarylink;
+  primarylink = "https://archiveofourown.org" + primarylink;
   // setting values
   validdata = true;
   AddNewSection(insection);
@@ -119,17 +119,17 @@ const QString catnames[AO3_SECCOUNT] = {"Anime & Manga","Books & Literature",
   "Movies","Music & Bands","Other Media","Theater","TV Shows",
   "Video Games","Uncategorized Fandoms"};
 const QString caturls[AO3_SECCOUNT] = {
-  "http://archiveofourown.org/media/Anime%20*a*%20Manga/fandoms",
-  "http://archiveofourown.org/media/Books%20*a*%20Literature/fandoms",
-  "http://archiveofourown.org/media/Cartoons%20*a*%20Comics%20*a*%20Graphic%20Novels/fandoms",
-  "http://archiveofourown.org/media/Celebrities%20*a*%20Real%20People/fandoms",
-  "http://archiveofourown.org/media/Movies/fandoms",
-  "http://archiveofourown.org/media/Music%20*a*%20Bands/fandoms",
-  "http://archiveofourown.org/media/Other%20Media/fandoms",
-  "http://archiveofourown.org/media/Theater/fandoms",
-  "http://archiveofourown.org/media/TV%20Shows/fandoms",
-  "http://archiveofourown.org/media/Video%20Games/fandoms",
-  "http://archiveofourown.org/media/Uncategorized%20Fandoms/fandoms"
+  "https://archiveofourown.org/media/Anime%20*a*%20Manga/fandoms",
+  "https://archiveofourown.org/media/Books%20*a*%20Literature/fandoms",
+  "https://archiveofourown.org/media/Cartoons%20*a*%20Comics%20*a*%20Graphic%20Novels/fandoms",
+  "https://archiveofourown.org/media/Celebrities%20*a*%20Real%20People/fandoms",
+  "https://archiveofourown.org/media/Movies/fandoms",
+  "https://archiveofourown.org/media/Music%20*a*%20Bands/fandoms",
+  "https://archiveofourown.org/media/Other%20Media/fandoms",
+  "https://archiveofourown.org/media/Theater/fandoms",
+  "https://archiveofourown.org/media/TV%20Shows/fandoms",
+  "https://archiveofourown.org/media/Video%20Games/fandoms",
+  "https://archiveofourown.org/media/Uncategorized%20Fandoms/fandoms"
   };
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const QString ao3_catdata::aname = "ao3mmcat.dat";

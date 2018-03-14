@@ -47,7 +47,7 @@ const QString ao3con::order_ids[ao3con::order_count]  = {"created_at","revised_a
         "comments_count","bookmarks_count"};
  QStringList* ao3con::order_list = NULL;
 //-------------------------------------------
-const QString ao3con::url_start = "http://archiveofourown.org/works?utf8=%E2%9C%93&commit=Sort+and+Filter";
+const QString ao3con::url_start = "https://archiveofourown.org/works?utf8=%E2%9C%93&commit=Sort+and+Filter";
 //-------------------------------------------
 QString ao3con::MakeUrlPart(size_t rindex, size_t sindex, size_t windex, QString intag, bool conly, bool ieng_only) {
   if (rindex>rat_count) return "";

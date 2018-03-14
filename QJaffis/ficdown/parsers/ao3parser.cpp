@@ -26,7 +26,7 @@ jfAO3_FicPartParser::jfAO3_FicPartParser():jfStoryPartParseBase() {}
 // virual methods that are implemented
 //------------------------------------
 QString* jfAO3_FicPartParser::makeRedirectedURL(const QString& inPart) {
-  if (inPart=="http://archiveofourown.org/") return NULL;
+  if (inPart=="https://archiveofourown.org/") return NULL;
   // AO3 redirects are pretty simple
   QString* rresult = new QString(inPart);
   (*rresult) += "?view_adult=true";
@@ -208,7 +208,7 @@ bool jfAO3_FicPartParser::ParseOtherPage() {
 bool jfAO3_FicPartParser::ExtractChapterFicIDs(jfFicExtract_AO3* extract_ptr, QString& out_partname) {
   // constants
   const QString fname = "jfAO3_FicPartParser::ExtractChapterFicIDs";
-  const QString toomuch = "<textarea cols=\"50\" rows=\"4\" id=\"embed_code\">&lt;a href=&quot;http://archiveofourown.org/works/";
+  const QString toomuch = "<textarea cols=\"50\" rows=\"4\" id=\"embed_code\">&lt;a href=&quot;https://archiveofourown.org/works/";
   const QString embed_code = "<textarea cols=\"50\" rows=\"4\" id=\"embed_code\">";
   const QString select1 = "<select name=\"selected_id\" id=\"selected_id\">";
   const QString select2 = "<select id=\"selected_id\" name=\"selected_id\">";
@@ -269,7 +269,7 @@ bool jfAO3_FicPartParser::ExtractChapterFicIDs(jfFicExtract_AO3* extract_ptr, QS
           return parsErr("Problems with getting fic id! : Twitter");
       }
       /**/lpt->tLog(fname,9);
-      if (!xparser.GetDelimitedULong("data-url=\"http://archiveofourown.org/works/","\"",qval,errres)) {
+      if (!xparser.GetDelimitedULong("data-url=\"https://archiveofourown.org/works/","\"",qval,errres)) {
           return parsErr("Problems with getting fic id! : " + errres);
       }
       /**/lpt->tLog(fname,10);

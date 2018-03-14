@@ -427,7 +427,7 @@ jfFicExtract_AO3::jfFicExtract_AO3(const jfFicExtract_AO3& source):jfFicExtract_
 // virtual methods
 //-----------------------------------------------------
 QString jfFicExtract_AO3::MakeUrl(size_t inval) const {
-  QString result = "http://archiveofourown.org/works/";
+  QString result = "https://archiveofourown.org/works/";
   assert(inval<=chapterids.size());
   result += QString::number(fic_id) + "/";
   if (pcount!=1) {
@@ -440,13 +440,13 @@ QString jfFicExtract_AO3::MakeUrl(size_t inval) const {
 //-----------------------------------------------------
 QString jfFicExtract_AO3::FirstUrl() const {
   QString result;
-  result = "http://archiveofourown.org/works/";
+  result = "https://archiveofourown.org/works/";
   result += QString::number(fic_id) + "?view_adult=true";
   return result;
 }
 //-----------------------------------------------------
 QString jfFicExtract_AO3::MakeAuthlink() const {
-  QString result = "http://archiveofourown.org/users/";
+  QString result = "https://archiveofourown.org/users/";
   result += author_name + "/";
   return result;
 }

@@ -361,7 +361,7 @@ bool jfAO3Fanfic::ParseStart() {
     return parseError("Error in getting fic id : " + errpass);
   }
   num_id = tval;
-  primarylink = "http://archiveofourown.org/works/" + QString::number(num_id);
+  primarylink = "https://archiveofourown.org/works/" + QString::number(num_id);
   primarylink += "?view_adult=true";
   // title
   if (!x_parser->GetMovePast("</a>",name)) return parseError("Could not extract title!");
@@ -377,7 +377,7 @@ bool jfAO3Fanfic::ParseStart() {
     if (!x_parser->GetDelimited("href=\"","\"",buffer)) {
       return parseError("Error in getting author link!");
     }
-    author_url = "http://archiveofourown.org" + buffer;
+    author_url = "https://archiveofourown.org" + buffer;
     // author name
     if (!x_parser->GetDelimited(">","</a>",author_name)) {
       return parseError("Error in getting author name!");
@@ -393,7 +393,7 @@ bool jfAO3Fanfic::ParseStart() {
   tparser = new jfStringParser(buffer);
   while (tparser->MovePast("<a class=\"tag\"")) {
     if (!tparser->GetDelimited("href=\"","\"",curl)) break;
-    curl = "http://archiveofourown.org" + curl;
+    curl = "https://archiveofourown.org" + curl;
     if (curl==cats[0]->GetUrl()) continue;
     temp = ao3_catdata::ao3_catmanager->GetData()->FindByUrl(curl);
     /* note that I've decided to ignore unfound fandoms after my first first
@@ -535,7 +535,7 @@ bool jfAO3Fanfic::ParseEnd() {
     if (!x_parser->GetDelimited("<a href=\"","\">",buffer2)) {
       return parseError("Problems getting series url!");
     }
-    series_url = "http://archiveofourown.org" + buffer2;
+    series_url = "https://archiveofourown.org" + buffer2;
     if (!x_parser->GetMovePast("</a>",buffer1)) {
       return parseError("Problems getting series name!");
     }
