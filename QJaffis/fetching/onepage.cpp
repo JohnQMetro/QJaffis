@@ -43,7 +43,7 @@ void jfOnePageGetter::StartProcessing() {
     if (parser_ptr != NULL) {
         getter = new jfFetchPage();
         okay = getter->SetParams(parser_ptr);
-        if (okay) okay = getter->SetURL(downurl);
+        if (okay) okay = getter->SetURL(downurl,1);
     }
     emit sendStart(okay);
     started = okay;

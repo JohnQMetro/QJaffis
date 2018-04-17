@@ -141,6 +141,7 @@ bool jfPauseStop::CancelStopAfter() {
 // should be called frequently, if true, we halt
 bool jfPauseStop::CheckPauseStop() {
   const QString fname = "jfPauseStop::CheckPauseStop";
+  /**/JDEBUGLOG(fname,0);
   protect_data.lock();
   if (istatus==jfps_STOPPING) {
     protect_data.unlock();

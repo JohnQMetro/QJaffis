@@ -3,7 +3,7 @@ Name    : pagegetter.cpp
 Basic   : Defines my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 16, 2013
-Updated : June 14, 2016
+Updated : March 24, 2018
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
@@ -49,12 +49,13 @@ jfFetchPage::jfFetchPage() {
 // Setting inputs
 //--------------------------
 // Setting the url. Returns true if we are before a download and the url is okay
-bool jfFetchPage::SetURL(const QString& inurl) {
+bool jfFetchPage::SetURL(const QString& inurl, const size_t& url_index) {
   // setting paramaters is only allowed before the download
   if (isdownloading) return false;
   if (afterdownload) return false;
   // setting
   fetch_this.setEncodedUrl(inurl.toLatin1());
+  testsDelegate->setPageIndex(url_index);
   return fetch_this.isValid();
 }
 //--------------------------
@@ -63,7 +64,7 @@ bool jfFetchPage::SetParams(jfPageParserBase* in_testsDelegate) {
   // setting paramaters is only allowed before the download
   // setting the values
   testsDelegate = in_testsDelegate;
-  cookie = testsDelegate->getCookie();
+  // cookie = testsDelegate->getCookie();
   // done
   return true;
 }
@@ -76,11 +77,16 @@ bool jfFetchPage::StartDownload() {
   const QString fname = "jfFetchPage::StartDownload";
   QByteArray cookie_value;
   QList<QSslError> sslErrors2Ignore;
+  /**/JDEBUGLOG(fname,1);
+  QString cookie = testsDelegate->getCookie();
   // starting a download is only allowed before a download!
+
   if (isdownloading) return false;
+  /**/JDEBUGLOG(fname,2);
   if (afterdownload) return false;
   // we need a valid url
   if (!fetch_this.isValid()) return false;
+  /**/JDEBUGLOG(fname,3);
   // building the request
   req = new QNetworkRequest(fetch_this);
   // for the request, there are some default values we have to overriden
@@ -95,12 +101,15 @@ bool jfFetchPage::StartDownload() {
     cookie_value = cookie.toLatin1();
     req->setRawHeader("cookie",cookie_value);
   }
+  /**/JDEBUGLOG(fname,4);
   // now we build the manager
   if (intermediary == NULL) intermediary = new QNetworkAccessManager();
   sslErrors2Ignore.append(QSslError(QSslError::NoError));
+  /**/JDEBUGLOG(fname,5);
   // and get the reply object
   raw_result = intermediary->get(*req);
   raw_result->ignoreSslErrors();
+  /**/JDEBUGLOG(fname,6);
   // done
   isdownloading = true;
   return true;
@@ -168,6 +177,7 @@ bool jfFetchPage::PrepareResults() {
   rc = ClearObjects();
   assert(rc);
   errlog[theerror]++;
+  /**/JDEBUGLOGS(fname,6,"Finished")
   return (theerror==jff_NOERROR);
 }
 //--------------------------

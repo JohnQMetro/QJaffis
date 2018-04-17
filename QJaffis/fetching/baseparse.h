@@ -3,7 +3,7 @@ Name    : baseparse.h
 Basic   : Declares a base class that handles page parsing (and redirection)
 Author  : John Q Metro
 Started : June 13, 2016
-Updated : June 28, 2016
+Updated : March 24, 2018
 
 ******************************************************************************/
 #ifndef BASEPARSE_H
@@ -30,7 +30,7 @@ class jfPageParserBase {
     // constructor
     jfPageParserBase();
     virtual ~jfPageParserBase();
-    void SetLogPointer(jfLoggBase* in_ptr);
+    virtual void SetLogPointer(jfLoggBase* in_ptr);
     // custom parse method
     virtual void ParseDownloadedPage(const QString& inPage, size_t pageindex) = 0;
     virtual void* getResults() = 0;
@@ -40,6 +40,7 @@ class jfPageParserBase {
     virtual bool testMissing(const QString *page) const = 0;
     virtual bool testIncomplete(const QString *page) const = 0;
     // getting results
+    virtual bool setPageIndex(const size_t& page_index);
     bool isPageParsed() const;
     QString getParseErrorMessage() const;
     size_t getPageCount() const;

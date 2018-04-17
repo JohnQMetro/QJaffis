@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    Includes for the main window
 // Created:     July 14, 2016.
-// Updated:     December 29, 2017
+// Updated:     March 30, 2018
 //***************************************************************************
 #ifndef MW_INCLUDES_H
   #define MW_INCLUDES_H
@@ -78,6 +78,10 @@
 #ifndef FIMTAGDOWN_DIALOG_H
     #include "fanfic/interface/fim/fimtagdown_dialog.h"
 #endif // FIMTAGDOWN_DIALOG_H
+
+#ifndef TESTPANEL_H
+    #include "test/testpanel.h"
+#endif // TESTPANEL_H
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // other

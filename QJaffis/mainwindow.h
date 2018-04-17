@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    Guess
 // Created:     By QtCreator, forgot when
-// Updated:     December 29, 2017
+// Updated:     March 30, 2018
 //***************************************************************************
 #ifndef MAINWINDOW_H
   #define MAINWINDOW_H
@@ -47,6 +47,7 @@ class jfMainWindow : public QMainWindow {
     void launchFIMGroupSearch();
     void launchDirectorySync();
     void fimTagDownload();
+    void launchTestsPanel();
     // non menu slots
     void handleTabChanged(int index);
     void handleSearchStart();

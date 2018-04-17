@@ -273,47 +273,48 @@ bool jfBaseDownloader::LoopGet(){
     /**/tLogS(fname,9,result_page_index);
     // getting and handling the results
     current_results = threads[current_index]->GetResults();
+    /**/tLogS(fname,10,current_index);
     tpagecount = current_results->pagecount;
-    /**/tLogS(fname,10,tpagecount);
+    /**/tLogS(fname,11,tpagecount);
     haltmode = (!HandleResults(current_results)) && (!skip_on_fail);
     delete current_results;
     current_results = NULL;
     pcountr = handlePagecount(tpagecount,current_index);
-    /**/tLogB(fname,11,pcountr);
+    /**/tLogB(fname,12,pcountr);
     // if we halt, we break out of the loop
     if (haltmode || (!pcountr)) break;
-    /**/tLog(fname,12);
+    /**/tLogB(fname,13,pauser == NULL);
     // here, checking the pause/stop
     halting = pauser->CheckPauseStop();
-    /**/tLog(fname,13);
+    /**/tLog(fname,14);
     if (halting) {
-      /**/tLog(fname,14);
+      /**/tLog(fname,15);
       haltmode = true;
       current_error = jfa_HALT;
       SendHaltMessage();
-      /**/tLog(fname,15);
+      /**/tLog(fname,16);
       break;
     }
-    /**/tLog(fname,16);
+    /**/tLog(fname,17);
     // otherwise, we do the next url (unless there is none)
     if (url_page_index < pagecount) {
-      /**/tLogS(fname,17,url_page_index);
+      /**/tLogS(fname,18,url_page_index);
       if (advanceFetchIndex()) {
         url_to_send = makeURLforPage(url_page_index);
-        /**/tLog(fname,18,*url_to_send);
+        /**/tLog(fname,19,*url_to_send);
         threads[current_index]->SendURL(url_to_send,url_page_index);
       }
     }
-    /**/tLogS(fname,19,current_index);
+    /**/tLogS(fname,20,current_index);
     // next index
     incrThreadIndex(current_index);
-    /**/tLog(fname,20);
+    /**/tLog(fname,21);
   }
-  /**/tLog(fname,21);
+  /**/tLog(fname,22);
   /* After the loop, stopping the threads (any maybe discarding results,
    * if there is a premature halt). */
   for (size_t xindex = 0; xindex < actual_threads ; xindex ++) {
-    /**/tLogL(fname,22,xindex);
+    /**/tLogL(fname,23,xindex);
     // getting and disposing of any results
     if (threads[xindex]->isFetching()) {
       current_results = threads[xindex]->GetResults();

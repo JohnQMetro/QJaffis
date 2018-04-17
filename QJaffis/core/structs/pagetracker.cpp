@@ -97,7 +97,7 @@ bool jfPageTracker::NotHtml(size_t index) const {
   // we extract
   cenum = (*typelist)[index];
   // and test
-  return ((cenum==jftl_GLOBFILEDIT) || (cenum==jftl_SKELEDIT)  || (cenum==jftl_FICUPDATE));
+  return ((cenum==jftl_GLOBFILEDIT) || (cenum==jftl_SKELEDIT)  || (cenum==jftl_FICUPDATE) || (cenum==jftl_TESTS));
 }
 //------------------------------------------------------------
 bool jfPageTracker::IsUpdater(size_t index) const {
@@ -117,6 +117,11 @@ bool jfPageTracker::IsFFNSearch(size_t index) const {
 bool jfPageTracker::IsFicUpdate(size_t index) const {
   assert(index<num_items);
   return (((*typelist)[index])==jftl_FICUPDATE);
+}
+//-----------------------------------------------------------
+bool jfPageTracker::IsTests(size_t index) const {
+    assert(index<num_items);
+    return (((*typelist)[index])==jftl_TESTS);
 }
 //------------------------------------------------------------
 jf_tlPageType jfPageTracker::GetType(size_t index) const {

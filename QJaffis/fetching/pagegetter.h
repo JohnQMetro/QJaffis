@@ -3,7 +3,7 @@ Name    : pagegetter.h
 Basic   : Declares my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 15, 2013
-Updated : June 13, 2016
+Updated : March 30, 2018
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
@@ -34,7 +34,7 @@ class jfPageParserBase; // forward declaration
 /* Page fetching class.
 -Generally, one calls SetParams(,,) to setup basic info for a site, before doing a loop
   that fetches multiple pages from that site.
--For each loop, SetURL() should be called first, and the result should be checked.
+-For each loop, SetURL(,) should be called first, and the result should be checked.
 -Then one calls StartDownload().
 -Optionally, once can do something else, because the download is asynchronous
 -After, call PrepareResults() to try and get the page. If there is an error, we set
@@ -53,7 +53,7 @@ class jfFetchPage : public QObject {
     // constructor
       jfFetchPage();
     // setting inputs
-      bool SetURL(const QString& inurl);
+      bool SetURL(const QString& inurl, const size_t& url_index);
       bool SetParams(jfPageParserBase* in_testsDelegate);
     // main functional methods
       bool StartDownload();  // starts the download, true if the url is valid and no download has been started
@@ -86,7 +86,6 @@ class jfFetchPage : public QObject {
       QUrl fetch_this;    // url to fetch the webpage
       // fp : tests if the result is just a message about missing fics/data
       jfPageParserBase* testsDelegate;
-      QString cookie;                   // no need for more complicated cookies
     // Qt objects used for the download
       QNetworkRequest* req;                 // combined with url and cookie to fetch
       QNetworkAccessManager* intermediary; // uses req to make raw_result

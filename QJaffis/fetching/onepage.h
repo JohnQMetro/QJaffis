@@ -1,6 +1,6 @@
 /*****************************************************************************
 Name    : onepage.h
-Basic   : Attempt at a simplified downloader for one page
+Basic   : Simplified downloader for one page
 Author  : John Q Metro
 Started : December 26, 2017
 Updated : December 26, 2017

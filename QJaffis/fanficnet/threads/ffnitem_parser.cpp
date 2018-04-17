@@ -98,15 +98,18 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
   /**/lpt->tLog(fname,8);
   // done with the items
   if (!(page_results->empty())) {
+      /**/lpt->tLog(fname,9);
     firstid = (*page_results)[0]->GetID();
     // post page processing and getting the result
+    /**/lpt->tLog(fname,10);
     PostPageProcessing();
+    /**/lpt->tLog(fname,11);
   }
   else {
       firstid = 0;
   }
   page_parsed = true;
-  /**/lpt->tLog(fname,9);
+  /**/lpt->tLog(fname,12);
 }
 
 //----------------------------------

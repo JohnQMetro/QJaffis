@@ -38,6 +38,7 @@ void jfStoryPartParseBase::ParseDownloadedPage(const QString& inPage, size_t pag
   if (pageindex == 1) result = ParseFirstPage(inPage);
   else if (pageindex > 1) result = ParseOtherPage();
   else assert(false);
+  /**/lpt->tLog(fname,2);
   // done
   page_parsed = result;
 }

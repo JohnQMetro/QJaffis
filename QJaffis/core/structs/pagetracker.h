@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    Declares a class to keep track of top-level notebook pages
 Created:     November 7, 2009
 Qt Conversion Started September 14, 2013
-Updated:     February 16, 2013
+Updated:     March 30, 2018
 ******************************************************************************/
 #ifndef PAGETRACKER_H_INCLUDED
 #define PAGETRACKER_H_INCLUDED
@@ -15,7 +15,7 @@ Updated:     February 16, 2013
 /******************************************************************************/
 // identifies page type
 enum jf_tlPageType {jftl_GLOBFILEDIT,jftl_SKELEDIT, jftl_GOOGSEARCH, jftl_FFNSEARCH, jftl_FFNUPDATE,
-                        jftl_FIMSEARCH, jftl_AO3SEARCH, jftl_FICUPDATE, jftl_FIMGSEARCH};
+                        jftl_FIMSEARCH, jftl_AO3SEARCH, jftl_FICUPDATE, jftl_FIMGSEARCH, jftl_TESTS};
 //-----------------------------------------------------
 class jfPTypeVector : public std::vector<jf_tlPageType> {};
 //=============================================================================
@@ -37,6 +37,7 @@ class jfPageTracker {
     bool   IsUpdater(size_t index) const;
     bool   IsFFNSearch(size_t index) const;
     bool   IsFicUpdate(size_t index) const;
+    bool   IsTests(size_t index) const;
     jf_tlPageType GetType(size_t index) const;
     // maniupulating pages
     bool AddPage(QWidget* inpage,jf_tlPageType ptype);

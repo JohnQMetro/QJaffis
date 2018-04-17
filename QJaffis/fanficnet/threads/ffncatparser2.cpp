@@ -113,7 +113,7 @@ bool jfFFNCrossoverParser::ParsePageCore(size_t pageindex) {
   bool store_result;
   // we start...
   /**/lpt->tLog(fname,0);
-  assert(crossstore_ptr != NULL);
+  // assert(crossstore_ptr != NULL);
   /**/lpt->tLog(fname,1);
   if (!xparser.MovePast(arrow_tag)) return parsErr("Cannot Find Arrow Switch!");
   // catname and name, we use FromEnd just in case a category name includes 'Crossovers'
@@ -156,9 +156,16 @@ bool jfFFNCrossoverParser::ParsePageCore(size_t pageindex) {
     }
     else {
       // adding the category...
-      rcat = crossstore_ptr->AddCategoryAndSetSection(tcat,store_result,uval,sname);
-      if (!store_result) delete tcat;
-      result_data->AddCategoryWhenUnsorted(rcat);
+      if (crossstore_ptr != NULL) {
+        rcat = crossstore_ptr->AddCategoryAndSetSection(tcat,store_result,uval,sname);
+        if (!store_result) delete tcat;
+        result_data->AddCategoryWhenUnsorted(rcat);
+      }
+      else {
+        tcat->SetSectionByID(uval,sname);
+        result_data->AddCategoryWhenUnsorted(rcat);
+      }
+
     }
     // done with the cat
   }

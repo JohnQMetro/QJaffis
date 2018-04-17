@@ -3,7 +3,7 @@ Name    : progress_panel.h
 Basic   : Defines abstract panel with progress bar that shows download info
 Author  : John Q Metro
 Started : March 31, 2013
-Updated : June 23, 2016
+Updated : April 17, 2018
 
 ******************************************************************************/
 #ifndef PROGRESS_PANEL_H
@@ -60,8 +60,8 @@ class jfProgressPanelBase : public QWidget {
       void HandleItemCount(int eitemcount);
       void HandleNewItem(struct jfItemInfoMsg itemdata);
       void HandleNewItemAction(QString action_name);
-      void HandleItemDone();
-      void HandleError(struct jfFetchErrorBundle error_info);
+      virtual void HandleItemDone();
+      virtual void HandleError(struct jfFetchErrorBundle error_info);
       void HandleAllDone(bool isfinished);
       void HandleReset();
   protected:

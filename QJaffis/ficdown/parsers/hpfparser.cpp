@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Harry Potter fanfic
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   August 4, 2016
+ * Updated:   April 17, 2018
  *
  **************************************************************/
 #ifndef HPFPARSER_H
@@ -93,17 +93,21 @@ bool jfHPF_FicPartParser::ParseFirstPage(const QString& indata) {
   /**/lpt->tLog(fname,4,buffer);
   // part count
   if (!xparser.GetDelimitedULong("<b>Chapters:</b>","<br>",qval,errval)) {
+       /**/lpt->tLog(fname,5,buffer);
     delete result;
+      /**/lpt->tLog(fname,6,buffer);
     return parsErr("Cannot extract chapter count!");
   }
+  /**/lpt->tLog(fname,6,buffer);
   // status
   if (!xparser.GetDelimited("<b>Status:</b>","<br>",buffer)) {
     delete result;
     return parsErr("Cannot extract status");
   }
+  /**/lpt->tLog(fname,7,buffer);
   result->pcount = qval;
   buffer = buffer.trimmed();
-  /**/lpt->tLog(fname,5,buffer);
+  /**/lpt->tLog(fname,8,buffer);
   result->complete = (buffer=="Completed");
 
   // next, all we need is the updated date, much easier than fimfiction
@@ -111,6 +115,7 @@ bool jfHPF_FicPartParser::ParseFirstPage(const QString& indata) {
     delete result;
     return parsErr("Cannot find updated date!");
   }
+  /**/lpt->tLog(fname,9,buffer);
   (result->updated_date) = QDate::fromString(buffer,"yyyy.MM.dd");
   if (!(result->updated_date).isValid()){
     delete result;
@@ -122,7 +127,7 @@ bool jfHPF_FicPartParser::ParseFirstPage(const QString& indata) {
   }
   // handling the chapters
   ccount = 0;
-  /**/lpt->tLog(fname,7);
+  /**/lpt->tLog(fname,10);
   // getting chapters ids
   while (xparser.GetDelimitedULong("<a href=\"?chapterid=","\">",qval,errval)) {
     result->chapterids.push_back(qval);
@@ -133,7 +138,7 @@ bool jfHPF_FicPartParser::ParseFirstPage(const QString& indata) {
     (result->partnames).append(htmlparse::ConvertEntities(buffer.trimmed(),false));
     ccount++;
   }
-  /**/lpt->tLogS(fname,8,ccount);
+  /**/lpt->tLogS(fname,11,ccount);
   // alternate version that works for 'mature' fics
   if (ccount==0) {
     while (xparser.GetDelimitedULong(hpciex,"&i=",qval,errval)) {
@@ -146,14 +151,14 @@ bool jfHPF_FicPartParser::ParseFirstPage(const QString& indata) {
       ccount++;
     }
   }
-  /**/lpt->tLogS(fname,9,ccount);
+  /**/lpt->tLogS(fname,12,ccount);
   // checking the result
   if ((result->pcount)!=ccount) {
     delete result;
     return parsErr("Stated partcount does not match list of parts!");
   }
   // done
-  /**/lpt->tLog(fname,10);
+  /**/lpt->tLog(fname,13);
   partcount = result->pcount;
   pagecount = partcount + 1;
   extract = result;
@@ -170,7 +175,8 @@ bool jfHPF_FicPartParser::ParseOtherPage() {
   QString buffer;
   jfFicPart result;
   // starting...
-  if (!xparser.MovePast(hval)) return parsErr("Cannot find ‘header’ tag!");
+  /**/lpt->tLog(fname,1);
+  if (!xparser.MovePast(hval)) return parsErr("Cannot find Â‘headerÂ’ tag!");
   // we get chapter info (used to determine partcount and partindex)
   if (xparser.GetDelimited(cboxs,"</form>",buffer)) {
     if (!HandleChapters(buffer,result)) {
@@ -182,20 +188,24 @@ bool jfHPF_FicPartParser::ParseOtherPage() {
     result.partcount = partcount = 1;
     result.partindex = 1;
   }
+  /**/lpt->tLog(fname,2);
   // moving to the part name
   if (!xparser.MovePastTwo("<center>","<br>")) return false;
   if (!xparser.MovePast(" : ")) return false;
   // getting the part name
   if (!xparser.GetMovePast("</center>",buffer)) return false;
   result.part_name = buffer.trimmed();
+  /**/lpt->tLog(fname,3);
   // next, the contents
   if (!xparser.GetDelimited("<div id='fluidtext'>","</div><br><hr>",buffer)) return false;
   // finishing off for the results
   fpart = new jfFicPart(result);
   partcount = result.partcount;
   pagecount = partcount+1;
+  /**/lpt->tLog(fname,4);
   // processing contents
   fpart->part_contents = PartProcessing(buffer);
+  /**/lpt->tLog(fname,5);
   // done
   return true;
 }
@@ -240,13 +250,21 @@ bool jfHPF_FicPartParser::HandleChapters(QString inbuffer,jfFicPart& fpoint) {
 
 //--------------------------------------
 QString jfHPF_FicPartParser::PartProcessing(QString inbuffer) {
+    const QString fname = "jfHPF_FicPartParser::PartProcessing";
+  /**/JDEBUGLOG(fname,1);
   inbuffer = inbuffer.trimmed();
   // misc non-breaking spaces
   inbuffer.replace("&nbsp;<br />","<br />");
   inbuffer.replace("<div>&nbsp;</div><br />","<br />");
   inbuffer.replace("<div><br />\n&nbsp;</div><br />","<br />\n<br />");
+  /**/JDEBUGLOG(fname,2)
   // getting rid of too may linebreaks... we do need the loop
-  while (0!=inbuffer.replace("<br />\n<br />\n<br />","<br />\n<br />"));
+  int oldlen,newlen;
+  do {
+      oldlen = inbuffer.length();
+      inbuffer.replace("<br />\n<br />\n<br />","<br />\n<br />");
+      newlen = inbuffer.length();
+  } while (oldlen != newlen);
   return inbuffer;
 }
 /**************************************************************/

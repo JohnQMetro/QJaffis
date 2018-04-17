@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Fimfiction.net parser for full item pages
             search results.
 Created :   June 30, 2016
-Updated :   June 30, 2016
+Updated :   April 14, 2018
 ******************************************************************************/
 #ifndef FIMPARSE_ITEMS_H
   #include "fimparse_items.h"
@@ -135,7 +135,8 @@ bool jfFIMPageParser::testIncomplete(const QString *page) const {
 // the cookie
 QString jfFIMPageParser::getCookie() const {
   jfFIMSearch* typed_search = dynamic_cast<jfFIMSearch*>(search_ptr);
-  if (typed_search->GetMature()) return "view_mature=true";
+  if (typed_search == NULL)return "view_mature=true";
+  else if (typed_search->GetMature()) return "view_mature=true";
   else return "";
 
 }

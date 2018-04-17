@@ -194,7 +194,11 @@ SOURCES += main.cpp\
     fanfic/threads/fim/newfimgroup_parser.cpp \
     core/filters/fim/fimfilters3.cpp \
     interface/filters/fim/fim3_filedit.cpp \
-    interface/misc/widgets4.cpp
+    interface/misc/widgets4.cpp \
+    test/testparse.cpp \
+    test/testurl.cpp \
+    test/testthread.cpp \
+    test/testpanel.cpp
 
 HEADERS  += mainwindow.h \
     initend.h \
@@ -377,7 +381,12 @@ HEADERS  += mainwindow.h \
     fanfic/threads/fim/newfimgroup_parser.h \
     core/filters/fim/fimfilters3.h \
     interface/filters/fim/fim3_filedit.h \
-    interface/misc/widgets4.h
+    interface/misc/widgets4.h \
+    test/testparse.h \
+    test/testurl.h \
+    test/testthread.h \
+    test/testpanel.h \
+    fanficnet/categories/catgroup.h
 
 OTHER_FILES += \
     todo.txt

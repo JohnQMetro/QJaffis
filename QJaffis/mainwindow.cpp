@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    Guess
 // Created:     By QtCreator, forgot when
-// Updated:     December 29, 2017
+// Updated:     March 30, 2018
 //***************************************************************************
 #ifndef MAINWINDOW_H
   #include "mainwindow.h"
@@ -35,6 +35,7 @@ namespace mac {
   QAction* defdir, *dwnffic;
   QAction* syncdir;
   QAction* fimtag;
+  QAction* tests;
 }
 //***************************************************************************
 jfMainWindow::jfMainWindow(QWidget *parent):QMainWindow(parent) {
@@ -345,7 +346,17 @@ void jfMainWindow::fimTagDownload() {
     fimtag_dialog->raise();
     fimtag_dialog->activateWindow();
 }
-
+//----------------------------------------------------------
+void jfMainWindow::launchTestsPanel() {
+    jfTestDisplay* test_panel;
+    QString tabname = "Tests";
+    test_panel = new jfTestDisplay();
+    ptracker->AddPage(test_panel,jftl_TESTS);
+    int tests_idx = main_display->addTab(test_panel,tabname);
+    // connect(fic_upd, SIGNAL(relayDoneSignal()), this, SLOT(handleFicUpdateEnd()));
+    main_display->setCurrentIndex(tests_idx);
+    EnableClose();
+}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // non menu slots
 //-------------------------------------------------------
@@ -544,6 +555,7 @@ void jfMainWindow::SetupMainMenu() {
   mac::sked = tmenu->addAction("Skeleton Editor...",this,SLOT(showGlobalSkeletons()));
   mac::gfil = tmenu->addAction("Global Filter Editor...",this,SLOT(showGlobalFilterEditor()));
   mac::defdir = tmenu->addAction("Default Directories...",this,SLOT(showPreferences()));
+  mac::tests = tmenu->addAction("Test download and parse...",this,SLOT(launchTestsPanel()));
   tmenu->addSeparator();
   mac::ffnc = tmenu->addAction("Download FFN Catgeories...",this,SLOT(launchFFNCategoryDownload()));
   mac::ao3c = tmenu->addAction("Download AO3 Fandoms...",this,SLOT(launchAO3FandomDownload()));

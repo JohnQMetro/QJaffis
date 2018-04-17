@@ -3,7 +3,7 @@ Name    : fetchandparse.h
 Basic   : Basal threads for download and parsing
 Author  : John Q Metro
 Started : October 17, 2015
-Updated : June 26, 2016
+Updated : March 24, 2018
 
 ******************************************************************************/
 #ifndef FETCHANDPARSE_H
@@ -79,7 +79,7 @@ void jfFetchAndParsePage::StartProcessing() {
   downloader = new jfFetchPage();
   downloader->SetParams(parser);
   /**/tLog(fname,2);
-  // the main loop, continues until get get a NULL URL
+  // the main loop, continues until we get a NULL URL
   while (fname,true) {
     /**/tLog(fname,3);
     // getting the URL (may block)
@@ -157,7 +157,7 @@ void jfFetchAndParsePage::StartProcessing() {
 bool jfFetchAndParsePage::DownloadPage() {
     const QString fname = "jfFetchAndParsePage::DownloadPage";
     /**/tLog(fname,1);
-  downloader->SetURL(urlToGet);
+  downloader->SetURL(urlToGet,urlIndex);
   /**/tLog(fname,2);
   downloader->StartDownload();
   /**/tLog(fname,3);
