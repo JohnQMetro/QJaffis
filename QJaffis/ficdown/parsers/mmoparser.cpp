@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: MediaMiner.org
  * Author:    John Q Metro
  * Created:   July 6, 2016
- * Updated:   August 4, 2016
+ * Updated:   April 18, 2018
  *
  **************************************************************/
 #ifndef MMOPARSER_H
@@ -51,7 +51,7 @@ bool jfMMO_FicPartParser::ParseFirstPage(const QString& indata) {
 
   // the url fragment, and fic id, can best be found in the <head>
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePast("<link rel=\"canonical\" href=\"http://www.mediaminer.org/fanfic/s/")) {
+  if (!xparser.MovePast("<link rel=\"canonical\" href=\"https://www.mediaminer.org/fanfic/s/")) {
     return parsErr("Cannot find story link in head!");
   }
   if (!xparser.MovePastTwice("/")) return parsErr("Problems in parsing link url!");
@@ -87,7 +87,7 @@ bool jfMMO_FicPartParser::ParseFirstPage(const QString& indata) {
     return parsErr("Cannot find end of author name!");
   }
   result->author_name = buffer.trimmed();
-  // net up, the ‘Uploaded Date’ — which is the only date provided, seems to be updated
+  // net up, the Â‘Uploaded DateÂ’ Â— which is the only date provided, seems to be updated
   if (!xparser.GetDelimited("<b>Uploaded On: </b>","|",buffer)) {
     delete result;
     return parsErr("Cannot get uploaded date!");
@@ -145,7 +145,7 @@ bool jfMMO_FicPartParser::ParseOtherPage() {
 
   // the part id can best be found in the <head>
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePast("<link rel=\"canonical\" href=\"http://www.mediaminer.org/fanfic/c/")) {
+  if (!xparser.MovePast("<link rel=\"canonical\" href=\"https://www.mediaminer.org/fanfic/c/")) {
     return parsErr("Cannot chapter link in head!");
   }
   if (!xparser.MovePastTwice("/")) return parsErr("Problems in parsing link url!");
@@ -205,6 +205,13 @@ QString jfMMO_FicPartParser::PartProcessing(QString inbuffer) {
   inbuffer = inbuffer.trimmed();
   // chopping div
   inbuffer.chop(6);
+  // handling windows 1251 characters (embedded in UTF-8)
+  inbuffer.replace(QChar(133),"&hellip;");
+  inbuffer.replace(QChar(147),"&ldquo;");
+  inbuffer.replace(QChar(148),"&rdquo;");
+  inbuffer.replace(QChar(145),"&lsquo;");
+  inbuffer.replace(QChar(146),"&rsquo;");
+
   return inbuffer.trimmed();
 }
 

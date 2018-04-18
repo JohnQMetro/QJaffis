@@ -3,7 +3,7 @@ Name    : pagegetter.cpp
 Basic   : Defines my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 16, 2013
-Updated : March 24, 2018
+Updated : April 18, 2018
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
@@ -325,7 +325,7 @@ bool jfFetchPage::ProcessResult() {
   // internal variables
   QByteArray byteresult, content_header;
   QString charset, buffer;
-  QTextCodec* htmlcodec, *defaultcodec;
+  QTextCodec *htmlcodec, *defaultcodec, *win1252codec;
   // reading the raw results
   content_header = raw_result->rawHeader("Content-Type");
   byteresult = raw_result->readAll();
@@ -351,6 +351,18 @@ bool jfFetchPage::ProcessResult() {
       thepage = NULL;
       return false;
     }
+  }
+  // trying to get around treating Windows-1252 as UTF-8
+  if (thepage->contains(QChar(0xFFFD))) {  // the presence of 'Unicode Replacement Characters' indicates problems
+      // the above probably happens if Windows-1252 is mislabelled as utf-8
+      bool checkbyte;
+      // check for certain bytes
+      checkbyte = byteresult.contains((char)133) || byteresult.contains((char)147);
+      if (!checkbyte) checkbyte = byteresult.contains((char)148) || byteresult.contains((char)145);
+      if (!checkbyte) checkbyte = byteresult.contains((char)146);
+      // if the bytes are in, we treat the bytes as windows-1252
+      win1252codec = QTextCodec::codecForName("windows-1252");
+      (*thepage) = win1252codec->toUnicode(byteresult);
   }
   /**/JDEBUGLOG(fname,5);
   // done

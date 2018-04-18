@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Harry Potter fanfic
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   April 17, 2018
+ * Updated:   April 18, 2018
  *
  **************************************************************/
 #ifndef HPFPARSER_H
@@ -48,7 +48,7 @@ QString jfHPF_FicPartParser::getCookie() const{
 bool jfHPF_FicPartParser::ParseFirstPage(const QString& indata) {
   // constants
   const QString fname = "ExtractFromIndex_HPF";
-  const QString hpciex = "location = \'http://www.harrypotterfanfiction.com/viewstory2.php?chapterid=";
+  const QString hpciex = "<a href=\"/viewstory2.php?chapterid=";
   const QString abhead1 = "&gt;&gt;</a> </form></span><br clear=all>";
   // variables
   jfFicExtract_HPF* result;
@@ -62,7 +62,7 @@ bool jfHPF_FicPartParser::ParseFirstPage(const QString& indata) {
     return parsErr("Could not find initial tags!");
   }
   // fic id
-  if (xparser.GetDelimitedULong("<a href=\"?psid=","\">",qval,errval)) {
+  if (!xparser.GetDelimitedULong("<center><a href=\"?psid=","\">",qval,errval)) {
     if (!xparser.GetDelimitedULong(" location = '?psid=","'\">",qval,errval)) {
       return parsErr("Could not get fic id!");
     }

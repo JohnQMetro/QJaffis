@@ -75,20 +75,15 @@ void jfFetchAndParsePage::StartProcessing() {
   // initial do once setup
   started = true;
   initLog("FetchAndParse");
-  /**/tLog(fname,1);
   downloader = new jfFetchPage();
   downloader->SetParams(parser);
-  /**/tLog(fname,2);
   // the main loop, continues until we get a NULL URL
   while (fname,true) {
-    /**/tLog(fname,3);
     // getting the URL (may block)
     ures = channel->GetUrl(urlIndex);
-    /**/tLogB(fname,4,ures == NULL);
     // checking URL afterwards
     if (ures==NULL) break;
     urlToGet = *ures;
-    /**/tLog(fname,5,urlToGet);
     currError = DownloadMethod();
     if (currError==jff_NOERROR) {
       /**/tLog(fname,6);

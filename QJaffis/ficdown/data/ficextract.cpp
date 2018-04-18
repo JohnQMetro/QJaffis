@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines Basic types for downloading fanfics
 Created :   March 16, 2012
 Conversion to QT started : April 18, 2013
-Updated :   August 4, 2016
+Updated :   April 18, 2018
 ******************************************************************************/
 #ifndef FICEXTRACT_H_INCLUDED
   #include "ficextract.h"
@@ -376,7 +376,7 @@ jfFicExtract_MMO::jfFicExtract_MMO(const jfFicExtract_MMO& source):jfFicExtract_
 // virtual methods
 //-----------------------------------------------------
 QString jfFicExtract_MMO::MakeUrl(size_t inval) const {
-  QString result = "http://www.mediaminer.org/fanfic/";
+  QString result = "https://www.mediaminer.org/fanfic/";
   assert(inval<=chapterids.size());
   result += "c/" + url_cname_part;
   result += "/" + QString::number(fic_id);
@@ -385,14 +385,14 @@ QString jfFicExtract_MMO::MakeUrl(size_t inval) const {
 }
 //-----------------------------------------------------
 QString jfFicExtract_MMO::FirstUrl() const {
-  QString result = "http://www.mediaminer.org/fanfic/";
+  QString result = "https://www.mediaminer.org/fanfic/";
   result += "s/" + url_cname_part;
   result += "/" + QString::number(fic_id);
   return result;
 }
 //-----------------------------------------------------
 QString jfFicExtract_MMO::MakeAuthlink() const {
-  QString result = "http://www.mediaminer.org/user_info.php/";
+  QString result = "https://www.mediaminer.org/user_info.php/";
   result += QString::number(auth_id);
   return result;
 }
