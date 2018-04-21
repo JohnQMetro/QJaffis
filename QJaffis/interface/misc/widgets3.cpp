@@ -131,7 +131,7 @@ jfDirPicker::jfDirPicker(QWidget* parent,bool vertical, bool left, QString indir
   // creating the widgets
   launch_dialog = new QPushButton("Select a &Directory");
   dlabel = new QLabel(indirlabel + " :");
-  dir_display = new QLabel(indir);
+  dir_display = new QLabel(thedir);
   // arranging
   ArrangeWidgets(vertical,left);
   // finishing
@@ -141,10 +141,12 @@ jfDirPicker::jfDirPicker(QWidget* parent,bool vertical, bool left, QString indir
 // i/o
 //------------------------------
 QString jfDirPicker::GetPath() const {
+  /**/JDEBUGLOGS("jfDirPicker::GetPath()",1,thedir)
   return thedir;
 }
 //------------------------------
 bool jfDirPicker::SetPath(QString inval) {
+  /**/JDEBUGLOGS("jfDirPicker::SetPath()",1,thedir)
   QDir tpath = QDir(inval);
   if (tpath.exists()) thedir = inval;
   else return false;
@@ -153,7 +155,8 @@ bool jfDirPicker::SetPath(QString inval) {
 }
 //-------------------------------
 void jfDirPicker::SetPathUnchecked(const QString& inval) {
-  QString thedir = inval.trimmed();
+    /**/JDEBUGLOGS("jfDirPicker::SetPathUnchecked",1,inval)
+  thedir = inval.trimmed();
   dir_display->setText(thedir);
 }
 //-------------------------------

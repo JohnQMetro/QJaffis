@@ -388,5 +388,7 @@ HEADERS  += mainwindow.h \
     test/testpanel.h \
     fanficnet/categories/catgroup.h
 
+RC_FILE = qjaffis.rc
+
 OTHER_FILES += \
     todo.txt

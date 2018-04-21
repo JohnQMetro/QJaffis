@@ -3,7 +3,7 @@
  * Purpose:   Declares dialog for updating directories
  * Author:    John Q Metro (johnqmetro@hotmail.com)
  * Created:   June 30, 2015
- * Updated:   August 3, 2016
+ * Updated:   April 21, 2018
  *
 **************************************************************/
 #ifndef DIRUPDATE_DIALOG_H_INCLUDED
@@ -107,6 +107,11 @@ jfUpdateDirectory_Dialog::jfUpdateDirectory_Dialog(QWidget* parent):QDialog(pare
   connect(mpanel,SIGNAL(SendStart()),this,SLOT(HandleStart()));
   connect(mpanel,SIGNAL(SendPanelDone(bool)),this,SLOT(HandleDone(bool)));
 
+  /* To allow an invalid default target directory (an sd card or something could be
+   * inserted afterwards, before the sync is started. */
+  QString txdir = jglobal::settings.GetDirectory(jglobal::DestinationForSync);
+  dpanel->SetValue(false,txdir);
+
   QSize xsize = QSize(705,180);
   resize(xsize);
 }
@@ -134,6 +139,7 @@ void jfUpdateDirectory_Dialog::HandleStart() {
   // starting
   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
   testres = GetDirectories(dir_err);
+  /**/JDEBUGLOGS(fname,2,dir_err)
   if (!testres) {
     // preparing the faliure (beacause of bad source or target dir)
     emsg.setIcon(QMessageBox::Critical);
@@ -142,7 +148,8 @@ void jfUpdateDirectory_Dialog::HandleStart() {
     emsg.setStandardButtons(QMessageBox::Abort);
     // showing the faliure
     QApplication::restoreOverrideCursor();
-    emsg.show();
+    QApplication::processEvents();
+    emsg.exec();
   }
   else {
     dpanel->SetLEnabled(false);
@@ -152,6 +159,7 @@ void jfUpdateDirectory_Dialog::HandleStart() {
     QApplication::restoreOverrideCursor();
     thread_object->start();
   }
+  QApplication::restoreOverrideCursor();
 }
 //-------------------------------------------------
 void jfUpdateDirectory_Dialog::HandleDone(bool) {
@@ -185,10 +193,12 @@ void jfUpdateDirectory_Dialog::FinishSizers() {
 }
 //------------------------------------------------------------------------
 bool jfUpdateDirectory_Dialog::GetDirectories(QString& out_err) {
+  const QString fname = "jfUpdateDirectory_Dialog::GetDirectories";
   sdir = dpanel->GetValue(true);
   tdir = dpanel->GetValue(false);
   QDir source_dir = QDir(sdir);
   QDir dest_dir = QDir(tdir);
+  /**/JDEBUGLOGS(fname,1,tdir);
   if (!source_dir.exists()) {
     out_err = "Source Directory does not exist!";
     return false;
