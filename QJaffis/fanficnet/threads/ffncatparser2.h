@@ -3,7 +3,7 @@ Name    : ffncatparser2.h
 Basic   : Fanfiction.Net category parsing, crossover versions
 Author  : John Q Metro
 Started : July 20, 2016
-Updated : July 20, 2016
+Updated : October 22, 2018
 
 ******************************************************************************/
 #ifndef FFNCATPARSER2_H
@@ -22,7 +22,7 @@ Updated : July 20, 2016
 #endif // CROSSOVER_GROUPS_H
 /******************************************************************************/
 /* This parser is supposed to parse the crossover category listings for a
-single fandom. It produces results of type jfFFN_CrossoverGroup  */
+section. It produces results of type jfFFN_CrossoverSection  */
 class jfFFNCrossoverSectionParser : public jfFFNCatParserBase {
   public:
     // constructor

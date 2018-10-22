@@ -43,7 +43,7 @@ class jfBaseDownloader : public jfThreadBase {
     void EndWaitAndClean();
     bool LoopGet();
     void AllDone(bool okay);
-    // sub thread ‘constants’
+    // sub thread 'constants'
     size_t max_threads;
     size_t actual_threads;
     size_t pagecount;

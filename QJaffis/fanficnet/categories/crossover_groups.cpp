@@ -3,7 +3,7 @@
  * Author  : John Q Metro
  * Purpose : Indirect indexes of FFN crossover categories.
  * Created : May 29, 2014
- * Updated : September 6, 2016
+ * Updated : October 22, 2018
  **************************************************************************/
 #ifndef CROSSOVER_GROUPS_H
   #include "crossover_groups.h"
@@ -614,7 +614,9 @@ bool jfFFN_CrossoverSection::SortAll() {
   ResetIndex();
   while (NextIndex()) {
     /**/JDEBUGLOGB(fname,2,(index->second.grouplink)==NULL);
-    if ((index->second.grouplink)==NULL) return false;
+    while ((index->second.grouplink)==NULL) {
+      if (!RemoveAtIndex()) return true;
+    }
     tx = index->second.grouplink->SortLinks();
     /**/JDEBUGLOGB(fname,3,tx);
     if (!tx) return false;
@@ -990,6 +992,15 @@ QString jfFFN_CrossoverSection::CrossLinkModify(QString srclink) const {
   // resuilding
   srclink = "https://www.fanfiction.net/crossovers/" + buffer1;
   return (srclink + "/" + buffer2 + "/");
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfFFN_CrossoverSection::RemoveAtIndex() {
+    if (before_first) return false;
+    if (index == crossgroups.end()) return false;
+    jfFFN_CrossSectionMap::iterator rem_index = index;
+    bool res_next = NextIndex();
+    crossgroups.erase(rem_index);
+    return res_next;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++
 // file i/o output

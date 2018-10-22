@@ -79,6 +79,7 @@ void jfFFN_CategoryDownloader::StartProcessing() {
         /* the pages downloaded are for all crossovers for a fandom, a
         * 'category' groups all fandoms for a section. */
         phase = 3;
+        skip_on_fail = true;
         /**/tLog(fname,5);
         category_data->MakeCrossStore();
         sectiondata.startaction = "Getting";
@@ -148,7 +149,7 @@ bool jfFFN_CategoryDownloader::DoSections(bool iscrossover) {
   return do_result;
 }
 //---------------------------------------
-// crossover group section, csection_index determines hich section is done
+// crossover group section, csection_index determines which section is done
 bool jfFFN_CategoryDownloader::DoCrossoverSection() {
   // initial
   category_data->UrlIndexToStart(csection_index);
