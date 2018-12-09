@@ -3,7 +3,7 @@
  * Author  : John Q Metro
  * Purpose : Indirect indexes of FFN crossover caregories.
  * Created : May 28, 2014
- * Updated : October 22, 2018
+ * Updated : December 9, 2018
  **************************************************************************/
 #ifndef CROSSOVER_GROUPS_H
 #define CROSSOVER_GROUPS_H
@@ -154,6 +154,7 @@ class jfFFN_CrossoverSection : public jfBaseObj {
     ~jfFFN_CrossoverSection();
   protected:
     QString CrossLinkModify(QString srclink) const;
+    bool EmptyAtIndex() const;
     bool RemoveAtIndex();
     // file i/o output
     virtual bool AddMiddleToFile(QTextStream* outfile) const;

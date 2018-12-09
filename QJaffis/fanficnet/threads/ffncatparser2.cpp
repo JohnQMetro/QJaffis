@@ -3,7 +3,7 @@ Name    : ffncatparser2.cpp
 Basic   : Fanfiction.Net category parsing, crossover versions
 Author  : John Q Metro
 Started : July 20, 2016
-Updated : July 20, 2016
+Updated : December 9 2018
 
 ******************************************************************************/
 #ifndef FFNCATPARSER2_H
@@ -26,6 +26,8 @@ bool jfFFNCrossoverSectionParser::ParsePageCore(size_t pageindex) {
   // constants
   const QString fname = "jfFFNCrossoverSectionParser::ParsePageCore";
   const QString arrow_tag = "<img src='/static/fcons/arrow-switch.png'";
+  const QString arrow_tag2 = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
+
   // variables
   QString buffer,errmsg;
   QString secname;
@@ -33,7 +35,9 @@ bool jfFFNCrossoverSectionParser::ParsePageCore(size_t pageindex) {
   jfFFN_HalfCrossover* tcat;
 
   // starting
-  if (!xparser.MovePast(arrow_tag)) return parsErr("Cannot find arrow icon!");
+  if (!xparser.MovePast(arrow_tag2)) {
+    if (!xparser.MovePast(arrow_tag)) return parsErr("Cannot find arrow icon!");
+  }
   if (!xparser.GetDelimitedFromEnd(">","Crossovers",buffer,"<hr size=1")) {
     return parsErr("Failed in extracting the Crossover Section name!");
   }
@@ -106,6 +110,7 @@ bool jfFFNCrossoverParser::ParsePageCore(size_t pageindex) {
   // constants
   const QString fname = "jfFFNCrossoverParser::ParsePageCore";
   const QString arrow_tag = "<img src='/static/fcons/arrow-switch.png'";
+  const QString arrow_tag2 = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
   // variables
   QString buffer, oerr;
   ulong uval;
@@ -115,7 +120,9 @@ bool jfFFNCrossoverParser::ParsePageCore(size_t pageindex) {
   /**/lpt->tLog(fname,0);
   // assert(crossstore_ptr != NULL);
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePast(arrow_tag)) return parsErr("Cannot Find Arrow Switch!");
+  if (!xparser.MovePast(arrow_tag2)) {
+    if (!xparser.MovePast(arrow_tag)) return parsErr("Cannot Find Arrow Switch!");
+  }
   // catname and name, we use FromEnd just in case a category name includes 'Crossovers'
   if (!xparser.GetDelimitedFromEnd("absmiddle>","Crossovers",buffer,"<hr size=1")) {
     return parsErr("Failed in extracting the Crossover Category name!");

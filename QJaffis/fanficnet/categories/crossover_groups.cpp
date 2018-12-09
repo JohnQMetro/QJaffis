@@ -3,7 +3,7 @@
  * Author  : John Q Metro
  * Purpose : Indirect indexes of FFN crossover categories.
  * Created : May 29, 2014
- * Updated : October 22, 2018
+ * Updated : December 9, 2018
  **************************************************************************/
 #ifndef CROSSOVER_GROUPS_H
   #include "crossover_groups.h"
@@ -266,7 +266,7 @@ bool jfFFN_CrossoverGroup::SortLinks() {
     rval = sorted_links.AddCheck(num_id,currcat);
     assert(rval);
   }
-  /**/JDEBUGLOG(fname,8);
+  /**/JDEBUGLOG(fname,3);
   // getting rid of the old stuff
   delete unsorted_links;
   unsorted_links = NULL;
@@ -608,17 +608,19 @@ bool jfFFN_CrossoverSection::SortAll() {
   // constants and variables
   const QString fname = "jfFFN_CrossoverSection::SortAll";
   if (nullmode) return false;
-  bool tx;
+  bool tx,isempty;
   // starting
   /**/JDEBUGLOGST(fname,1,crossgroups.size());
   ResetIndex();
   while (NextIndex()) {
+    isempty = (index->second.grouplink) == NULL;
     /**/JDEBUGLOGB(fname,2,(index->second.grouplink)==NULL);
-    while ((index->second.grouplink)==NULL) {
+    while (EmptyAtIndex()) {
+      /**/JDEBUGLOG(fname,3)
       if (!RemoveAtIndex()) return true;
     }
     tx = index->second.grouplink->SortLinks();
-    /**/JDEBUGLOGB(fname,3,tx);
+    /**/JDEBUGLOGB(fname,4,tx);
     if (!tx) return false;
   }
   return true;
@@ -993,7 +995,16 @@ QString jfFFN_CrossoverSection::CrossLinkModify(QString srclink) const {
   srclink = "https://www.fanfiction.net/crossovers/" + buffer1;
   return (srclink + "/" + buffer2 + "/");
 }
-//+++++++++++++++++++++++++++++++++++++++++++++++++
+//----------------------------------------------------
+// used to help in discarding empty crossovers
+bool jfFFN_CrossoverSection::EmptyAtIndex() const {
+    assert(!before_first);
+    assert(index != crossgroups.end());
+    if ((index->second.grouplink) == NULL) return true;
+    if (((index->second.grouplink)->GetCount()) == 0) return true;
+    else return false;
+}
+//-----------------------------------------------------
 bool jfFFN_CrossoverSection::RemoveAtIndex() {
     if (before_first) return false;
     if (index == crossgroups.end()) return false;

@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Fanfiction.net
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   August 4, 2016
+ * Updated:   December 9, 2018
  *
  **************************************************************/
 #ifndef FFNPARSER_H
@@ -164,7 +164,7 @@ bool jfFFN_FicPartParser::FirstProcessStart(QString& out_title) {
   // constants
   const QString fname = "jfFicPart::FirstProcessStart";
   const QString titlehead_tag = " id=pre_story_links>";
-  const QString icon_tag1 = "<img src='//fast-fictionpressllc.netdna-ssl.com/static/fcons/arrow-switch.png'";
+  const QString icon_tag1 = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
   const QString icon_tag2 = "<img src='/static/fcons/arrow-switch.png'";
   const QString chev_tag = "<span class='xcontrast_txt icon-chevron-right xicon-section-arrow'>";
   // variables
