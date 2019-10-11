@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Filters for fimfiction.net
 Created :   July 4, 2012
 Conversion to QT Started September 30, 2013
-Updated :   August 18, 2014
+Updated :   October 10, 2019
 ******************************************************************************/
 #ifndef FIMFILTERS1_H_INCLUDED
 #define FIMFILTERS1_H_INCLUDED
@@ -23,10 +23,11 @@ class jfFimThumbsFilter : public jfBaseFilter {
     jfFimThumbsFilter();
     jfFimThumbsFilter(int inmin, int inmax);
     // setting values
-    bool SetValues(int inmin, int inmax);
+    bool SetValues(int inmin, int inmax, bool inc_disabled = false);
     // getting values
     int GetMin() const;
     int GetMax() const;
+    bool GetIncludeDisabled() const;
     // redefined virtual methods
     virtual bool isEmpty() const;
     virtual QString GetTypeID() const;
@@ -47,6 +48,7 @@ class jfFimThumbsFilter : public jfBaseFilter {
     virtual size_t ExtraLines() const;
     // internal values
     int min, max;
+    bool include_disabled;
 };
 //===========================================================================
 class jfFIMGenreFilter : public jfTagFilterCore {
@@ -132,7 +134,9 @@ class jfFimThumbPercentFilter : public jfBaseFilter {
     virtual bool FromString(const QString& sourcedata);
     virtual QString ToString() const;
     bool SetPercent(size_t invalue);
+    void SetIncludeDisabled(bool yes);
     size_t GetPercent() const;
+    bool GetIncludeDisabled() const;
     // gets a description
     virtual QString GetTypeDescription() const;
     // copy
@@ -150,6 +154,7 @@ class jfFimThumbPercentFilter : public jfBaseFilter {
     virtual size_t ExtraLines() const;
     // internal data
     size_t value;
+    bool include_disabled;
 };
 
 /*****************************************************************************/

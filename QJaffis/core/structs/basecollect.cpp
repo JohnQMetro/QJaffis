@@ -743,19 +743,20 @@ bool jfFilterMap::ReadRestFromFile(jfFileReader* infile) {
       if (exlocmap!=NULL) exp_item->SetFiltermapLink(exlocmap);
       else exp_item->SetFiltermapLink(this);
     }
-    /**/JDEBUGLOG(fname,5)
+    /**/JDEBUGLOGS(fname,6,newitem->GetTypeDescription())
     if (newitem==NULL) return infile->BuildError("Unrecognized Filter type!");
     assert(newitem!=NULL);
-    /**/JDEBUGLOG(fname,6)
+    /**/JDEBUGLOG(fname,7)
     // and then load
     if (!newitem->GetFromFile(infile)) {
       delete newitem;
+      /**/JDEBUGLOG(fname,8)
       return false;
     }
-    /**/JDEBUGLOGS(fname,7,newitem->GetName())
+    /**/JDEBUGLOGS(fname,9,newitem->GetName())
     // we add the newly loaded item to the list
     coredata[newitem->GetName()] = newitem;
-    /**/JDEBUGLOG(fname,8)
+    /**/JDEBUGLOG(fname,10)
   }
   return true;
   // done

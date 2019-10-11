@@ -89,19 +89,26 @@ jfFIMOnePanelSearch::jfFIMOnePanelSearch(jfFIMSearch* searchin, QWidget* parent)
   // constants
 	const QString fname="jfFIMOnePanelSearch::jfFIMOnePanelSearch";
 	// starting with creation of the search object
+    /**/JDEBUGLOG(fname,1)
   if (searchin==NULL) {
+        /**/JDEBUGLOG(fname,2)
     searchdata = MakeTypedSearch();
+        /**/JDEBUGLOG(fname,3)
     typed_search = dynamic_cast<jfFIMSearch*>(searchdata);
   }
   else {
+        /**/JDEBUGLOG(fname,4)
     searchdata = searchin;
     typed_search = searchin;
   }
+    /**/JDEBUGLOG(fname,5)
   // making panel 1
   panel1 = MakeFirstPanel();
+    /**/JDEBUGLOG(fname,6)
   custinit = true;
   // finishing off
   FinishConstruction();
+  /**/JDEBUGLOG(fname,7)
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 jfSearchPanelBase*  jfFIMOnePanelSearch::MakeFirstPanel(){
@@ -131,18 +138,28 @@ jfFIMMain::jfFIMMain(jfSearchCore* searchin, bool notebook, QWidget* parent):
   // the usual constant
 	const QString fname = "jfFIMMain::jfFIMMain";
   // preparing notebook and results display
+    /**/JDEBUGLOG(fname,1)
   if (noteb) container = new QTabWidget();
   else container = NULL;
+    /**/JDEBUGLOG(fname,2)
   r_panel = MakeResultGroup(false,rtype_BASIC);
 	// making the custom panel
+    /**/JDEBUGLOG(fname,3)
   p_search = MakeSearchGroup(searchin,threepanel);
+    /**/JDEBUGLOG(fname,4)
   ConsStepTwo(filterglobals::fclist[6]);
+    /**/JDEBUGLOG(fname,5)
   TopArranger();
+    /**/JDEBUGLOG(fname,6)
   rc_menu = new jfFanficPopupMenu();
+    /**/JDEBUGLOG(fname,7)
   connect(rc_menu,SIGNAL(sendDescription(QString)),this,SLOT(HandleAppendText(QString)));
+    /**/JDEBUGLOG(fname,8)
   r_panel->SetPopupMenu(rc_menu);
   rc_menu = NULL;
+  /**/JDEBUGLOG(fname,9)
   ConnectResult();
+  /**/JDEBUGLOG(fname,10)
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual method
@@ -153,11 +170,14 @@ jfSearchGroupingCore* jfFIMMain::MakeSearchGroup(jfSearchCore* xnewsearch, bool 
   jfSearchGroupingCore* result;
   jfFIMSearch* temp;
   // starting
+  /**/JDEBUGLOG(fname,1)
   if (xnewsearch!=NULL) temp = dynamic_cast<jfFIMSearch*>(xnewsearch);
   else temp = NULL;
   // creating the panel
+  /**/JDEBUGLOGB(fname,2,threepanels)
   if (threepanels) result = new jfFIMOnePanelSearch(temp);
   else result = new jfFIMSearchGrp(temp);
+  /**/JDEBUGLOG(fname,3)
   typed_mpanel = result;
   return result;
 }

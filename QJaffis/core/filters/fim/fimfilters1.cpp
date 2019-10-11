@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Filters for fimfiction.net
 Created :   July 4, 2012
 Conversion to QT Started September 30, 2013
-Updated :   December 30, 2017
+Updated :   October 11, 2019
 ******************************************************************************/
 #ifndef FIMFILTERS1_H_INCLUDED
   #include "fimfilters1.h"
@@ -21,8 +21,9 @@ Updated :   December 30, 2017
 /*****************************************************************************/
 jfFimThumbsFilter::jfFimThumbsFilter():jfBaseFilter() {
   validdata = false;
-  min = -9999;
-  max =  9999;
+  min = -99999;
+  max =  99999;
+  include_disabled = false;
 }
 //---------------------------------------------------
 jfFimThumbsFilter::jfFimThumbsFilter(int inmin, int inmax):jfBaseFilter() {
@@ -30,10 +31,11 @@ jfFimThumbsFilter::jfFimThumbsFilter(int inmin, int inmax):jfBaseFilter() {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // setting values
-bool jfFimThumbsFilter::SetValues(int inmin, int inmax) {
+bool jfFimThumbsFilter::SetValues(int inmin, int inmax, bool inc_disabled) {
   if (inmax>=inmin) {
     min = inmin;
     max = inmax;
+    include_disabled = inc_disabled;
     validdata = true;
   }
   else validdata = false;
@@ -45,9 +47,14 @@ bool jfFimThumbsFilter::SetValues(int inmin, int inmax) {
 int jfFimThumbsFilter::GetMin() const { return min; }
 //-------------------------------------------
 int  jfFimThumbsFilter::GetMax() const { return max; }
+//-------------------------------------------
+bool jfFimThumbsFilter::GetIncludeDisabled() const { return include_disabled; }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // redefined virtual methods
-bool jfFimThumbsFilter::isEmpty() const { return false; }
+bool jfFimThumbsFilter::isEmpty() const {
+    if (!include_disabled) return false;
+    return ((min == INT_MIN) && (max == INT_MAX));
+}
 //----------------------------------------------------------------------
 QString jfFimThumbsFilter::GetTypeID() const {
   return "FimThumbsFilter";
@@ -59,18 +66,22 @@ bool jfFimThumbsFilter::FromString(const QString& sourcedata) {
   jfLineParse* lparser;
   lparser = new jfLineParse(sourcedata);
   validdata = false;
-  if (lparser->NNotX(2)) delete lparser;
+  include_disabled = false;
+  size_t lnum = lparser->Num();
+  if ((lnum < 2) || (lnum > 3)) delete lparser;
   else {
-    if ((lparser->IIntVal(0,min)) && (lparser->IIntVal(1,max))) validdata = true;
+    if ((lparser->IIntVal(0,min)) && (lparser->IIntVal(1,max))) {
+        if (lnum == 2) validdata = true;
+        else validdata = lparser->BoolVal(2,include_disabled);
+    }
     delete lparser;
   }
   return validdata;
 }
 //---------------------------------------------------
 QString jfFimThumbsFilter::ToString() const {
-  QString result;
-  result = QString::number(min) + ";";
-  result += QString::number(max);
+  jfOutString result;
+  result << min << max << include_disabled;
   return result;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -84,6 +95,7 @@ This filter passes fics for which the thumbsup-thumbsdown lies between the min a
 jfBaseFilter* jfFimThumbsFilter::GenCopy() const {
   jfFimThumbsFilter* result;
   result = new jfFimThumbsFilter(min,max);
+  result->include_disabled = include_disabled;
   CopyOver(result);
   return result;
 }
@@ -97,6 +109,8 @@ bool jfFimThumbsFilter::CoreMatch(const jfBasePD* testelem) const {
   assert(testelem!=NULL);
   // determining the type
   rvalue = dynamic_cast<const jfFIM_Fanfic*>(testelem);
+  if (rvalue->AreRatingsDisabled()) return include_disabled;
+  // getting net thumbs up
   tnet = (rvalue->GetThumbs(false)) - (rvalue->GetThumbs(true));
   // checking the FimThumbs
   assert(tnet<=999999999);
@@ -124,7 +138,7 @@ bool jfFimThumbsFilter::ReadRestFromFile(jfFileReader* infile) {
   // starting checks (and reading the line)
   assert(infile!=NULL);
   if (!infile->ReadLine(cline,funcname)) return false;
-  // there is only one line, and one filed, so this is pretty simple
+  // there is only one line, so this is pretty simple
   resx = FromString(cline);
   if (!resx) return infile->BuildError("The min-max string is invalid!");
   else return true;
@@ -355,6 +369,7 @@ size_t jfFimRatingFilter::ExtraLines() const {return 1;}
 //--------------------------------------------------
 jfFimThumbPercentFilter::jfFimThumbPercentFilter() {
   value = 0;
+  include_disabled = false;
 }
 //--------------------------------------------------
 jfFimThumbPercentFilter::jfFimThumbPercentFilter(QString value_in) {
@@ -363,21 +378,32 @@ jfFimThumbPercentFilter::jfFimThumbPercentFilter(QString value_in) {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // match against the filter, note this currently dependant on fimfiction.net
 bool jfFimThumbPercentFilter::isEmpty() const {
-  return (0==value);
+    return ((0==value) && include_disabled);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // loading from a string representation
 //--------------------------------------------------
 bool jfFimThumbPercentFilter::FromString(const QString& sourcedata) {
-  unsigned long tval;
-  if (!Str2ULong(sourcedata,tval)) return false;
-  if (tval>100) return false;
-  value = tval;
-  return true;
+    jfLineParse* lparser;
+    QString oerr = "";
+    lparser = new jfLineParse(sourcedata);
+    validdata = false;
+    include_disabled = false;
+    size_t lnum = lparser->Num();
+    if ((lnum < 1) || (lnum > 2)) delete lparser;
+    else {
+      if (lparser->SBoundVal(0,100,value,oerr)) {
+          if (lnum == 1) validdata = true;
+          else validdata = lparser->BoolVal(1,include_disabled);
+      }
+      delete lparser;
+    }
+    return validdata;
 }
 //--------------------------------------------------
 QString jfFimThumbPercentFilter::ToString() const {
-  return QString::number(value);
+    jfOutString result;
+    return (result << value << include_disabled);
 }
 //---------------------------------------------------
 bool jfFimThumbPercentFilter::SetPercent(size_t invalue) {
@@ -386,8 +412,16 @@ bool jfFimThumbPercentFilter::SetPercent(size_t invalue) {
   return true;
 }
 //---------------------------------------------------
+void jfFimThumbPercentFilter::SetIncludeDisabled(bool yes) {
+    include_disabled = yes;
+}
+//---------------------------------------------------
 size_t jfFimThumbPercentFilter::GetPercent() const {
   return value;
+}
+//---------------------------------------------------
+bool jfFimThumbPercentFilter::GetIncludeDisabled() const {
+    return include_disabled;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // gets a description
@@ -403,6 +437,7 @@ jfBaseFilter* jfFimThumbPercentFilter::GenCopy() const {
   result = new jfFimThumbPercentFilter();
   CopyOver(result);
   result->SetPercent(value);
+  result->SetIncludeDisabled(include_disabled);
   return result;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -420,6 +455,9 @@ bool jfFimThumbPercentFilter::CoreMatch(const jfBasePD* testelem) const {
   assert(testelem!=NULL);
   // getting values
   rvalue = dynamic_cast<const jfFIM_Fanfic*>(testelem);
+  // testing for Ratings Disabled
+  if (rvalue->AreRatingsDisabled()) return include_disabled;
+  // more general test
   cvalue1 = rvalue->GetThumbs(false);
   cvalue2 = rvalue->GetThumbs(true);
   compvalue = ((float)cvalue1 + (float)cvalue2);
@@ -434,7 +472,7 @@ bool jfFimThumbPercentFilter::AddRestToFile(QTextStream* outfile) const {
   // checking and special conditions
   if (outfile==NULL) return false;
   // composing line 4
-  (*outfile) << QString::number(value) << "\n";
+  (*outfile) << ToString() << "\n";
   return true;
 }
 //--------------------------------------------------

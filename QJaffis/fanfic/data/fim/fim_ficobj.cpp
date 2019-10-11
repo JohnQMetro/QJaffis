@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Fanfic object for fimfiction.net
 Created :   May 8, 2012
 Conversion to QT started : April 20, 2013
-Updated :   January 2, 2018
+Updated :   October 11, 2019
 ******************************************************************************/
 #ifndef FIM_FICOBJ_H_INCLUDED
   #include "fim_ficobj.h"
@@ -75,20 +75,29 @@ bool jfFIM_Fanfic::SetFromString(const QString& inval, QString& parse_err, bool 
     if (!xparser->GetDelimitedULong(avatartag,"_64.jpg\"",qval,buffer2)) author_id = 0;
     else author_id = qval;
   }
-  // thumbs up and thumbs down
-  if (!xparser->GetDelimited("<span class=\"likes\">","</span>",buffer)) {
-    return ParseError(parse_err,"Cannot find likes!");
+  // rating
+  if (!xparser->MovePast(" data-controller=\"rate-story\">")) {
+      return ParseError(parse_err,"Cannot find likes! A");
   }
-  if (buffer=="") thumbsup = 0;
-  else if (Str2ULongC(buffer,qval)) thumbsup = qval;
-  else return ParseError(parse_err,"Likes value is not a number!");
+  // looking for likes
+  if (xparser->GetDelimited("<span class=\"likes\">","</span>",buffer)) {
+      if (buffer=="") thumbsup = 0;
+      else if (Str2ULongC(buffer,qval)) thumbsup = qval;
+      else return ParseError(parse_err,"Likes value is not a number!");
 
-  if (!xparser->GetDelimited("<span class=\"dislikes\">","</span>",buffer)) {
-    return ParseError(parse_err,"Cannot find dislikes!");
+      if (!xparser->GetDelimited("<span class=\"dislikes\">","</span>",buffer)) {
+        return ParseError(parse_err,"Cannot find dislikes!");
+      }
+      if (buffer=="") thumbsdown = 0;
+      else if (Str2ULongC(buffer,qval)) thumbsdown = qval;
+      else return ParseError(parse_err,"Dislikes value is not a number!");
   }
-  if (buffer=="") thumbsdown = 0;
-  else if (Str2ULongC(buffer,qval)) thumbsdown = qval;
-  else return ParseError(parse_err,"Dislikes value is not a number!");
+  // failing that, we look for 'Ratings Disabled'
+  else if (xparser->MovePastLimit("Ratings Disabled","<div class=\"divider\">")) {
+      thumbsup = -1;
+      thumbsdown = 0;
+  }
+  else return ParseError(parse_err,"Cannot find likes! B");
 
   // getting the fic id
   if (!xparser->GetDelimitedULong("id=\"story_","\"",qval,oerr)) {
@@ -347,9 +356,13 @@ QString jfFIM_Fanfic::GetWarnings() const {
     return warnings;
 }
 //-----------------------------------------------------------------------
-size_t jfFIM_Fanfic::GetThumbs(bool down) const {
+int jfFIM_Fanfic::GetThumbs(bool down) const {
   if (down) return thumbsdown;
   else return thumbsup;
+}
+//-----------------------------------------------------------------------
+bool jfFIM_Fanfic::AreRatingsDisabled() const {
+    return (thumbsup < 0);
 }
 //--------------------------------------------------------------------------
 QString jfFIM_Fanfic::GetRating() const {
@@ -454,8 +467,12 @@ QString jfFIM_Fanfic::ToDisplayHTML() const {
   result += " - Parts: " + QString::number(part_count);
   result += " - Words: " + QString::number(word_count);
   // thumbs up and down
-  result += " - Thumbs Up: " + QString::number(thumbsup);
-  result += " - Thumbs Down: " + QString::number(thumbsdown) + "</font><br>\n";
+  if (thumbsup < 0) result += " - Rating Disabled";
+  else {
+    result += " - Thumbs Up: " + QString::number(thumbsup);
+    result += " - Thumbs Down: " + QString::number(thumbsdown);
+  }
+  result += "</font><br>\n";
   // genres and content type...
   bool hasGenre = !genres.isEmpty();
   bool hasCT = !content_types.isEmpty();
@@ -508,7 +525,8 @@ bool jfFIM_Fanfic::LoadValues(jfSkeletonParser* inparser) const {
   inparser->AddText("ITEMF_WARNINGS",warnings);
   inparser->AddUInt("ITEMF_AUTHORID",author_id);
   inparser->AddText("ITEMF_RATING",rating);
-  inparser->AddUInt("THUMBSUP",thumbsup);
+  inparser->AddBool("THUMBS_DISABLED",(thumbsup < 0));
+  inparser->AddUInt("THUMBSUP",(thumbsup< 0)?0:thumbsup);
   inparser->AddUInt("THUMBSDOWN",thumbsdown);
   inparser->AddUInt("THUMBSDOWN",thumbsdown);
   inparser->AddText("ITEMF_PUBDATE",pubdate.toString("MM-dd-yyyy"));
@@ -646,8 +664,8 @@ bool jfFIM_Fanfic::ReadExtraStuff(jfFileReader* infile) {
   // the next line
   if (!infile->ReadParseLine(3,4,funcname)) return false;
   rating = infile->lp.UnEscStr(0);
-  if (!infile->lp.SIntVal(1,thumbsup)) return infile->BuildError("The thumbsup is not valid!");
-  if (!infile->lp.SIntVal(2,thumbsdown)) return infile->BuildError("The thumbsdown is not valid!");
+  if (!infile->lp.IIntVal(1,thumbsup)) return infile->BuildError("The thumbsup is not valid!");
+  if (!infile->lp.IIntVal(2,thumbsdown)) return infile->BuildError("The thumbsdown is not valid!");
   // the optional published date value
   if ((infile->lp.Num())==4) {
     if (!infile->lp.DateVal(2,pubdate)) {

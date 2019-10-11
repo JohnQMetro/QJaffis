@@ -266,10 +266,14 @@ bool jfSimpleExpFilterCore::ReadRestFromFile(jfFileReader* infile) {
   QString cline;
   bool resx;
   // starting checks (and reading the line)
+  /**/JDEBUGLOG(funcname,1)
   assert(infile!=NULL);
+  /**/JDEBUGLOG(funcname,2)
   if (!infile->ReadUnEsc(cline,funcname)) return false;
   // there is only one line, and one filed, so this is pretty simple
+  /**/JDEBUGLOGS(funcname,3,cline)
   resx = FromString(cline);
+  /**/JDEBUGLOGB(funcname,4,resx)
   if (!resx) return infile->BuildError("The expression string is invalid!");
   else return true;
 }

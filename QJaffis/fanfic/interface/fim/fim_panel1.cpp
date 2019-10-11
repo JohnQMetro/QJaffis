@@ -85,6 +85,7 @@ bool jfFIM_DFE::SaveFiltersExtended() {
 }
 //--------------------------------------------------------------------
 bool jfFIM_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
+    const QString fname = "jfFIM_DFE::ChangeSearchExtended";
   // variables
   jfFimThumbsFilter* thumbs_filter;
   jfFimThumbPercentFilter* thumb_perfilter;
@@ -92,25 +93,38 @@ bool jfFIM_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   QString exp_value, err_msg;
   bool atest;  size_t pvalue;
   // thumbs filter
+  /**/JDEBUGLOG(fname,1)
   thumbs_filter = dynamic_cast<jfFimThumbsFilter*>(embedded_filters->GetItem(DEF_fimthumbs_name));
+  /**/JDEBUGLOG(fname,1)
   if (thumbs_filter!=NULL) {
+      /**/JDEBUGLOG(fname,2)
     atest = tud_filedit->SetFromObj(thumbs_filter);
     assert(atest);
   }
+  /**/JDEBUGLOG(fname,3)
   // thumbs percent filter
   thumb_perfilter = dynamic_cast<jfFimThumbPercentFilter*>(embedded_filters->GetItem(DEF_fimpthumbs_name));
+  /**/JDEBUGLOG(fname,4)
   if (thumb_perfilter!=NULL) {
+      /**/JDEBUGLOG(fname,5)
     pvalue = thumb_perfilter->GetPercent();
     tper_edit->SetValue(pvalue);
   }
+  /**/JDEBUGLOG(fname,6)
   // dual summary expression match filter
-  qvalue = dynamic_cast<jfFIM_DualDesc_ExprFilter*>(embedded_filters->GetItem(DEF_fimdualdesc_name));
+  jfBaseFilter* bddesc = embedded_filters->GetItem(DEF_fimdualdesc_name);
+  /**/JDEBUGLOGB(fname,7,(bddesc == NULL))
+  /**/JDEBUGLOGS(fname,8,bddesc->GetTypeID())
+  qvalue = dynamic_cast<jfFIM_DualDesc_ExprFilter*>(bddesc);
+  /**/JDEBUGLOG(fname,9)
   if (qvalue!=NULL) {
+      /**/JDEBUGLOG(fname,10)
     exp_value = qvalue->ToString();
     atest = dual_expredit->SetData(exp_value,err_msg);
-    delete qvalue;
+    /**/JDEBUGLOG(fname,11)
     assert(atest);
   }
+  /**/JDEBUGLOG(fname,12)
   return true;
 }
 //===============================================================================
@@ -125,6 +139,7 @@ jfFIM_SearchOptions::jfFIM_SearchOptions(QWidget* parent):jfSearchOptionsBase(pa
 // load and store data
 //---------------------------
 bool jfFIM_SearchOptions::LoadFrom(jfSearchCore* insearch) {
+    const QString fname = "jfFIM_SearchOptions::LoadFrom";
   // local variables
   QString omsg,tltag;
   jfFIMSearch* typed_insearch;
@@ -134,38 +149,53 @@ bool jfFIM_SearchOptions::LoadFrom(jfSearchCore* insearch) {
   QChar rval;
   bool tval;
   // starting...
+  /**/JDEBUGLOG(fname,1)
   typed_insearch = dynamic_cast<jfFIMSearch*>(insearch);
   // loading up the strings
   search_edit->setText(typed_insearch->GetSString());
+  /**/JDEBUGLOG(fname,2)
   // loading the other values
   genres_entry->SetOrChangeTags(typed_insearch->GetGenres());
+  /**/JDEBUGLOG(fname,3)
   content_entry->SetOrChangeTags(typed_insearch->GetContentType());
+  /**/JDEBUGLOG(fname,4)
   char_sentry->setBoldStrings(fimcon::important_characters);
+  /**/JDEBUGLOG(fname,5)
   char_sentry->SetInitialData("Characters",typed_insearch->GetCharacters(),false);
+  /**/JDEBUGLOG(fname,6)
   cbox->setChecked(typed_insearch->GetCompleted());
+  /**/JDEBUGLOG(fname,7)
   // setting the word count filter
   nwc = typed_insearch->GetWC();
   tval = wcount->SetMinMax(nwc);
+  /**/JDEBUGLOGB(fname,8,tval)
   assert(tval);
   delete nwc;
   // setting the ratings value
   rval = typed_insearch->GetRating();
   rindex =fimcon::ratchars.indexOf(rval);
+  /**/JDEBUGLOGI(fname,9,rindex)
   assert(rindex>=0);
   rating_picker->setCurrentIndex(rindex);
   // order value
   oindex = typed_insearch->GetOrder();
+  /**/JDEBUGLOGI(fname,10,oindex)
   order_picker->setCurrentIndex(oindex);
   // other
   matures->setChecked(typed_insearch->GetMature());
+  /**/JDEBUGLOG(fname,11)
   warnings_entry->SetOrChangeTags(typed_insearch->GetWarnings());
-  // equestria girld tristate cb
+  /**/JDEBUGLOG(fname,12)
+  // equestria girl tristate cb
   jfTAG_STATUS egstatus = typed_insearch->GetEGStatus();
+  /**/JDEBUGLOG(fname,13)
   if (egstatus == jfts_NONE) equestria_girls_cb->setCheckState(Qt::Unchecked);
   else if (egstatus == jfts_EXCLUDE) equestria_girls_cb->setCheckState(Qt::PartiallyChecked);
   else if (egstatus == jfts_INCLUDE) equestria_girls_cb->setCheckState(Qt::Checked);
   else assert(false);
+  /**/JDEBUGLOG(fname,14)
   egcbChanged(0);
+  /**/JDEBUGLOG(fname,15)
   // done
   return true;
 }
@@ -301,13 +331,19 @@ void jfFIM_SearchOptions::ArrangeWidgets() {
 jfFIMPanel1::jfFIMPanel1(jfFIMSearch* insearch, QWidget* parent):jfSearchPanelBase(insearch,false,false,7,parent) {
   const QString fname = "jfFIMPanel1::jfFIMPanel1";
   // starting
+  /**/JDEBUGLOG(fname,1)
   typed_search = insearch;
+  /**/JDEBUGLOG(fname,2)
   filt_panel = MakeTypedFilEdit();
+  /**/JDEBUGLOG(fname,3)
   SearchPanel = new jfFIM_SearchOptions();
+  /**/JDEBUGLOG(fname,4)
   // starting...
   // finishing off
   ArrangePanels();
+  /**/JDEBUGLOG(fname,5)
   ChangeObj(mainobj);
+  /**/JDEBUGLOG(fname,6)
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // other external methods
@@ -320,12 +356,16 @@ bool jfFIMPanel1::LoadToObj() {
 //----------------------------------------------------------------------------
 bool jfFIMPanel1::ChangeObj(jfSearchCore* obj_data) {
   // local variables
+    const QString fname = "jfFIMPanel1::ChangeObj";
   bool rval;
   // starting...
+  /**/JDEBUGLOG(fname,1)
   typed_search = dynamic_cast<jfFIMSearch*>(obj_data);
   mainobj = obj_data;
+  /**/JDEBUGLOG(fname,2)
   // filters
   rval = filt_panel->ChangeSearch(obj_data);
+  /**/JDEBUGLOGB(fname,3,rval)
   if (!rval) return false;
   return SearchPanel->LoadFrom(obj_data);
 }

@@ -94,7 +94,7 @@ void jfMainWindow::launchNewAO3Search() {
 //------------------------------------------------------
 void jfMainWindow::openSavedSearch() {
   // local variables
-  const QString fname = "JaffisFrame::OnOpenFile";
+  const QString fname = "jfMainWindow::openSavedSearch";
   QString xfilen, typstr, outerr;
   jfSearchCore* loadres;
   // jfGoogleMain* google_edit;
@@ -116,28 +116,17 @@ void jfMainWindow::openSavedSearch() {
       /**/JDEBUGLOG(fname,4)
       // however, we do have to check the type
       typstr = loadres->GetTypeID();
-      /**/JDEBUGLOG(fname,5)
-      /*
-      if (typstr == "GoogleSearch") {
-        // creating a Google Search tab
-        google_edit = new jfGoogleMain(mainarranger,-1,loadres);
-        // adding it to the notebook and tracker
-        ptracker->AddPage(google_edit,jftl_GOOGSEARCH);
-        tabname = "Google Search: " + google_edit->GetSearchName();
-        main_display->addTab(google_edit,tabname);
-        CallResize();
-        // enabling the close page menu item
-        (MainMenu->GetMenu(0))->Enable(jfID_MENU_CLOSECURR,true);
-      }\
-      */
+      /**/JDEBUGLOGS(fname,5,typstr)
       if (typstr == "FFNSearch") {
         // creating a FFN Search tab
         ffn_edit = new jfFFNMain(loadres);
+        /**/JDEBUGLOG(fname,6)
         PrepNewSearch(ffn_edit,jftl_FFNSEARCH,true,"Fanfiction.Net");
       }
       else if (typstr == "FIMSearch") {
         // creating a FIM Search tab
         fim_edit = new jfFIMMain(loadres,true);
+        /**/JDEBUGLOG(fname,7)
         PrepNewSearch(fim_edit,jftl_FIMSEARCH,true,"Fimfiction.net");
       }
       else if (typstr == "AO3Search") {
@@ -155,10 +144,10 @@ void jfMainWindow::openSavedSearch() {
     }
     // the load failed, we show a message before exiting
     else {
-      /**/JDEBUGLOG(fname,6)
+      /**/JDEBUGLOG(fname,8)
       QMessageBox::critical(this,"File Open failed!",outerr);
     }
-    /**/JDEBUGLOG(fname,7);
+    /**/JDEBUGLOG(fname,9);
   }
 }
 
@@ -466,23 +455,34 @@ void jfMainWindow::ConnectSearch(jfMainSearchGroup* newpanel) {
 }
 //------------------------------------------------------
 bool jfMainWindow::PrepNewSearch(jfMainSearchGroup* nsearch, jf_tlPageType stype, bool usname, const QString& site_name) {
+    const QString fname = "jfMainWindow::PrepNewSearch";
   // special checks
+    /**/JDEBUGLOG(fname,1)
   if (nsearch==NULL) return false;
+     /**/JDEBUGLOG(fname,2)
   if (site_name.isEmpty()) return false;
+     /**/JDEBUGLOG(fname,3)
   // variables
   int fimsw;
   QString tabname;
   searchcount++;
+   /**/JDEBUGLOG(fname,4)
   tabname = site_name + " Search : ";
   if (usname) tabname += nsearch->GetSearchName();
   else tabname += QString::number(searchcount);
+   /**/JDEBUGLOG(fname,5)
   // adding to tracker and notebook
   ptracker->AddPage(nsearch,stype);
+   /**/JDEBUGLOG(fname,6)
   fimsw = main_display->addTab(nsearch,tabname);
+   /**/JDEBUGLOG(fname,1)
   // finishing
   main_display->setCurrentIndex(fimsw);
+   /**/JDEBUGLOG(fname,7)
   ConnectSearch(nsearch);
+   /**/JDEBUGLOG(fname,8)
   EnableClose();
+   /**/JDEBUGLOG(fname,9)
   // done
   return true;
 }

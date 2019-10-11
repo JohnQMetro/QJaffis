@@ -233,11 +233,16 @@ bool jfTagStatusPicker::ChangeTagStatuses(jfTagListing* in_tags) {
 }
 //----------------------------------------
 bool jfTagStatusPicker::SetOrChangeTags(jfTagListing* in_tags) {
+    const QString fname = "jfTagStatusPicker::SetOrChangeTags";
+    /**/JDEBUGLOG(fname,1)
   if (in_tags == NULL) return false;
+    /**/JDEBUGLOG(fname,2)
   if ((in_tags->size()) != (main_list->count())) {
+        /**/JDEBUGLOG(fname,3)
     return SetTagList(in_tags);
   }
   else {
+        /**/JDEBUGLOG(fname,4)
     return ChangeTagStatuses(in_tags);
   }
 }
