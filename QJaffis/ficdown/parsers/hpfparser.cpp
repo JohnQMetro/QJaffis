@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Harry Potter fanfic
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   April 18, 2018
+ * Updated:   October 12, 2019
  *
  **************************************************************/
 #ifndef HPFPARSER_H
@@ -18,7 +18,10 @@
 /**************************************************************/
 // +++ [ METHODS for jfHPF_FicPartParser ] +++
 //+++++++++++++++++++++++++++++++++++++++++++++++
-jfHPF_FicPartParser::jfHPF_FicPartParser():jfStoryPartParseBase(){}
+jfHPF_FicPartParser::jfHPF_FicPartParser():jfStoryPartParseBase(){
+    spec = QRegExp("[&'']");
+    wdiv = QRegExp("<div\\s+style=\"[^\"]+\">&nbsp;</div><br\\s*/>",Qt::CaseInsensitive);
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++
 // virual methods that are implemented
 //--------------------------------------
@@ -43,93 +46,110 @@ QString jfHPF_FicPartParser::getCookie() const{
   return "";
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++
+bool jfHPF_FicPartParser::IDEPHelper(const QString& label, const QString& start,ulong& outval) {
+    QString oerr;
+    size_t odex = xparser.GetIndex();
+    if (!xparser.MovePast(start)) return parsErr("Cannot find start of " + label);
+    if (!xparser.MovePast(spec)) return parsErr("Cannot find end of " + label);
+    if (!Str2ULong(xparser.GetSkipped(),outval)) return parsErr("Cannot convert string to number for " + label);
+    if (!xparser.MovePast(">")) return parsErr("Cannot find end of containing block for " + label);
+    return true;
+}
+
 // custom virtual methods that are implemented
 //--------------------------------------
 bool jfHPF_FicPartParser::ParseFirstPage(const QString& indata) {
   // constants
-  const QString fname = "ExtractFromIndex_HPF";
-  const QString hpciex = "<a href=\"/viewstory2.php?chapterid=";
-  const QString abhead1 = "&gt;&gt;</a> </form></span><br clear=all>";
+  const QString fname = "jfHPF_FicPartParser::ParseFirstPage";
   // variables
   jfFicExtract_HPF* result;
-  QString buffer,errval;
+  QString buffer,buffer2,errval;
   unsigned long qval;
   size_t ccount;
   // starting
   /**/lpt->tLog(fname,1);
   // skippting past the header
-  if (!xparser.MovePastAlt(abhead1,">Report Abuse</a>&nbsp;]")) {
-    return parsErr("Could not find initial tags!");
+  if (!xparser.MovePast("</header>")) {
+    return parsErr("Could not find end of Header!");
   }
-  // fic id
-  if (!xparser.GetDelimitedULong("<center><a href=\"?psid=","\">",qval,errval)) {
-    if (!xparser.GetDelimitedULong(" location = '?psid=","'\">",qval,errval)) {
-      return parsErr("Could not get fic id!");
-    }
-  }
-  /**/lpt->tLog(fname,2);
   // title
-  if (!xparser.GetMovePast("</a>",buffer)){
-    return parsErr("Could not find end of title!");
+  if (!xparser.GetDelimited("<h2>","<i>",buffer)) {
+      return parsErr("Could not extract title!");
   }
-  // now that we have two good pieces of data, build the result...
-  result = new jfFicExtract_HPF();
-  result->fic_id = qval;
-  result->fic_title = buffer.trimmed();
-  /**/lpt->tLog(fname,3,buffer);
-
   // author id
-  if (!xparser.GetDelimitedULong("<a href=\"viewuser.php?showuid=","\">",qval,errval)) {
-    delete result;
-    return parsErr("Cannot extract author id");
-  }
+  if (!IDEPHelper("author id","<a href=\'viewuser.php?uid=",qval)) return false;
+
   // author name
-  if (!xparser.GetMovePast("</a>",buffer)) {
-    delete result;
-    return parsErr("Cannot extract author pen-name!");
+  if (!xparser.GetMovePast("</a>",buffer2)) {
+      return parsErr("Cannot extract author pen-name!");
   }
+  // now that we have three good pieces of data, build the result...
+  result = new jfFicExtract_HPF();
+  result->fic_title = buffer.trimmed();
   result->auth_id = qval;
-  result->author_name = buffer.trimmed();
-  /**/lpt->tLog(fname,4,buffer);
+  result->author_name = buffer2.trimmed();
+  /**/lpt->tLog(fname,2,buffer.trimmed());
+
+  // fic id
+  if (!IDEPHelper("fic id","<a href=\'/reviews.php?storyid=",qval)) return false;
+  result->fic_id = qval;
+
   // part count
-  if (!xparser.GetDelimitedULong("<b>Chapters:</b>","<br>",qval,errval)) {
-       /**/lpt->tLog(fname,5,buffer);
+  if (!xparser.MovePast("<div class=\'entry__key\'>Chapters</div>")) {
+    /**/lpt->tLog(fname,5,buffer);
     delete result;
-      /**/lpt->tLog(fname,6,buffer);
-    return parsErr("Cannot extract chapter count!");
+    return parsErr("Cannot find start of chapter count!");
   }
-  /**/lpt->tLog(fname,6,buffer);
-  // status
-  if (!xparser.GetDelimited("<b>Status:</b>","<br>",buffer)) {
-    delete result;
-    return parsErr("Cannot extract status");
+  if (!xparser.GetDelimitedULong("<div class=\'entry__value\'>","</div>",qval,errval)) {
+      delete result;
+      return parsErr("failed to extract chapter count!");
   }
-  /**/lpt->tLog(fname,7,buffer);
   result->pcount = qval;
-  buffer = buffer.trimmed();
-  /**/lpt->tLog(fname,8,buffer);
+
+  // status
+  if (!xparser.MovePast("<div class='entry__key'>Status</div>")) {
+    /**/lpt->tLog(fname,6,buffer);
+    delete result;
+    return parsErr("Cannot find start of status!");
+  }
+  if (!xparser.GetDelimited("<div class=\'entry__value\'>","</div>",buffer)) {
+      delete result;
+      return parsErr("failed to extract status!");
+  }
+
+  /**/lpt->tLog(fname,7,buffer);
   result->complete = (buffer=="Completed");
 
-  // next, all we need is the updated date, much easier than fimfiction
-  if (!xparser.GetDelimited("<b>Last Updated:</b> ","<br />",buffer)) {
+  // next, all we need is the updated date
+  if (!xparser.MovePast("<div class='entry__key'>Last Updated</div>")) {
+    /**/lpt->tLog(fname,8,buffer);
     delete result;
-    return parsErr("Cannot find updated date!");
+    return parsErr("Cannot find start of updated!");
   }
+  if (!xparser.GetDelimited("<div class=\'entry__value\'>","</div>",buffer)) {
+      delete result;
+      return parsErr("failed to extract status!");
+  }
+
   /**/lpt->tLog(fname,9,buffer);
-  (result->updated_date) = QDate::fromString(buffer,"yyyy.MM.dd");
-  if (!(result->updated_date).isValid()){
-    delete result;
-    return parsErr("Could not parse updated date!");
+  QDateTime hpf_ud = QDateTime::fromString(buffer,"yyyy-MM-dd h:mma");
+  if (!hpf_ud.isValid()) {
+      delete result;
+      return parsErr("Could not parse updated date time!");
   }
-  if (!xparser.MovePastTwice("</table>")) {
+  result->updated_date = hpf_ud.date();
+
+  if (!xparser.MovePastTwo("</section>","<tbody>")) {
     delete result;
-    return parsErr("Could not find table ends!");
+    return parsErr("Could not find end of section / start of chapter list!");
   }
   // handling the chapters
   ccount = 0;
   /**/lpt->tLog(fname,10);
   // getting chapters ids
-  while (xparser.GetDelimitedULong("<a href=\"?chapterid=","\">",qval,errval)) {
+  const QString cstart = "<a class='h4' href='/viewstory.php?chapterid=";
+
+  while (IDEPHelper("chapter id",cstart,qval)) {
     result->chapterids.push_back(qval);
     if (!xparser.GetMovePast("</a>",buffer)) {
       delete result;
@@ -139,19 +159,7 @@ bool jfHPF_FicPartParser::ParseFirstPage(const QString& indata) {
     ccount++;
   }
   /**/lpt->tLogS(fname,11,ccount);
-  // alternate version that works for 'mature' fics
-  if (ccount==0) {
-    while (xparser.GetDelimitedULong(hpciex,"&i=",qval,errval)) {
-      result->chapterids.push_back(qval);
-      if (!xparser.GetDelimited("\">","</a>",buffer)) {
-        delete result;
-        return parsErr("Problems extracting part name!");
-      }
-      (result->partnames).append(htmlparse::ConvertEntities(buffer.trimmed(),false));
-      ccount++;
-    }
-  }
-  /**/lpt->tLogS(fname,12,ccount);
+
   // checking the result
   if ((result->pcount)!=ccount) {
     delete result;
@@ -168,96 +176,85 @@ bool jfHPF_FicPartParser::ParseFirstPage(const QString& indata) {
 //--------------------------------------
 bool jfHPF_FicPartParser::ParseOtherPage() {
   // consstants
-  const QString fname = "jfFicPart_HPF::SetFromStringCore";
-  const QString hval = "Report Abuse</a>&nbsp;]";
-  const QString cboxs = "<form style=\"margin:0\" enctype=\"multipart/form-data\" method=\"post\" action=\"\">";
+  const QString fname = "jfHPF_FicPartParser::ParseOtherPage";
+  const QString hval = "<div class='navbar__r'>";
   // varibales
-  QString buffer;
+  QString buffer,oerr;
   jfFicPart result;
+  ulong qval;
   // starting...
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePast(hval)) return parsErr("Cannot find header tag!");
-  // we get chapter info (used to determine partcount and partindex)
-  if (xparser.GetDelimited(cboxs,"</form>",buffer)) {
-    if (!HandleChapters(buffer,result)) {
-      return parsErr("Chapter Processing failed");
-    }
+  if (!xparser.MovePast(hval)) return parsErr("Cannot findend of header!");
+
+  // getting partindex
+  if (!xparser.GetDelimitedULong("<i class=\"fa fa-book\"></i>","/",qval,oerr)) {
+      /**/lpt->tLog(fname,2,xparser.GetBlock(1000));
+      return parsErr("Cannot extract Part Index! " + oerr);
   }
-  else {
-    // we assume 1 part
-    result.partcount = partcount = 1;
-    result.partindex = 1;
+  result.partindex = qval;
+  if (!xparser.GetMovePastULong("</a>",qval,oerr)) {
+      /**/lpt->tLog(fname,3,xparser.GetBlock(1000));
+      return parsErr("Cannot extract Part Count!");
   }
-  /**/lpt->tLog(fname,2);
-  // moving to the part name
-  if (!xparser.MovePastTwo("<center>","<br>")) return false;
-  if (!xparser.MovePast(" : ")) return false;
-  // getting the part name
-  if (!xparser.GetMovePast("</center>",buffer)) return false;
+  result.partcount = qval;
+
+  // moving to the part id and part name
+  if (!xparser.MovePast("<section class='section section--2'>")) {
+      /**/lpt->tLog(fname,4);
+      return parsErr("Cannot find start of section 2");
+  }
+  const QString cid_st = "<a href='/viewstory.php?chapterid=";
+  if (!IDEPHelper("chapter id",cid_st,qval)) return false;
+  result.partid = qval;
+
+  // next, we get the part title
+  if (!xparser.GetMovePast("</a>",buffer)) {
+      /**/lpt->tLog(fname,6);
+      return parsErr("Unable to find part title!");
+  }
   result.part_name = buffer.trimmed();
-  /**/lpt->tLog(fname,3);
-  // next, the contents
-  if (!xparser.GetDelimited("<div id='fluidtext'>","</div><br><hr>",buffer)) return false;
+
+  // main contents
+  if (!xparser.MovePast("<div class='storytext-container'")) {
+      /**/lpt->tLog(fname,7);
+      return parsErr("Cannot find start of main contents!");
+  }
+  if (!xparser.GetDelimited(">","<div class='chapter-nav chapter-nav--footer'>",buffer)) {
+      /**/lpt->tLog(fname,8);
+      return parsErr("Cannot extract main fic part contents!");
+  }
   // finishing off for the results
   fpart = new jfFicPart(result);
   partcount = result.partcount;
   pagecount = partcount+1;
-  /**/lpt->tLog(fname,4);
+  /**/lpt->tLog(fname,9);
   // processing contents
   fpart->part_contents = PartProcessing(buffer);
-  /**/lpt->tLog(fname,5);
+  /**/lpt->tLog(fname,10);
   // done
   return true;
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++
-//helper methods
-//--------------------------------------
-bool jfHPF_FicPartParser::HandleChapters(QString inbuffer,jfFicPart& fpoint) {
-  // variables
-  jfStringParser* qparser;
-  QString buffer;
-  size_t ccount;
-  bool fail = false;
-  unsigned long tval;
-  QString oerr;
-  // we start
-  qparser = new jfStringParser(inbuffer);
-  ccount = 0;
-  // the main parsing loop
-  while (qparser->MovePast("<option value=\"?chapterid=")) {
-    ccount++;
-    // looking for the part id
-    if (!qparser->GetMovePastULong("\"",tval,oerr)) fail = true;
-    else if (!qparser->GetMovePast(">",buffer)) fail = true;
-    else {
-      buffer =buffer.trimmed();
-      if (buffer=="selected") {
-        fpoint.partindex = ccount;
-        fpoint.partid = tval;
-      }
-      if (!qparser->MovePast(".")) fail = true;
-    }
-    if (fail) break;
-  }
-  // done with the loop
-  delete qparser;
-  if (fail) return false;
-  if (ccount==0) return false;
-  fpoint.partcount = ccount;
-  return true;
-}
-
-//--------------------------------------
 QString jfHPF_FicPartParser::PartProcessing(QString inbuffer) {
     const QString fname = "jfHPF_FicPartParser::PartProcessing";
   /**/JDEBUGLOG(fname,1);
   inbuffer = inbuffer.trimmed();
-  // misc non-breaking spaces
+
+
+  // trailing div
+  if (inbuffer.endsWith("</div>",Qt::CaseInsensitive)) {
+      inbuffer.chop(6);
+      inbuffer = inbuffer.trimmed();
+  }
+  // misc non-breaking spaces messes
   inbuffer.replace("&nbsp;<br />","<br />");
   inbuffer.replace("<div>&nbsp;</div><br />","<br />");
+  inbuffer.replace(wdiv,"<br />");
+  inbuffer.replace("</div><br />","</div>");
   inbuffer.replace("<div><br />\n&nbsp;</div><br />","<br />\n<br />");
   /**/JDEBUGLOG(fname,2)
+
   // getting rid of too may linebreaks... we do need the loop
   int oldlen,newlen;
   do {

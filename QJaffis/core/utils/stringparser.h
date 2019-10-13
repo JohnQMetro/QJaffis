@@ -4,8 +4,8 @@ Basic   : String parsing class
 Author  : John Q Metro
 Started : August 21, 2012 (spit from utils2.h)
 Conversion to QT started : March 2, 2013
-Updated : July 20, 2017
-Notes   : Added MovePastLimit
+Updated : October 12, 2019
+Notes   : Added GetDelimitedEndPairULong
 
 ******************************************************************************/
 #ifndef STRINGPARSER_H_INCLUDED
@@ -16,6 +16,7 @@ Notes   : Added MovePastLimit
 #include <QtGlobal>
 #include <Qt>
 #include <QStringList>
+#include <QRegExp>
 
 /*****************************************************************************/
 /* another class used in parsing... this one is for more complicated things than delimited
@@ -41,6 +42,7 @@ class jfStringParser {
     // parsing methods
     // looks for <find>, if found, returns true and moves the index past the substring
     bool MovePast(QString find);
+    bool MovePast(const QRegExp& find);
     bool MovePastTwice(QString find);
     bool MovePastLimit(QString find, QString limit);
     bool MovePastTwo(QString first, QString second);
@@ -67,6 +69,7 @@ class jfStringParser {
     bool GetDelimitedFloat(QString start, QString end, double& outval, QString& outerr);
     /* another version of get delimited which uses a pair of possible ends */
     bool GetDelimitedEndPair(QString start, QString end1,QString end2, QString& outbuf);
+    bool GetDelimitedEndPairULong(QString start, QString end1,QString end2, ulong& outval, QString& outerr);
     /* returns true if the string or string at the index starts with a substring */
     bool StartsWith(QString start) const;
     bool StartsWithAtIndex(QString start) const;

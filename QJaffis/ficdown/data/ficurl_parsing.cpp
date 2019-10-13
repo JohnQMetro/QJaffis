@@ -3,7 +3,7 @@ Name:        ficurl_parsing.cpp
 Author  :    John Q Metro
 Purpose :    When given a fic url to download, it has to be checked
 Created :    July 8, 2016
-Updated :    July 12, 2016 (conversionto Qt)
+Updated :    October 12, 2019 (HPF changes)
 
 ****************************************************************************/
 #ifndef FICURL_PARSING_H_INCLUDED
@@ -18,7 +18,7 @@ const QString FFN_TAG = "www.fanfiction.net";
 const QString FIM_TAG = "www.fimfiction.net";
 const QString AO3_TAG = "archiveofourown.org";
 const QString MMO_TAG = "www.mediaminer.org";
-const QString HPF_TAG = "www.harrypotterfanfiction.com";
+const QString HPF_TAG = "harrypotterfanfiction.com";
 
 //================================================================================
 // constructor
@@ -188,21 +188,26 @@ bool jfFicURLParser::HandleAO3(QStringList* urlarr) {
 bool jfFicURLParser::HandleHPF(QStringList* urlarr) {
   // variables and constants
   const QString vsPREFIX = "viewstory.php?psid=";
+  const QString srAFFIX = "&showRestricted";
   QString aftdomain,buffer;
   unsigned long tval;
+  bool showres;
   // starting...
   type = jfft_HPF;
   aftdomain = urlarr->at(0);
   if (writehttp) outputURL = "http://";
   outputURL += HPF_TAG + "/";
   // harry potter fanfic urls must be index pages
-  // format "viewstory.php?psid=<num>"
+  // format "viewstory.php?psid=<num>[&showRestricted]"
   if (!aftdomain.startsWith(vsPREFIX)) return false;
   buffer = aftdomain.mid(vsPREFIX.length());
+  showres = buffer.endsWith(srAFFIX);
+  if (showres)buffer.chop(srAFFIX.length());
   // checking the fic id
   if (!Str2ULong(buffer,tval)) return false;
   // building the result...
   outputURL += vsPREFIX + buffer;
+  if (showres) outputURL += srAFFIX;
   // names are not included
   return true;
 }

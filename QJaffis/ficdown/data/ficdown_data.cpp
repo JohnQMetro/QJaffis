@@ -4,7 +4,7 @@
 // Purpose :    Downloading fics, we need structures to hold the data
 // Created:     June 19, 2011
 // Conversion to QT started : April 18, 2013
-// Updated:     September 6, 2016
+// Updated:     October 13, 2019
 /////////////////////////////////////////////////////////////////////////////
 #ifndef FFNDOWN_DATA_H_INCLUDED
   #include "ffndown_data.h"
@@ -22,6 +22,20 @@
 #include <assert.h>
 #include <math.h>
 //****************************************************************************
+
+jfBadCharsFilter::jfBadCharsFilter(const QString badchars, QObject* parent):QValidator(parent) {
+    cfilt = QRegExp("[" + QRegExp::escape(badchars) + "]");
+}
+QValidator::State jfBadCharsFilter::validate(QString & input, int & pos) const {
+    if (input.indexOf(cfilt)>0) fixup(input);
+    if (input.isEmpty()) return QValidator::Intermediate;
+    else return QValidator::Acceptable;
+}
+void jfBadCharsFilter::fixup(QString & input) const {
+    input = input.replace(cfilt,"");
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /*
 // groups together skeletons and thier outputs
 class jfFD_OutStuff : public wxObject {
@@ -117,6 +131,7 @@ bool jfFD_OutStuff::StartNewFile() {
 }
 //--------------------------
 bool jfFD_OutStuff::AddToFile(QString inval) {
+    const QString fname = "jfFD_OutStuff::AddToFile";
   // problems
   if (!fileopen) return false;
   if (outfiles.size()==0) return false;
@@ -126,6 +141,7 @@ bool jfFD_OutStuff::AddToFile(QString inval) {
 }
 //--------------------------
 bool jfFD_OutStuff::CloseFile() {
+    const QString fname = "jfFD_OutStuff::CloseFile";
   // problems
   if (!fileopen) return false;
   if (outfiles.size()==0) return false;
@@ -398,7 +414,7 @@ bool jfFanfic::StartResult() {
   if (!dataset) return false;
   /**/JDEBUGLOG(fname,2);
   if ((sdata->pcount)!=maindata.size()) return false;
-  /**/JDEBUGLOG(fname,3);
+  /**/JDEBUGLOGI(fname,3,maindata.size());
   if (theskel==NULL) return false;
   /**/JDEBUGLOG(fname,4);
   // variables
@@ -406,27 +422,32 @@ bool jfFanfic::StartResult() {
   QString work_text, bundle_text;
   bool lcvres;
   // initializing
+  /**/JDEBUGLOG(fname,5);
   split_manager = new jfFanficSplitter(sguide);
   output_manager = new jfFD_OutStuff();
   output_manager->parse = new jfSkeletonParser();
   output_manager->base = theskel;
   // we now load some initial values
+  /**/JDEBUGLOG(fname,6);
   lcvres = LoadCoreValues(output_manager->parse);
   assert(lcvres);
   // next, we loop to create the formatted output for the parts
   for (lindex=0;lindex<(sdata->pcount);lindex++) {
     maindata[lindex]->LoadCoreValues(output_manager->parse);
     work_text = output_manager->MakeResult(output_manager->base->item_skel);
+    /**/JDEBUGLOGS(fname,7,work_text);
     split_manager->AddParts(work_text);
   }
   // the parts are done, we now get and set the number of files
-  /**/JDEBUGLOG(fname,5);
+  /**/JDEBUGLOG(fname,8);
   split_manager->CalculateSplit();
   gfcount = split_manager->GetFilecount();
   output_manager->SetNameInfo(filebase,dirbase,gfcount);
   // next, the navbar for the files (if necessary)
   bundle_text = "";
+  /**/JDEBUGLOG(fname,9);
   if (gfcount>1) {
+      /**/JDEBUGLOG(fname,10);
     for (lindex=1;lindex<=gfcount;lindex++) {
       // we need to initialize 2 values
       lcvres = output_manager->GetFilename(work_text,lindex);
@@ -442,6 +463,7 @@ bool jfFanfic::StartResult() {
       }
     }
   }
+  /**/JDEBUGLOG(fname,11);
   // adding the navbar to the parser
   output_manager->parse->AddText("OFILE_NAVBAR",bundle_text);
   // done
@@ -467,13 +489,16 @@ bool jfFanfic::WriteFile(size_t findex_in) {
   assert(output_manager->GetFilename(work_text,findex_in));
   output_manager->parse->AddText("OFILE_FILENAME",work_text);
   output_manager->parse->AddText("OFILE_LABEL",PLabelMaker(findex_in));
+  /**/JDEBUGLOG(fname,1);
   // next up, we need to build the navbar for the parts...
   part_start = split_manager->GetFileIndex(findex_in,true);
   part_end = split_manager->GetFileIndex(findex_in,false);
   part_count = part_end - part_start + 1;
   // if the part_count is 1, we skip it...
   bundle_text = "";
+  /**/JDEBUGLOG(fname,2);
   if (part_count!=1) {
+      /**/JDEBUGLOG(fname,3);
     for (pindex=part_start;pindex<=part_end;pindex++) {
       maindata[pindex-1]->LoadCoreValues(output_manager->parse);
       work_text = output_manager->MakeResult(output_manager->base->partlink);
@@ -484,20 +509,25 @@ bool jfFanfic::WriteFile(size_t findex_in) {
       }
     }
   }
+  /**/JDEBUGLOG(fname,3);
   // here, we add the result to the parser
   output_manager->parse->AddText("PARTS_NAVBAR",bundle_text);
   // we also start building things
   // the header text
   work_text = output_manager->MakeResult(output_manager->base->header_skel);
   sfres = output_manager->StartNewFile();
+  /**/JDEBUGLOG(fname,4);
   assert(sfres);
   output_manager->AddToFile(work_text);
+  /**/JDEBUGLOGS(fname,5,work_text);
   // we now loop thru the parts...
   for (pindex=part_start;pindex<=part_end;pindex++) {
+      /**/JDEBUGLOGST(fname,6,pindex);
     // this is probably not really necessary
     maindata[pindex-1]->LoadCoreValues(output_manager->parse);
     // adding the item text to the results
     output_manager->AddToFile(split_manager->GetPart(pindex));
+    /**/JDEBUGLOG(fname,7);
     // the item separattor
     if (pindex!=part_end) {
       work_text = output_manager->MakeResult(output_manager->base->item_separator);
@@ -505,10 +535,12 @@ bool jfFanfic::WriteFile(size_t findex_in) {
     }
   }
   // done with the loop
+  /**/JDEBUGLOG(fname,8);
   work_text = output_manager->MakeResult(output_manager->base->footer_skel);
   output_manager->AddToFile(work_text);
   // finishing
   output_manager->CloseFile();
+  /**/JDEBUGLOG(fname,9);
   return true;
 }
 //--------------------------------------------

@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Fanfiction.net
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   December 9, 2018
+ * Updated:   October 11, 2019
  *
  **************************************************************/
 #ifndef FFNPARSER_H
@@ -29,11 +29,20 @@ QString* jfFFN_FicPartParser::makeRedirectedURL(const QString& inPart) {
 //--------------------------------------
 bool jfFFN_FicPartParser::testMissing(const QString *page) const {
   // constants and variables
+  const QString mstring_pfx = "Story Not Found";
   const QString mstring1 = "Story Not Found<hr size=1 noshade>Unable to locate story. Code 1.";
+  const QString mstring2 = "Story Not Found<hr size=\"1\" noshade=\"\">Unable to locate story. Code 1.";
+  const QString mstring3 = "Story Not Found<hr size=\"1\" noshade=\"\">Story is unavailable for reading.";
+  const QString mstring4 = "Story Not Found<hr size=1 noshade>Story is unavailable for reading.";
   // checking
   assert(page!=NULL);
-  bool rval = page->contains(mstring1);
-  return !rval;
+  bool rval = page->contains(mstring_pfx);
+  if (!rval) return true;
+  if (page->contains(mstring1)) return false;
+  if (page->contains(mstring2)) return false;
+  if (page->contains(mstring3)) return false;
+  if (page->contains(mstring4)) return false;
+  return true;
 }
 //--------------------------------------
 bool jfFFN_FicPartParser::testIncomplete(const QString *page) const {

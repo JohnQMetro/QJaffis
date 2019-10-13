@@ -4,7 +4,7 @@ Basic   : String parsing class
 Author  : John Q Metro
 Started : August 21, 2012 (split from utils2.cpp)
 Conversion to QT started : March 2, 2013
-Updated : July 20, 2017
+Updated : October 12, 2013
 Notes   :
 
 ******************************************************************************/
@@ -120,6 +120,23 @@ bool jfStringParser::MovePast(QString find) {
     return true;
   }
 }
+//---------------------------------------------------------------------
+bool jfStringParser::MovePast(const QRegExp& find) {
+    // local variables
+    int fpos;
+    // basic check
+    if (!ready) return false;
+    if (find.isEmpty()) return false;
+    // looking...
+    fpos = find.indexIn(rawdata,mainindex);
+    if (fpos == -1) return false;
+    else {
+      skipped_data = rawdata.mid(mainindex,fpos-mainindex);
+      SetIndex(fpos + find.matchedLength());
+      return true;
+    }
+}
+
 //------------------------------------------------------------------------
 /* looks for the second instance of <find>. if found, returns true and moves
 the index past the substring */
@@ -394,12 +411,12 @@ bool jfStringParser::GetDelimitedULong(QString start, QString end, unsigned long
   }
   return true;
 }
+//-----------------------------------------------------------------------------------
+const QString err_startnotfound = "The specified start of the field was not found!";
+const QString err_endnotfound = "The specified end of the field was not found!";
+const QString err_notaninteger = "The field was found, but is not an integer!";
 //------------------------------------------------------------------------------------
 bool jfStringParser::GetDelimitedFloat(QString start, QString end, double& outval, QString& outerr) {
-  // constants
-  QString err_startnotfound = "The specified start of the field was not found!";
-  QString err_endnotfound = "The specified end of the field was not found!";
-  QString err_notaninteger = "The field was found, but is not an integer!";
   // local variables
   QString buffer;
   size_t oindex;
@@ -434,6 +451,34 @@ bool jfStringParser::GetDelimitedEndPair(QString start, QString end1,QString end
   // using find first pair
   return GetMovePastPair(end1,end2,outbuf);
 }
+//----------------------------------------------------------------------------
+bool jfStringParser::GetDelimitedEndPairULong(QString start, QString end1,QString end2, ulong& outval, QString& outerr) {
+    // local variables
+    QString buffer;
+    size_t oindex;
+    bool okres;
+    // we start...
+    oindex = mainindex;
+    if (!MovePast(start)) {
+      outerr = err_startnotfound;
+      return false;
+    }
+    if (!GetMovePastPair(end1,end2,buffer)) {
+      outerr = err_endnotfound;
+      mainindex = oindex;
+      return false;
+    }
+    buffer = buffer.trimmed();
+    // numeric conversion
+    outval = buffer.toDouble(&okres);
+    if (!okres) {
+      outerr = err_notaninteger;
+      mainindex = oindex;
+      return false;
+    }
+    return true;
+}
+
 //----------------------------------------------------------------------------
 /* return strue if a line starts with a certain string */
 bool jfStringParser::StartsWith(QString start) const {

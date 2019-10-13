@@ -205,7 +205,7 @@ bool jfFIM_Fanfic::SetFromString(const QString& inval, QString& parse_err, bool 
   if (!xparser->GetDelimited(">","</span>",buffer)) return ParseError(parse_err,"Status not found!");
   buffer = buffer.trimmed();
   completed = (buffer=="Complete");
-  /**/JDEBUGLOGS(fname,2,xparser->GetBlock(2000))
+  /**/JDEBUGLOG(fname,2)
   // published date
   tfrag = "<span class=\"desktop\"><b>Published:</b> </span><";
   // this is more complicated than it used to be

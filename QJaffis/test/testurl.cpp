@@ -3,7 +3,7 @@ Name    : testurl.cpp
 Basic   : URLs and any misc stuff for the test routines
 Author  : John Q Metro
 Started : March 18, 2018
-Updated : April 7, 2018
+Updated : October 11, 2019
 ******************************************************************************/
 #ifndef TESTURL_H
     #include "testurl.h"
@@ -77,8 +77,8 @@ const QString test::urls[test::count] = {
     "https://www.fanfiction.net/comic/Astounding-Wolf-Man/?&srt=2&r=10",
     "https://www.fanfiction.net/Sonic-the-Hedgehog-and-My-Little-Pony-Crossovers/253/621/?&srt=2&r=10",
     /** Fanfiction.Net fic pages **/
-    "https://www.fanfiction.net/s/12844335/1/Chaos-High-School",
-    "https://www.fanfiction.net/s/12844335/2/Chaos-High-School",
+    "https://www.fanfiction.net/s/13380174/1/The-Devil-Wears-a-Suit-and-Tie",
+    "https://www.fanfiction.net/s/13380174/2/The-Devil-Wears-a-Suit-and-Tie",
     /** Archive of Our Own stuff **/
     "https://archiveofourown.org/media/TV%20Shows/fandoms",
     "https://archiveofourown.org/works?utf8=%E2%9C%93&commit=Sort+and+Filter&work_search%5Bsort_column%5D=revised_at&work_search%5Bcategory_ids%5D%5B%5D=21&work_search%5Bother_tag_names%5D=&work_search%5Bquery%5D=&work_search%5Blanguage_id%5D=&work_search%5Bcomplete%5D=0&tag_id=The+A-Team+-+All+Media+Types",
@@ -94,8 +94,8 @@ const QString test::urls[test::count] = {
     "https://www.fimfiction.net/groups?q=twilight&order=date_created",
     "https://www.fimfiction.net/group/212215/twilight-sparkles-library",
     /** Others **/
-    "https://www.harrypotterfanfiction.com/viewstory.php?psid=338339",
-    "https://www.harrypotterfanfiction.com/viewstory.php?chapterid=528599",
+    "https://harrypotterfanfiction.com/viewstory.php?psid=338339",
+    "https://harrypotterfanfiction.com/viewstory.php?chapterid=528599",
     "https://www.mediaminer.org/fanfic/s/tenchi-muyo-fan-fiction/the-second-chance/159822",
     "https://www.mediaminer.org/fanfic/c/tenchi-muyo-fan-fiction/the-second-chance/159822/560497"
 

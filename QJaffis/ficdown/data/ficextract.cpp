@@ -329,22 +329,22 @@ jfFicExtract_HPF::jfFicExtract_HPF(const jfFicExtract_HPF& source):jfFicExtract_
 // virtual methods
 //-----------------------------------------------------
 QString jfFicExtract_HPF::MakeUrl(size_t inval) const {
-  QString result = "http://www.harrypotterfanfiction.com/viewstory.php?chapterid=";
+  QString result = "https://harrypotterfanfiction.com/viewstory.php?chapterid=";
   assert(inval<=chapterids.size());
   result += QString::number(chapterids[inval-1]);
-  return result;
+  return result + "&showRestricted";
 }
 //-----------------------------------------------------
 QString jfFicExtract_HPF::FirstUrl() const {
-  QString result = "http://www.harrypotterfanfiction.com/viewstory.php?psid=";
+  QString result = "https://harrypotterfanfiction.com/viewstory.php?psid=";
   result += QString::number(fic_id);
-  return result;
+  return result + "&showRestricted";
 }
 //-----------------------------------------------------
 QString jfFicExtract_HPF::MakeAuthlink() const {
-  QString result = "http://www.harrypotterfanfiction.com/viewuser.php?showuid=";
+  QString result = "https://harrypotterfanfiction.com/viewuser.php?showuid=";
   result += QString::number(auth_id);
-  return result;
+  return result + "&showRestricted";
 }
 //-----------------------------------------------------
 jf_FICTYPE jfFicExtract_HPF::GetFicType() const {

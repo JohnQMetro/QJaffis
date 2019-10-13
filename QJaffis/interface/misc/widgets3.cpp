@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Some misc user interface stuff
 Created :   December 5, 2010
 Conversion to Qt Started May 22, 2013
-Updated :   August 5, 2015
+Updated :   October 13, 2019
 ******************************************************************************/
 #ifndef WIDGETS3_H_INCLUDED
   #include "widgets3.h"
@@ -46,6 +46,11 @@ void jfLabeledEdit::SetLabel(QString inlabel) {
   clabel = inlabel;
   thelabel->setText(inlabel + " : ");
 }
+//-----------------
+void jfLabeledEdit::SetValidator(const QValidator * v) {
+    thetext->setValidator(v);
+}
+
 //------------------
 QString jfLabeledEdit::GetLabel() const {
   return clabel;

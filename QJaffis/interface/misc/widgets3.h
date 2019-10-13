@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Some misc user interface stuff
 Created :   December 5, 2010
 Conversion to Qt Started May 22, 2013
-Updated :   August 3, 2016
+Updated :   October 13, 2019
 ******************************************************************************/
 #ifndef WIDGETS3_H_INCLUDED
 #define WIDGETS3_H_INCLUDED
@@ -33,6 +33,7 @@ class jfLabeledEdit : public QWidget {
     jfLabeledEdit(QWidget* parent, QString inlabel, bool horiz, QString intext = "");
     // getting and setting
     void SetLabel(QString inlabel);
+    void SetValidator(const QValidator * v);
     QString GetLabel() const;
     void SetText(QString intext);
     void SetFiletag(QString inval);

@@ -4,7 +4,7 @@
 // Purpose :    Downloading fics, we need structures to hold the data
 // Created:     June 17, 2011
 // Conversion to QT started : April 18, 2013
-// Updated:     July 10, 2016
+// Updated:     October 13, 2019
 /////////////////////////////////////////////////////////////////////////////
 #ifndef FFNDOWN_DATA_H_INCLUDED
 #define FFNDOWN_DATA_H_INCLUDED
@@ -20,8 +20,22 @@
   #include "ficpart.h"
 #endif // FICPART_H
 //---------------------------------------
-#include<QString>
+#include <QString>
+#include <QValidator>
+#include <QRegExp>
 //****************************************************************************
+// a validator for filtering forbidden characters
+class jfBadCharsFilter : public virtual QValidator {
+public:
+    jfBadCharsFilter(const QString badchars, QObject* parent = 0);
+    QValidator::State validate(QString & input, int & pos) const;
+    void fixup(QString & input) const;
+
+protected:
+  QRegExp cfilt;
+};
+
+//==========================================================================
 // groups together skeletons and thier outputs
 class jfFD_OutStuff {
   public:

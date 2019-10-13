@@ -36,6 +36,8 @@ jfFicDownDialog_Core::jfFicDownDialog_Core(QWidget* parent):QDialog(parent) {
   sdir_label = new QLabel("Subfolder :",this);
   pick_subdir = new QComboBox(this);
   name_edit = new jfLabeledEdit(this,"Filename base",true);
+  filter = new jfBadCharsFilter("\\/:*?\"<>|");
+  name_edit->SetValidator(filter);
   split_guide = new jfLabeledIntEdit(this,"File Size Guide",true,100,9999);
   // setting some values
   split_guide->SetValue(jglobal::settings.ficsize_hint);

@@ -4,7 +4,7 @@
 // Purpose :    Declares the dialogs for downloading fanfics
 // Created:     July 16, 2011
 // Started Qt conversion May 22, 2013
-// Updated:     July 12, 2016
+// Updated:     October 13, 2019
 ******************************************************************************/
 #ifndef FFNDOWN_DIALOG_H_INCLUDED
   #define FFNDOWN_DIALOG_H_INCLUDED
@@ -67,6 +67,7 @@ class jfFicDownDialog_Core : public QDialog {
     // also...
       jfProgressPanelSingle* progress;
     // internal data
+      jfBadCharsFilter* filter;
       jfFicExtract* xmain_data;
       jf_FICTYPE ftype;
       jfFicDownParameters* fparams;
