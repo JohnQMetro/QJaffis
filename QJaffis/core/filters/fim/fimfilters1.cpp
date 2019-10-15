@@ -15,6 +15,9 @@ Updated :   October 11, 2019
 #ifndef FIM_CONSTANTS_H
   #include "../../../fanfic/data/fim/fim_constants.h"
 #endif // FIM_CONSTANTS_H
+#ifndef LOGGING_H_INCLUDED
+  #include "../../utils/logging.h"
+#endif // LOGGING_H_INCLUDED
 //-------------------------------------------------
 #include <assert.h>
 #include <QRegExp>
@@ -109,7 +112,10 @@ bool jfFimThumbsFilter::CoreMatch(const jfBasePD* testelem) const {
   assert(testelem!=NULL);
   // determining the type
   rvalue = dynamic_cast<const jfFIM_Fanfic*>(testelem);
-  if (rvalue->AreRatingsDisabled()) return include_disabled;
+  if (rvalue->AreRatingsDisabled()) {
+      /**/JDEBUGLOGB("jfFimThumbsFilter::CoreMatch",1,include_disabled)
+      return include_disabled;
+  }
   // getting net thumbs up
   tnet = (rvalue->GetThumbs(false)) - (rvalue->GetThumbs(true));
   // checking the FimThumbs
@@ -456,7 +462,10 @@ bool jfFimThumbPercentFilter::CoreMatch(const jfBasePD* testelem) const {
   // getting values
   rvalue = dynamic_cast<const jfFIM_Fanfic*>(testelem);
   // testing for Ratings Disabled
-  if (rvalue->AreRatingsDisabled()) return include_disabled;
+  if (rvalue->AreRatingsDisabled()) {
+      /**/JDEBUGLOGB("jfFimThumbPercentFilter::CoreMatch",1,include_disabled)
+      return include_disabled;
+  }
   // more general test
   cvalue1 = rvalue->GetThumbs(false);
   cvalue2 = rvalue->GetThumbs(true);

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Editors for fim filters : thumbs rating
 Created :   July 5, 2012
 Conversion to Qt started October 15, 2013
-Updated :   July 19, 2012
+Updated :   October 14, 2019
 ******************************************************************************/
 #ifndef FIM1_FILEDIT_H_INCLUDED
 #define FIM1_FILEDIT_H_INCLUDED
@@ -25,7 +25,7 @@ Updated :   July 19, 2012
 /*****************************************************************************/
 
 // core of Thumbs Up / Thumbs Down filter editor
-class jfFIMThumbsPanel : public jfMinMaxEditor {
+class jfFIMThumbsPanel : public QWidget {
   public:
     // the constructor
     jfFIMThumbsPanel(bool wrapped, QWidget* parent = NULL );
@@ -34,6 +34,10 @@ class jfFIMThumbsPanel : public jfMinMaxEditor {
     // set
     bool SetFromObj(const jfFimThumbsFilter* inval);
   protected:
+    jfMinMaxEditor* minmax;
+    QCheckBox *include_rdisabled;
+    QBoxLayout *top_layout;
+
 };
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the actual Thumbs Up / Thumbs Down filter editor, a wrapper for jfFIMThumbsPanel

@@ -3,7 +3,7 @@ Name    :   fim2_filedit.h
 Author  :   John Q Metro
 Purpose :   More Editors for fim filters
 Created :   August 5, 2015
-Updated :   July 8, 2016 (moved thumbs up percent filter here)
+Updated :   October 15, 2019
 ******************************************************************************/
 #ifndef FIM2_FILEDIT_H
 #define FIM2_FILEDIT_H
@@ -66,6 +66,23 @@ class jfFIMGroupMCFilterEditor : public jfZeroToMaxFilterEditor {
     virtual jfMinMaxUFilter* MakeTypedMinMax() const;
 };
 //====================================================================================
+// core of Thumb Percent filter editor
+class jfFimThumbPercentPanel : public QWidget {
+  public:
+    // the constructor
+    jfFimThumbPercentPanel(QWidget* parent = NULL );
+    // get
+    jfFimThumbPercentFilter* GetNewFilter() const;
+    // set
+    bool SetFromObj(const jfFimThumbPercentFilter* inval);
+    void SetDefault();
+  protected:
+    jfLabeledIntEdit* min_perc;
+    QCheckBox *include_rdisabled;
+    QBoxLayout *top_layout;
+
+};
+//-----------------------------------------------------------
 // filter editor for jfFimThumbPercentFilter
 class jfFimThumbPercentFilterEditor : public jfBaseFilterEditor {
     // the default constructor
@@ -76,6 +93,6 @@ class jfFimThumbPercentFilterEditor : public jfBaseFilterEditor {
     virtual jfBaseFilter* GetFilter();
     virtual bool GeneralCheck() const;
   protected:
-    jfLabeledIntEdit* insert_panel;
+    jfFimThumbPercentPanel* insert_panel;
 };
 /*****************************************************************************/

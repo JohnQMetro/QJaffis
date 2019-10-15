@@ -118,8 +118,9 @@ class jfMinMaxEditor : public QWidget {
     int GetMax() const;
     IntPair* GetMixMax() const;
     bool LoadIntoPair(IntPair* destination) const;
-  protected:
     bool SetRange(int in_lbound, int in_ubound);
+  protected:
+
     // helper methods
     void SetupLayout(bool wrapped, bool horizontal);
 

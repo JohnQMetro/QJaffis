@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Editors for fim filters : thumbs rating
 Created :   July 5, 2012
 Conversion to Qt started October 15, 2013
-Updated :   December 30, 2017 (new FIMfiction.net tags)
+Updated :   October 14, 2019
 ******************************************************************************/
 #ifndef FIM1_FILEDIT_H_INCLUDED
   #include "fim1_filedit.h"
@@ -16,11 +16,16 @@ Updated :   December 30, 2017 (new FIMfiction.net tags)
 #include <QMessageBox>
 #include <assert.h>
 /*****************************************************************************/
-jfFIMThumbsPanel::jfFIMThumbsPanel(bool wrapped, QWidget* parent):
-        jfMinMaxEditor("Net Thumbs Up/Down",wrapped, false, true,parent) {
-  // setting things
-  SetRange(-9999,99999);
-  SetMinMax(20,99999);
+jfFIMThumbsPanel::jfFIMThumbsPanel(bool wrapped, QWidget* parent):QWidget(parent) {
+    minmax = new jfMinMaxEditor("Net Thumbs Up/Down",wrapped,false,true);
+    include_rdisabled = new QCheckBox("Include Disabled");
+    top_layout = new QHBoxLayout();
+    top_layout->addWidget(minmax,3,Qt::AlignVCenter);
+    top_layout->addWidget(include_rdisabled,2,Qt::AlignVCenter);
+    minmax->SetRange(-9999,99999);
+    minmax->SetMinMax(20,99999);
+    setLayout(top_layout);
+
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // get
@@ -30,11 +35,13 @@ jfFimThumbsFilter* jfFIMThumbsPanel::GetNewFilter() const {
   size_t qmin;
   bool lres;
   // test
-  lres = CheckMessage();
+  lres = minmax->CheckMessage();
   if (!lres) return NULL;
   // things are okay
-  qmin = min_entry->value();
-  result = new jfFimThumbsFilter(min_entry->value(),max_entry->value());
+  qmin = minmax->GetMin();
+  result = new jfFimThumbsFilter();
+  bool chk = include_rdisabled->isChecked();
+  result->SetValues(minmax->GetMin(),minmax->GetMax(),chk);
   return result;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -44,7 +51,10 @@ bool jfFIMThumbsPanel::SetFromObj(const jfFimThumbsFilter* inval) {
   if (inval==NULL) return false;
   if (!(inval->IsValid())) return false;
   // setting things
-  return SetMinMax(inval->GetMin(),inval->GetMax());
+  bool sok = minmax->SetMinMax(inval->GetMin(),inval->GetMax());
+  if (!sok) return false;
+  include_rdisabled->setChecked(inval->GetIncludeDisabled());
+  return true;
 }
 //===========================================================================
 jfFimThumbsFilterEditor::jfFimThumbsFilterEditor(jfFilterMap* infmap, const jfBaseFilter* infilt,

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines the custom first panel for fimfiction.net searching
 Created :   June 23, 2012
 Conversion to Qt started February 3, 2014
-Updated :   January 5, 2018
+Updated :   October 15, 2019
 ******************************************************************************/
 #ifndef FIM_PANEL1_H_INCLUDED
   #include "fim_panel1.h"
@@ -32,7 +32,7 @@ jfFIM_DFE::jfFIM_DFE(jfFIMSearch* inobj, QWidget* parent):jfDefaultFilterEditorB
   // thumbs up or down filter
   tud_filedit = new jfFIMThumbsPanel(true);
   // percentage-based thumbs filter
-  tper_edit = new jfLabeledIntEdit(NULL,"Percent Thumbs Up",true,0,100);
+  tper_edit = new jfFimThumbPercentPanel();
   // new expression filter
   dual_label = new QLabel("Expression Filter matching either short or long descriptions :");
   dual_expredit = new jfSimpleExprEdit(true);
@@ -69,10 +69,8 @@ bool jfFIM_DFE::SaveFiltersExtended() {
   thumbs_filter->SetName(DEF_fimthumbs_name);
   embedded_filters->ReplaceSame(thumbs_filter,oindex);
   // saving percent thumbs stuff
-  thumb_perfilter = new jfFimThumbPercentFilter();
-  gvalue = tper_edit->GetValue();
-  thumb_perfilter->SetPercent(gvalue);
-  thumbs_filter->SetName(DEF_fimpthumbs_name);
+  thumb_perfilter = tper_edit->GetNewFilter();
+  thumb_perfilter->SetName(DEF_fimpthumbs_name);
   embedded_filters->ReplaceSame(thumb_perfilter,oindex);
   // saving dual expr filter stuff
   testval = dual_expredit->CheckFilter(test_msg);
@@ -107,21 +105,16 @@ bool jfFIM_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   /**/JDEBUGLOG(fname,4)
   if (thumb_perfilter!=NULL) {
       /**/JDEBUGLOG(fname,5)
-    pvalue = thumb_perfilter->GetPercent();
-    tper_edit->SetValue(pvalue);
+      tper_edit->SetFromObj(thumb_perfilter);
   }
   /**/JDEBUGLOG(fname,6)
   // dual summary expression match filter
   jfBaseFilter* bddesc = embedded_filters->GetItem(DEF_fimdualdesc_name);
   /**/JDEBUGLOGB(fname,7,(bddesc == NULL))
-  /**/JDEBUGLOGS(fname,8,bddesc->GetTypeID())
   qvalue = dynamic_cast<jfFIM_DualDesc_ExprFilter*>(bddesc);
-  /**/JDEBUGLOG(fname,9)
   if (qvalue!=NULL) {
-      /**/JDEBUGLOG(fname,10)
     exp_value = qvalue->ToString();
     atest = dual_expredit->SetData(exp_value,err_msg);
-    /**/JDEBUGLOG(fname,11)
     assert(atest);
   }
   /**/JDEBUGLOG(fname,12)

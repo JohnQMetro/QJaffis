@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares the custom first panel for fimfiction.net searching
 Created :   June 23, 2012
 Conversion to Qt started February 3, 2014
-Updated :   January 5, 2018 (tag change)
+Updated :   October 15, 2019
 ******************************************************************************/
 #ifndef FIM_PANEL1_H_INCLUDED
 #define FIM_PANEL1_H_INCLUDED
@@ -18,6 +18,9 @@ Updated :   January 5, 2018 (tag change)
 #endif // FIM_SEARCH_H_INCLUDED
 #ifndef FIM1_FILEDIT_H_INCLUDED
   #include "../../../interface/filters/fim/fim1_filedit.h"
+#endif // FIM1_FILEDIT_H_INCLUDED
+#ifndef FIM2_FILEDIT_H_INCLUDED
+  #include "../../../interface/filters/fim/fim2_filedit.h"
 #endif // FIM1_FILEDIT_H_INCLUDED
 #ifndef FILTERS_EDIT1_H_INCLUDED
   #include "../../../interface/filters/extended/filters_edit1.h"
@@ -53,7 +56,7 @@ class jfFIM_DFE : public jfDefaultFilterEditorBase {
     virtual bool ChangeSearchExtended(jfSearchCore* obj_data);
     // extra filters
     jfFIMThumbsPanel* tud_filedit;
-    jfLabeledIntEdit* tper_edit;
+    jfFimThumbPercentPanel* tper_edit;
     jfSimpleExprEdit* dual_expredit;
     QLabel* dual_label;
     // layout
