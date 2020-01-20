@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Archiveofourown.org
  * Author:    John Q Metro
  * Created:   July 6, 2016
- * Updated:   July 19, 2017
+ * Updated:   January 20, 2020
  *
  **************************************************************/
 #ifndef AO3PARSER_H
@@ -21,7 +21,9 @@ const QString cstart1 = "<h3 class=\"landmark heading\" id=\"work\">Chapter Text
 const QString cstart2 = "<h3 class=\"landmark heading\" id=\"work\">Work Text:</h3>";
 //===================================================================================
 // constructor
-jfAO3_FicPartParser::jfAO3_FicPartParser():jfStoryPartParseBase() {}
+jfAO3_FicPartParser::jfAO3_FicPartParser():jfStoryPartParseBase() {
+    setupRegExp();
+}
 //++++++++++++++++++++++++++++++++++++++++
 // virual methods that are implemented
 //------------------------------------
@@ -263,13 +265,14 @@ bool jfAO3_FicPartParser::ExtractChapterFicIDs(jfFicExtract_AO3* extract_ptr, QS
    /**/lpt->tLog(fname,8);
   // getting the fic id from twitter buttons...
   if (!ficidf) {
-      const QString twit1 = "<a href=\"http://twitter.com/share\"";
-      const QString twit2 = "<a href=\"http://www.twitter.com/share\"";
-      if (!xparser.MovePastAlt(twit1,twit2)) {
+      if (!xparser.MovePast(*twit_exp)) {
           return parsErr("Problems with getting fic id! : Twitter");
       }
       /**/lpt->tLog(fname,9);
-      if (!xparser.GetDelimitedULong("data-url=\"https://archiveofourown.org/works/","\"",qval,errres)) {
+      if (!xparser.MovePast(*ao3_exp)) {
+          return parsErr("Problems with getting fic id! :data_url");
+      }
+      if (!xparser.GetMovePastULong("\"",qval,errres)) {
           return parsErr("Problems with getting fic id! : " + errres);
       }
       /**/lpt->tLog(fname,10);
@@ -408,6 +411,25 @@ QString jfAO3_FicPartParser::GetStartNotes() {
     return "";
   }
   return "";
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++
+// some regexs, because http vs https is annoying
+QRegExp* jfAO3_FicPartParser::twit_exp = NULL;
+QRegExp* jfAO3_FicPartParser::ao3_exp = NULL;
+
+void jfAO3_FicPartParser::setupRegExp() {
+    if (twit_exp == NULL) {
+        QString p1 = QRegExp::escape("<a href=\"http");
+        QString p2 = QRegExp::escape("://");
+        QString p3  =QRegExp::escape("twitter.com/share\"");
+        twit_exp = new QRegExp(p1+"s?"+p2+"(www)?"+p3,Qt::CaseInsensitive);
+
+    }
+    if (ao3_exp == NULL) {
+        QString q1 = QRegExp::escape("data-url=\"http");
+        QString q2 = QRegExp::escape("://archiveofourown.org/works/");
+        ao3_exp = new QRegExp(q1+"s?"+q2,Qt::CaseInsensitive);
+    }
 }
 
 /**************************************************************/

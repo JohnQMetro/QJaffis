@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Archiveofourown.org
  * Author:    John Q Metro
  * Created:   July 6, 2016
- * Updated:   July 6, 2016
+ * Updated:   January 20, 2020
  *
  **************************************************************/
 #ifndef AO3PARSER_H
@@ -17,6 +17,8 @@
 #ifndef FICEXTRACT_H_INCLUDED
   #include "../data/ficextract.h"
 #endif // FICEXTRACT_H_INCLUDED
+
+#include <QRegExp>
 /**************************************************************/
 class jfAO3_FicPartParser : public jfStoryPartParseBase {
   public:
@@ -37,5 +39,9 @@ class jfAO3_FicPartParser : public jfStoryPartParseBase {
     bool HandleChapters(QString inbuffer,jfFicPart& fpoint);
     QString PartProcessing(QString inbuffer);
     QString GetStartNotes();
+    // some regexs, because http vs https is annoying
+    static QRegExp* twit_exp;
+    static QRegExp* ao3_exp;
+    void setupRegExp();
 };
 /**************************************************************/
