@@ -3,7 +3,7 @@ Name    : pagegetter.cpp
 Basic   : Defines my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 16, 2013
-Updated : April 18, 2018
+Updated : Feb 27, 2020
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
@@ -277,6 +277,7 @@ jfFetchPage::~jfFetchPage() {
 // sets theerror based upon QNetworkReply::NetworkError
 bool jfFetchPage::MakeError() {
   const QString fname = "jfFetchPage::MakeError";
+  QString serror;
   // special case
   if (!isdownloading) return false;
   // the source error
@@ -286,11 +287,18 @@ bool jfFetchPage::MakeError() {
     theerror = jff_NOERROR;
     return true;
   }
-  /**/JDEBUGLOGS(fname,2,raw_result->errorString());
+  serror = raw_result->errorString();
+  /**/JDEBUGLOGS(fname,2,serror);
   /**/JDEBUGLOGST(fname,3,raw_error);
   // here, we have an actual error message to sort
   // one of the few times I've taken advantage of the C switch
   switch (raw_error) {
+    case QNetworkReply::UnknownContentError           :/**/JDEBUGLOG(fname,15);
+      if (serror.contains("Too Many Requests",Qt::CaseInsensitive)) {
+          theerror = jff_RATELIMIT;
+      }
+      else theerror = jff_FALIURE;
+      break;
     case QNetworkReply::ConnectionRefusedError        :/**/JDEBUGLOG(fname,4);
     case QNetworkReply::TimeoutError                  :/**/JDEBUGLOG(fname,5);
     case QNetworkReply::RemoteHostClosedError         :/**/JDEBUGLOG(fname,6);
@@ -302,7 +310,6 @@ bool jfFetchPage::MakeError() {
     case QNetworkReply::ContentReSendError            :/**/JDEBUGLOG(fname,12);
     case QNetworkReply::UnknownNetworkError           :/**/JDEBUGLOG(fname,13);
     case QNetworkReply::UnknownProxyError             :/**/JDEBUGLOG(fname,14);
-    case QNetworkReply::UnknownContentError           :/**/JDEBUGLOG(fname,15);
     case QNetworkReply::ProtocolFailure               :/**/JDEBUGLOG(fname,16);
     case QNetworkReply::ProtocolUnknownError          :/**/JDEBUGLOG(fname,17);
       theerror = jff_TRYAGAIN;

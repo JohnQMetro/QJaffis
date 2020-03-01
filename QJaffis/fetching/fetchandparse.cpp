@@ -3,7 +3,7 @@ Name    : fetchandparse.h
 Basic   : Basal threads for download and parsing
 Author  : John Q Metro
 Started : October 17, 2015
-Updated : March 24, 2018
+Updated : February 27, 2010
 
 ******************************************************************************/
 #ifndef FETCHANDPARSE_H
@@ -26,6 +26,7 @@ jfFetchAndParsePage::jfFetchAndParsePage():jfLoggBase() {
   downloader = NULL;
   fetched_page = NULL;
   urlIndex = 0;
+  pause_before = 0;
 }
 //----------------------------------------
 bool jfFetchAndParsePage::setChannel(jfThreadDataPasser* in_channel) {
@@ -84,7 +85,7 @@ void jfFetchAndParsePage::StartProcessing() {
     // checking URL afterwards
     if (ures==NULL) break;
     urlToGet = *ures;
-    currError = DownloadMethod();
+    currError = DownloadMethod(pause_before);
     if (currError==jff_NOERROR) {
       /**/tLog(fname,6);
       // time to parse!
@@ -160,17 +161,19 @@ bool jfFetchAndParsePage::DownloadPage() {
 }
 //--------------------------------------------
 /* The downloader, with redirection and retry loops, urlToGet must be set */
-jfFETCH_ERROR jfFetchAndParsePage::DownloadMethod() {
+jfFETCH_ERROR jfFetchAndParsePage::DownloadMethod(uint pre_pause) {
   const QString fname = "jfFetchAndParsePage::DownloadMethod";
   // variables
+  uint sleep_time = 1;
   size_t retry_count = 0;
   bool download_okay = false;
   QString *ures;
   jfFETCH_ERROR currError = jff_NOERROR;
   /**/tLog(fname,1);
   // download
-  while (retry_count < 5) {
+  while (retry_count < 10) {
       /**/tLogS(fname,2,retry_count);
+    if (pre_pause > 0) iPause(pre_pause);
     download_okay = DownloadPage();
     // if the download is fine, we get the page and exit the loop
     if (download_okay) {
@@ -195,24 +198,41 @@ jfFETCH_ERROR jfFetchAndParsePage::DownloadMethod() {
           delete ures;
         }
       }
+      // rate limit error...
+      else if (currError == jff_RATELIMIT) {
+          if (sleep_time < 10) sleep_time = 10;
+          else sleep_time = sleep_time * 2;
+          /**/tLog(fname,6);
+          downloader->Reset();
+      }
       // hard download error, trying gain means nothing
       else if (currError != jff_TRYAGAIN){
-          /**/tLog(fname,6);
+          /**/tLog(fname,7);
         downloader->Reset();
         break;
       }
       // here, if we try again, it might work!
-      else downloader->Reset();
+      else {
+          /**/tLog(fname,8);
+          downloader->Reset();
+          sleep_time = 1;
+      }
     }
     /**/tLog(fname,7);
     // if we get here, we are retrying for the next loop
     retry_count++;
-    jfSleepThread::msleep(1000);
+    if (sleep_time > 1) QCoreApplication::processEvents();
+    iPause(sleep_time);
     QCoreApplication::processEvents();
   }
   /**/tLogB(fname,8,download_okay);
   if (download_okay) return jff_NOERROR;
   else return currError;
+}
+//------------------------------
+void jfFetchAndParsePage::iPause(uint secs) {
+    unsigned long stime = secs*1000;
+    jfSleepThread::msleep(stime);
 }
 
 //============================================================================================

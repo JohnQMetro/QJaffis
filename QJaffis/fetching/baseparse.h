@@ -46,6 +46,7 @@ class jfPageParserBase {
     size_t getPageCount() const;
     // also
     virtual QString getCookie() const = 0;
+    // virtual uint getPause() const = 0;
   protected:
     bool NewData(const QString& inPage);
     bool parsErr(const QString& err_in);

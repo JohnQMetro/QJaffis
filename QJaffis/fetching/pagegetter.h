@@ -3,7 +3,7 @@ Name    : pagegetter.h
 Basic   : Declares my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 15, 2013
-Updated : March 30, 2018
+Updated : Feb 27, 2010
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
@@ -22,6 +22,7 @@ Updated : March 30, 2018
  * following is now the error after a single attempt at fetching. */
 enum jfFETCH_ERROR {jff_NOERROR,      // no error
                     jff_TRYAGAIN,     // some sort of error, but not serious
+                    jff_RATELIMIT,    // rate limit error, try again but with more delay...
                     jff_REDIRECTION,  // redirection, change the url and try again
                     jff_MISSING,      // 404 not found (or some equivalent). Don't try again
                     jff_FALIURE,      // an error that means trying again is futile

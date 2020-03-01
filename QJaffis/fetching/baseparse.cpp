@@ -46,9 +46,13 @@ size_t jfPageParserBase::getPageCount() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfPageParserBase::NewData(const QString& inPage) {
+  const QString fname = "jfPageParserBase::NewData";
+  /**/lpt->tLog(fname,1);
   xparser.ChangeData(inPage);
+  /**/lpt->tLog(fname,2);
   page_parsed = false;
   parseErrorMessage.clear();
+  /**/lpt->tLog(fname,3);
   pagecount = 0;
   return (!inPage.isEmpty());
 }

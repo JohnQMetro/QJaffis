@@ -3,7 +3,7 @@ Name    : fetchandparse.h
 Basic   : Basal threads for download and parsing
 Author  : John Q Metro
 Started : October 17, 2015
-Updated : June 26, 2016
+Updated : February 28, 2020
 
 ******************************************************************************/
 #ifndef FETCHANDPARSE_H
@@ -41,11 +41,13 @@ class jfFetchAndParsePage : public jfLoggBase {
   protected:
     // helper methods
     bool DownloadPage();
-    jfFETCH_ERROR DownloadMethod();
+    jfFETCH_ERROR DownloadMethod(uint pre_pause);
+    void iPause(uint secs);
     // internal data storage
     QString urlToGet;
     size_t urlIndex;
     bool started;
+    uint pause_before;
     QString *fetched_page;
     QString redirectionResult;
     // internal page parsing object
