@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Archiveofourown.org
  * Author:    John Q Metro
  * Created:   July 6, 2016
- * Updated:   January 20, 2020
+ * Updated:   July 8, 2020
  *
  **************************************************************/
 #ifndef AO3PARSER_H
@@ -210,10 +210,9 @@ bool jfAO3_FicPartParser::ParseOtherPage() {
 bool jfAO3_FicPartParser::ExtractChapterFicIDs(jfFicExtract_AO3* extract_ptr, QString& out_partname) {
   // constants
   const QString fname = "jfAO3_FicPartParser::ExtractChapterFicIDs";
-  const QString toomuch = "<textarea cols=\"50\" rows=\"4\" id=\"embed_code\">&lt;a href=&quot;https://archiveofourown.org/works/";
-  const QString embed_code = "<textarea cols=\"50\" rows=\"4\" id=\"embed_code\">";
   const QString select1 = "<select name=\"selected_id\" id=\"selected_id\">";
   const QString select2 = "<select id=\"selected_id\" name=\"selected_id\">";
+  const QString navend = "<li class=\"comments\" id=\"show_comments_link_top\">";
   // variables
   unsigned long qval;
   QString buffer,errres;
@@ -227,7 +226,7 @@ bool jfAO3_FicPartParser::ExtractChapterFicIDs(jfFicExtract_AO3* extract_ptr, QS
     // single part stories
     partcount = extract_ptr->pcount = 1;
     /**/lpt->tLogS(fname,2,partcount);
-    if (!xparser.MovePast(embed_code)) return parsErr("Cannot find link TEXTAREA!");
+    if (!xparser.MovePast(navend)) return parsErr("Cannot find nav end");
     /**/lpt->tLog(fname,3);
     extract_ptr->chapterids.push_back(1);
     extract_ptr->partnames.append("");
@@ -265,18 +264,11 @@ bool jfAO3_FicPartParser::ExtractChapterFicIDs(jfFicExtract_AO3* extract_ptr, QS
    /**/lpt->tLog(fname,8);
   // getting the fic id from twitter buttons...
   if (!ficidf) {
-      if (!xparser.MovePast(*twit_exp)) {
-          return parsErr("Problems with getting fic id! : Twitter");
+      if (xparser.GetDelimitedULong("<li><a href=\"/downloads/","/",qval,errres)) {
+          extract_ptr->fic_id = qval;
+          ficidf = true;
       }
-      /**/lpt->tLog(fname,9);
-      if (!xparser.MovePast(*ao3_exp)) {
-          return parsErr("Problems with getting fic id! :data_url");
-      }
-      if (!xparser.GetMovePastULong("\"",qval,errres)) {
-          return parsErr("Problems with getting fic id! : " + errres);
-      }
-      /**/lpt->tLog(fname,10);
-      extract_ptr->fic_id = qval;
+      /**/lpt->tLogB(fname,9,ficidf);
   }
 
   return true;
