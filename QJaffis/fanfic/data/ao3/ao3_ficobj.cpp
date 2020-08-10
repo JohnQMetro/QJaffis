@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines fanfic object data of archoveofourown.org
 Created :   August 26, 2012
 Conversion to Qt Started September 28, 2013
-Updated :   September 7, 2016
+Updated :   August 10, 2020
 ******************************************************************************/
 #ifndef AO3_FICOBJ_H_INCLUDED
   #include "ao3_ficobj.h"
@@ -551,8 +551,16 @@ bool jfAO3Fanfic::ParseEnd() {
   word_count = tval;
   // part count
   if (!x_parser->MovePast("<dt class=\"chapters\">Chapters:</dt>"))return parseError("Cannot find part count!");
-  if (!x_parser->GetDelimitedULong("<dd class=\"chapters\">","/",tval,errout)) {
-    return parseError("Cannot extract part count! " + errout);
+  if (!x_parser->MovePast("<dd class=\"chapters\">")) {
+      return parseError("Cannot find start of chapter counts!");
+  }
+  // try the 'not embedded in a link' first
+  if (!x_parser->GetMovePastULong("/",tval,errout)) {
+      // if that fails, assume we are embedded in a link
+      if (!x_parser->GetDelimitedULong("\">","</a>",tval,errout)) {
+          return parseError("Cannot extract part count! " + errout);
+      }
+      x_parser->MovePast("/");
   }
   part_count = tval;
   // estimated part count
