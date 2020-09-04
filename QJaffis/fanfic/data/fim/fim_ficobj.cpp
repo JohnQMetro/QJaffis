@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Fanfic object for fimfiction.net
 Created :   May 8, 2012
 Conversion to QT started : April 20, 2013
-Updated :   October 11, 2019
+Updated :   September 4, 2020
 ******************************************************************************/
 #ifndef FIM_FICOBJ_H_INCLUDED
   #include "fim_ficobj.h"
@@ -437,7 +437,7 @@ QString jfFIM_Fanfic::ToDisplayHTML() const {
   // we start with the table
   result = "<table width=99%><tr><td>";
   // building the title line
-  result += "<font size=+2><a href=\"";
+  result += "<font size=+3><a href=\"";
   result += primarylink + "\">";
   result += name + "</a>";
   // adding the author stuff
@@ -445,7 +445,7 @@ QString jfFIM_Fanfic::ToDisplayHTML() const {
   result += "</font> ";
   // status
   if (ustatus!=jud_NONE) {
-    result += "<font size=+1 color=";
+    result += "<font size=+2 color=";
     if (ustatus==jud_UPDATED) result += "lime><b>[Updated";
     else if (ustatus==jud_MISSING) result += "red><b>[Missing";
     else if (ustatus==jud_NEW) result += "aqua><b>[New";
@@ -455,12 +455,12 @@ QString jfFIM_Fanfic::ToDisplayHTML() const {
   result += "</td></tr>\n";
   // next line: link display
   result += "<tr><td>";
-  result += "<font color=green>";
+  result += "<font color=green size=+1>";
   result += primarylink + "</font><br>\n";
   // adding the main description
-  result +=  "<font color=#010101>" + GetDescExtract(6,750) + "<br>\n";
+  result +=  "<font color=#010101 size=+2>" + GetDescExtract(6,750) + "<br>\n";
   // next up.. two extra lines
-  result += "<font color=gray>Published: " + pubdate.toString("MM-dd-yyyy");
+  result += "<font color=gray size=+1>Published: " + pubdate.toString("MM-dd-yyyy");
   result += " - Updated: " + updated_date.toString("MM-dd-yyyy");
   result += " - Rating: " + rating;
   // part count and word count
@@ -479,25 +479,25 @@ QString jfFIM_Fanfic::ToDisplayHTML() const {
   bool hasWarn = !warnings.isEmpty();
   // final info,
   if (hasGenre) {
-      result += "<font color=green><b>Genres:</b> ";
+      result += "<font color=green size=+1><b>Genres:</b> ";
       result += genres + "</font>";
   }
   if (hasCT) {
       if (hasGenre) result += " &middot; ";
-      result += "<font color=gray><b>Types:</b> ";
+      result += "<font color=gray size=+1><b>Types:</b> ";
       result += content_types + "</font>";
   }
   // warnings
   if (hasWarn) {
       if (hasGenre || hasCT) result += " &middot; ";
-      result += "<font color=red><b>Warnings:</b> ";
+      result += "<font color=red size=+2><b>Warnings:</b> ";
       result += warnings + "</font>";
   }
   if (hasGenre || hasCT || hasWarn) result += "<br>\n";
   // characters and completion status
   bool hasChar = !characters.isEmpty();
   if (hasChar || completed) {
-      result += "<font color=blue>";
+      result += "<font color=blue size=+1>";
       if (hasChar) {
           result += "<b>Characters:</b> " + characters;
       }

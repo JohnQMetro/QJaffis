@@ -155,7 +155,7 @@ QString jfGenericFanfic::DisplayHTMLHeader(size_t mindex) const {
   if (!texmpx.isEmpty()) result += " bgcolor=\"#" + texmpx + "\"";
   result += "><tr><td>";
   // building the title line
-  result += "<font size=+2 color=#010101><a href=\"";
+  result += "<font size=+3 color=#010101><a href=\"";
   result += primarylink + "\">";
   result += name + "</a>";
   // adding the author stuff
@@ -163,7 +163,7 @@ QString jfGenericFanfic::DisplayHTMLHeader(size_t mindex) const {
   result += "</font> ";
   // status
   if (ustatus!=jud_NONE) {
-    result += "<font size=+1 color=";
+    result += "<font size=+2 color=";
     if (ustatus==jud_UPDATED) result += "Lime><b>[Updated";
     else if (ustatus==jud_MISSING) result += "Red><b>[Missing";
     else if (ustatus==jud_NEW) result += "Aqua><b>[New";

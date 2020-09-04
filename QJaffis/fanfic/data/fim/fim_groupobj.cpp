@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Group object for fimfiction.net
 Created :   July 31, 2013
 Started conversion to Qt August 3, 2015
-Updated :   January 6, 2018 (SetFromCardString)
+Updated :   September 4 2020
 ******************************************************************************/
 #ifndef FIM_GROUPOBJ_H_INCLUDED
   #include "fim_groupobj.h"
@@ -211,7 +211,7 @@ QString jfFIMGroup::ToDisplayHTML() const {
   // we start with the table
   result = "<table width=99%><tr><td>";
   // building the title line
-  result += "<font size=+2 color=#010101><a href=\"";
+  result += "<font size=+3 color=#010101><a href=\"";
   result += primarylink + "\">";
   result += name + "</a>";
   // adding the author stuff
@@ -219,12 +219,12 @@ QString jfFIMGroup::ToDisplayHTML() const {
   result += "</font></td></tr>\n";
   // next line: link display
   result += "<tr><td>";
-  result += "<font color=\"green\">";
+  result += "<font color=\"green\" size=+1>";
   result += primarylink + "</font><br>\n";
   // adding the main description
-  result += "<font color=#010101>" + GetDescExtract(5,500) + "<br>\n";
+  result += "<font color=#010101 size=+2>" + GetDescExtract(5,500) + "<br>\n";
   // next up.. critical information
-  result += "<font color=gray>Published: ";
+  result += "<font color=gray size=+1>Published: ";
   result += "Stories : " + QString::number(ficcount);
   result += " - Members : " + QString::number(memcount);
   result += " - Last Comment : ";
@@ -233,7 +233,7 @@ QString jfFIMGroup::ToDisplayHTML() const {
   // else result += last_comment.Format(wxT("%m-%d-%Y"));
   result += "</font><br>\n";
   // the forum link
-  result += "<font color=green>";
+  result += "<font color=green size=+1>";
   result += forumlink + "</font></td></tr>\n</table>";
   // done
   return result;

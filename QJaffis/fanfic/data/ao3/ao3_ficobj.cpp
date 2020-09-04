@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines fanfic object data of archoveofourown.org
 Created :   August 26, 2012
 Conversion to Qt Started September 28, 2013
-Updated :   August 10, 2020
+Updated :   September 4, 2020
 ******************************************************************************/
 #ifndef AO3_FICOBJ_H_INCLUDED
   #include "ao3_ficobj.h"
@@ -195,23 +195,23 @@ QString jfAO3Fanfic::ToDisplayHTML() const {
   // we start with the table
   result = DisplayHTMLHeader(1);
   // fandom display
-  result += "<br>\n<font color=\"green\">";
+  result += "<br>\n<font color=\"green\" size=+1>";
   result += GetFandoms() + "</font>";
   result += "</td></tr>\n";
   // next line: link display
   result += "<tr><td>";
-  result += "<font color=\"green\">";
+  result += "<font color=\"green\" size=+1>";
   result += primarylink + "</font><br>\n";
   // adding the main description
-  result += "<font color=\"#010101\">" + description + "</font><br>\n";
+  result += "<font color=\"#010101\" size=+2>" + description + "</font><br>\n";
   // series
   if (InSeries()) {
-    result += "<font color=cyan>Part ";
+    result += "<font color=cyan size=+1>Part ";
     result += QString::number(series_index) + " of the " + series_name;
     result += " Series.</font><br>\n";
   }
   // next up.. three extra lines
-  result += "<font color=gray>Updated: " + updated_date.toString("MM-dd-yyyy");
+  result += "<font color=gray size=+1>Updated: " + updated_date.toString("MM-dd-yyyy");
   result += " - Rating: " + RatingToString();
   result += " - Orientation: " + OrientToString();
   // part count and word count
@@ -237,12 +237,12 @@ QString jfAO3Fanfic::ToDisplayHTML() const {
     optline += "Pairings: " + relationships;
   }
   if (!optline.isEmpty()) {
-    result += "<br>\n<font color=olive size=2>";
+    result += "<br>\n<font color=olive size=+1>";
     result += optline;
     result += "</font>";
   }
   if (!extratags.isEmpty()) {
-    result += "<br>\n<font color=teal size=2>Tags : ";
+    result += "<br>\n<font color=teal size=+1>Tags : ";
     result += extratags;
     result += "</font>";
   }

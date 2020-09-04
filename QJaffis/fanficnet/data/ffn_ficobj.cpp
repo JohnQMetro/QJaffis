@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net item object
 // Created:     May 25, 2010
 // Conversion to Qt Started September 25, 2013
-// Updated:     July 8, 2016 (change base to jfGenericFanfic3)
+// Updated:     September 4, 2020 (increase font size for display html)
 /////////////////////////////////////////////////////////////////////////////
 #ifndef JFFNFICOBJ
   #include "ffn_ficobj.h"
@@ -84,7 +84,7 @@ QString jfFFNItemCore::ToDisplayHTML() const {
   // we start with the table
   result = ("<table width=99%><tr><td>");
   // building the title line
-  result += ("<font size=+2 color=#010101><a href=\"");
+  result += ("<font size=+3 color=#010101><a href=\"");
   result += primarylink + ("\">");
   result += name + ("</a>");
   // adding the author stuff
@@ -92,7 +92,7 @@ QString jfFFNItemCore::ToDisplayHTML() const {
   result += ("</font> ");
   // status
   if (ustatus!=jud_NONE) {
-    result += ("<font size=+1 color=");
+    result += ("<font size=+2 color=");
     if (ustatus==jud_UPDATED) result += ("Lime><b>[Updated");
     else if (ustatus==jud_MISSING) result += ("Red><b>[Missing");
     else if (ustatus==jud_NEW) result += ("Aqua><b>[New");
@@ -102,12 +102,12 @@ QString jfFFNItemCore::ToDisplayHTML() const {
   result += ("</td></tr>\n");
   // next line: link display
   result += ("<tr><td>");
-  result += ("<font color=\"green\">");
+  result += ("<font color=\"green\" size=+1>");
   result += primarylink + ("</font><br>\n");
   // adding the main description
-  result += "<font color=#010101>" + description + ("<br>\n");
+  result += "<font color=#010101 size=+2>" + description + ("<br>\n");
   // next up.. two extra lines
-  result += ("<font color=gray>Published: ");
+  result += ("<font color=gray size=+1>Published: ");
   result += published.toString("MM-dd-yyyy");
   if (isupdated) {
     result += " - Updated: " + updated_date.toString("MM-dd-yyyy");
@@ -121,7 +121,7 @@ QString jfFFNItemCore::ToDisplayHTML() const {
   result += " - Words: " + QString::number(word_count);
   result += " - Favs: " + QString::number(favs) + "</font><br>\n";
   // final info,
-  result += ("<font color=gray>");
+  result += ("<font color=gray size=+1>");
   result += language;
   if (!genres.isEmpty()) {
     result += (" - Genres: ") + genres;
