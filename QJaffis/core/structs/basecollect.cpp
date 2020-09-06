@@ -206,7 +206,7 @@ bool jfFilterMap::MatchAll(const jfBasePD* inval) const {
   bool iresult;
   QString mstring;
   // a check
-  assert(inval!=NULL);
+  /**/jfAssertLog(inval!=NULL,fname,"MatchAll parameter is not null");
   // the loop
   for (findex = coredata.begin(); findex!=coredata.end(); findex++) {
     mstring = (findex->second)->ToString();

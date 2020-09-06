@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines some interface panels for some AO3 Filters
 Created :   October 6, 2012
 Conversion to Qt Started October 19, 2013
-Updated :   October 10, 2012
+Updated :   September 6, 2020
 ******************************************************************************/
 #ifndef AO3_SPECIAL2_H_INCLUDED
   #include "ao3_special2.h"
@@ -21,7 +21,7 @@ jfAO3PairingPanel::jfAO3PairingPanel(bool orient, QWidget* parent):QWidget(paren
   // creating GUI elemnts
   altbox = new QCheckBox("Check if only one pairing needs to match");
   altbox->setChecked(true);
-  pairlistbox = new jfLabeledEdit(NULL,"Pairings to find",(omode)?(false):(true));
+  pairlistbox = new jfLabeledEdit(NULL,"Pairings to find (comma separated, use '/' (romantic/sexual) or '&' (other) to separate the names.",(omode)?(false):(true));
   // arranging
   bsizer = new QVBoxLayout();
   bsizer->addWidget(altbox,0);
@@ -81,7 +81,7 @@ jfAO3_PairingFilterEditor::jfAO3_PairingFilterEditor(const jfBaseFilter* infilt,
                QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
   // we start...
   // we create the insert.. the *actual*  editor
-  insert_panel = new jfAO3PairingPanel(false);
+  insert_panel = new jfAO3PairingPanel(true);
   // finalizing things
   insert = new QBoxLayout(QBoxLayout::TopToBottom);
   insert->addWidget(insert_panel,1);

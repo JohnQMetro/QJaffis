@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   AO3 pairing and warning filters
 Created :   October 4, 2012
 Conversion to Qt Started Oct 2, 2013
-Updated :   October 10, 2012
+Updated :   September 5, 2020 (Revise pair filter)
 ******************************************************************************/
 #ifndef AO3_SPECIALS2_H_INCLUDED
 #define AO3_SPECIALS2_H_INCLUDED
@@ -16,10 +16,30 @@ Updated :   October 10, 2012
 #ifndef AO3_SPECIALS1_H_INCLUDED
   #include "ao3_specials1.h"
 #endif // AO3_SPECIALS1_H_INCLUDED
+
+#include <QVector>
 /*****************************************************************************/
 extern const QString warn3_ac;
 extern const QString warnlist[];
 //-----------------------------
+// AO3 now distinguishes between romantic and platonic pairings
+class jfAO3Pairing {
+  public:
+    QString first;
+    QString second;
+    bool is_platonic;
+
+    jfAO3Pairing();
+    jfAO3Pairing(const jfAO3Pairing& source);
+    jfAO3Pairing(const QString& A, const QString& B, const bool in_platonic );
+
+    QString toString() const;
+
+    static jfAO3Pairing* ParsePairing(const QString& source);
+    static bool ComparePairing(const jfAO3Pairing& pattern,const jfAO3Pairing& target, bool notype, bool either);
+};
+//------------------------------------------------------
+
 class jfAO3PairFilter : public jfBaseFilter {
   public:
     // constructors
@@ -39,15 +59,15 @@ class jfAO3PairFilter : public jfBaseFilter {
     // special meta-information
     virtual QString GetTypeID() const;
     // other methods
-    size_t GetPairs() const;
     void SetAlternates(bool inval);
     bool GetAlternate() const;
     // destructor
     ~jfAO3PairFilter();
   protected:
+    static void EmptyPairList(QVector<jfAO3Pairing*>& plist);
     // the core matching method
     virtual bool CoreMatch(const jfBasePD* testelem) const;
-    QStringList* ParsePairs(const QString& inval) const;
+    QVector<jfAO3Pairing*>* ParsePairs(const QString& inval) const;
     // file i/o
     virtual bool AddRestToFile(QTextStream* outfile) const;
     virtual bool ReadRestFromFile(jfFileReader* infile);
@@ -55,7 +75,7 @@ class jfAO3PairFilter : public jfBaseFilter {
     may have objects of varying length */
     virtual size_t ExtraLines() const;
     // internal data
-    QStringList* pnames;
+    QVector<jfAO3Pairing*>* pnames;
     bool alternate;
 };
 //========================================================================
