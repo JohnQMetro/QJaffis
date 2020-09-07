@@ -3,7 +3,7 @@ Name    : pagegetter.cpp
 Basic   : Defines my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 16, 2013
-Updated : Feb 27, 2020
+Updated : September 7, 2020
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
@@ -23,6 +23,8 @@ Updated : Feb 27, 2020
 #endif // BASEPARSE_H
 
 #include <assert.h>
+#include <random>
+#include <ctime>
 //---------------------------------
 #include <QByteArray>
 #include <QEventLoop>
@@ -44,6 +46,14 @@ jfFetchPage::jfFetchPage() {
   theerror = jff_NOERROR;
   check_clientred = false;
   for (int xi=0;xi<7;xi++) errlog[xi] = 0;
+  limit_count = 50;
+  xff_ip = "192.168.10.5";
+  xfh = (", X-Forwarded-For:" + xff_ip).toAscii();
+  rlimd.append("archiveofourown.org");
+  rlimd.append("www.archiveofourown.org");
+  srand(time(NULL));
+  hs = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.";
+  xhq = (hs + jfFetchPage::randomByte() + " Safari/537.36").toAscii();
 }
 //++++++++++++++++++++++++++++++++++++
 // Setting inputs
@@ -90,7 +100,8 @@ bool jfFetchPage::StartDownload() {
   // building the request
   req = new QNetworkRequest(fetch_this);
   // for the request, there are some default values we have to overriden
-  req->setRawHeader("User-Agent", "qjaffis-agent/1.1");
+  req->setRawHeader("User-Agent", "qjaffis-agent/1.2");
+  RateLimitHandle(*req);
   req->setAttribute(QNetworkRequest::CacheSaveControlAttribute,false);
   req->setAttribute(QNetworkRequest::CookieSaveControlAttribute,true);
   // adding a cookie if needed
@@ -296,6 +307,7 @@ bool jfFetchPage::MakeError() {
     case QNetworkReply::UnknownContentError           :/**/JDEBUGLOG(fname,15);
       if (serror.contains("Too Many Requests",Qt::CaseInsensitive)) {
           theerror = jff_RATELIMIT;
+          limit_count = 50;
       }
       else theerror = jff_FALIURE;
       break;
@@ -426,6 +438,29 @@ bool jfFetchPage::ClearObjects() {
   raw_result = NULL;
   // done
   return true;
+}
+//-----------------------------------------------------------
+bool jfFetchPage::RateLimitHandle(QNetworkRequest& head_target) {
+    const QString fname = "jfFetchPage::RateLimitHandle";
+    QString domain = fetch_this.host();
+    if (!rlimd.contains(domain,Qt::CaseInsensitive)) return false;
+    limit_count++;
+    if (limit_count > 20) {
+        xff_ip = jfFetchPage::randomByte() + ".";
+        xff_ip += jfFetchPage::randomByte() + ".";
+        xff_ip += jfFetchPage::randomByte() + ".";
+        xff_ip += jfFetchPage::randomByte();
+        limit_count = 1;
+        xfh = (", X-Forwarded-For:" + xff_ip).toAscii();
+        xhq = (hs + jfFetchPage::randomByte() + " Safari/537.36").toAscii();
+    }
+
+    head_target.setRawHeader("User-Agent", xhq);
+    head_target.setRawHeader("X-Forwarded-For", xfh);
+    return true;
+}
+QString jfFetchPage::randomByte() {
+    return QString::number(rand() % 256);
 }
 
 //*****************************************************************************

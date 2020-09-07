@@ -3,7 +3,7 @@ Name    : pagegetter.h
 Basic   : Declares my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 15, 2013
-Updated : Feb 27, 2010
+Updated : September 7, 2020 (rate limit bypass attempt)
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
@@ -16,6 +16,7 @@ Updated : Feb 27, 2010
 #include <QNetworkReply>
 #include <QUrl>
 #include <QObject>
+#include <QStringList>
 //*****************************************************************************
 // an enumerated type for downloader errors, simpler than Qt Errors
 /* updated Oct 18, 2015, to reflect a split between fetching and parsing, the
@@ -80,6 +81,8 @@ class jfFetchPage : public QObject {
       bool ProcessResult(); // read and convert the BytesRead, and check for redirection, etc.
       bool ParseForClient(); // parses the result for client side redirection
       bool ClearObjects(); // used to delete the qt objects after download
+      bool RateLimitHandle(QNetworkRequest& head_target);
+      static QString randomByte();
     // flags
       bool isdownloading; // flag, are we downloading?
       bool afterdownload; // flag, do we have results (error or no)
@@ -97,6 +100,14 @@ class jfFetchPage : public QObject {
       jfFETCH_ERROR theerror; // we store our simplified error here
     // misc extra stuff
       size_t errlog[7];       // counting all the errors for debugging
+
+    // stuff added for rate limiting
+      int limit_count;
+      QString xff_ip;
+      QStringList rlimd;
+      QByteArray xfh;
+      QByteArray xhq;
+      QString hs;
 
 };
 
