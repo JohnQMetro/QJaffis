@@ -43,6 +43,7 @@ class jfLabeledEdit : public QWidget {
     QLabel* thelabel;
     QLineEdit* thetext;
     QBoxLayout* layout;
+    QHBoxLayout* zogx;
 };
 //--------------------------------------------------------------
 // just to reduce layout, a bundled integer entry and label

@@ -33,18 +33,25 @@ const QChar am = QChar('&');
 /*****************************************************************************/
 jfAO3Pairing::jfAO3Pairing() {
     first = ""; second = ""; is_platonic = false;
+    reader = false; original = false;
 }
 //----------------------------
 jfAO3Pairing::jfAO3Pairing(const jfAO3Pairing& source) {
     first = source.first;
     second = source.second;
     is_platonic = source.is_platonic;
+    reader = source.reader;
+    original = source.original;
 }
 //----------------------------
 jfAO3Pairing::jfAO3Pairing(const QString& A, const QString& B, const bool in_platonic ) {
     first = A.toLower();
     second = B.toLower();
     is_platonic = in_platonic;
+    reader = (A == "reader") || (A == "you");
+    if (!reader) reader = (B == "reader") || (B == "you");
+    original = A.startsWith("original") || (A == "ofc") || (A == "omc");
+    if (!original) original = B.startsWith("original") || (B == "ofc") || (B == "omc");
 }
 
 QString jfAO3Pairing::toString() const {
@@ -98,6 +105,8 @@ bool jfAO3Pairing::ComparePairing(const jfAO3Pairing& pattern,const jfAO3Pairing
 jfAO3PairFilter::jfAO3PairFilter():jfBaseFilter() {
   pnames = NULL;
   alternate = true;
+  match_reader = false;
+  match_original = false;
 }
 //------------------------------
 jfAO3PairFilter::jfAO3PairFilter(const jfAO3PairFilter& source):jfBaseFilter() {
@@ -114,13 +123,15 @@ jfAO3PairFilter::jfAO3PairFilter(const jfAO3PairFilter& source):jfBaseFilter() {
       }
   }
   alternate = source.alternate;
+  match_reader = source.match_reader;
+  match_original = source.match_original;
 }
 //+++++++++++++++++++++++++++++++++++++++++++
 // public methods implemented here
 //---------------------------
 bool jfAO3PairFilter::isEmpty() const {
-  if (pnames==NULL) return true;
-  else return (pnames->isEmpty());
+  if ((pnames != NULL) && (!pnames->isEmpty())) return false;
+  return !(match_reader || match_original);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++
 // string conversion
@@ -130,15 +141,19 @@ bool jfAO3PairFilter::FromString(const QString& sourcedata) {
   if (pnames!=NULL) delete pnames;
   // parsing
   jfLineParse lparse(sourcedata);
-  if (lparse.NNotX(2)) return false;
+  size_t nx = lparse.Num();
+  if ((nx < 2) || (nx > 4)) return false;
   // getting...
   if (!lparse.BoolVal(0,alternate)) return false;
   QString srcstuff = lparse.GetT(1);
-  return SetNamesData(srcstuff);
+  if (!SetNamesData(srcstuff)) return false;
+  if (!lparse.BoolVal(2,match_reader)) return false;
+  return lparse.BoolVal(3,match_original);
 }
 //-------------------------------
 QString jfAO3PairFilter::ToString() const {
-  return Bool2Str(alternate) + ";" + GetNamesData();
+    QString ox = Bool2Str(alternate) + ";" + GetNamesData() + ";";
+    return ox + Bool2Str(match_reader) + ";" + Bool2Str(match_original);
 }
 //---------------------------------
 bool jfAO3PairFilter::SetNamesData(const QString& sourcedata) {
@@ -187,6 +202,9 @@ jfBaseFilter* jfAO3PairFilter::GenCopy() const {
           (newfilt->pnames)->replace(pdex,new jfAO3Pairing(*(pnames->at(pdex))));
       }
   }
+  newfilt->alternate = alternate;
+  newfilt->match_reader = match_reader;
+  newfilt->match_original = match_original;
   return newfilt;
 }
 //------------------------------
@@ -201,6 +219,23 @@ void jfAO3PairFilter::SetAlternates(bool inval) {
 //----------------------------------
 bool jfAO3PairFilter::GetAlternate() const {
   return alternate;
+}
+//----------------------------------
+void jfAO3PairFilter::SetMatchReader(bool inval) {
+    match_reader = inval;
+}
+
+//----------------------------------
+bool jfAO3PairFilter::GetMatchReader() const {
+    return match_reader;
+}
+//----------------------------------
+void jfAO3PairFilter::SetMatchOriginal(bool inval) {
+    match_original = inval;
+}
+//----------------------------------
+bool jfAO3PairFilter::GetMatchOriginal() const {
+    return match_original;
 }
 //--------------------------------
 // destructor
@@ -238,8 +273,30 @@ bool jfAO3PairFilter::CoreMatch(const jfBasePD* testelem) const {
   /**/JDEBUGLOG(fname,1)
   temp = dynamic_cast<const jfAO3Fanfic*>(testelem);
   parsedinput = ParsePairs(htmlparse::HTML2Text(temp->GetRelationships()));
-  /**/JDEBUGLOG(fname,2)
   if (parsedinput == NULL) return false;
+  // we first check vs the special flags
+  if (match_original || match_reader) {
+      for (int qloop = 0; qloop < (parsedinput->size()); qloop++) {
+          test2 = parsedinput->at(qloop);
+          if (match_original && (test2->original)) {
+              found = true;
+              break;
+          }
+          if (match_reader && (test2->reader)) {
+              found = true;
+              break;
+          }
+      }
+      if (found) {
+          jfAO3PairFilter::EmptyPairList(*parsedinput);
+          delete parsedinput;
+          return true;
+      }
+  }
+
+
+  /**/JDEBUGLOG(fname,2)
+  if ((pnames == NULL) || (pnames->isEmpty())) return false;
   // outer matching loop.. using the filter info
   for (int oloop = 0; oloop < (pnames->size()); oloop++) {
       found = false;

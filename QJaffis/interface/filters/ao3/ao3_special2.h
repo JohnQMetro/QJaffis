@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares some interface panels for some AO3 Filters
 Created :   October 6, 2012
 Conversion to Qt Started October 19, 2013
-Updated :   October 10 2012
+Updated :   September 9, 2020
 ******************************************************************************/
 #ifndef AO3_SPECIAL2_H_INCLUDED
 #define AO3_SPECIAL2_H_INCLUDED
@@ -30,8 +30,12 @@ class jfAO3PairingPanel : public QWidget {
     // i/o
     bool SetFromString(const QString& inval);
     void SetAlternateCheck(bool cval);
+    void SetReaderCheck(bool cval);
+    void SetOriginalCheck(bool cval);
     QString GetStringValue() const;
     bool GetAlternateCheck() const;
+    bool GetReaderCheck() const;
+    bool GetOriginalCheck() const;
     // filter based i/o
     jfAO3PairFilter* GetFilter() const;
     bool StoreToFilter(jfAO3PairFilter* outval);
@@ -39,6 +43,8 @@ class jfAO3PairingPanel : public QWidget {
   protected:
     // GUI data
     QCheckBox* altbox;
+    QCheckBox* readerbox;
+    QCheckBox* originalbox;
     jfLabeledEdit* pairlistbox;
     QVBoxLayout* bsizer;
     // non gui data

@@ -48,7 +48,7 @@ bool jfLineParse::IsEmpt() const {
 //---------------------------------------------------------------
 bool jfLineParse::NNotX(const size_t& X) const {
   return (Num()!=X);
-};
+}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // getting values at index
 QString jfLineParse::UnEscStr(size_t index) const {

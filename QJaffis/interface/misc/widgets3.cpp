@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Some misc user interface stuff
 Created :   December 5, 2010
 Conversion to Qt Started May 22, 2013
-Updated :   October 13, 2019
+Updated :   September 10, 2020
 ******************************************************************************/
 #ifndef WIDGETS3_H_INCLUDED
   #include "widgets3.h"
@@ -30,13 +30,22 @@ Updated :   October 13, 2019
 jfLabeledEdit::jfLabeledEdit(QWidget* parent, QString inlabel, bool horiz, QString intext):QWidget(parent) {
   // creating the sizer
   layout = new QBoxLayout((horiz)?(QBoxLayout::LeftToRight):(QBoxLayout::TopToBottom),this);
+  layout->setSizeConstraint(QLayout::SetNoConstraint);
+  zogx = (horiz) ? NULL : (new QHBoxLayout());
   // creating the items
   clabel = inlabel;
   thelabel = new QLabel(inlabel+ " : ");
   thetext = new QLineEdit(intext);
   // arranging
-  layout->addWidget(thelabel,0,(horiz)?(Qt::AlignVCenter):(Qt::AlignAbsolute));
-  layout->addWidget(thetext,1,(horiz)?(Qt::AlignVCenter):(Qt::AlignAbsolute));
+  layout->addWidget(thelabel,0,(horiz)?(Qt::AlignVCenter):(Qt::AlignLeft));
+  if (horiz) {
+      layout->addWidget(thetext,1,Qt::AlignVCenter);
+  }
+  else {
+      zogx->addWidget(thetext,1);
+      layout->addLayout(zogx);
+  }
+
   setLayout(layout);
 }
 //+++++++++++++++++

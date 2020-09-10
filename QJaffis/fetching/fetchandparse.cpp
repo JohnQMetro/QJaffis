@@ -201,6 +201,7 @@ jfFETCH_ERROR jfFetchAndParsePage::DownloadMethod(uint pre_pause) {
       // rate limit error...
       else if (currError == jff_RATELIMIT) {
           if (sleep_time < 10) sleep_time = 10;
+          else if (sleep_time > 80) sleep_time += downloader->GetRetryAfter();
           else sleep_time = sleep_time * 2;
           /**/tLog(fname,6);
           downloader->Reset();
@@ -218,7 +219,7 @@ jfFETCH_ERROR jfFetchAndParsePage::DownloadMethod(uint pre_pause) {
           sleep_time = 1;
       }
     }
-    /**/tLog(fname,7);
+    /**/tLog(fname,9);
     // if we get here, we are retrying for the next loop
     retry_count++;
     if (sleep_time > 1) QCoreApplication::processEvents();

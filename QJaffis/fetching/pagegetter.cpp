@@ -3,7 +3,7 @@ Name    : pagegetter.cpp
 Basic   : Defines my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 16, 2013
-Updated : September 7, 2020
+Updated : September 8, 2020
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
@@ -184,6 +184,14 @@ bool jfFetchPage::PrepareResults() {
       }
     }
   }
+  else if (theerror == jff_RATELIMIT) {
+      QByteArray ret = raw_result->rawHeader("Retry-After");
+      QString rastr = QString(ret).trimmed();
+      /**/JDEBUGLOGS(fname,6,"RETRY-AFTER: " + rastr);
+      bool oint;
+      retry_after = rastr.toInt(&oint);
+      if (!oint) retry_after = 0;;
+  }
   // following, whether in error or not, we clean up...
   rc = ClearObjects();
   assert(rc);
@@ -271,7 +279,12 @@ bool jfFetchPage::Reset() {
   theerror = jff_NOERROR;
   redirectto.clear();
   afterdownload = false;
+  limit_count = 50;
   return true;
+}
+//-----------------------------------
+int jfFetchPage::GetRetryAfter() const {
+    return retry_after;
 }
 //++++++++++++++++++++++++++++++++++++
 // destructor
@@ -451,12 +464,16 @@ bool jfFetchPage::RateLimitHandle(QNetworkRequest& head_target) {
         xff_ip += jfFetchPage::randomByte() + ".";
         xff_ip += jfFetchPage::randomByte();
         limit_count = 1;
-        xfh = (", X-Forwarded-For:" + xff_ip).toAscii();
+
+        xfh = xff_ip.toAscii();
         xhq = (hs + jfFetchPage::randomByte() + " Safari/537.36").toAscii();
     }
 
     head_target.setRawHeader("User-Agent", xhq);
-    head_target.setRawHeader("X-Forwarded-For", xfh);
+    head_target.setRawHeader("X-Originating-IP", xfh);
+    head_target.setRawHeader("X-Forwarded-For", "rwgaergwe");
+    head_target.setRawHeader("X-Remote-IP", xfh);
+    head_target.setRawHeader("X-Remote-Addr", xfh);
     return true;
 }
 QString jfFetchPage::randomByte() {

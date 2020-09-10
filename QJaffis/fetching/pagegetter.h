@@ -73,6 +73,7 @@ class jfFetchPage : public QObject {
       QString GetRedirection() const;  // returns the redirection result, which may be empty
       QString GetRedirectTarget() const; // like GetRedirection, but resolves the redirection first
       bool Reset(); // after calling PrepareResults(), one can call this to discard results
+      int GetRetryAfter() const;
     // destructor
       ~jfFetchPage();
   protected:
@@ -108,6 +109,7 @@ class jfFetchPage : public QObject {
       QByteArray xfh;
       QByteArray xhq;
       QString hs;
+      int retry_after;
 
 };
 

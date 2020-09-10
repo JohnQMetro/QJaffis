@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   AO3 pairing and warning filters
 Created :   October 4, 2012
 Conversion to Qt Started Oct 2, 2013
-Updated :   September 5, 2020 (Revise pair filter)
+Updated :   September 9, 2020 (Revise pair filter)
 ******************************************************************************/
 #ifndef AO3_SPECIALS2_H_INCLUDED
 #define AO3_SPECIALS2_H_INCLUDED
@@ -28,6 +28,8 @@ class jfAO3Pairing {
     QString first;
     QString second;
     bool is_platonic;
+    bool reader;
+    bool original;
 
     jfAO3Pairing();
     jfAO3Pairing(const jfAO3Pairing& source);
@@ -61,6 +63,10 @@ class jfAO3PairFilter : public jfBaseFilter {
     // other methods
     void SetAlternates(bool inval);
     bool GetAlternate() const;
+    void SetMatchReader(bool inval);
+    bool GetMatchReader() const;
+    void SetMatchOriginal(bool inval);
+    bool GetMatchOriginal() const;
     // destructor
     ~jfAO3PairFilter();
   protected:
@@ -77,6 +83,8 @@ class jfAO3PairFilter : public jfBaseFilter {
     // internal data
     QVector<jfAO3Pairing*>* pnames;
     bool alternate;
+    bool match_reader;
+    bool match_original;
 };
 //========================================================================
 // excludes fics based on warnings

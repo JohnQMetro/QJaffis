@@ -402,10 +402,14 @@ void jfFilterMapEditor::DeletePressed(bool checked) {
 // saving a filter
 void jfFilterMapEditor::SavePressed(bool checked) {
   const QString fname = "jfFilterMapEditor::SavePressed";
+  /**/JDEBUGLOG(fname,1)
   assert(!isblank);
+  /**/JDEBUGLOG(fname,2)
   // we only go ahead with the save if the check passes
   if (editing_panel->GeneralCheck()) {
+      /**/JDEBUGLOG(fname,3)
     CoreSave();
+      /**/JDEBUGLOG(fname,4)
   }
 }
 //--------------------------------------------------------------------------

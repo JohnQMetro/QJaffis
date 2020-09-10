@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines some interface panels for some AO3 Filters
 Created :   October 6, 2012
 Conversion to Qt Started October 19, 2013
-Updated :   September 6, 2020
+Updated :   September 10, 2020
 ******************************************************************************/
 #ifndef AO3_SPECIAL2_H_INCLUDED
   #include "ao3_special2.h"
@@ -21,10 +21,16 @@ jfAO3PairingPanel::jfAO3PairingPanel(bool orient, QWidget* parent):QWidget(paren
   // creating GUI elemnts
   altbox = new QCheckBox("Check if only one pairing needs to match");
   altbox->setChecked(true);
+  readerbox = new QCheckBox("Check to match any pairing including 'Reader' or 'You'.");
+  readerbox->setChecked(false);
+  originalbox = new QCheckBox("Check to match any original character pairing.");
+  originalbox->setChecked(false);
   pairlistbox = new jfLabeledEdit(NULL,"Pairings to find (comma separated, use '/' (romantic/sexual) or '&' (other) to separate the names.",(omode)?(false):(true));
   // arranging
   bsizer = new QVBoxLayout();
   bsizer->addWidget(altbox,0);
+  bsizer->addWidget(readerbox,0);
+  bsizer->addWidget(originalbox,0);
   bsizer->addWidget(pairlistbox,0);
   // finishing
   setLayout(bsizer);
@@ -40,6 +46,13 @@ bool jfAO3PairingPanel::SetFromString(const QString& inval) {
 void jfAO3PairingPanel::SetAlternateCheck(bool cval) {
   altbox->setChecked(cval);
 }
+void jfAO3PairingPanel::SetReaderCheck(bool cval) {
+    readerbox->setChecked(cval);
+}
+
+void jfAO3PairingPanel::SetOriginalCheck(bool cval) {
+    originalbox->setChecked(cval);
+}
 //-------------------------------------
 QString jfAO3PairingPanel::GetStringValue() const {
   return pairlistbox->GetText();
@@ -48,24 +61,36 @@ QString jfAO3PairingPanel::GetStringValue() const {
 bool jfAO3PairingPanel::GetAlternateCheck() const {
   return altbox->isChecked();
 }
+bool jfAO3PairingPanel::GetReaderCheck() const {
+    return readerbox->isChecked();
+}
+bool jfAO3PairingPanel::GetOriginalCheck() const {
+    return originalbox->isChecked();
+}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++
 // filter based i/o
 //-------------------------------------
 jfAO3PairFilter* jfAO3PairingPanel::GetFilter() const {
-  jfAO3PairFilter* result;
-  result = new jfAO3PairFilter();
-  if (!result->SetNamesData(pairlistbox->GetText())) {
+  jfAO3PairFilter* result = new jfAO3PairFilter();
+  bool rb = readerbox->isChecked();
+  bool ob = originalbox->isChecked();
+  bool hn = result->SetNamesData(pairlistbox->GetText());
+  if ((!hn) && (!rb) && (!ob)) {
     delete result;
     return NULL;
   }
   result->SetAlternates(altbox->isChecked());
+  result->SetMatchReader(rb);
+  result->SetMatchOriginal(ob);
   return result;
 }
 //-------------------------------------
 bool jfAO3PairingPanel::StoreToFilter(jfAO3PairFilter* outval) {
   assert(outval!=NULL);
-  if (!outval->SetNamesData(pairlistbox->GetText())) return false;
+  outval->SetNamesData(pairlistbox->GetText());
   outval->SetAlternates(altbox->isChecked());
+  outval->SetMatchReader(readerbox->isChecked());
+  outval->SetMatchOriginal(originalbox->isChecked());
   return true;
 }
 //-------------------------------------
@@ -74,6 +99,8 @@ bool jfAO3PairingPanel::LoadFromFilter(const jfAO3PairFilter* inval) {
   if (!inval->IsValid()) return false;
   pairlistbox->SetText(inval->GetNamesData());
   altbox->setChecked(inval->GetAlternate());
+  readerbox->setChecked(inval->GetMatchReader());
+  originalbox->setChecked(inval->GetMatchOriginal());
   return true;
 }
 //=============================================================================
@@ -108,6 +135,7 @@ jfBaseFilter* jfAO3_PairingFilterEditor::GetFilter() {
 //--------------------------------------------------------------
 bool jfAO3_PairingFilterEditor::GeneralCheck() const {
   jfAO3PairFilter* result = insert_panel->GetFilter();
+  if (result == NULL) return false;
   bool resval = result->IsValid();
   delete result;
   return resval;
