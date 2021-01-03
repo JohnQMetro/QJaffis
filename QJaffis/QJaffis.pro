@@ -198,7 +198,8 @@ SOURCES += main.cpp\
     test/testparse.cpp \
     test/testurl.cpp \
     test/testthread.cpp \
-    test/testpanel.cpp
+    test/testpanel.cpp \
+    fetching/cloudfget.cpp
 
 HEADERS  += mainwindow.h \
     initend.h \
@@ -386,7 +387,8 @@ HEADERS  += mainwindow.h \
     test/testurl.h \
     test/testthread.h \
     test/testpanel.h \
-    fanficnet/categories/catgroup.h
+    fanficnet/categories/catgroup.h \
+    fetching/cloudfget.h
 
 RC_FILE = qjaffis.rc
 

@@ -4,7 +4,7 @@
  * Author:    John Q Metro
  * Created:   Febuary 13, 2011
   Conversion to QT Started June 23, 2013
- * Updated:   December 30, 2017
+ * Updated:   January 2, 2021 (Cloudflare interface init)
  *
  **************************************************************/
 #ifndef INITEND_H_INCLUDED
@@ -86,6 +86,10 @@
 #ifndef DEFCOLORS_H
     #include "interface/defcolors.h"
 #endif // DEFCOLORS_H
+
+#ifndef CLOUDFGET_H
+  #include "fetching/cloudfget.h"
+#endif // CLOUDFGET_H
 //****************************************************************
 
 const QString jglobal::dirlabels[NUMDIRS] = {"Google Results","Google Save Files",
@@ -196,6 +200,14 @@ bool jglobal::jfGlobalSettings::LoadAtStart(){
   loadres = filterglobals::LoadStrings();
   if (loadres) emit sendDone();
   else sendString("Loading Global Filters failed.");
+  QCoreApplication::processEvents();
+
+  // Cloudflare init
+  emit sendAction("Initializing Cloudscraper interface.");
+  QCoreApplication::processEvents();
+  bool okay = cloudscrape::StartFFCloudscraper();
+  if (okay) emit sendDone();
+  else sendString("Failed to setup cloudscaper.");
   QCoreApplication::processEvents();
 
   // FanFiction.Net related stuff

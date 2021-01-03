@@ -77,12 +77,13 @@ class jfFetchPage : public QObject {
     // destructor
       ~jfFetchPage();
   protected:
+      bool TestPageDelegates();
     // internal methods
       bool MakeError();  // sets theerror based upon QNetworkReply::NetworkError
-      bool ProcessResult(); // read and convert the BytesRead, and check for redirection, etc.
+      bool ProcessResult(bool write_to_file); // read and convert the BytesRead, and check for redirection, etc.
       bool ParseForClient(); // parses the result for client side redirection
       bool ClearObjects(); // used to delete the qt objects after download
-      bool RateLimitHandle(QNetworkRequest& head_target);
+      // bool RateLimitHandle(QNetworkRequest& head_target);
       static QString randomByte();
     // flags
       bool isdownloading; // flag, are we downloading?
@@ -103,13 +104,17 @@ class jfFetchPage : public QObject {
       size_t errlog[7];       // counting all the errors for debugging
 
     // stuff added for rate limiting
+      /*
       int limit_count;
       QString xff_ip;
       QStringList rlimd;
       QByteArray xfh;
       QByteArray xhq;
       QString hs;
+      */
       int retry_after;
+
+      bool use_cloudscrape;
 
 };
 

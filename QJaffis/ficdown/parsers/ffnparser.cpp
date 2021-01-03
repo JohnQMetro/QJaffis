@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Fanfiction.net
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   October 11, 2019
+ * Updated:   January 2, 2021
  *
  **************************************************************/
 #ifndef FFNPARSER_H
@@ -48,7 +48,7 @@ bool jfFFN_FicPartParser::testMissing(const QString *page) const {
 bool jfFFN_FicPartParser::testIncomplete(const QString *page) const {
   // constants and variables
   const QString err1 = "FanFiction.Net Error<hr size=1 noshade>An error has occurred while processing your request.";
-  const QString trunc1 = "<div class='btn-group dropup'align=left>";
+  const QString trunc1 = "<a href='/tos/'>Terms of Service</a>";
   // checking
   assert(page!=NULL);
   bool rval = page->contains(err1);

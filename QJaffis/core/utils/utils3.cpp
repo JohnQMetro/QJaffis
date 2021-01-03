@@ -70,6 +70,7 @@ bool FromFile(QString& outdata, QString filename) {
   }
   // creating the stream and reading
   instream = new QTextStream(infile);
+  instream->setCodec("UTF-8");
   outdata = instream->readAll();
   // done
   infile->close();

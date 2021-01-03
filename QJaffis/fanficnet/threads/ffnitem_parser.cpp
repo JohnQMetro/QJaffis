@@ -136,9 +136,12 @@ bool jfFFNItemParser::testMissing(const QString *page) const{
 }
 //----------------------------------
 bool jfFFNItemParser::testIncomplete(const QString *page) const {
+    const QString fname = "jfFFNItemParser::testIncomplete";
   assert(page!=NULL);
   const QString footer1= "<a href='/tos/'>Terms of Service</a>";
   const QString footer2 = "<!-- BEGIN footer -->";
+  bool t1 = page->contains(footer1);
+  /**/lpt->tLogB(fname,1,t1);
   return page->contains(footer1);
 }
 //----------------------------------

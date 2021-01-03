@@ -3,7 +3,8 @@ Name    : pagegetter.cpp
 Basic   : Defines my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 16, 2013
-Updated : September 8, 2020
+Updated : January 2, 2021
+Started attempts to get past Cloudflare
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
@@ -22,6 +23,10 @@ Updated : September 8, 2020
   #include "baseparse.h"
 #endif // BASEPARSE_H
 
+#ifndef CLOUDFGET_H
+  #include "cloudfget.h"
+#endif // CLOUDFGET_H
+
 #include <assert.h>
 #include <random>
 #include <ctime>
@@ -30,6 +35,7 @@ Updated : September 8, 2020
 #include <QEventLoop>
 #include <QTextCodec>
 #include <QSslError>
+#include <QCoreApplication>
 //*****************************************************************************
 // --- [ PUBLIC METHODS for jfFetchPage ] ---
 //++++++++++++++++++++++++++++++++++++
@@ -46,6 +52,10 @@ jfFetchPage::jfFetchPage() {
   theerror = jff_NOERROR;
   check_clientred = false;
   for (int xi=0;xi<7;xi++) errlog[xi] = 0;
+  use_cloudscrape = false;
+
+  // attempts to get past archive of our own rate limiting failed
+  /*
   limit_count = 50;
   xff_ip = "192.168.10.5";
   xfh = (", X-Forwarded-For:" + xff_ip).toAscii();
@@ -54,6 +64,7 @@ jfFetchPage::jfFetchPage() {
   srand(time(NULL));
   hs = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.";
   xhq = (hs + jfFetchPage::randomByte() + " Safari/537.36").toAscii();
+  */
 }
 //++++++++++++++++++++++++++++++++++++
 // Setting inputs
@@ -66,6 +77,7 @@ bool jfFetchPage::SetURL(const QString& inurl, const size_t& url_index) {
   // setting
   fetch_this.setEncodedUrl(inurl.toLatin1());
   testsDelegate->setPageIndex(url_index);
+  use_cloudscrape = (fetch_this.isValid() && (fetch_this.host() == "www.fanfiction.net"));
   return fetch_this.isValid();
 }
 //--------------------------
@@ -96,31 +108,44 @@ bool jfFetchPage::StartDownload() {
   if (afterdownload) return false;
   // we need a valid url
   if (!fetch_this.isValid()) return false;
-  /**/JDEBUGLOG(fname,3);
+  /**/JDEBUGLOGB(fname,3,use_cloudscrape);
+
+  /* Trying to use tokens from cloudscaper is not working, so
+   * use the cloudscraper script to do the entire download... */
+  if (use_cloudscrape) {
+      thepage = cloudscrape::ffn_interface->FetchOnePage(fetch_this);
+      isdownloading = true;
+      return true;
+  }
+
   // building the request
   req = new QNetworkRequest(fetch_this);
-  // for the request, there are some default values we have to overriden
-  req->setRawHeader("User-Agent", "qjaffis-agent/1.2");
-  RateLimitHandle(*req);
   req->setAttribute(QNetworkRequest::CacheSaveControlAttribute,false);
   req->setAttribute(QNetworkRequest::CookieSaveControlAttribute,true);
-  // adding a cookie if needed
+  /**/JDEBUGLOG(fname,4);
+  /**/JDEBUGLOG(fname,6);
+  req->setRawHeader("User-Agent", "qjaffis-agent/1.4");
   if (!cookie.isEmpty()) {
     /* note that cookies are supposed to be ASCII, but Qt has no US-ASCII codec (the
-      toAscii() function does not return us-ascii according to the Qt docs!). I'll
-      risk latin-1, at least for now. */
+       toAscii() function does not return us-ascii according to the Qt docs!). I'll
+       risk latin-1, at least for now. */
     cookie_value = cookie.toLatin1();
     req->setRawHeader("cookie",cookie_value);
   }
-  /**/JDEBUGLOG(fname,4);
+  /* commenting out the failed attempt to get past AO3 rate limiting
+  req->setRawHeader("User-Agent", xhq);
+  RateLimitHandle(*req);
+  */
+
+  /**/JDEBUGLOG(fname,7);
   // now we build the manager
   if (intermediary == NULL) intermediary = new QNetworkAccessManager();
   sslErrors2Ignore.append(QSslError(QSslError::NoError));
-  /**/JDEBUGLOG(fname,5);
+  /**/JDEBUGLOG(fname,8);
   // and get the reply object
   raw_result = intermediary->get(*req);
   raw_result->ignoreSslErrors();
-  /**/JDEBUGLOG(fname,6);
+  /**/JDEBUGLOG(fname,9);
   // done
   isdownloading = true;
   return true;
@@ -130,18 +155,40 @@ bool jfFetchPage::StartDownload() {
 bool jfFetchPage::PrepareResults() {
   // variables
   const QString fname = "jfFetchPage::PrepareResults";
+  // the most basic error : we have not even started!
+  /**/JDEBUGLOG(fname,1)
+  if (!isdownloading) return false;
+  /* using cloudscaper, the download is already done, so we have some dummy stuff */
+  if (use_cloudscrape) {
+      /**/JDEBUGLOG(fname,2)
+      // no complicated error handling here
+      bool okay = (thepage != NULL);
+      theerror = (okay) ? jff_NOERROR : jff_FALIURE;
+      if (okay) okay = TestPageDelegates();
+      // after fetch
+      /**/JDEBUGLOG(fname,3)
+      isdownloading = false;
+      afterdownload = true;
+      raw_result = NULL;
+
+      errlog[theerror]++;
+      /**/JDEBUGLOGS(fname,4,"Finished")
+      return (theerror==jff_NOERROR);
+  }
+  /**/JDEBUGLOG(fname,5)
+  // otherwise, the async fetch might still be running
   QEventLoop blocker;
   bool rc;
   QUrl redtarg;
   QByteArray byteresult, header_content;
-  // the most basic error : we have not even started!
-  if (!isdownloading) return false;
+  /**/JDEBUGLOG(fname,6)
   // I like synchronous IO for it's self-contained nature
   if (raw_result->isRunning()) {
     rc = connect(raw_result, SIGNAL(finished()), &blocker, SLOT(quit()));
     assert(rc);
     blocker.exec();
   }
+  /**/JDEBUGLOG(fname,7)
   // here, things are presumably finished
   assert(raw_result->isFinished());
   if (MakeError()) {
@@ -149,7 +196,7 @@ bool jfFetchPage::PrepareResults() {
     redtarg = (raw_result->attribute(QNetworkRequest::RedirectionTargetAttribute)).toUrl();
     if ((!redtarg.isEmpty()) && (redtarg!=fetch_this)) {
       theerror = jff_REDIRECTION;
-      /**/JDEBUGLOGS(fname,1,redirectto)
+      /**/JDEBUGLOGS(fname,8,redirectto)
       redirectto = redtarg.toString();
     }
     // no server side redirection
@@ -157,46 +204,29 @@ bool jfFetchPage::PrepareResults() {
       /* Getting the actual data at last. The following method gets the raw bytes,
       and the character set, converts it to the result, and optionally tests for
       client-side redirection via META tag. */
-      if (ProcessResult()) {
-        /**/JDEBUGLOG(fname,2)
+      if (ProcessResult(false)) {
+        /**/JDEBUGLOG(fname,9)
         // finally, we use the function pointers to test the result
-        // test missing
-        if (testsDelegate != NULL) {
-          rc = testsDelegate->testMissing(thepage);
-          if (!rc) {
-            /**/JDEBUGLOG(fname,3)
-            theerror = jff_MISSING;
-            delete thepage;
-            thepage = NULL;
-          }
-        }
-        // test incomplete
-        if ((testsDelegate != NULL) && (thepage!=NULL)) {
-          rc = testsDelegate->testIncomplete(thepage);
-          if (!rc) {
-            /**/JDEBUGLOGS(fname,4,"PAGE TRUNCATED")
-            theerror = jff_TRYAGAIN;
-            delete thepage;
-            thepage = NULL;
-          }
-        }
-        /**/JDEBUGLOGS(fname,5,jf_FetchErr2String(theerror,false));
+        TestPageDelegates();
       }
     }
   }
   else if (theerror == jff_RATELIMIT) {
       QByteArray ret = raw_result->rawHeader("Retry-After");
       QString rastr = QString(ret).trimmed();
-      /**/JDEBUGLOGS(fname,6,"RETRY-AFTER: " + rastr);
+      /**/JDEBUGLOGS(fname,10,"RETRY-AFTER: " + rastr);
       bool oint;
       retry_after = rastr.toInt(&oint);
-      if (!oint) retry_after = 0;;
+      if (!oint) retry_after = 0;
+  }
+  else {
+      ProcessResult(true);
   }
   // following, whether in error or not, we clean up...
   rc = ClearObjects();
   assert(rc);
   errlog[theerror]++;
-  /**/JDEBUGLOGS(fname,6,"Finished")
+  /**/JDEBUGLOGS(fname,11,"Finished")
   return (theerror==jff_NOERROR);
 }
 //--------------------------
@@ -279,7 +309,7 @@ bool jfFetchPage::Reset() {
   theerror = jff_NOERROR;
   redirectto.clear();
   afterdownload = false;
-  limit_count = 50;
+  // limit_count = 50;
   return true;
 }
 //-----------------------------------
@@ -295,6 +325,37 @@ jfFetchPage::~jfFetchPage() {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++
 // --- [ PROTECTED METHODS for jfFetchPage ] ---
+bool jfFetchPage::TestPageDelegates() {
+    const QString fname = "jfFetchPage::TestPageDelegates";
+    /**/JDEBUGLOG(fname,1)
+    // if the tests delegate is missing, is is considered true by default
+    if (testsDelegate == NULL) return true;
+    // test missing
+    bool rc = testsDelegate->testMissing(thepage);
+    /**/JDEBUGLOGB(fname,2,rc)
+    if (!rc) {
+        /**/JDEBUGLOGS(fname,3,"FAILED MISSING TEST")
+        theerror = jff_MISSING;
+        delete thepage;
+        thepage = NULL;
+        return false;
+    }
+    // test incomplete
+    /**/JDEBUGLOG(fname,4)
+    rc = testsDelegate->testIncomplete(thepage);
+    /**/JDEBUGLOGB(fname,5,rc)
+    if (!rc) {
+        /**/JDEBUGLOGS(fname,6,"PAGE TRUNCATED")
+        /**/JDEBUGLOGS(fname,7,(*thepage))
+        theerror = jff_TRYAGAIN;
+        delete thepage;
+        thepage = NULL;
+        return false;
+    }
+    /**/JDEBUGLOGS(fname,8,jf_FetchErr2String(theerror,false));
+    return true;
+}
+
 //--------------------------
 // internal methods
 //--------------------------
@@ -320,7 +381,7 @@ bool jfFetchPage::MakeError() {
     case QNetworkReply::UnknownContentError           :/**/JDEBUGLOG(fname,15);
       if (serror.contains("Too Many Requests",Qt::CaseInsensitive)) {
           theerror = jff_RATELIMIT;
-          limit_count = 50;
+          // limit_count = 50;
       }
       else theerror = jff_FALIURE;
       break;
@@ -350,7 +411,7 @@ bool jfFetchPage::MakeError() {
 }
 //---------------------------------
 // read and convert the BytesRead, and check for redirection, etc.
-bool jfFetchPage::ProcessResult() {
+bool jfFetchPage::ProcessResult(bool write_to_file) {
   const QString fname = "jfFetchPage::ProcessResult";
   // special case
   if (!isdownloading) return false;
@@ -362,22 +423,41 @@ bool jfFetchPage::ProcessResult() {
   content_header = raw_result->rawHeader("Content-Type");
   byteresult = raw_result->readAll();
   // this should not really happen...
+  /**/JDEBUGLOG(fname,1)
   if (byteresult.isEmpty()) {
+      /**/JDEBUGLOG(fname,2)
     theerror = jff_TRYAGAIN;
     return false;
   }
   // character set conversion. Note that if unrecognized, we use UTF-8
   defaultcodec = QTextCodec::codecForName("UTF-8");
   htmlcodec = QTextCodec::codecForHtml(byteresult,defaultcodec);
-  /**/JDEBUGLOGS(fname,1,htmlcodec->name());
+  /**/JDEBUGLOGS(fname,3,htmlcodec->name());
   thepage = new QString();
   (*thepage) = htmlcodec->toUnicode(byteresult);
-  /**/JDEBUGLOGB(fname,2,check_clientred);
+  // special, write to file for debugging...
+  if (write_to_file) {
+      /**/JDEBUGLOG(fname,4)
+    QString fname = fetch_this.encodedPath() + "x" + ".html";
+      fname = fname.replace("/","_");
+      fname = "/" + fname;
+    QString path= QCoreApplication::applicationDirPath() + fname;
+    /**/JDEBUGLOGS(fname,4,path)
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly)) file.close();
+    else {
+        /**/JDEBUGLOG(fname,5)
+      file.write(thepage->toUtf8());
+      file.close();
+    }
+  }
+
+  /**/JDEBUGLOGB(fname,6,check_clientred);
   // optional ... check for client side redirection (meta version)
   if (check_clientred) {
-      /**/JDEBUGLOG(fname,3);
+      /**/JDEBUGLOG(fname,7);
     if (ParseForClient()) {
-        /**/JDEBUGLOG(fname,4);
+        /**/JDEBUGLOG(fname,8);
       theerror = jff_REDIRECTION;
       delete thepage;
       thepage = NULL;
@@ -396,7 +476,7 @@ bool jfFetchPage::ProcessResult() {
       win1252codec = QTextCodec::codecForName("windows-1252");
       (*thepage) = win1252codec->toUnicode(byteresult);
   }
-  /**/JDEBUGLOG(fname,5);
+  /**/JDEBUGLOG(fname,9);
   // done
   return true;
 }
@@ -452,6 +532,7 @@ bool jfFetchPage::ClearObjects() {
   // done
   return true;
 }
+/*
 //-----------------------------------------------------------
 bool jfFetchPage::RateLimitHandle(QNetworkRequest& head_target) {
     const QString fname = "jfFetchPage::RateLimitHandle";
@@ -466,16 +547,17 @@ bool jfFetchPage::RateLimitHandle(QNetworkRequest& head_target) {
         limit_count = 1;
 
         xfh = xff_ip.toAscii();
-        xhq = (hs + jfFetchPage::randomByte() + " Safari/537.36").toAscii();
+        // xhq = (hs + jfFetchPage::randomByte() + " Safari/537.36").toAscii();
     }
 
-    head_target.setRawHeader("User-Agent", xhq);
+    // head_target.setRawHeader("User-Agent", xhq);
     head_target.setRawHeader("X-Originating-IP", xfh);
     head_target.setRawHeader("X-Forwarded-For", "rwgaergwe");
     head_target.setRawHeader("X-Remote-IP", xfh);
     head_target.setRawHeader("X-Remote-Addr", xfh);
     return true;
 }
+*/
 QString jfFetchPage::randomByte() {
     return QString::number(rand() % 256);
 }
