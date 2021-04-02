@@ -1,9 +1,9 @@
 /******************************************************************************
 Name    :   ao3item_parser.cpp
 Author  :   John Q Metro
-Purpose :   Parser for AO3 section pages to lists of categories/fandoms
+Purpose :   Parser for AO3 fic licting pages
 Created :   July 16, 2016
-Updated :   February 29, 2020
+Updated :   April 2, 2021
 ******************************************************************************/
 #ifndef AO3ITEM_PARSER_H
   #include "ao3item_parser.h"
@@ -146,14 +146,14 @@ bool jfAO3ItemParser::FicParsingLoop() {
   // constants and asserts
   const QString funcname = "jfAO3ItemParser::FicParsingLoop";
   const QString fps = "<!--title, author, fandom-->";
-  const QString fpe1 = "<li class=\"work blurb group\" ";
+  // const QString fpe1 = "<li class=\"work blurb group\" ";
   // variables
   jfAO3Fanfic* temp;
   QString buffer, zbuffer;
   QString errout;
   // starting
   // the loop
-  while(xparser.GetDelimitedEndPair(fps,fpe1,"<!--/content-->",buffer)) {
+  while(xparser.GetDelimited(fps,"</dl>",buffer)) {
     // building
     temp = new jfAO3Fanfic();
     temp->SetFromString(buffer,this_category,errout);
