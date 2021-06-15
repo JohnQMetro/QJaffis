@@ -47,14 +47,12 @@ bool jfFFN_FicPartParser::testMissing(const QString *page) const {
 //--------------------------------------
 bool jfFFN_FicPartParser::testIncomplete(const QString *page) const {
   // constants and variables
-  const QString err1 = "FanFiction.Net Error<hr size=1 noshade>An error has occurred while processing your request.";
-  const QString trunc1 = "<a href='/tos/'>Terms of Service</a>";
   // checking
   assert(page!=NULL);
-  bool rval = page->contains(err1);
-  if (rval) return false;
-  rval = page->contains(trunc1);
-  return rval;
+  const QString footer1 = "<div id=p_footer class=maxwidth";
+  const QString footer2 = "<div id=\"p_footer\" class=\"maxwidth\"";
+  if (page->contains(footer1)) return true;
+  else return page->contains(footer2);
 }
 //--------------------------------------
 QString jfFFN_FicPartParser::getCookie() const{

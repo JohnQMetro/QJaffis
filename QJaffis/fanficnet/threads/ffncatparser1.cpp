@@ -36,7 +36,10 @@ bool jfFFNCatParserBase::testMissing(const QString *page) const {
 //--------------------------
 bool jfFFNCatParserBase::testIncomplete(const QString *page) const {
   assert(page != NULL);
-  return page->contains("<div id=p_footer class=maxwidth");
+  const QString footer1 = "<div id=p_footer class=maxwidth";
+  const QString footer2 = "<div id=\"p_footer\" class=\"maxwidth\"";
+  if (page->contains(footer1)) return true;
+  else return page->contains(footer2);
 }
 //--------------------------
 QString jfFFNCatParserBase::getCookie() const {
@@ -108,22 +111,27 @@ bool jfFFNSectionParser::ParseStart(QString& out_section_name) {
   // constants
   const QString fname = "jfFFNSectionParser::ParseStart";
   const QString header1 = "<div style='width:100%;' class=xcontrast_outer id=content_parent>";
-  const QString colhead = "<TD VALIGN=TOP style='line-height:150%;'>";
+  const QString header2 = "<div style=\"width:100%;\" class=\"xcontrast_outer\" id=\"content_parent\">";
+  const QString colhead1 = "<td style=\"line-height:150%\" valign=\"TOP\">";
+  const QString colhead2 = "<TD VALIGN=TOP style='line-height:150%";
+  const QString colhead3 = "<td style=\"line-height:150%;\" valign=\"TOP\">";
   // script.png' or arrow_switch.png'
   // local variables
   QString buffer;
   // parsing begins
   out_section_name = "";
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePast(header1)) {
+  if (!xparser.MovePastAlt(header2,header1)) {
     /**/lpt->tLog(fname,2);
     return parsErr("Cannot find critical header string");
   }
   /**/lpt->tLog(fname,3);
   // once here, we extract the name...
-  if (!xparser.GetDelimited("align=absmiddle>","</td>",buffer)) {
-    /**/lpt->tLog(fname,4);
-    return parsErr("Problems getting the name!");
+  if (!xparser.GetDelimited("align=\"absmiddle\">","<",buffer)) {
+      /**/lpt->tLog(fname,4);
+      if (!xparser.GetDelimited("align=absmiddle>","<",buffer)) {
+          return parsErr("Problems getting the name!");
+      }
   }
   // checking the name
   buffer = buffer.trimmed();
@@ -133,13 +141,16 @@ bool jfFFNSectionParser::ParseStart(QString& out_section_name) {
   }
   /**/lpt->tLog(fname,7,buffer);
   // next up is processing the list...
-  if (!xparser.MovePast(colhead)) {
-    return parsErr("Cannot find start of first category column!");
+  if (!xparser.MovePastAlt(colhead1,colhead2)) {
+      if (!xparser.MovePast(colhead3)) {
+          /**/lpt->tLog(fname,8,xparser.GetBlock(3000));
+            return parsErr("Cannot find start of first category column!");
+      }
   }
-  /**/lpt->tLog(fname,8);
+  /**/lpt->tLog(fname,9);
   // chopping the post list off
-  if (!xparser.ChopAfter("</TD></TR></TABLE>",true)) {
-    /**/lpt->tLog(fname,9);
+  if (!xparser.ChopAfter("</td></tr></tbody></table>",true)) {
+    /**/lpt->tLog(fname,10);
     return parsErr("Cannot find end of categories!");
   }
   out_section_name = buffer;

@@ -138,11 +138,10 @@ bool jfFFNItemParser::testMissing(const QString *page) const{
 bool jfFFNItemParser::testIncomplete(const QString *page) const {
     const QString fname = "jfFFNItemParser::testIncomplete";
   assert(page!=NULL);
-  const QString footer1= "<a href='/tos/'>Terms of Service</a>";
-  const QString footer2 = "<!-- BEGIN footer -->";
-  bool t1 = page->contains(footer1);
-  /**/lpt->tLogB(fname,1,t1);
-  return page->contains(footer1);
+  const QString footer1 = "<div id=p_footer class=maxwidth";
+  const QString footer2 = "<div id=\"p_footer\" class=\"maxwidth\"";
+  if (page->contains(footer1)) return true;
+  else return page->contains(footer2);
 }
 //----------------------------------
 QString jfFFNItemParser::getCookie() const {
@@ -155,15 +154,16 @@ bool jfFFNItemParser::CheckNames() {
   // constants
   const QString fname = "jfFFNItemParser::CheckNames";
   const QString header1 = "<div style='width:100%;' class=xcontrast_outer id=content_parent>";
+  const QString header2 = "<div style=\"width:100%;\" class=\"xcontrast_outer\" id=\"content_parent\">";
   const QString itmico1 = "/static/ficons/";
   const QString itmico2 = "/static/fcons/";
 
-  const QString chev_sym = " icon-chevron-right xicon-section-arrow'></span>";
+  const QString chev_sym = " icon-chevron-right xicon-section-arrow\"></span>";
   // variables
   QString buffer1,buffer2;
   // checks and asserts
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePast(header1)) return false;
+  if (!xparser.MovePastAlt(header2,header1)) return false;
   if (!xparser.MovePastAlt(itmico1,itmico2)) return false;
   // the crossover version
   /**/lpt->tLog(fname,2);
@@ -200,6 +200,7 @@ bool jfFFNItemParser::CheckCrossoverName() {
   name1 = ccat->GetCatPart(true);
   name2 = ccat->GetCatPart(false);
   // extracting the names from the parser
+  /**/lpt->tLog("jfFFNItemParser::CheckCrossoverName()",1,xparser.GetBlock(3000));
   if(!xparser.MovePast("<a href=\'/crossovers/")) return false;
   if(!xparser.GetDelimited("/\'>","</a>",buffer1)) return false;
   if(!xparser.MovePast("<a href=\'/crossovers/")) return false;

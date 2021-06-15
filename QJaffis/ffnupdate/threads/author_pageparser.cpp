@@ -63,7 +63,10 @@ bool jfFFNAuthorPageParser::testMissing(const QString *page) const {
 //-----------------------------------
 bool jfFFNAuthorPageParser::testIncomplete(const QString *page) const {
   assert(page !=NULL);
-  return page->contains("<div id=p_footer");
+  const QString footer1 = "<div id=p_footer class=maxwidth";
+  const QString footer2 = "<div id=\"p_footer\" class=\"maxwidth\"";
+  if (page->contains(footer1)) return true;
+  else return page->contains(footer2);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 QString jfFFNAuthorPageParser::getCookie() const { return ""; }

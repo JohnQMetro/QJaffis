@@ -27,6 +27,7 @@ bool jfFFNCrossoverSectionParser::ParsePageCore(size_t pageindex) {
   const QString fname = "jfFFNCrossoverSectionParser::ParsePageCore";
   const QString arrow_tag = "<img src='/static/fcons/arrow-switch.png'";
   const QString arrow_tag2 = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
+  const QString arrow_tag3 = "<img src=\"//ff74.b-cdn.net/static/fcons/arrow-switch.png\"";
 
   // variables
   QString buffer,errmsg;
@@ -35,18 +36,22 @@ bool jfFFNCrossoverSectionParser::ParsePageCore(size_t pageindex) {
   jfFFN_HalfCrossover* tcat;
 
   // starting
-  if (!xparser.MovePast(arrow_tag2)) {
+  if (!xparser.MovePastAlt(arrow_tag3,arrow_tag2)) {
     if (!xparser.MovePast(arrow_tag)) return parsErr("Cannot find arrow icon!");
   }
-  if (!xparser.GetDelimitedFromEnd(">","Crossovers",buffer,"<hr size=1")) {
+  if (!xparser.GetDelimitedFromEnd(">","Crossovers",buffer,"<hr size=")) {
     return parsErr("Failed in extracting the Crossover Section name!");
   }
   secname = buffer.trimmed();
   // adding the plural
   if ((secname!="Misc") && (secname!="Anime/Manga")) secname += "s";
   // preparing for the list
-  if (!xparser.MovePast("<div id='list_output'>")) return parsErr("Cannot find section crossover list!");
-  if (!xparser.ChopAfter("</TD></TR></TABLE>",true)) return parsErr("Cannot find end of section crossover list!");
+  if (!xparser.MovePastAlt("<div id=\"list_output\">", "<div id='list_output'>")) {
+      return parsErr("Cannot find section crossover list!");
+  }
+  if (!xparser.ChopAfter("</td></tr></tbody></table>",true)) {
+      return parsErr("Cannot find end of section crossover list!");
+  }
 
   // creating the result!
   result_data = new jfFFN_CrossoverSection();
@@ -111,6 +116,7 @@ bool jfFFNCrossoverParser::ParsePageCore(size_t pageindex) {
   const QString fname = "jfFFNCrossoverParser::ParsePageCore";
   const QString arrow_tag = "<img src='/static/fcons/arrow-switch.png'";
   const QString arrow_tag2 = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
+  const QString arrow_tag3 = "<img src=\"//ff74.b-cdn.net/static/fcons/arrow-switch.png\"";
   // variables
   QString buffer, oerr;
   ulong uval;
@@ -120,23 +126,35 @@ bool jfFFNCrossoverParser::ParsePageCore(size_t pageindex) {
   /**/lpt->tLog(fname,0);
   // assert(crossstore_ptr != NULL);
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePast(arrow_tag2)) {
+  if (!xparser.MovePastAlt(arrow_tag3, arrow_tag2)) {
     if (!xparser.MovePast(arrow_tag)) return parsErr("Cannot Find Arrow Switch!");
   }
   // catname and name, we use FromEnd just in case a category name includes 'Crossovers'
-  if (!xparser.GetDelimitedFromEnd("absmiddle>","Crossovers",buffer,"<hr size=1")) {
-    return parsErr("Failed in extracting the Crossover Category name!");
+  if (!xparser.GetDelimitedFromEnd("absmiddle\">","Crossovers",buffer,"<hr size=")) {
+      if (!xparser.GetDelimitedFromEnd("absmiddle>","Crossovers",buffer,"<hr size=")) {
+        return parsErr("Failed in extracting the Crossover Category name!");
+      }
   }
   QString catname = buffer.trimmed();
   if (catname.isEmpty()) return parsErr("The crossover category name is Empty!");
   // getting the id
-  if (!xparser.MovePast("<a class=btn href='/")) return parsErr("Cannot find main link!");
+  if (!xparser.MovePast("<a class=\"btn\" href=\"/")) {
+      if (!xparser.MovePast("<a class=btn href='/")) {
+        return parsErr("Cannot find main link!");
+      }
+  }
   if (!xparser.GetDelimitedULong("/","/",uval,oerr)) {
     return parsErr("Problems with getting the category ID : " + oerr);
   }
   // preparing for the list
-  if (!xparser.MovePast("<div id='list_output'>")) return parsErr("Cannot find crossover list!");
-  if (!xparser.ChopAfter("</TR></TABLE>",true)) return parsErr("Cannot find end of crossover list!");
+  if (!xparser.MovePastAlt("<div id=\"list_output\">","<div id='list_output'>")) {
+      return parsErr("Cannot find crossover list!");
+  }
+  if (!xparser.ChopAfter("</td></tr></tbody></table>",true)) {
+    if (!xparser.ChopAfter("</TR></TABLE>",true)) {
+        return parsErr("Cannot find end of crossover list!");
+    }
+  }
   /**/lpt->tLog(fname,2);
 
   // we create the result here, and load basic info
