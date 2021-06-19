@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Fanfiction.net
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   August 4, 2016
+ * Updated:   June 19, 2021
  *
  **************************************************************/
 #ifndef FFNPARSER_H
@@ -27,6 +27,7 @@ class jfFFN_FicPartParser : public jfStoryPartParseBase {
     // custom virtual methods that are implemented
     virtual bool ParseFirstPage(const QString& indata);
     virtual bool ParseOtherPage();
+    virtual bool ExtractPartContents(QString& partcontents);
     //helper methods
     bool FirstProcessStart(QString& out_title);
     bool DateAndCompletion(jfFicExtract_FFN* in_result);

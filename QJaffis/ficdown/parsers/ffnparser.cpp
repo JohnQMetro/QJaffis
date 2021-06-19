@@ -141,40 +141,86 @@ bool jfFFN_FicPartParser::ParseOtherPage() {
     return parsErr("Missing Start Tag");
   }
   /**/lpt->tLog(fname,2);
-  // we here make the possibly dubious assumption that there are no <div> tags in the actual story
-  if (!xparser.GetDelimited(" id=\"storytext\">","</div>",partcontents)) {
-    if (!xparser.GetDelimited(" id='storytext'>","</div>",partcontents)) {
-        return parsErr("Cannot find contents");
-    }
+
+  /* extracting parts. I'll try the old way first, and if that fails, switch
+   * to the more elaborate new way. */
+  if (!xparser.GetDelimited(" id='storytext'>","</div>",partcontents)) {
+      /**/lpt->tLog(fname,3);
+      if (!ExtractPartContents(partcontents)) {
+         return parsErr("Cannot find contents");
+      }
   }
-  /**/lpt->tLog(fname,3);
+  /**/lpt->tLog(fname,4);
   // just to check...
   if (!xparser.MovePastAlt(patscript_tag1,patscript_tag2)) {
     return parsErr("Cannot find separator after style and social script parts");
   }
-  /**/lpt->tLog(fname,4);
+  /**/lpt->tLog(fname,5);
   // next, we look for more info...
   if (!xparser.MovePast("<script>")) {
     return parsErr("Cannot find fic info script start");
   }
   // looking for the fic id
   if (!xparser.GetDelimitedULong("var storyid = ",";",oval,errout)) {
-    /**/lpt->tLog(fname,5);
+    /**/lpt->tLog(fname,6);
     return parsErr("Problems getting fic id! " + errout);
   }
   story_id = oval;
-  /**/lpt->tLogS(fname,6,story_id);
+  /**/lpt->tLogS(fname,7,story_id);
   if (!xparser.GetDelimitedULong("var chapter =",";",oval,errout)) {
     return parsErr("Problems with chaper index : " + errout);
   }
 
   // setting up result info
   intfic.partindex = oval;
-  /**/lpt->tLogS(fname,7,intfic.partindex);
+  /**/lpt->tLogS(fname,8,intfic.partindex);
   fpart = new jfFicPart(intfic);
   fpart->part_contents = PartProcessing(partcontents);
-  /**/lpt->tLog(fname,8);
+  /**/lpt->tLog(fname,9);
   return true;
+}
+//---------------------------------------------------------------------------
+/* A new extract contents. The pages are formatted differently when fetched
+ * via a web-browser (using Selenium and Python). */
+bool jfFFN_FicPartParser::ExtractPartContents(QString& partcontents) {
+    const QString fname = "jfFFN_FicPartParser::ExtractPartContents";
+    QString result = "";
+    QString buffer = "";
+    int scount = 0;
+    result.reserve(60000);
+    buffer.reserve(30000);
+    /**/lpt->tLog(fname,1);
+    // moving part the intro part
+    if (!xparser.MovePastTwo("<div class=\"storytext",">")) {
+        /**/lpt->tLog(fname,2,xparser.GetBlock(3000));
+        return parsErr("Cannot find start of contents!");
+    }
+    scount = 1;
+    /**/lpt->tLog(fname,3);
+    /* trying to skip over the Google advertising blocks inserted by
+     * Javascript. */
+    while(xparser.GetMovePast("<div ", buffer)) {
+        result += buffer;
+        scount += 1;
+        if (!xparser.MovePast("class=\"google-auto-placed ap_container\"><ins")) break;
+        if (!xparser.MovePast("</ins></div>")) {
+            /**/lpt->tLog(fname,4,xparser.GetBlock(3000));
+            return parsErr("Cannot find end of google advert block!");
+        }
+    }
+    /**/lpt->tLog(fname,5);
+    // trimming /div from the end
+    if (result.endsWith("</div>")) {
+        result.chop(6);
+        result = result.trimmed();
+        if (result.endsWith("</div>")) {
+            result.chop(6);
+            result = result.trimmed();
+        }
+    }
+    // done
+    partcontents = result;
+    return true;
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++
@@ -185,8 +231,10 @@ bool jfFFN_FicPartParser::FirstProcessStart(QString& out_title) {
   const QString fname = "jfFicPart::FirstProcessStart";
   const QString titlehead_tag = " id=pre_story_links>";
   const QString titlehead_tag2 = "id=\"pre_story_links\">";
-  const QString icon_tag1 = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
-  const QString icon_tag2 = "<img src='/static/fcons/arrow-switch.png'";
+  const QString icon_tag1a = "<img src=\"//ff74.b-cdn.net/static/fcons/arrow-switch.png\"";
+  const QString icon_tag2a = "<img src=\"/static/fcons/arrow-switch.png\"";
+  const QString icon_tag1b = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
+  const QString icon_tag2b = "<img src='/static/fcons/arrow-switch.png'";
   const QString chev_tag1 = "<span class='xcontrast_txt icon-chevron-right xicon-section-arrow'>";
   const QString chev_tag2 = "<span class=\"xcontrast_txt icon-chevron-right xicon-section-arrow\">";
   // variables
@@ -197,10 +245,11 @@ bool jfFFN_FicPartParser::FirstProcessStart(QString& out_title) {
   if (!xparser.MovePastAlt(titlehead_tag2,titlehead_tag)) {
     return parsErr("Missing Special DIV tag!");
   }
-  crossover = xparser.MovePastAlt(icon_tag1,icon_tag2);
+  crossover = xparser.MovePastAlt(icon_tag1a,icon_tag2a);
+  if (!crossover) crossover = xparser.MovePastAlt(icon_tag1b,icon_tag2b);
   if (!crossover) {
     if (!xparser.MovePastAlt(chev_tag2,chev_tag1)) {
-      /**/lpt->tLog(fname,2);
+        /**/lpt->tLog(fname,2,xparser.GetBlock(3000));
       return parsErr("Missing Icon or Chevron!");
     }
   }
