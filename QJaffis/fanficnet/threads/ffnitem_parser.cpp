@@ -3,7 +3,7 @@ Name    :   ffnitem_parser.cpp
 Author  :   John Q Metro
 Purpose :   Parser for Fanfiction.Net Category pages, to get lists of fanfics
 Created :   July 22, 2016
-Updated :   July 25, 2016
+Updated :   June 17, 2021
 ******************************************************************************/
 #ifndef FFNITEM_PARSER_H
   #include "ffnitem_parser.h"
@@ -158,7 +158,7 @@ bool jfFFNItemParser::CheckNames() {
   const QString itmico1 = "/static/ficons/";
   const QString itmico2 = "/static/fcons/";
 
-  const QString chev_sym = " icon-chevron-right xicon-section-arrow\"></span>";
+  const QString chev_sym1 = " icon-chevron-right xicon-section-arrow\"></span>";
   // variables
   QString buffer1,buffer2;
   // checks and asserts
@@ -169,14 +169,14 @@ bool jfFFNItemParser::CheckNames() {
   /**/lpt->tLog(fname,2);
   if ((this_category->GetCatType())==jfx_CROSS) {
     if (!CheckCrossoverName()) {
-      /**/lpt->tLog(fname,3);
+      /**/lpt->tLog(fname,3,xparser.GetBlock(3000));
       return false;
     }
   }
   // the non crossover version
   else {
     /**/lpt->tLog(fname,4);
-    if (!xparser.GetDelimited(chev_sym,"<div ",buffer1)) return false;
+    if (!xparser.GetDelimited(chev_sym1,"<div ",buffer1)) return false;
     buffer1 = buffer1.trimmed();
     buffer2 = this_category->GetName();
     buffer2 = buffer2.trimmed();
@@ -200,11 +200,10 @@ bool jfFFNItemParser::CheckCrossoverName() {
   name1 = ccat->GetCatPart(true);
   name2 = ccat->GetCatPart(false);
   // extracting the names from the parser
-  /**/lpt->tLog("jfFFNItemParser::CheckCrossoverName()",1,xparser.GetBlock(3000));
-  if(!xparser.MovePast("<a href=\'/crossovers/")) return false;
-  if(!xparser.GetDelimited("/\'>","</a>",buffer1)) return false;
-  if(!xparser.MovePast("<a href=\'/crossovers/")) return false;
-  if(!xparser.GetDelimited("/\'>","</a>",buffer2)) return false;
+  if(!xparser.MovePastAlt("<a href=\"/crossovers/","<a href=\'/crossovers/")) return false;
+  if(!xparser.GetDelimited(">","</a>",buffer1)) return false;
+  if(!xparser.MovePastAlt("<a href=\"/crossovers/","<a href=\'/crossovers/")) return false;
+  if(!xparser.GetDelimited(">","</a>",buffer2)) return false;
   // checking the match
   option1 = (name1==buffer1) && (name2==buffer2);
   option2 = (name1==buffer2) && (name2==buffer1);
@@ -215,6 +214,8 @@ bool jfFFNItemParser::CheckCrossoverName() {
 bool jfFFNItemParser::PageAndItemCount(size_t& itemcount) {
   // constants
   const QString fname = "jfFFNItemCollectionCore::PageAndItemCount";
+  const QString pagehead1 = "<center style=\"margin-top:5px;margin-bottom:5px;\">";
+  const QString pagehead2 = "<center style='margin-top:5px;margin-bottom:5px;'>";
   // local variables
   QString cname;
   QString buffer;
@@ -226,7 +227,7 @@ bool jfFFNItemParser::PageAndItemCount(size_t& itemcount) {
   // starting up things
   /**/lpt->tLog(fname,1);
   // next, numeric data
-  if (xparser.MovePast("<center style='margin-top:5px;margin-bottom:5px;'>")) {
+  if (xparser.MovePastAlt(pagehead1,pagehead2)) {
     /**/lpt->tLog(fname,2);
     if (!xparser.GetMovePast(" | ",buffer)) {
       return parsErr("Could not get itemcount! \n" + xparser.GetBlock(200));
@@ -240,15 +241,22 @@ bool jfFFNItemParser::PageAndItemCount(size_t& itemcount) {
     }
     itemcount = outval;
     /**/lpt->tLogS(fname,4,itemcount);
-    // the latest version of fanfiction.net makes getting the pagecount a chore ...
+    // getting pagecount is a chore
     if (isk) {
-      if (!xparser.GetDelimitedFromEndULong("&p=","'>Last",outval,outerr,"</center>")) {
-        if (!xparser.GetDelimitedFromEndULong("&p=","'>Next",outval,outerr,"</center>")) {
-          if (!xparser.GetDelimitedFromEndULong("<b>","</b>",outval,outerr,"</center>")) {
-            return parsErr("Could not determine pagecount! \n" + xparser.GetBlock(400));
-          }
+        // last works for large categories unless we are near the end
+        if (!xparser.GetDelimitedFromEndULong("&amp;p=","\">Last",outval,outerr,"</center>")) {
+            if (!xparser.GetDelimitedFromEndULong("&p=","'>Last",outval,outerr,"</center>")) {
+                // next works near the end
+                if (!xparser.GetDelimitedFromEndULong("&amp;p=","\">Next",outval,outerr,"</center>")) {
+                    if (!xparser.GetDelimitedFromEndULong("&p=","'>Next",outval,outerr,"</center>")) {
+                        // for the very last page
+                        if (!xparser.GetDelimitedFromEndULong("<b>","</b>",outval,outerr,"</center>")) {
+                            return parsErr("Could not determine pagecount! \n" + xparser.GetBlock(400));
+                        }
+                    }
+                }
+            }
         }
-      }
       /**/lpt->tLogS(fname,6,outval);
     }
     else {

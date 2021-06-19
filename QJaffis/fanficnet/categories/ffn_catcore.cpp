@@ -188,7 +188,9 @@ bool jfFFN_SectionCategory::SetFromSource(const QString& sname, const QString& i
   name = buffer;
   // next up, we extract the number of items...
   if (xparser.GetDelimitedFloat("'gray'>(","K)",cfx_out,oerr)) ccount = cfx_out*1000;
+  else if (xparser.GetDelimitedFloat("\"gray\">(","K)",cfx_out,oerr)) ccount = cfx_out*1000;
   else if (xparser.GetDelimitedULong("'gray'>(",")",ccount_out,oerr)) ccount = ccount_out;
+  else if (xparser.GetDelimitedULong("\"gray\">(",")",ccount_out,oerr)) ccount = ccount_out;
   else {
     parse_err = "Could not find number of items in category! : " + oerr;
     return false;
@@ -273,7 +275,9 @@ bool jfFFN_HalfCrossover::SetFromSource(const QString& sname, const QString& inr
   name = buffer;
   // next up, we extract the number of items...
   if (xparser.GetDelimitedULong("'gray'>(","K)",ccount_out,oerr)) ccount = ccount_out*1000;
+  else if (xparser.GetDelimitedULong("\"gray\">(","K)",ccount_out,oerr)) ccount = ccount_out*1000;
   else if (xparser.GetDelimitedULong("'gray'>(",")",ccount_out,oerr)) ccount = ccount_out;
+  else if (xparser.GetDelimitedULong("\"gray\">(",")",ccount_out,oerr)) ccount = ccount_out;
   else {
     parse_err = "Could not find number of items in category! : " + oerr;
     return false;
@@ -410,7 +414,9 @@ bool jfFFN_CrossoverCategory::SetFromSource(const QString icatname, size_t icati
   // creating the main name
   name = cat1 + " and " + cat2 + " Crossovers";
   // next up, we extract the number of items...
-  if (xparser.GetDelimitedULong("'gray'>(","K)",ccount_out,oerr)) ccount = ccount_out*1000;
+  if (xparser.GetDelimitedULong("\"gray\">(","K)",ccount_out,oerr)) ccount = ccount_out*1000;
+  else if (xparser.GetDelimitedULong("'gray'>(","K)",ccount_out,oerr)) ccount = ccount_out*1000;
+  else if (xparser.GetDelimitedULong("\"gray\">(",")",ccount_out,oerr)) ccount = ccount_out;
   else if (xparser.GetDelimitedULong("'gray'>(",")",ccount_out,oerr)) ccount = ccount_out;
   else {
     parse_err = "Could not find number of items in category! : " + oerr;

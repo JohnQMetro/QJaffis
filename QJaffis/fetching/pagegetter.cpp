@@ -220,7 +220,7 @@ bool jfFetchPage::PrepareResults() {
       if (!oint) retry_after = 0;
   }
   else {
-      ProcessResult(true);
+      ProcessResult(false);
   }
   // following, whether in error or not, we clean up...
   rc = ClearObjects();

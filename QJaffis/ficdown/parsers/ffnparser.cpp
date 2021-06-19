@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Fanfiction.net
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   January 2, 2021
+ * Updated:   June 19, 2021
  *
  **************************************************************/
 #ifndef FFNPARSER_H
@@ -76,14 +76,23 @@ bool jfFFN_FicPartParser::ParseFirstPage(const QString& indata) {
   result->fic_title = buffer;
   /**/lpt->tLog(fname,2,buffer);
   // looking for the author id
-  if (!xparser.GetDelimitedULong("<a class='xcontrast_txt' href='/u/","/",qval,errout)) {
-    delete result;
-    /**/lpt->tLog(fname,3);
-    return parsErr("Problems getting author id! " + errout);
+  const QString aidpfx1 = "<a class=\"xcontrast_txt\" href=\"/u/";
+  const QString aidpfx2 = "<a class='xcontrast_txt' href='/u/";
+
+  if (!xparser.MovePastAlt(aidpfx1,aidpfx2)) {
+      delete result;
+      /**/lpt->tLog(fname,3);
+      return parsErr("Cannot find start of author id!");
   }
+  if (!xparser.GetMovePastULong("/",qval,errout)) {
+      delete result;
+      /**/lpt->tLog(fname,4);
+      return parsErr("Problems getting author id! " + errout);
+  }
+
   result->auth_id = qval;
   // getting the author name
-  if (!xparser.GetDelimited("'>","</a>",buffer)) {
+  if (!xparser.GetDelimited(">","</a>",buffer)) {
     delete result;
     /**/lpt->tLog(fname,4);
     return parsErr("Problems getting author name!");
@@ -114,8 +123,10 @@ bool jfFFN_FicPartParser::ParseFirstPage(const QString& indata) {
 bool jfFFN_FicPartParser::ParseOtherPage() {
   // constants
   const QString fname = "jfFFN_FicPartParser::ParseOtherPage";
-  const QString ficstart_tag = "<div role='main' aria-label='story content' class='storytextp' id='storytextp'";
-  const QString patscript_tag = "<FORM name=myselect";
+  const QString ficstart_tag1 = "<div role=\"main\" aria-label=\"story content\" class=\"storytextp\" id=\"storytextp\"";
+  const QString ficstart_tag2 = "<div role='main' aria-label='story content' class='storytextp' id='storytextp'";
+  const QString patscript_tag1 = "<form name=\"myselect\"";
+  const QString patscript_tag2 = "<FORM name=myselect";
 
   // variables
   jfFicPart intfic;
@@ -126,17 +137,19 @@ bool jfFFN_FicPartParser::ParseOtherPage() {
   /**/lpt->tLog(fname,1);
   if (!SectionProcessing(intfic)) return false;
   // doing things
-  if (!xparser.MovePast(ficstart_tag)) {
+  if (!xparser.MovePastAlt(ficstart_tag1, ficstart_tag2)) {
     return parsErr("Missing Start Tag");
   }
   /**/lpt->tLog(fname,2);
   // we here make the possibly dubious assumption that there are no <div> tags in the actual story
-  if (!xparser.GetDelimited(" id='storytext'>","</div>",partcontents)) {
-    return parsErr("Cannot find contents");
+  if (!xparser.GetDelimited(" id=\"storytext\">","</div>",partcontents)) {
+    if (!xparser.GetDelimited(" id='storytext'>","</div>",partcontents)) {
+        return parsErr("Cannot find contents");
+    }
   }
   /**/lpt->tLog(fname,3);
   // just to check...
-  if (!xparser.MovePast(patscript_tag)) {
+  if (!xparser.MovePastAlt(patscript_tag1,patscript_tag2)) {
     return parsErr("Cannot find separator after style and social script parts");
   }
   /**/lpt->tLog(fname,4);
@@ -171,32 +184,38 @@ bool jfFFN_FicPartParser::FirstProcessStart(QString& out_title) {
   // constants
   const QString fname = "jfFicPart::FirstProcessStart";
   const QString titlehead_tag = " id=pre_story_links>";
+  const QString titlehead_tag2 = "id=\"pre_story_links\">";
   const QString icon_tag1 = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
   const QString icon_tag2 = "<img src='/static/fcons/arrow-switch.png'";
-  const QString chev_tag = "<span class='xcontrast_txt icon-chevron-right xicon-section-arrow'>";
+  const QString chev_tag1 = "<span class='xcontrast_txt icon-chevron-right xicon-section-arrow'>";
+  const QString chev_tag2 = "<span class=\"xcontrast_txt icon-chevron-right xicon-section-arrow\">";
   // variables
   QString buffer;
   bool crossover;
   // we start
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePast(titlehead_tag)) {
+  if (!xparser.MovePastAlt(titlehead_tag2,titlehead_tag)) {
     return parsErr("Missing Special DIV tag!");
   }
   crossover = xparser.MovePastAlt(icon_tag1,icon_tag2);
   if (!crossover) {
-    if (!xparser.MovePast(chev_tag)) {
+    if (!xparser.MovePastAlt(chev_tag2,chev_tag1)) {
       /**/lpt->tLog(fname,2);
       return parsErr("Missing Icon or Chevron!");
     }
   }
   /**/lpt->tLogB(fname,3,crossover);
   // extracting the title
-  if (!xparser.GetDelimited("<b class='xcontrast_txt'>","</b>",buffer)) {
+  if (!xparser.MovePastAlt("<b class=\"xcontrast_txt\">","<b class='xcontrast_txt'>")) {
     /**/lpt->tLog(fname,4);
-    return parsErr("Cannot find the title!");
+    return parsErr("Cannot find the title! A");
+  }
+  if (!xparser.GetMovePast("</b>",buffer)) {
+    /**/lpt->tLog(fname,5);
+    return parsErr("Cannot find the title! B");
   }
   buffer = buffer.trimmed();
-  /**/lpt->tLog(fname,5,buffer);
+  /**/lpt->tLog(fname,6,buffer);
   if (buffer.isEmpty()) {
     return parsErr("Title is Empty!");
   }
@@ -217,15 +236,20 @@ bool jfFFN_FicPartParser::DateAndCompletion(jfFicExtract_FFN* in_result) {
   unsigned long xoval;
   QString buffer1,xoerr;
   // looking for the updated date (or published date)
-  if (!xparser.GetDelimitedULong("Updated: <span data-xutime='","'>",xoval,xoerr)) {
-    if (!xparser.GetDelimitedULong("Published: <span data-xutime='","'>",xoval,xoerr)) {
-      /**/lpt->tLog(fname,1);
-      return parsErr("Problems getting date! " + xoerr);
-    }
+  if (!xparser.GetDelimitedULong("Updated: <span data-xutime=\"","\">",xoval,xoerr)) {
+      if (!xparser.GetDelimitedULong("Updated: <span data-xutime='","'>",xoval,xoerr)) {
+          if (!xparser.GetDelimitedULong("Published: <span data-xutime=\"","\">",xoval,xoerr)) {
+            if (!xparser.GetDelimitedULong("Published: <span data-xutime='","'>",xoval,xoerr)) {
+                /**/lpt->tLog(fname,1);
+                return parsErr("Problems getting date! " + xoerr);
+            }
+          }
+      }
   }
   // the time in xoval is a unix time stamp
   temptime = QDateTime::fromTime_t((uint)(xoval));
   in_result->updated_date = temptime.date();
+
   // getting the place where we look for completion status
   if (!xparser.GetDelimited("</span>"," - id:",buffer1)) {
     /**/lpt->tLog(fname,2);
@@ -239,7 +263,9 @@ bool jfFFN_FicPartParser::DateAndCompletion(jfFicExtract_FFN* in_result) {
 //--------------------------------------
 bool jfFFN_FicPartParser::SectionProcessing(jfFicPart& fpoint) {
   // constants and variables
-  const QString chapt_start = "<SELECT id=chap_select title=\"Chapter Navigation\"";
+  const QString chapt_start1 = "<SELECT id=chap_select title=\"Chapter Navigation\"";
+  const QString chapt_start2 = "<select id=\"chap_select\" title=\"Chapter Navigation\"";
+
   jfStringParser* opt_parser;
   QString extopt, partname, partname_x;
   size_t part_counter = 0;
@@ -247,7 +273,7 @@ bool jfFFN_FicPartParser::SectionProcessing(jfFicPart& fpoint) {
   bool exopcs = false;
 
   // checking first...
-  if (!xparser.MovePast(chapt_start)) {
+  if (!xparser.MovePastAlt(chapt_start2, chapt_start1)) {
     // only one part
     pagecount = partcount = fpoint.partcount = 1;
     fpoint.partindex = 1;
