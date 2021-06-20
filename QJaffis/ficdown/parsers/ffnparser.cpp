@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Fanfiction.net
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   June 19, 2021
+ * Updated:   June 20, 2021
  *
  **************************************************************/
 #ifndef FFNPARSER_H
@@ -195,20 +195,21 @@ bool jfFFN_FicPartParser::ExtractPartContents(QString& partcontents) {
         /**/lpt->tLog(fname,2,xparser.GetBlock(3000));
         return parsErr("Cannot find start of contents!");
     }
-    scount = 1;
+    scount = 0;
     /**/lpt->tLog(fname,3);
     /* trying to skip over the Google advertising blocks inserted by
      * Javascript. */
     while(xparser.GetMovePast("<div ", buffer)) {
+        /**/lpt->tLog(fname,4);
         result += buffer;
         scount += 1;
         if (!xparser.MovePast("class=\"google-auto-placed ap_container\"><ins")) break;
         if (!xparser.MovePast("</ins></div>")) {
-            /**/lpt->tLog(fname,4,xparser.GetBlock(3000));
+            /**/lpt->tLog(fname,5,xparser.GetBlock(3000));
             return parsErr("Cannot find end of google advert block!");
         }
     }
-    /**/lpt->tLog(fname,5);
+    /**/lpt->tLogI(fname,6,scount);
     // trimming /div from the end
     if (result.endsWith("</div>")) {
         result.chop(6);

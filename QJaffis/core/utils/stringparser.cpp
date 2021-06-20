@@ -4,7 +4,7 @@ Basic   : String parsing class
 Author  : John Q Metro
 Started : August 21, 2012 (split from utils2.cpp)
 Conversion to QT started : March 2, 2013
-Updated : October 12, 2013
+Updated : June 20, 2021 (fixing a bug in MovePastTwo)
 Notes   :
 
 ******************************************************************************/
@@ -200,7 +200,7 @@ bool jfStringParser::MovePastTwo(QString first, QString second) {
   else {
     // looking again
     secindex = fpos + first.length();
-    fpos = rawdata.indexOf(second,mainindex,casesen);
+    fpos = rawdata.indexOf(second,secindex,casesen);
     if (fpos == -1) return false;
     // handling a positive result
     skipped_data = rawdata.mid(mainindex,fpos-mainindex);
