@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Archiveofourown.org
  * Author:    John Q Metro
  * Created:   July 6, 2016
- * Updated:   July 8, 2020
+ * Updated:   July 24, 2021
  *
  **************************************************************/
 #ifndef AO3PARSER_H
@@ -280,15 +280,15 @@ bool jfAO3_FicPartParser::DatesAndCompletion(jfFicExtract_AO3* extract_ptr) {
   const QString fname = "jfAO3_FicPartParser::DatesAndCompletion";
   // variables
   QString buffer;
-  // completion
-  extract_ptr->complete = true;
+  bool is_complete = false;
   /**/lpt->tLog(fname,1);
   // the date is somewhat complicated, as we have 3 successive options
-  if (xparser.GetDelimited("Completed:</dt><dd class=\"status\">","</dd>",buffer)) buffer = buffer.trimmed();
-  else if (xparser.GetDelimited("Updated:</dt><ddclass=\"status\">","</dd>",buffer)) {
+  if (xparser.GetDelimited("Completed:</dt><dd class=\"status\">","</dd>",buffer)) {
+      buffer = buffer.trimmed();
+      is_complete = true;
+  }
+  else if (xparser.GetDelimited("Updated:</dt><dd class=\"status\">","</dd>",buffer)) {
     buffer = buffer.trimmed();
-    /**/lpt->tLog(fname,2,buffer);
-    extract_ptr->complete = false;
   }
   else if (xparser.GetDelimited("Published:</dt><dd class=\"published\">","</dd>",buffer)) {
     buffer = buffer.trimmed();
@@ -296,13 +296,23 @@ bool jfAO3_FicPartParser::DatesAndCompletion(jfFicExtract_AO3* extract_ptr) {
   else {
     return parsErr("Cannot find date!");
   }
-  /**/lpt->tLog(fname,3);
+  /**/lpt->tLog(fname,2);
+  // single part fics that are complete do *not* get the completed message
+  if (!is_complete) {
+      QString chapbuf;
+      if (xparser.GetDelimited("Chapters:</dt><dd class=\"chapters\">","</dd>",chapbuf)) {
+          /**/lpt->tLog(fname,3,chapbuf);
+          is_complete = (chapbuf == "1/1");
+      }
+  }
+  extract_ptr->complete = is_complete;
+  /**/lpt->tLog(fname,4);
   // parsing the date
   extract_ptr->updated_date = QDate::fromString(buffer,"yyyy-MM-dd");
   if (!(extract_ptr->updated_date).isValid()) {
     return parsErr("Parsing date failed!");
   }
-  /**/lpt->tLog(fname,4);
+  /**/lpt->tLog(fname,5);
   return true;
 }
 
