@@ -234,7 +234,6 @@ bool jglobal::jfGlobalSettings::LoadAtStart(){
 
   emit sendLoading("ArchiveOfOurOwn.org Fandoms");
   QCoreApplication::processEvents();
-  ao3con::SetupLists();
   loadres = ao3_catdata::Initialize();
   if (loadres) emit sendDone();
   else emit sendString("Loading ArchiveOfOurOwn.org Fandoms failed: file missing or corrupt.");

@@ -73,8 +73,8 @@ bool jfAO3Fanfic::SetFromString(QString inval, const jfAO3_Category* incat, QStr
     }
   }
   if (!success) {
-    parse_err = parser_error;
-    /**/JDEBUGLOGS(fxname,1,parse_err)
+    parse_err = parser_error;;
+    JDEBUGLOGS(fxname,1, parse_err)
   }
   else delete x_parser;
   validdata = success;

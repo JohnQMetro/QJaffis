@@ -32,6 +32,7 @@ jfAO3_FicList::jfAO3_FicList(const jfAO3_Category* cat_linkin):jfTypedCollection
   const QString fname = "jfAO3_FicList::jfAO3_FicList";
   // checks
   /**/jfAssertLog(cat_linkin!=NULL,fname,"The input category link is NULL!");
+  /*jerror::AssertLog(cat_linkin!=NULL,fname,"The input category link is NULL!");*/
   // category link
   cat_link = cat_linkin;
   caturl = cat_link->GetUrl();
@@ -204,11 +205,8 @@ void jfAO3ResColl::WriteHtmlHeader(jfHtmlParams* indata) {
   QString skeldata;
   jfAO3_FicList* temp;
   // the usual checks
-  assert(indata!=NULL);
-  if (!indata->CheckOk()) {
-    /**/JDEBUGLOGS(fname,2,indata->errmsg)
-    assert(false);
-  }
+  /* jerror::AssertLog(indata->CheckOk(),fname,indata->errmsg); */
+  /**/jfAssertLog(indata->CheckOk(),fname,indata->errmsg);
   // loading values
   // the start of the header
   buffer = indata->MakeResult(indata->base->header_skel);

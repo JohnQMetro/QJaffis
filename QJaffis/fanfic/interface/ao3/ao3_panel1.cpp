@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     July 17, 2016
+// Updated:     December 21, 2021
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
   #include "ao3_panel1.h"
@@ -16,6 +16,9 @@
 #ifndef AO3_CONSTS_H_INCLUDED
   #include "../../../fanfic/data/ao3/ao3_consts.h"
 #endif // AO3_CONSTS_H_INCLUDED
+#ifndef AO3_LOOKVALS_H
+    #include "../../../fanfic/data/ao3/ao3_lookvals.h"
+#endif // AO3_LOOKVALS_H
 //--------------------------------------
 #ifndef AO3_SPECIAL1_H_INCLUDED
   #include "../../../interface/filters/ao3/ao3_special1.h"
@@ -246,75 +249,98 @@ jfAO3_ESearchOptions::jfAO3_ESearchOptions(jfAO3Search* insearch, bool dowrapper
 // io
 //------------------------------
 bool jfAO3_ESearchOptions::SaveToSearch(jfAO3Search* outsearch) const {
+    const QString fname = "jfAO3_ESearchOptions::SaveToSearch";
   // bad input
   if (outsearch==NULL) return false;
-  // variables
-  bool cval;
-  int rv[4];
-  QString tagval;
-  // the completed value
-  cval = completed->isChecked();
-  // the extra tag
-  tagval = extratags->GetText();
-  // the other values
-  rv[0] = ratings->currentIndex();
-  if (rv[0]<0) return false;
-  rv[1] = sex_orient->currentIndex();
-  if (rv[1]<0) return false;
-  rv[2] = warnings->currentIndex();
-  if (rv[2]<0) return false;
-  rv[3] = result_order->currentIndex();
-  if (rv[3]<0) return false;
+    // orientation
+    orient_entry->GetTagList();
+    // rating combo
+    outsearch->SetRatingIndex(ratings->currentIndex());
+    // result order
+    outsearch->SetOrder(result_order->currentIndex());
+    // warning excludes
+    outsearch->SetWarningExcludes(wx_violence->isChecked(), wx_death->isChecked(), wx_rape->isChecked(), wx_underage_sex->isChecked());
+    // tag excludes
+    outsearch->SetTagExcludes(excluded_tags->GetText(), etag_template->GetText());
+    // predefined tag excludes
+    outsearch->SetPredefinedExcludes(tag_excl_gendex->isChecked(), tag_excl_emo->isChecked(), tag_excl_other->isChecked());
+    // includes
+    /**/JDEBUGLOGS(fname,1,extratags->GetText())
+    outsearch->SetIncludes(extratags->GetText());
+    // word min and max
+    outsearch->SetWordLimits(words_min->GetValue(), words_max->GetValue());
+    // other stuff
+    outsearch->SetExtras(completed->isChecked(), english_only->isChecked());
 
-  // setting the value
-  outsearch->SetSearchOptions(rv[0],rv[1],rv[2],tagval,cval);
-  outsearch->SetOrder(rv[3]);
   return true;
 }
 //------------------------------
 bool jfAO3_ESearchOptions::LoadFromSearch(jfAO3Search* insearch) {
   if (insearch==NULL) return false;
-  // ratings
-  int gvalue = insearch->GetSearchValue(0);
-  if (gvalue==-1) return false;
-  ratings->setCurrentIndex(gvalue);
-  // sexal orientation
-  gvalue = insearch->GetSearchValue(1);
-  if (gvalue==-1) return false;
-  sex_orient->setCurrentIndex(gvalue);
-  // warnings
-  gvalue = insearch->GetSearchValue(2);
-  if (gvalue==-1) return false;
-  warnings->setCurrentIndex(gvalue);
+  // orientation
+  orient_entry->SetOrChangeTags(insearch->GetOrientation());
+  // rating index
+  ratings->setCurrentIndex(insearch->GetRatingIndex());
   // result order
-  gvalue = insearch->GetSearchValue(3);
-  if (gvalue==-1) return false;
-  result_order->setCurrentIndex(gvalue);
-  // completed status
-  completed->setChecked(insearch->GetCompletedValue());
-  // extra tags
-  extratags->SetText(insearch->GetExtraSTag());
+  result_order->setCurrentIndex(insearch->GetOrderIndex());
+  // warning excludes
+  wx_violence->setChecked(insearch->GetExcludedViolence());
+  wx_death->setChecked(insearch->GetExcludedDeath());
+  wx_rape->setChecked(insearch->GetExcludedRape());
+  wx_underage_sex->setCheckable(insearch->GetExcludedUnderageSex());
+  // excluded tags
+  excluded_tags->SetText(insearch->GetExcludedTagsList());
+  etag_template->SetText(insearch->GetExcludeReplacer());
+  // predefined excludes
+  tag_excl_gendex->setChecked(insearch->IsGendSexExcluded());
+  tag_excl_emo->setChecked(insearch->IsEmoStuffExcluded());
+  tag_excl_other->setChecked(insearch->IsOtherStuffExcluded());
+  // includes
+  extratags->SetText(insearch->GetIncludedTagsList());
+  // min max word count
+  words_min->SetValue(insearch->GetMinWordCount());
+  words_max->SetValue(insearch->GetMaxWordCount());
+  // flags
+  english_only->setChecked(insearch->IsEnglishOnly());
+  completed->setChecked(insearch->IsCompletedOnly());
   // done
   return true;
 }
 //------------------------------
 void jfAO3_ESearchOptions::SetDefaults() {
+    /*
   completed->setChecked(false);
   ratings->setCurrentIndex(0);
   sex_orient->setCurrentIndex(0);
   warnings->setCurrentIndex(0);
   result_order->setCurrentIndex(0);
   extratags->SetText("");
+    */
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // special
 void jfAO3_ESearchOptions::Disable(bool dis) {
   completed->setEnabled(!dis);
   ratings->setEnabled(!dis);
-  sex_orient->setEnabled(!dis);
-  warnings->setEnabled(!dis);
   result_order->setEnabled(!dis);
   extratags->setEnabled(!dis);
+  orient_entry->setEnabled(!dis);
+  ratings->setEnabled(!dis);
+  result_order->setEnabled(!dis);
+  wx_violence->setEnabled(!dis);
+  wx_death->setEnabled(!dis);
+  wx_rape->setEnabled(!dis);
+  wx_underage_sex->setEnabled(!dis);
+  excluded_tags->setEnabled(!dis);
+  etag_template->setEnabled(!dis);
+  tag_excl_gendex->setEnabled(!dis);
+  tag_excl_emo->setEnabled(!dis);
+  tag_excl_other->setEnabled(!dis);
+  extratags->setEnabled(!dis);
+  words_min->setEnabled(!dis);
+  words_max->setEnabled(!dis);
+  english_only->setEnabled(!dis);
+  completed->setEnabled(!dis);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // setup methods
@@ -324,49 +350,104 @@ void jfAO3_ESearchOptions::CreateSizers() {
   if (wrapped) {
     topwrap = new QHBoxLayout();
     sbwrapper = new QGroupBox("Built-in Archive Of Our Own Filters");
+    sbwrapper->setContentsMargins(0,0,0,0);
+    sbwrapper->setMaximumHeight(150);
   }
   else {
     topwrap = NULL;
     sbwrapper = NULL;
   }
   // the grid sizer
-  mainsizer = new QGridLayout();
+  mainsizer = new QHBoxLayout();
+  mainsizer->setContentsMargins(5,5,5,5);
   // possible nesting
   if (wrapped) {
     sbwrapper->setLayout(mainsizer);
     topwrap->addWidget(sbwrapper,1);
   }
+  // making some of the columns
+  column2 = new QVBoxLayout();
+  warnex_wrapper = new QGroupBox("Exclude Warnings");
+  warnex_wrapper->setContentsMargins(0,0,0,0);
+  warnex_column = new QVBoxLayout();
+  warnex_column->setContentsMargins(10,5,10,5);
+  warnex_column->setSpacing(0);
+  warnex_wrapper->setLayout(warnex_column);
+  tagbox = new QGridLayout();
+  column5 = new QVBoxLayout();
+
 }
 //------------------------------
 void jfAO3_ESearchOptions::MakeControls() {
-   rat_label = new QLabel("Ratings : ");
+
+   orient_entry = new jfTagStatusPicker("Sex Orientation",false);
+   // rating combo picker
+   rat_label = new QLabel("Ratings :");
    ratings = new QComboBox();
-   ratings->addItems(*ao3con::rat_list);
-   soc_label = new QLabel("Sex Orientation : ");
-   sex_orient = new QComboBox();
-   sex_orient->addItems(*ao3con::soc_list);
-   warn_label  = new QLabel("Warnings : ");
-   warnings = new QComboBox();
-   warnings->addItems(*ao3con::warn_list);
-   reso_label = new QLabel("Result Order : ");
+   ratings->addItems(ao3values::ratingMaker.GetPredefined());
+   // result order picker
+   reso_label = new QLabel("Result Order :");
    result_order = new QComboBox();
-   result_order->addItems(*ao3con::order_list);
-   completed = new QCheckBox("Completed");
-   extratags = new jfLabeledEdit(NULL,"Tag Search",true);
+   result_order->addItems(ao3values::moreMaker.GetOrderingList());
+   // warning excludes
+   wx_violence = new QCheckBox("Violence");
+   wx_death = new QCheckBox("Major Character Death");
+   wx_rape = new QCheckBox("Rape");
+   wx_underage_sex = new QCheckBox("Underage Sex");
+   // excluded tag inputs
+   excluded_tags = new jfLabeledEdit(NULL,"Tags to Exclude",false);
+   etag_template = new jfLabeledEdit(NULL, "Exclude Insert", false);
+   // predefined excluded tag checkboxes
+   tag_excl_gendex = new QCheckBox("Gender/Sex");
+   tag_excl_emo = new QCheckBox("Emotional");
+   tag_excl_other = new QCheckBox("Other");
+
+   extratags = new jfLabeledEdit(NULL,"Tags to Require", true);
+
+   words_min = new jfLabeledIntEdit(NULL,"Min Words",true,0,2000000000);
+   words_max = new jfLabeledIntEdit(NULL, "Max Words", true, 0, 2000000000);
+
+   english_only = new QCheckBox("English Only");
+   completed = new QCheckBox("Completed Only");
+
 }
 //------------------------------
 void jfAO3_ESearchOptions::ArrangeControls() {
+    mainsizer->addWidget(orient_entry, 3, Qt::AlignRight);
+    // column2
+    column2->addWidget(rat_label,0,Qt::AlignTop | Qt::AlignLeft);
+    column2->addWidget(ratings, 0 , Qt::AlignTop | Qt::AlignLeft);
+    column2->addSpacing(3);
+    column2->addWidget(reso_label, 0, Qt::AlignTop | Qt::AlignLeft);
+    column2->addWidget(result_order, 0, Qt::AlignTop | Qt::AlignLeft);
+    column2->addStretch(1);
+    // column2->addSpacerItem();
+    mainsizer->addLayout(column2, 2);
+    // warning excludes
+    warnex_column->addWidget(wx_violence, 0);
+    warnex_column->addWidget(wx_death, 0);
+    warnex_column->addWidget(wx_rape, 0);
+    warnex_column->addWidget(wx_underage_sex, 0);
+    mainsizer->addWidget(warnex_wrapper, 2);
+    // excludes and includes
+    tagbox->addWidget(excluded_tags, 0, 0, 1, 3);
+    tagbox->addWidget(etag_template, 0, 3);
+    tagbox->addWidget(tag_excl_gendex, 1, 0);
+    tagbox->addWidget(tag_excl_emo, 1, 1);
+    tagbox->addWidget(tag_excl_other, 1, 2);
+    tagbox->addWidget(extratags, 2, 0, 1, 4);
+    tagbox->setColumnStretch(0,1);
+    tagbox->setColumnStretch(1,1);
+    tagbox->setColumnStretch(2,1);
+    tagbox->setColumnStretch(3,1);
+    mainsizer->addLayout(tagbox,9);
+    // column5
+    column5->addWidget(words_min);
+    column5->addWidget(words_max);
+    column5->addWidget(completed);
+    column5->addWidget(english_only);
+    mainsizer->addLayout(column5, 2);
 
-  mainsizer->addWidget(rat_label,0,0,Qt::AlignRight);
-  mainsizer->addWidget(ratings,0,1);
-  mainsizer->addWidget(soc_label,0,2,Qt::AlignRight);
-  mainsizer->addWidget(sex_orient,0,3);
-  mainsizer->addWidget(warn_label,0,4,Qt::AlignRight);
-  mainsizer->addWidget(warnings,0,5);
-  mainsizer->addWidget(completed,0,6,Qt::AlignVCenter);
-  mainsizer->addWidget(reso_label,1,0,Qt::AlignRight);
-  mainsizer->addWidget(result_order,1,1);
-  mainsizer->addWidget(extratags,1,2,1,5);
 }
 //=========================================================================
 jfAO3_SearchOptions::jfAO3_SearchOptions(jfAO3Search* insearch, QWidget* parent):jfSearchOptionsBase(parent) {
@@ -375,7 +456,7 @@ jfAO3_SearchOptions::jfAO3_SearchOptions(jfAO3Search* insearch, QWidget* parent)
   main_picker = new jf_Gen_CatPicker(insearch->GetHolder() ,insearch->GetSelector(),7);
   soptions = new jfAO3_ESearchOptions(insearch,true,false);
   mlayout = new QVBoxLayout();
-  mlayout->addWidget(main_picker,1);
+  mlayout->addWidget(main_picker,2);
   mlayout->addWidget(soptions,0);
   setLayout(mlayout);
 }

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Filters relating to dates
 Created :   November 29, 2011
 Conversion to QT Started October 1, 2013
-Updated :   July 8, 2016 (removed FFN and renamed file)
+Updated :   December 3, 2021 (fixed bug in ToString)
 ******************************************************************************/
 #ifndef DATERANGE_FILTER_H
   #include "daterange.h"
@@ -97,7 +97,7 @@ QString jfDateRangeFilter::ToString() const {
   result += " to ";
   // old date
   if (olddate.isValid()) {
-    result = olddate.toString("MM/dd/yyyy");
+    result += olddate.toString("MM/dd/yyyy");
   }
   return result;
 }
@@ -105,7 +105,7 @@ QString jfDateRangeFilter::ToString() const {
 // setting data
 bool jfDateRangeFilter::SetDates(QDate instart,QDate inend) {
   // tester
-  if ((instart.isValid()) && (inend.isValid())) {
+  if (instart.isValid() && inend.isValid()) {
     if (instart<inend) return false;
   }
   // setting the dates
@@ -173,7 +173,7 @@ bool jfDateRangeFilter::ReadRestFromFile(jfFileReader* infile) {
   if (!infile->ReadLine(cline,funcname)) return false;
   // there is only one line, and one filed, so this is pretty simple
   resx = FromString(cline);
-  if (!resx) return infile->BuildError("The completed string is invalid!");
+  if (!resx) return infile->BuildError("The date range string is invalid!");
   else return true;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

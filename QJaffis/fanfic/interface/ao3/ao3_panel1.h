@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     July 17, 2016
+// Updated:     November 21, 2021
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
 #define AO3_PANEL1_H_INCLUDED
@@ -93,20 +93,52 @@ class jfAO3_ESearchOptions : public QWidget {
     void MakeControls();
     void ArrangeControls();
    // the gui controls
+    // sex orientation
+   jfTagStatusPicker* orient_entry;
+   // rating combo picker
    QLabel* rat_label;
    QComboBox* ratings;
-   QLabel* soc_label;
-   QComboBox* sex_orient;
-   QLabel* warn_label;
-   QComboBox* warnings;
-   QCheckBox* completed;
-   jfLabeledEdit* extratags;
+   // result order picker
    QLabel* reso_label;
    QComboBox* result_order;
+   // warning excludes
+   QCheckBox* wx_violence;
+   QCheckBox* wx_death;
+   QCheckBox* wx_rape;
+   QCheckBox* wx_underage_sex;
+
+   jfLabeledEdit* excluded_tags;
+   jfLabeledEdit* etag_template;
+
+   QCheckBox* tag_excl_gendex;
+   QCheckBox* tag_excl_emo;
+   QCheckBox* tag_excl_other;
+
+   jfLabeledEdit* extratags;
+
+   jfLabeledIntEdit* words_min;
+   jfLabeledIntEdit* words_max;
+
+   QCheckBox* english_only;
+   QCheckBox* completed;
+
+    // columns
+   // 1 orientation
+   // 2: ratings and result order (vbox)
+   //  3 group warning excludes
+   // 4: tags in 4 rows: include, 2+3 exclude, 4 row or checkbox excludes
+   // 5 : other stuff
+
+   QHBoxLayout* mainsizer;
+   QVBoxLayout* column2;
+   QGroupBox* warnex_wrapper;
+   QVBoxLayout* warnex_column;
+   QGridLayout* tagbox; // column4
+   QVBoxLayout* column5;
+
 
    // sizers
    QGroupBox* sbwrapper;
-   QGridLayout* mainsizer;
    QHBoxLayout* topwrap;
    // special
    bool wrapped;

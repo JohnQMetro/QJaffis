@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    The interface for updating downloaded fanfics
 // Created:     July 26, 2016
-// Updated:     July 26, 2016
+// Updated:     December 23, 2021
 ******************************************************************************/
 #ifndef FICUPDATE_PANEL_H
   #define FICUPDATE_PANEL_H
@@ -66,12 +66,14 @@ class jfFic_UpdateDisplay : public QWidget {
     jfDirPicker* dir_pick;
     jfLabeledIntEdit* split_guide;
     QCheckBox* main_check;
+    QCheckBox* skip_ffn;
     jfProgPanelFicUpdating* main_display;
     QLabel* fic_count;
     QPlainTextEdit* results_display;
     // layouts
     QGroupBox* sbox;
     QVBoxLayout* sbox_layout, *main_sizer;
+    QHBoxLayout* check_sizer;
     QHBoxLayout* top_sizer;
     // thread data
     bool launched;

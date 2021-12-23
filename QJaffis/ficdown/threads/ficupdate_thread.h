@@ -3,7 +3,7 @@
  * Purpose:   Downloaded fanfic updater thread
  * Author:    John Q Metro
  * Created:   July 25, 2016
- * Updated:   July 26, 2016
+ * Updated:   December 23, 2021
  *
  **************************************************************/
 #ifndef FICUPDATE_THREAD_H
@@ -46,7 +46,7 @@ class jfFicUpdateThread : public jfFicDownloaderBase {
     Q_OBJECT
   public:
     jfFicUpdateThread(size_t in_max_threads);
-    bool SetParams(const QString& indir, const size_t& in_sizeguide, bool in_docomplete);
+    bool SetParams(const QString& indir, const size_t& in_sizeguide, bool in_docomplete, bool skip_ffn);
   signals:
     void sendOneActionSection(QString action,QString what);
     void sendSectionCount(size_t sec_count);
@@ -77,6 +77,7 @@ class jfFicUpdateThread : public jfFicDownloaderBase {
     size_t fic_index;
     bool halting;
     bool docomplete;
+    bool skipffn;
     size_t sizeguide;
 
     //loading info

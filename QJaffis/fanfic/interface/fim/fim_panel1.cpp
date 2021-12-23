@@ -221,7 +221,7 @@ bool jfFIM_SearchOptions::StoreTo(jfSearchCore* outsearch) {
   typed_outsearch->SetMinor(oindex,rchar);
   // other
   typed_outsearch->SetMature(matures->isChecked());
-  // equestria girld tristate cb
+  // equestria girls tristate cb
   Qt::CheckState egcheck = equestria_girls_cb->checkState();
   if (egcheck == Qt::Unchecked) typed_outsearch->SetEGStatus(jfts_NONE);
   else if (egcheck == Qt::PartiallyChecked) typed_outsearch->SetEGStatus(jfts_EXCLUDE);

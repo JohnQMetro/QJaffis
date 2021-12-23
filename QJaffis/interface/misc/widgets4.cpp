@@ -72,6 +72,7 @@ jfExprEditBase::jfExprEditBase(bool mline_in, QWidget* parent):QWidget(parent) {
   fcheck_btn = new QPushButton("Check");
   // creating the top sizer, which is always horizontal
   topsizer = new QHBoxLayout();
+  topsizer->setContentsMargins(5,5,5,5);
   // we create and arrange
   mline = mline_in;
   if (mline) {

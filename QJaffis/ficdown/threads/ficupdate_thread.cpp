@@ -3,7 +3,7 @@
  * Purpose:   Downloaded fanfic updater thread
  * Author:    John Q Metro
  * Created:   July 25, 2016
- * Updated:   July 26, 2016
+ * Updated:   December 23, 2021
  *
  **************************************************************/
 #ifndef FICUPDATE_THREAD_H
@@ -125,13 +125,15 @@ jfFicUpdateThread::jfFicUpdateThread(size_t in_max_threads):jfFicDownloaderBase(
   ficlist = NULL;
   halting = false;
   docomplete = false;
+  skipffn = false;
 }
 //-------------------------------------
-bool jfFicUpdateThread::SetParams(const QString& indir, const size_t& in_sizeguide, bool in_docomplete) {
+bool jfFicUpdateThread::SetParams(const QString& indir, const size_t& in_sizeguide, bool in_docomplete, bool skip_ffn) {
   if (indir.isEmpty()) return false;
   sourcedir = indir;
   sizeguide = in_sizeguide;
   docomplete = in_docomplete;
+  skipffn = skip_ffn;
   return true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++
@@ -368,6 +370,13 @@ bool jfFicUpdateThread::DoAllFanfics() {
         emit sendSectionDone(true);
         continue;
       }
+    }
+    // skipping fanfiction.net
+    if (skipffn) {
+        if (fic_data->GetFicType() == jfft_FFN) {
+            emit sendSectionDone(true);
+            continue;
+        }
     }
     // doing the fic
     fictype = fic_data->GetFicType();

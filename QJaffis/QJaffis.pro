@@ -199,7 +199,9 @@ SOURCES += main.cpp\
     test/testurl.cpp \
     test/testthread.cpp \
     test/testpanel.cpp \
-    fetching/cloudfget.cpp
+    fetching/cloudfget.cpp \
+    fanfic/data/ao3/ao3_lookvals.cpp \
+    fanfic/data/ao3/ao3_urlmake.cpp
 
 HEADERS  += mainwindow.h \
     initend.h \
@@ -388,7 +390,9 @@ HEADERS  += mainwindow.h \
     test/testthread.h \
     test/testpanel.h \
     fanficnet/categories/catgroup.h \
-    fetching/cloudfget.h
+    fetching/cloudfget.h \
+    fanfic/data/ao3/ao3_lookvals.h \
+    fanfic/data/ao3/ao3_urlmake.h
 
 RC_FILE = qjaffis.rc
 

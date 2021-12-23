@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    The interface for updating downloaded fanfics
 // Created:     July 26, 2016
-// Updated:     July 26, 2016
+// Updated:     December 23, 2021
 ******************************************************************************/
 #ifndef FICUPDATE_PANEL_H
   #include "ficupdate_panel.h"
@@ -80,12 +80,15 @@ jfFic_UpdateDisplay::jfFic_UpdateDisplay(QWidget* parent):QWidget(parent) {
   split_guide = new jfLabeledIntEdit(NULL,"File Size Guide (KB)",true,10,200000);
   split_guide->SetValue(jglobal::settings.ficsize_hint);
   main_check = new QCheckBox("Check Completed Stories");
+  skip_ffn = new QCheckBox("Skip Fanfiction.net Stories");
   main_display = new jfProgPanelFicUpdating();
   fic_count = new QLabel("Nothing Done Yet");
   results_display = new QPlainTextEdit();
   results_display->setLineWrapMode(QPlainTextEdit::NoWrap);
   // arranging in sizers
   top_sizer = new QHBoxLayout();
+  check_sizer = new QHBoxLayout();
+  check_sizer->setContentsMargins(0,0,0,0);
   top_sizer->addWidget(dir_pick,1,Qt::AlignVCenter);
   top_sizer->addSpacing(6);
   top_sizer->addWidget(split_guide,0,Qt::AlignVCenter);
@@ -93,7 +96,9 @@ jfFic_UpdateDisplay::jfFic_UpdateDisplay(QWidget* parent):QWidget(parent) {
   sbox_layout->addWidget(fic_count,0);
   sbox_layout->addWidget(results_display,1);
   main_sizer->addLayout(top_sizer,0);
-  main_sizer->addWidget(main_check,0,Qt::AlignLeft);
+  check_sizer->addWidget(main_check, 0, Qt::AlignLeft);
+  check_sizer->addWidget(skip_ffn, 0, Qt::AlignLeft);
+  main_sizer->addLayout(check_sizer);
   main_sizer->addWidget(main_display,0);
   main_sizer->addWidget(sbox,1);
   // connections
@@ -138,7 +143,7 @@ void jfFic_UpdateDisplay::HandleStart() {
   xvalue = split_guide->GetValue();
   xdir = dir_pick->GetPath();
   downloader = new jfFicUpdateThread(3);
-  downloader->SetParams(xdir,xvalue,main_check->isChecked());
+  downloader->SetParams(xdir,xvalue,main_check->isChecked(), skip_ffn->isChecked());
   // setting the info and launching
   /**/JDEBUGLOG(fname,2)
   SetupDownloaderAndThread();

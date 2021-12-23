@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Category picking panel for generic section/category picking
 Created :   August 25, 2012
 Conversion to Qt Started April 6, 2014
-Updated :   April 29, 2014
+Updated :   December 20, 2021
 ******************************************************************************/
 #ifndef GCAT_PICKER_H_INCLUDED
   #include "gcat_picker.h"
@@ -405,6 +405,7 @@ jf_Gen_CatPicker::jf_Gen_CatPicker(jfGen_CatHolder* inmain, jfGenCat_PickData* i
   assert(atest);
   // the filter sizer
   expredit_sizer = new QGridLayout();
+  expredit_sizer->setContentsMargins(5,0,5,0);
   expredit_sizer->addWidget(and_label,0,0,Qt::AlignVCenter);
   expredit_sizer->addWidget(and_edit,0,1);
   expredit_sizer->addWidget(or_label,1,0,Qt::AlignVCenter);
@@ -416,6 +417,7 @@ jf_Gen_CatPicker::jf_Gen_CatPicker(jfGen_CatHolder* inmain, jfGenCat_PickData* i
   middle_sizer->addWidget(picked_display,10-prop);
   // the top level sizer
   top_sizer = new QVBoxLayout();
+  top_sizer->setContentsMargins(5,5,5,5);
   top_sizer->addLayout(middle_sizer,1);
   top_sizer->addLayout(expredit_sizer);
   // connections

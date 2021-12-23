@@ -86,6 +86,7 @@ jfLabeledIntEdit::jfLabeledIntEdit(QWidget* parent, QString inlabel, bool horiz,
   assert(max>min);
   // creating the sizer
   layout = new QBoxLayout((horiz)?(QBoxLayout::LeftToRight):(QBoxLayout::TopToBottom),this);
+  layout->setContentsMargins(5,5,5,5);
   // creating the items
   clabel = inlabel;
   thelabel = new QLabel(inlabel+ " : ");
