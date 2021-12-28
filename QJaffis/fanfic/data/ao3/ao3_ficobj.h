@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares fanfic object data of archoveofourown.org
 Created :   August 26, 2012
 Conversion to Qt Started September 28, 2013
-Updated :  July 1, 2016
+Updated :  December 24, 2021 (multiple orientation related changes)
 ******************************************************************************/
 #ifndef AO3_FICOBJ_H_INCLUDED
 #define AO3_FICOBJ_H_INCLUDED
@@ -34,7 +34,7 @@ class jfAO3Fanfic : public jfGenericFanfic2 {
     virtual QString GetTypeID() const;
     // getting info
     QChar GetRating() const;
-    QChar GetOrientation() const;
+    QString GetOrientations() const;
     QChar GetWarnflag() const;
     QString GetWarntag() const;
     bool TestWarntag(QChar inval) const;
@@ -63,7 +63,6 @@ class jfAO3Fanfic : public jfGenericFanfic2 {
   protected:
     // internal to string helper methods
     QString RatingToString() const;
-    QString OrientToString() const;
     QString WarnToString() const;
     // internal parsing methods
     bool ParseStart();
@@ -80,8 +79,9 @@ class jfAO3Fanfic : public jfGenericFanfic2 {
     virtual bool AddExtraStuff(QTextStream* outfile) const;
     virtual bool ReadExtraStuff(jfFileReader* infile);
     // more data
-    QChar rating, orient, warn;
+    QChar rating, warn;
     QString warntags;
+    QString orientations;
     int eccount;
     size_t kudcount;
     QString relationships, characters, extratags;

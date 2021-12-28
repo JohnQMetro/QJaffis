@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   AO3 rating and orientation filters
 Created :   September 9, 2012
 Conversion to Qt Started Oct 2, 2013
-Updated :   September 11, 2012
+Updated :   December 28, 2021
 ******************************************************************************/
 #ifndef AO3_SPECIALS1_H_INCLUDED
   #include "ao3_specials1.h"
@@ -16,6 +16,9 @@ Updated :   September 11, 2012
 #ifndef AO3_CONSTS_H_INCLUDED
   #include "../../../fanfic/data/ao3/ao3_consts.h"
 #endif // AO3_CONSTS_H_INCLUDED
+#ifndef AO3_LOOKVALS_H
+    #include "../../../fanfic/data/ao3/ao3_lookvals.h"
+#endif // AO3_LOOKVALS_H
 //----------------------------------------
 #include <assert.h>
 #include <QRegExp>
@@ -113,55 +116,57 @@ bool jfAO3RatingFilter::CoreMatch(const jfBasePD* testelem) const {
   const jfAO3Fanfic* testval = dynamic_cast<const jfAO3Fanfic*>(testelem);
   return value.contains(testval->GetRating());
 }
-//========================================================================
-// constructors
-//------------------------------------
-jfAO3OrientationFilter::jfAO3OrientationFilter():jfSpecialsFilter() {}
-//------------------------------------
-jfAO3OrientationFilter::jfAO3OrientationFilter(const QString& sourcedata):jfSpecialsFilter() {
-  FromString(sourcedata);
+
+//=======================================================================
+jfAO3OrientationFilter::jfAO3OrientationFilter():jfTagFilterCore() {
+  cm = ",";
 }
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// implemented virtual methods
-//------------------------------------
-bool jfAO3OrientationFilter::FromString(const QString& sourcedata) {
-  QRegExp xrpos = QRegExp("[^"+ao3con::orient_ac+"]");
-  if (!sourcedata.contains(xrpos)) {
-    value = sourcedata;
+//---------------------------------------------
+jfAO3OrientationFilter::jfAO3OrientationFilter(const jfAO3OrientationFilter& insrc):jfTagFilterCore(insrc) {
+  cm = ",";
+  validdata = DoVerify();
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// getting and setting values
+bool jfAO3OrientationFilter::SetToEmpty() {
+    if (thedata == NULL) thedata = new jfTagListing();
+    ao3values::orientMaker.SetTagsToEmpty(*thedata);
     validdata = true;
-  }
-  else validdata = false;
-  return validdata;
+    return true;
 }
-//------------------------------------
-QString jfAO3OrientationFilter::GetTypeDescription() const {
-  return "Checks if the Sexual Orientation for the tested fanfic is one \
-of the selected Orientations.";
-}
-//------------------------------------
-jfBaseFilter* jfAO3OrientationFilter::GenCopy() const {
-  jfAO3OrientationFilter* qval = new jfAO3OrientationFilter(value);
-  return qval;
-}
-//------------------------------------
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// redefined virtual methods
 QString jfAO3OrientationFilter::GetTypeID() const {
   return "AO3OrientationFilter";
 }
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// implemented custom methods
-//------------------------------------
-void jfAO3OrientationFilter::SetToFull() {
-  value = ao3con::orient_ac;
-  validdata = true;
+//-----------------------------------------------------------------------------
+QString jfAO3OrientationFilter::GetTypeDescription() const {
+    return "Compares the Archiveofourown.org orientation (like 'F/M' or 'Gen') of the fic against the \
+include/exclude/alternate list specified by the filter.";
 }
-//------------------------------------
-bool jfAO3OrientationFilter::IsFull() const {
-  return value==ao3con::orient_ac;
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jfBaseFilter* jfAO3OrientationFilter::GenCopy() const {
+  return new jfAO3OrientationFilter(*this);
 }
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
 bool jfAO3OrientationFilter::CoreMatch(const jfBasePD* testelem) const {
-  const jfAO3Fanfic* testval = dynamic_cast<const jfAO3Fanfic*>(testelem);
-  return value.contains(testval->GetOrientation());
+  const jfAO3Fanfic* rvalue;
+  // we start
+  assert(testelem!=NULL);
+  rvalue = dynamic_cast<const jfAO3Fanfic*>(testelem);
+  return MatchVsData(rvalue->GetOrientations());
 }
-/*****************************************************************************/
+//-----------------------------------------------
+bool jfAO3OrientationFilter::ModifyList(QStringList* templist) const {
+  return false;
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// check the tags against a list of pre-approved tags
+bool jfAO3OrientationFilter::DoVerify() {
+    QStringList* genrelist = ao3values::orientMaker.GetOrientations();
+    if (genrelist == NULL) return false;
+    bool result = VerifyTags(genrelist,NULL);
+    delete genrelist;
+    return result;
+}

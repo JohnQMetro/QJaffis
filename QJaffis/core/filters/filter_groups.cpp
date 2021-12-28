@@ -4,7 +4,7 @@
 // Purpose :    Defines global filter map groupings and associated stuff
 // Created:     01.08.06
 // Started conversion to Qt June 23, 2013
-// Updated:     January 21, 2018
+// Updated:     December 28, 2021
 /////////////////////////////////////////////////////////////////////////////
 // headers
 // ----------------------------------------------------------------------------
@@ -80,6 +80,8 @@ jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname) {
   jfFIMContentTypeFilter* xtag_result;
   jfFIMWarningsFilter* wtag_result;
 
+  jfAO3OrientationFilter* otag_result;
+
   // the multiple types
   if (typestring=="UrlFilter") result = new jfUrlFilter();
   else if (typestring=="ExprFilter") result = new jfExpressionFilter();
@@ -126,7 +128,11 @@ jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname) {
   else if (typestring=="ExtraTagFilter") result = new jfExtraTagFilter();
   else if (typestring=="AO3FandomFilter") result = new jfAO3FandomFilter();
   else if (typestring=="AO3RatingFilter") result = new jfAO3RatingFilter();
-  else if (typestring=="AO3OrientationFilter") result = new jfAO3OrientationFilter();
+  else if (typestring=="AO3OrientationFilter") {
+      otag_result = new jfAO3OrientationFilter();
+      otag_result->SetToEmpty();
+      result = otag_result;
+  }
   else if (typestring=="AO3PairFilter") result = new jfAO3PairFilter();
   else if (typestring=="AO3WarnFilter") result = new jfAO3WarnFilter();
   else if (typestring=="AO3KudoCountFilter") result = new jfAO3KudoFilter();

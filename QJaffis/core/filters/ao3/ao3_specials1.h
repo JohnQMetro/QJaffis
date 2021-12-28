@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   AO3 rating and orientation filters
 Created :   September 8, 2012
 Conversion to Qt Started Oct 2, 2013
-Updated :   September 8, 2012
+Updated :   December 24, 2021 (changing orientation filter to a tagfilter)
 ******************************************************************************/
 #ifndef AO3_SPECIALS1_H_INCLUDED
 #define AO3_SPECIALS1_H_INCLUDED
@@ -12,6 +12,9 @@ Updated :   September 8, 2012
 //-------------------------------------------
 #ifndef JFBASEFILTER
   #include "../base/filterbase.h"
+#endif
+#ifndef MOREFILTERS1_H_INCLUDED
+  #include "../extended/morefilters1.h"
 #endif
 /*****************************************************************************/
 class jfSpecialsFilter : public jfBaseFilter {
@@ -64,21 +67,23 @@ class jfAO3RatingFilter : public jfSpecialsFilter {
     virtual bool CoreMatch(const jfBasePD* testelem) const;
 };
 //========================================================================
-class jfAO3OrientationFilter : public jfSpecialsFilter {
+
+class jfAO3OrientationFilter : public jfTagFilterCore {
   public:
     // constructors
     jfAO3OrientationFilter();
-    jfAO3OrientationFilter(const QString& sourcedata);
-    // implemented virtual methods
-    virtual bool FromString(const QString& sourcedata);
+    jfAO3OrientationFilter(const jfAO3OrientationFilter& insrc);
+    // getting and setting values
+    virtual bool SetToEmpty();
+    // redefined virtual methods
+    virtual QString GetTypeID() const;
     virtual QString GetTypeDescription() const;
     virtual jfBaseFilter* GenCopy() const;
-    virtual QString GetTypeID() const;
-    // implemented custom methods
-    virtual void SetToFull();
-    virtual bool IsFull() const;
   protected:
     // the core matching method
     virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool ModifyList(QStringList* templist) const;
+    // check the tags against a list of pre-approved tags
+    virtual bool DoVerify();
 };
 /*****************************************************************************/

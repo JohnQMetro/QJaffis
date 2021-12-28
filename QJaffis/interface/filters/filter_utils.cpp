@@ -4,12 +4,16 @@ Author  :   John Q Metro
 Purpose :   A filter editor creator, and anything else that comes to mind
 Created :   December 27, 2010
 Conversion to Qt Started Oct 24, 2013
-Updated :   January 21, 2018
+Updated :   December 27, 2021
 ******************************************************************************/
 #ifndef FILTER_UTILS_H_INCLUDED
   #include "filter_utils.h"
 #endif // FILTER_UTILS_H_INCLUDED
 //-----------------------------------------------------------
+#ifndef LOGGING_H_INCLUDED
+  #include "../../core/utils/logging.h"
+#endif // LOGGING_H_INCLUDED
+
 #ifndef EXPRESSION_H
   #include "../../core/filters/base/expression.h"
 #endif // EXPRESSION_H
@@ -88,10 +92,13 @@ Updated :   January 21, 2018
 // creates an appropriate editor using the provided links
 jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilterMap* containing_map,
                            jfBaseFilter* input_filter, bool isglobal) {
+    const QString fname = "MakeFilterEditor";
   // we first check the inputs. anything wrong results in assert faliure
+    /**/JDEBUGLOG(fname,1)
   assert(parent!=NULL);
   assert(containing_map!=NULL);
   assert(input_filter!=NULL);
+  /**/JDEBUGLOG(fname,2)
   // variables
   // filters of the right type
   jfUrlFilter*          a01;
@@ -239,7 +246,8 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
   }
   else if (in_typeid=="AO3OrientationFilter") {
     a23 = dynamic_cast<jfAO3OrientationFilter*>(input_filter);
-    result = new jfAO3_OrientFilterEditor(a23,containing_map,parent);
+    result = new jfAO3_OrientFilterEditor(containing_map,a23,parent);
+      /**/JDEBUGLOG(fname,5)
   }
   else if (in_typeid=="AO3PairFilter") {
     a24 = dynamic_cast<jfAO3PairFilter*>(input_filter);

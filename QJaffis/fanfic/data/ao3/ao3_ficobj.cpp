@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines fanfic object data of archoveofourown.org
 Created :   August 26, 2012
 Conversion to Qt Started September 28, 2013
-Updated :   September 4, 2020
+Updated :   December 26, 2021
 ******************************************************************************/
 #ifndef AO3_FICOBJ_H_INCLUDED
   #include "ao3_ficobj.h"
@@ -27,7 +27,7 @@ Updated :   September 4, 2020
 // default constructors
 //----------------------------
 jfAO3Fanfic::jfAO3Fanfic():jfGenericFanfic2() {
-  rating = orient = warn = ao3con::unchar;
+  rating = warn = ao3con::unchar;
   eccount = -1;
   kudcount = 0;
   series_index = 0;
@@ -36,7 +36,7 @@ jfAO3Fanfic::jfAO3Fanfic():jfGenericFanfic2() {
 //----------------------------
 jfAO3Fanfic::jfAO3Fanfic(const jfAO3Fanfic& src):jfGenericFanfic2(src) {
   rating = src.rating;
-  orient = src.orient;
+  orientations = src.orientations;
   warn = src.warn;
   eccount = src.eccount;
   kudcount = src.kudcount;
@@ -90,7 +90,7 @@ QString jfAO3Fanfic::GetTypeID() const {
 //----------------------------
 QChar jfAO3Fanfic::GetRating() const { return rating; }
 //----------------------------
-QChar jfAO3Fanfic::GetOrientation() const { return orient; }
+QString jfAO3Fanfic::GetOrientations() const { return orientations; }
 //----------------------------
 QChar jfAO3Fanfic::GetWarnflag() const { return warn; }
 //----------------------------
@@ -159,9 +159,13 @@ QString jfAO3Fanfic::ToText() const {
   }
   // next up.. two extra lines
   result += "Updated: " + updated_date.toString("MM-dd-yyyy");
+
   // the rating... and orientation
   result += " - Rating: " + RatingToString();
-  result += " - Orientation: " + OrientToString();
+  result += " - Orientation";
+  result += (orientations.contains(","))?"s: ":": ";
+  result += orientations;
+
   // part count and word count
   result += " - Parts: " + QString::number(part_count);
   result += " - Words: " + QString::number(word_count);
@@ -206,14 +210,16 @@ QString jfAO3Fanfic::ToDisplayHTML() const {
   result += "<font color=\"#010101\" size=+2>" + description + "</font><br>\n";
   // series
   if (InSeries()) {
-    result += "<font color=cyan size=+1>Part ";
+    result += "<font color=\"darkviolet\" size=+1>Part ";
     result += QString::number(series_index) + " of the " + series_name;
     result += " Series.</font><br>\n";
   }
   // next up.. three extra lines
-  result += "<font color=gray size=+1>Updated: " + updated_date.toString("MM-dd-yyyy");
+  result += "<font color=\"gray\" size=+1>Updated: " + updated_date.toString("MM-dd-yyyy");
   result += " - Rating: " + RatingToString();
-  result += " - Orientation: " + OrientToString();
+  result += " - Orientation";
+  result += (orientations.contains(","))?"s: ":": ";
+  result += orientations;
   // part count and word count
   result += " - Parts: " + QString::number(part_count);
   result += " - Words: " + QString::number(word_count);
@@ -226,11 +232,13 @@ QString jfAO3Fanfic::ToDisplayHTML() const {
   result += "</font>";
   buffer = WarnToString();
   if (!buffer.isEmpty()) {
-    optline = "Warnings: " + WarnToString();
+    optline = "<font color=\"red\">Warnings: " + WarnToString();
+    optline += "</font>";
   }
   if (!characters.isEmpty()) {
     if (!optline.isEmpty()) optline += " &nbsp;&mdash;&nbsp; ";
-    optline += "Characters: " + characters;
+    optline += "<font color=\"darkblue\">Characters: " + characters;
+    optline += "</font>";
   }
   if (!relationships.isEmpty()) {
     if (!optline.isEmpty()) optline += " &nbsp;&mdash;&nbsp; ";
@@ -264,7 +272,7 @@ bool jfAO3Fanfic::LoadValues(jfSkeletonParser* inparser) const {
   // rating
   inparser->AddText("ITEMF_RATING",RatingToString());
   // orientation
-  inparser->AddText("ITEMF_ORIENT",OrientToString());
+  inparser->AddText("ITEMF_ORIENT",GetOrientations());
   // warnings
   inparser->AddText("ITEMF_WARNING",WarnToString());
   // kudos
@@ -298,18 +306,6 @@ QString jfAO3Fanfic::RatingToString() const {
   else if (rating=='M') return "Mature";
   else if (rating=='E') return "Explicit";
   else if (rating=='_') return "Unspecified";
-  else assert(false);
-  return "";
-}
-//----------------------------
-QString jfAO3Fanfic::OrientToString() const {
-  if (orient=='F') return "FSlash";
-  else if (orient=='G') return "Gen";
-  else if (orient=='H') return "Het";
-  else if (orient=='M') return "Multi";
-  else if (orient=='O') return "Other";
-  else if (orient=='S') return "Slash";
-  else if (orient=='_') return "Unspecified";
   else assert(false);
   return "";
 }
@@ -434,6 +430,15 @@ bool jfAO3Fanfic::ParseMiddle() {
   else if (buffer=="mature rating") warn = 'E';
   else return parseError("Warning Flags unrecognized!");
   // orientation
+  if (!x_parser->MovePastTwo("<span class=\"category-","\"")) {
+      return parseError("Cannot start of find orientation!");
+  }
+  if (!x_parser->GetDelimited("title=\"","\"",buffer)) {
+      return parseError("Cannot find orientation!");
+  }
+  if (buffer == "No category") orientations = "";
+  else orientations = buffer.trimmed();
+  /*
   if (!x_parser->GetDelimited("<span class=\"category-","\"",buffer)) {
     return parseError("Cannot find orientation!");
   }
@@ -445,6 +450,7 @@ bool jfAO3Fanfic::ParseMiddle() {
   else if (buffer=="other category") orient = 'O';
   else if (buffer=="none category") orient = '_';
   else return parseError("Orientation unrecognized!");
+  */
   // completed flag
   if (!x_parser->GetDelimited("<span class=\"complete-","\"",buffer)) {
     return parseError("Cannot find completion status!");
@@ -691,7 +697,7 @@ bool jfAO3Fanfic::AddExtraStuff(QTextStream* outfile) const {
   // checking and special conditions
   if (outfile==NULL) return false;
   // preparing line 8
-  xresult << rating << orient << warn << warntags << eccount << kudcount;
+  xresult << rating << orientations << warn << warntags << eccount << kudcount;
   (*outfile) << xresult << "\n";
   xresult.clear();
   // doing line 9
@@ -721,7 +727,7 @@ bool jfAO3Fanfic::ReadExtraStuff(jfFileReader* infile) {
   if (!infile->ReadParseLine(6,funcname)) return false;
   // testing special chars
   if (!infile->lp.CharVal(0,rating,ao3con::rating_ac)) return infile->BuildError("Rating is invalid!");
-  if (!infile->lp.CharVal(1,orient,ao3con::orient_ac)) return infile->BuildError("Orientation is invalid!");
+  orientations = infile->lp.UnEscStr(1);
   if (!infile->lp.CharVal(2,warn,ao3con::warn1_ac)) return infile->BuildError("Warn Flag is invalid!");
   buffer = infile->lp.UnEscStr(3);
   if (buffer.contains(qcheck)) {

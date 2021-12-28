@@ -3,7 +3,7 @@ Name    :   ao3_lookvals.h
 Author  :   John Q Metro
 Purpose :   Some constants and utility functions for making AO3 searches
 Created :   June 12, 2021
-Updated :   October 30, 2020
+Updated :   December 24, 2021
 ******************************************************************************/
 #ifndef AO3_LOOKVALS_H
     #define AO3_LOOKVALS_H
@@ -49,6 +49,9 @@ Updated :   October 30, 2020
         jfTagListing* MakeOrientationPickOne(size_t which) const;
         QString OrientationLookupID(const QString& tomatch) const;
         QString OrientationListingToQueryPart(const jfTagListing* source) const;
+        // filter helper methods
+        void SetTagsToEmpty(jfTagListing& listing) const;
+        QStringList* GetOrientations() const;
 
         virtual ~AO3OrientMake();
       protected:

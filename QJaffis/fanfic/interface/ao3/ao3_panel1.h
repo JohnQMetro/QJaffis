@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     November 21, 2021
+// Updated:     December 27, 2021 (Removed Orientation filter)
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
 #define AO3_PANEL1_H_INCLUDED
@@ -42,7 +42,6 @@ const QString DEF_ao3chars_name = "Default Archiveofourown.org Characters Filter
 const QString DEF_ao3wc_name = "Default Archiveofourown.org Word Count Filter";
 const QString DEF_ao3com_name = "Default Archiveofourown.org Completed Filter";
 const QString DEF_ao3rat_name = "Default Archiveofourown.org Ratings Filter";
-const QString DEF_ao3ori_name = "Default Archiveofourown.org Orientation Filter";
 const QString DEF_ao3etf_name = "Default Archiveofourown.org Extra Tags Filter";
 const QString DEF_ao3kudof_name = "Default Archiveofourown.org Kudos Filter";
 
@@ -66,7 +65,7 @@ class jfAO3_DFE : public jfDefaultFilterEditorBase {
     jfZeroToMaxEditor* wc_picker;
     jfZeroToMaxEditor* kc_picker;
     jfComplFiltEdit* cpicker;
-    jfCharCheckBoxGroup *ratpicker, *orientpick;
+    jfCharCheckBoxGroup *ratpicker;
     QLabel* taglabel;
     jfSimpleExprEdit* tag_filedit;
     // an extra set of sizers

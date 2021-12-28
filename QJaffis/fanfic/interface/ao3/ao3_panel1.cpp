@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     December 21, 2021
+// Updated:     December 27, 2021 (removed orientation picker)
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
   #include "ao3_panel1.h"
@@ -59,7 +59,6 @@ jfAO3_DFE::jfAO3_DFE(jfAO3Search* inobj, QWidget* parent):jfDefaultFilterEditorB
   cpicker = new jfComplFiltEdit(NULL);
   // additional rating and orientation filter
   ratpicker = new jfCharCheckBoxGroup("Ratings", 5,ratinglist,ao3con::rating_ac,0);
-  orientpick = new jfCharCheckBoxGroup("Sexual Orientation", 7,orientlist,ao3con::orient_ac,4);
   // extra tags filter
   taglabel = new QLabel("Extra Tags Filter :");
   tag_filedit = new jfSimpleExprEdit(false);
@@ -68,7 +67,6 @@ jfAO3_DFE::jfAO3_DFE(jfAO3Search* inobj, QWidget* parent):jfDefaultFilterEditorB
   lsizer3->addLayout(lsizer2);
   lsizer3->addWidget(cpicker,0);
   lsizer3->addWidget(ratpicker,0);
-  lsizer3->addWidget(orientpick,0);
   lsizer3->addSpacing(8);
   lsizer3->addWidget(taglabel,0,Qt::AlignLeft);
   lsizer3->addWidget(tag_filedit,0);
@@ -90,7 +88,6 @@ void jfAO3_DFE::Disable(bool yes) {
   kc_picker->setEnabled(!yes);
   cpicker->setEnabled(!yes);
   ratpicker->setEnabled(!yes);
-  orientpick->setEnabled(!yes);
   tag_filedit->setEnabled(!yes);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -136,13 +133,10 @@ bool jfAO3_DFE::SaveFiltersExtended() {
   cm_filter = cpicker->GetValue();
   cm_filter->SetName(DEF_ao3com_name);
   embedded_filters->ReplaceSame(cm_filter,oindex);
-  // the rating and orientation filter
+  // the rating filter
   jfAO3RatingFilter* rat_filter = new jfAO3RatingFilter(ratpicker->GetStringValue());
   rat_filter->SetName(DEF_ao3rat_name);
   embedded_filters->ReplaceSame(rat_filter,oindex);
-  jfAO3OrientationFilter* ori_filter = new jfAO3OrientationFilter(orientpick->GetStringValue());
-  ori_filter->SetName(DEF_ao3ori_name);
-  embedded_filters->ReplaceSame(ori_filter,oindex);
   // extra tags filter
   exprval = tag_filedit->CheckFilter(omsg);
   assert(exprval!=NULL);
@@ -202,13 +196,6 @@ bool jfAO3_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
     atest = cpicker->LoadValue(cm_filter);
     assert(atest);
   }
-  // orientation filter
-  ori_filter = dynamic_cast<jfAO3OrientationFilter*>(embedded_filters->GetItem(DEF_ao3ori_name));
-  if (ori_filter!=NULL) {
-    atest = orientpick->SetFromString(ori_filter->ToString());
-    assert(atest);
-  }
-  else orientpick->CheckAll();
   // ratingd filter
   rat_filter = dynamic_cast<jfAO3RatingFilter*>(embedded_filters->GetItem(DEF_ao3rat_name));
   if (rat_filter!=NULL) {
