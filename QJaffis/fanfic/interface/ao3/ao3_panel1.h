@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     December 27, 2021 (Removed Orientation filter)
+// Updated:     December 28, 2021 (Crossovers only)
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
 #define AO3_PANEL1_H_INCLUDED
@@ -120,6 +120,7 @@ class jfAO3_ESearchOptions : public QWidget {
 
    QCheckBox* english_only;
    QCheckBox* completed;
+   QCheckBox* crossover_only;
 
     // columns
    // 1 orientation

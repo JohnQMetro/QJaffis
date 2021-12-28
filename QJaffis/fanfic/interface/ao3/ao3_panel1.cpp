@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     December 27, 2021 (removed orientation picker)
+// Updated:     December 28, 2021
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
   #include "ao3_panel1.h"
@@ -258,6 +258,7 @@ bool jfAO3_ESearchOptions::SaveToSearch(jfAO3Search* outsearch) const {
     outsearch->SetWordLimits(words_min->GetValue(), words_max->GetValue());
     // other stuff
     outsearch->SetExtras(completed->isChecked(), english_only->isChecked());
+    outsearch->SetCrossoverOnly(crossover_only->isChecked());
 
   return true;
 }
@@ -290,6 +291,7 @@ bool jfAO3_ESearchOptions::LoadFromSearch(jfAO3Search* insearch) {
   // flags
   english_only->setChecked(insearch->IsEnglishOnly());
   completed->setChecked(insearch->IsCompletedOnly());
+  crossover_only->setChecked(insearch->IsCrossoverOnly());
   // done
   return true;
 }
@@ -328,6 +330,7 @@ void jfAO3_ESearchOptions::Disable(bool dis) {
   words_max->setEnabled(!dis);
   english_only->setEnabled(!dis);
   completed->setEnabled(!dis);
+  crossover_only->setEnabled(!dis);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // setup methods
@@ -396,6 +399,7 @@ void jfAO3_ESearchOptions::MakeControls() {
 
    english_only = new QCheckBox("English Only");
    completed = new QCheckBox("Completed Only");
+   crossover_only = new QCheckBox("Crossover Only");
 
 }
 //------------------------------
@@ -433,6 +437,7 @@ void jfAO3_ESearchOptions::ArrangeControls() {
     column5->addWidget(words_max);
     column5->addWidget(completed);
     column5->addWidget(english_only);
+    column5->addWidget(crossover_only);
     mainsizer->addLayout(column5, 2);
 
 }

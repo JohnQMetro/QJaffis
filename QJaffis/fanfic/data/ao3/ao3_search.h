@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares search object of AO3
 Created :   August 28, 2012
 Conversion to Qt Started March 29, 2014
-Updated :   December 19, 2021
+Updated :   December 28, 2021
 ******************************************************************************/
 #ifndef AO3_SEARCH_H_INCLUDED
 #define AO3_SEARCH_H_INCLUDED
@@ -47,6 +47,7 @@ class jfAO3Search : public jfSearchCore {
     void SetIncludes(const QString& in_includes);
     void SetWordLimits(int in_words_from, int in_words_to);
     void SetExtras(bool in_completed_only, bool in_english_only);
+    void SetCrossoverOnly(bool only_crossovers);
     // getting data
     jfGenCat_PickData* GetSelector();
     jfGen_CatHolder* GetHolder();
@@ -69,6 +70,7 @@ class jfAO3Search : public jfSearchCore {
     int GetMaxWordCount() const;
     bool IsCompletedOnly() const;
     bool IsEnglishOnly() const;
+    bool IsCrossoverOnly() const;
 
     // implemented method for sending category data
     virtual void DispatchCategory();

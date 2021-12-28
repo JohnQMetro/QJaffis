@@ -141,6 +141,9 @@ void jfAO3Search::SetExtras(bool in_completed_only, bool in_english_only) {
     conly = in_completed_only;
     eng_only = in_english_only;
 }
+void jfAO3Search::SetCrossoverOnly(bool only_crossovers) {
+    cross_only = only_crossovers;
+}
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // getting data
@@ -207,6 +210,9 @@ bool jfAO3Search::IsCompletedOnly() const {
 }
 bool jfAO3Search::IsEnglishOnly() const {
     return eng_only;
+}
+bool jfAO3Search::IsCrossoverOnly() const {
+    return cross_only;
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
