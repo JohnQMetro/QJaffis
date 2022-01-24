@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Archiveofourown.org
  * Author:    John Q Metro
  * Created:   July 6, 2016
- * Updated:   July 24, 2021
+ * Updated:   January 23, 2022
  *
  **************************************************************/
 #ifndef AO3PARSER_H
@@ -122,20 +122,13 @@ bool jfAO3_FicPartParser::ParseFirstPage(const QString& indata) {
   tempfic.startnotes = GetStartNotes();
   /**/lpt->tLog(fname,8,tempfic.startnotes);
   // getting part contents
-  // single part
-  if (partcount==1) {
-    /**/lpt->tLog(fname,9);
-    if (!xparser.GetDelimited(cstart2,"<!-- end cache -->",xbuffer)) {
-      delete ffresult;
-      return parsErr("AO3 P1s Cannot find contents!");
-    }
-  }
-  else {
-    /**/lpt->tLog(fname,10);
-    if (!xparser.GetDelimited(cstart1,"<!--/main-->",xbuffer)) {
-      delete ffresult;
-      return parsErr("AO3 P1m Cannot find contents!");
-    }
+  // this is getting rather vague, so we'll try multiple methods
+  if (!xparser.GetDelimitedEndPair(cstart1,"<!--/main-->","<!-- end cache -->",xbuffer)) {
+      /**/lpt->tLog(fname,9);
+      if (!xparser.GetDelimitedEndPair(cstart2,"<!--/main-->","<!-- end cache -->",xbuffer)) {
+        delete ffresult;
+        return parsErr("AO3 P1x Cannot find contents!");
+      }
   }
   /**/lpt->tLog(fname,11);
   // here, there is no chance of faliure, so we set some results

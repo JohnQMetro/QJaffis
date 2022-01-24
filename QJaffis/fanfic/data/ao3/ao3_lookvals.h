@@ -92,6 +92,7 @@ Updated :   December 24, 2021
         QStringList gensex_excludes;
         QStringList other_excludes;
         QStringList emo_excludes;
+        QStringList fluff_excludes;
     };
 
     class AO3MoreMake {

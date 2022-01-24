@@ -180,11 +180,18 @@ AO3RatingMake::~AO3RatingMake() {
 AO3TagExcludeMake::AO3TagExcludeMake() {
     gensex_excludes << "Alpha/Beta/Omega Dynamics" << "Coming Out" << "Trans Character" <<
         "Trans Male Character" << "Trans Female Character" << "LGBTQ Themes" << "Genderbending" <<
-        "Mpreg" << "Sex Pollen" << "Anal Sex";
+        "Mpreg" << "Sex Pollen" << "Anal Sex" << "Gender Identity" << "Sexual Identity" <<
+                       "Alternate Universe - Gender Changes";
     other_excludes << "Reader" << "Alternate Universe - Soulmates" << "Alternate Universe - Merpeople" <<
-                    "Alternate Universe - Dragons" << "Pack Dynamics";
+                      "Alternate Universe - Dragons" << "Pack Dynamics" << "Alternate Universe - Shifters" <<
+                      "Shifter AU" << "Mermaids";
     emo_excludes << "Suicidal Thoughts" << "Angst" << "Hurt/Comfort" << "Implied/Referenced Self-Harm" <<
-                    "Touch-Starved" << "Mental Breakdown";
+                    "Touch-Starved" << "Mental Breakdown" << "Panic Attacks" << "Implied/Referenced Suicide" <<
+                    "Hurt No Comfort" << "Anxiety" << "Dissociation" << "Feral" << "Eating Disorders" <<
+                    "Guilt" << "Childhood Trauma" << "Sad" << "Implied/Referenced Suicide" <<
+                    "Emotional Hurt" << "Hurt No Comfort" << "Suicide Attempt";
+    fluff_excludes << "Fluff" << "Family Feels" << "Family Bonding" << "Family Fluff" <<
+                      "Sibling Bonding" << "Cute";
 }
 QString AO3TagExcludeMake::QueryPart(const QStringList& basic_list) const {
     if (basic_list.isEmpty()) return "";
