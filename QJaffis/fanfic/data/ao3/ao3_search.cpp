@@ -412,7 +412,7 @@ bool jfAO3Search::AddMiddleToFile(QTextStream* outfile) const {
   (*outfile) << xline << "\n";
   xline.clear();
   // includes, words from and words to
-  xline << includes << words_from << words_to;
+  xline << words_from << words_to << includes;
   (*outfile) << xline << "\n";
   xline.clear();
   // orientation
@@ -480,13 +480,13 @@ bool jfAO3Search::ReadMiddleFromFile(jfFileReader* infile) {
 
   // includes and word limits
   if (!infile->ReadParseLine(3,fname)) return false;
-  includes = infile->lp.UnEscStr(0);
-  if (!infile->lp.IIntVal(1, words_from)) {
+  if (!infile->lp.IIntVal(0, words_from)) {
       return infile->BuildError("Words from value invalid.");
   }
-  if (!infile->lp.IIntVal(2, words_to)) {
+  if (!infile->lp.IIntVal(1, words_to)) {
       return infile->BuildError("Words to value invalid.");
   }
+  includes = infile->lp.UnEscStr(2);
   // orientation
   if (!ReadTagListing(orientation_parameters,"Orientation",infile)) return false;
 
