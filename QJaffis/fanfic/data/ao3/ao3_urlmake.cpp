@@ -3,7 +3,7 @@ Name    :   ao3_urlmake.cpp
 Author  :   John Q Metro
 Purpose :   Defines a url generator for AO3 searches
 Created :   November 20, 2021
-Updated :   December 19, 2021
+Updated :   January 27, 2022
 ******************************************************************************/
 #ifndef AO3_URLMAKE_H
     #include "ao3_urlmake.h"
@@ -35,8 +35,8 @@ bool AO3UrlMaker::setRatingChoice(size_t index) {
     rating = ao3values::ratingMaker.MakeUsingPredefined(index);
     return !orientation.isEmpty();
 }
-bool AO3UrlMaker::setFullExcludeQuery(bool gensex, bool emo, bool other, const QString& template_list, const QString& insert) {
-    excludes = ao3values::excludeMaker.MakeFullExcludeQuery(gensex, emo, other, template_list, insert);
+bool AO3UrlMaker::setFullExcludeQuery(bool gensex, bool emo, bool other, bool fluff, const QString& template_list, const QString& insert) {
+    excludes = ao3values::excludeMaker.MakeFullExcludeQuery(gensex, emo, other, fluff, template_list, insert);
     return !orientation.isEmpty();
 }
 bool AO3UrlMaker::setWarningExcludes(bool violence, bool death, bool rape, bool underage) {

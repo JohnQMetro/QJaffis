@@ -22,7 +22,7 @@ class AO3UrlMaker {
     // adding parts
     bool setOrientationListing(const jfTagListing* source);
     bool setRatingChoice(size_t index);
-    bool setFullExcludeQuery(bool gensex, bool emo, bool other, const QString& template_list, const QString& insert);
+    bool setFullExcludeQuery(bool gensex, bool emo, bool other, bool fluff, const QString& template_list, const QString& insert);
     bool setWarningExcludes(bool violence, bool death, bool rape, bool underage);
     bool setOrderingChoice(size_t order_choice);
     bool setTagIncludes(const QString raw_include);

@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     December 28, 2021
+// Updated:     January 27, 2022
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
   #include "ao3_panel1.h"
@@ -250,7 +250,7 @@ bool jfAO3_ESearchOptions::SaveToSearch(jfAO3Search* outsearch) const {
     // tag excludes
     outsearch->SetTagExcludes(excluded_tags->GetText(), etag_template->GetText());
     // predefined tag excludes
-    outsearch->SetPredefinedExcludes(tag_excl_gendex->isChecked(), tag_excl_emo->isChecked(), tag_excl_other->isChecked());
+    outsearch->SetPredefinedExcludes(tag_excl_gendex->isChecked(), tag_excl_emo->isChecked(), tag_excl_other->isChecked(), tag_excl_fluff->isChecked());
     // includes
     /**/JDEBUGLOGS(fname,1,extratags->GetText())
     outsearch->SetIncludes(extratags->GetText());
@@ -283,6 +283,7 @@ bool jfAO3_ESearchOptions::LoadFromSearch(jfAO3Search* insearch) {
   tag_excl_gendex->setChecked(insearch->IsGendSexExcluded());
   tag_excl_emo->setChecked(insearch->IsEmoStuffExcluded());
   tag_excl_other->setChecked(insearch->IsOtherStuffExcluded());
+  tag_excl_fluff->setChecked(insearch->IsFluffStuffExcluded());
   // includes
   extratags->SetText(insearch->GetIncludedTagsList());
   // min max word count
@@ -325,6 +326,7 @@ void jfAO3_ESearchOptions::Disable(bool dis) {
   tag_excl_gendex->setEnabled(!dis);
   tag_excl_emo->setEnabled(!dis);
   tag_excl_other->setEnabled(!dis);
+  tag_excl_fluff->setEnabled(!dis);
   extratags->setEnabled(!dis);
   words_min->setEnabled(!dis);
   words_max->setEnabled(!dis);
@@ -391,6 +393,7 @@ void jfAO3_ESearchOptions::MakeControls() {
    tag_excl_gendex = new QCheckBox("Gender/Sex");
    tag_excl_emo = new QCheckBox("Emotional");
    tag_excl_other = new QCheckBox("Other");
+   tag_excl_fluff = new QCheckBox("Fluff");
 
    extratags = new jfLabeledEdit(NULL,"Tags to Require", true);
 
@@ -426,6 +429,7 @@ void jfAO3_ESearchOptions::ArrangeControls() {
     tagbox->addWidget(tag_excl_gendex, 1, 0);
     tagbox->addWidget(tag_excl_emo, 1, 1);
     tagbox->addWidget(tag_excl_other, 1, 2);
+    tagbox->addWidget(tag_excl_fluff, 1, 3);
     tagbox->addWidget(extratags, 2, 0, 1, 4);
     tagbox->setColumnStretch(0,1);
     tagbox->setColumnStretch(1,1);

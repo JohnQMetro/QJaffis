@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     December 28, 2021 (Crossovers only)
+// Updated:     January 27, 2022
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
 #define AO3_PANEL1_H_INCLUDED
@@ -112,6 +112,7 @@ class jfAO3_ESearchOptions : public QWidget {
    QCheckBox* tag_excl_gendex;
    QCheckBox* tag_excl_emo;
    QCheckBox* tag_excl_other;
+   QCheckBox* tag_excl_fluff;
 
    jfLabeledEdit* extratags;
 

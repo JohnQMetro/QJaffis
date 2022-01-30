@@ -3,7 +3,7 @@ Name    :   ao3_lookvals.cpp
 Author  :   John Q Metro
 Purpose :   Some constants and utility functions for making AO3 searches
 Created :   June 12, 2021
-Updated :   December 24, 2021
+Updated :   January 27, 2022
 ******************************************************************************/
 #ifndef AO3_LOOKVALS_H
     #include "ao3_lookvals.h"
@@ -181,7 +181,7 @@ AO3TagExcludeMake::AO3TagExcludeMake() {
     gensex_excludes << "Alpha/Beta/Omega Dynamics" << "Coming Out" << "Trans Character" <<
         "Trans Male Character" << "Trans Female Character" << "LGBTQ Themes" << "Genderbending" <<
         "Mpreg" << "Sex Pollen" << "Anal Sex" << "Gender Identity" << "Sexual Identity" <<
-                       "Alternate Universe - Gender Changes";
+                       "Alternate Universe - Gender Changes" << "Dysphoria";
     other_excludes << "Reader" << "Alternate Universe - Soulmates" << "Alternate Universe - Merpeople" <<
                       "Alternate Universe - Dragons" << "Pack Dynamics" << "Alternate Universe - Shifters" <<
                       "Shifter AU" << "Mermaids";
@@ -219,18 +219,19 @@ QString AO3TagExcludeMake::QueryPartWithTemplate(const QStringList& basic_list, 
         return start + ao3values::PercentEncode(rest);
     }
 }
-QStringList AO3TagExcludeMake::MakePredefinedExcludes(bool gensex, bool emo, bool other) const {
+QStringList AO3TagExcludeMake::MakePredefinedExcludes(bool gensex, bool emo, bool other, bool fluff) const {
     QStringList res;
     if (gensex) res << gensex_excludes;
     if (emo) res << emo_excludes;
-    if (other) other_excludes;
+    if (other) res << other_excludes;
+    if (fluff) res << fluff_excludes;
     return res;
 }
-QString AO3TagExcludeMake::MakeFullExcludeQuery(bool gensex, bool emo, bool other, const QString& template_list, const QString& insert) const {
+QString AO3TagExcludeMake::MakeFullExcludeQuery(bool gensex, bool emo, bool other, bool fluff, const QString& template_list, const QString& insert) const {
     bool has_flag_excludes = gensex || emo || other;
     bool has_template_list = template_list.length() > 0;
     QStringList base_list;
-    if (has_flag_excludes) base_list = MakePredefinedExcludes(gensex, emo, other);
+    if (has_flag_excludes) base_list = MakePredefinedExcludes(gensex, emo, other, fluff);
     if (has_template_list) {
         QStringList user_list = template_list.split(",",QString::SkipEmptyParts);
         // trim any whitespace in the parts

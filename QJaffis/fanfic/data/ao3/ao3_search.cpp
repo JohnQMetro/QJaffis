@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines search object of AO3
 Created :   August 28, 2012
 Conversion to Qt Started March 29, 2014
-Updated :   December 19, 2021
+Updated :   January 27, 2022
 ******************************************************************************/
 #ifndef AO3_SEARCH_H_INCLUDED
   #include "ao3_search.h"
@@ -42,7 +42,7 @@ jfAO3Search::jfAO3Search():jfSearchCore() {
   wx_rape = true;
   orientation_parameters = NULL; // created as needed
   excludes = includes = template_replacer = "";
-  gensex = emo = other = false;
+  gensex = emo = other = fluff = false;
   conly = false;
   eng_only = true;
   ord_index = 1; // updated date new to old
@@ -125,10 +125,11 @@ void jfAO3Search::SetTagExcludes(const QString& in_excludes, const QString& in_r
     template_replacer = in_replacer;
 }
 
-void jfAO3Search::SetPredefinedExcludes(bool in_gensex, bool in_emo, bool in_other) {
+void jfAO3Search::SetPredefinedExcludes(bool in_gensex, bool in_emo, bool in_other, bool in_fluff) {
     gensex = in_gensex;
     emo = in_emo;
     other = in_other;
+    fluff = in_fluff;
 }
 void jfAO3Search::SetIncludes(const QString& in_includes) {
     includes = in_includes;
@@ -195,6 +196,9 @@ bool jfAO3Search::IsEmoStuffExcluded() const {
 }
 bool jfAO3Search::IsOtherStuffExcluded() const {
     return other;
+}
+bool jfAO3Search::IsFluffStuffExcluded() const {
+    return fluff;
 }
 QString jfAO3Search::GetIncludedTagsList() const {
     return includes;
@@ -367,7 +371,7 @@ void jfAO3Search::MakeURLMaker() {
     /**/JDEBUGLOG(fname,3)
     url_maker->setOrderingChoice(ord_index);
     /**/JDEBUGLOG(fname,4)
-    url_maker->setFullExcludeQuery(gensex, emo, other, excludes, template_replacer);
+    url_maker->setFullExcludeQuery(gensex, emo, other, fluff, excludes, template_replacer);
     /**/JDEBUGLOG(fname,6)
     url_maker->setWarningExcludes(wx_violence, wx_death, wx_rape, wx_underage);
     /**/JDEBUGLOG(fname,7)
@@ -408,7 +412,7 @@ bool jfAO3Search::AddMiddleToFile(QTextStream* outfile) const {
   (*outfile) << xline << "\n";
   xline.clear();
   // excludes: flags, then custom
-  xline << gensex << emo << other << false << false << excludes << template_replacer;
+  xline << gensex << emo << other << fluff << false << excludes << template_replacer;
   (*outfile) << xline << "\n";
   xline.clear();
   // includes, words from and words to
@@ -471,6 +475,9 @@ bool jfAO3Search::ReadMiddleFromFile(jfFileReader* infile) {
       return infile->BuildError("Emotional excludes flag invalid.");
   }
   if (!infile->lp.BoolVal(2,other)) {
+      return infile->BuildError("Other excludes flag invalid.");
+  }
+  if (!infile->lp.BoolVal(3,fluff)) {
       return infile->BuildError("Other excludes flag invalid.");
   }
   // skipping reserved

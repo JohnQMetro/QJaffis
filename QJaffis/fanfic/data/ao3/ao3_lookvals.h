@@ -3,7 +3,7 @@ Name    :   ao3_lookvals.h
 Author  :   John Q Metro
 Purpose :   Some constants and utility functions for making AO3 searches
 Created :   June 12, 2021
-Updated :   December 24, 2021
+Updated :   January 27, 2022
 ******************************************************************************/
 #ifndef AO3_LOOKVALS_H
     #define AO3_LOOKVALS_H
@@ -86,8 +86,8 @@ Updated :   December 24, 2021
         QString QueryPart(const QStringList& basic_list) const;
         // make query exclude from 2 lists. In the second one, % is replaced by insert
         QString QueryPartWithTemplate(const QStringList& basic_list, const QStringList& template_list, const QString& insert) const;
-        QStringList MakePredefinedExcludes(bool gensex, bool emo, bool other) const;
-        QString MakeFullExcludeQuery(bool gensex, bool emo, bool other, const QString& template_list, const QString& insert) const;
+        QStringList MakePredefinedExcludes(bool gensex, bool emo, bool other, bool fluff) const;
+        QString MakeFullExcludeQuery(bool gensex, bool emo, bool other, bool fluff, const QString& template_list, const QString& insert) const;
       protected:
         QStringList gensex_excludes;
         QStringList other_excludes;
