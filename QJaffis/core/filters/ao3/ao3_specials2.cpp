@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   AO3 pairing and warning filters
 Created :   October 4, 2012
 Conversion to Qt Started Oct 2, 2013
-Updated :   September 6, 2020 (Revise pair filter)
+Updated :   February 2, 2022 (Bugfixing)
 ******************************************************************************/
 #ifndef AO3_SPECIALS2_H_INCLUDED
   #include "ao3_specials2.h"
@@ -45,13 +45,16 @@ jfAO3Pairing::jfAO3Pairing(const jfAO3Pairing& source) {
 }
 //----------------------------
 jfAO3Pairing::jfAO3Pairing(const QString& A, const QString& B, const bool in_platonic ) {
-    first = A.toLower();
-    second = B.toLower();
+    QString Alc = A.toLower();
+    QString Blc = B.toLower();
+    first = A;
+    second = B;
     is_platonic = in_platonic;
-    reader = (A == "reader") || (A == "you");
-    if (!reader) reader = (B == "reader") || (B == "you");
-    original = A.startsWith("original") || (A == "ofc") || (A == "omc");
-    if (!original) original = B.startsWith("original") || (B == "ofc") || (B == "omc");
+    // checking reader and original
+    reader = (Alc == "reader") || (Alc == "you");
+    if (!reader) reader = (Blc == "reader") || (Blc == "you");
+    original = Alc.startsWith("original") || (Alc == "ofc") || (Alc == "omc");
+    if (!original) original = Blc.startsWith("original") || (Blc == "ofc") || (Blc == "omc");
 }
 
 QString jfAO3Pairing::toString() const {
@@ -82,17 +85,17 @@ bool jfAO3Pairing::ComparePairing(const jfAO3Pairing& pattern,const jfAO3Pairing
     const QString fname = "jfAO3Pairing::ComparePairing";
     bool cross_match = false;
     // the pattern names must be contained by the target names
-    bool matchX = target.first.contains(pattern.first);
+    bool matchX = target.first.contains(pattern.first, Qt::CaseInsensitive);
     if (!matchX) {
         if (!either) return false;
-        cross_match = target.second.contains(pattern.first);
+        cross_match = target.second.contains(pattern.first, Qt::CaseInsensitive);
         if (!cross_match) return false;
     }
     if (!cross_match) {
-        if (!target.second.contains(pattern.second)) return false;
+        if (!target.second.contains(pattern.second, Qt::CaseInsensitive)) return false;
     }
     else {
-        if (!target.first.contains(pattern.second)) return false;
+        if (!target.first.contains(pattern.second, Qt::CaseInsensitive)) return false;
     }
     // if we get here, we might still need to match the type
     if (notype) return true;
