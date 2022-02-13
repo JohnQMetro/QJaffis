@@ -51,8 +51,8 @@ jfAO3Pairing::jfAO3Pairing(const QString& A, const QString& B, const bool in_pla
     second = B;
     is_platonic = in_platonic;
     // checking reader and original
-    reader = (Alc == "reader") || (Alc == "you");
-    if (!reader) reader = (Blc == "reader") || (Blc == "you");
+    reader = (Alc == "reader") || (Alc == "you") || Alc.endsWith(" reader");
+    if (!reader) reader = (Blc == "reader") || (Blc == "you") || (Blc.endsWith(" reader"));
     original = Alc.startsWith("original") || (Alc == "ofc") || (Alc == "omc");
     if (!original) original = Blc.startsWith("original") || (Blc == "ofc") || (Blc == "omc");
 }
