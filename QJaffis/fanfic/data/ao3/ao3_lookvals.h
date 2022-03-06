@@ -3,7 +3,7 @@ Name    :   ao3_lookvals.h
 Author  :   John Q Metro
 Purpose :   Some constants and utility functions for making AO3 searches
 Created :   June 12, 2021
-Updated :   January 27, 2022
+Updated :   March 6, 2022
 ******************************************************************************/
 #ifndef AO3_LOOKVALS_H
     #define AO3_LOOKVALS_H
@@ -93,6 +93,7 @@ Updated :   January 27, 2022
         QStringList other_excludes;
         QStringList emo_excludes;
         QStringList fluff_excludes;
+        QStringList whump_excludes;
     };
 
     class AO3MoreMake {

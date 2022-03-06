@@ -3,7 +3,7 @@ Name    :   ao3_lookvals.cpp
 Author  :   John Q Metro
 Purpose :   Some constants and utility functions for making AO3 searches
 Created :   June 12, 2021
-Updated :   January 27, 2022
+Updated :   March 6, 2022
 ******************************************************************************/
 #ifndef AO3_LOOKVALS_H
     #include "ao3_lookvals.h"
@@ -73,28 +73,21 @@ QString AO3OrientMake::OrientationListingToQueryPart(const jfTagListing* source)
     // looping through the labels
     QString outurl = "";
     outurl.reserve(200);
-    /**/JDEBUGLOGI(fname,1, orientation_ids.length())
     for(size_t odex = 0; odex < orientation_labels.length(); odex++) {
-        /**/JDEBUGLOGI(fname,2,odex)
         jfTagListing::const_iterator vp = source->find(orientation_labels[odex]);
         if (vp == source->end()) continue;
-        /**/JDEBUGLOGI(fname,3,odex)
         jfTAG_STATUS stat = vp->second;
         if (stat == jfts_INCLUDE) {
             if (outurl.length() > 0) outurl += '&';
             outurl += incl;
-            /**/JDEBUGLOGI(fname,4,odex)
             outurl += orientation_ids.at(odex);
         }
         else if (stat == jfts_EXCLUDE) {
             if (outurl.length() > 0) outurl += '&';
             outurl += excl;
-            /**/JDEBUGLOGI(fname,5,odex)
             outurl += orientation_ids.at(odex);
         }
-        /**/JDEBUGLOGI(fname,6,odex)
     }
-    /**/JDEBUGLOG(fname,7)
     return outurl;
 
 }
@@ -181,17 +174,21 @@ AO3TagExcludeMake::AO3TagExcludeMake() {
     gensex_excludes << "Alpha/Beta/Omega Dynamics" << "Coming Out" << "Trans Character" <<
         "Trans Male Character" << "Trans Female Character" << "LGBTQ Themes" << "Genderbending" <<
         "Mpreg" << "Sex Pollen" << "Anal Sex" << "Gender Identity" << "Sexual Identity" <<
-                       "Alternate Universe - Gender Changes" << "Dysphoria";
+                       "Alternate Universe - Gender Changes" << "Dysphoria" << "Sexuality Crisis" <<
+                       "Masturbation" << "Explicit Sexual Content";
     other_excludes << "Reader" << "Alternate Universe - Soulmates" << "Alternate Universe - Merpeople" <<
                       "Alternate Universe - Dragons" << "Pack Dynamics" << "Alternate Universe - Shifters" <<
-                      "Shifter AU" << "Mermaids";
+                      "Shifter AU" << "Mermaids" << "Vampire AU" << "Wingfic";
     emo_excludes << "Suicidal Thoughts" << "Angst" << "Hurt/Comfort" << "Implied/Referenced Self-Harm" <<
                     "Touch-Starved" << "Mental Breakdown" << "Panic Attacks" << "Implied/Referenced Suicide" <<
                     "Hurt No Comfort" << "Anxiety" << "Dissociation" << "Feral" << "Eating Disorders" <<
                     "Guilt" << "Childhood Trauma" << "Sad" << "Implied/Referenced Suicide" <<
-                    "Emotional Hurt" << "Hurt No Comfort" << "Suicide Attempt";
+                    "Emotional Hurt" << "Hurt No Comfort" << "Suicide Attempt" << "Self-Harm" <<
+                    "Self-Esteem Issues" << "Anorexia";
     fluff_excludes << "Fluff" << "Family Feels" << "Family Bonding" << "Family Fluff" <<
-                      "Sibling Bonding" << "Cute";
+                      "Sibling Bonding" << "Cute" << "Brotherly Bonding" << "Batfamily Feels" <<
+                      "Age Regression" << "Adorable" << "Soft" << "Snuggling & Cuddling" << "Cuddle Pollen";
+    whump_excludes << "Whump" << "Whumptober" << "Sickfic" << "Health Issues" << "Seizures" << "Fainting";
 }
 QString AO3TagExcludeMake::QueryPart(const QStringList& basic_list) const {
     if (basic_list.isEmpty()) return "";

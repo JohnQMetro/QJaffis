@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   AO3 pairing and warning filters
 Created :   October 4, 2012
 Conversion to Qt Started Oct 2, 2013
-Updated :   February 2, 2022 (Bugfixing)
+Updated :   March 6, 2022 (Bugfixing)
 ******************************************************************************/
 #ifndef AO3_SPECIALS2_H_INCLUDED
   #include "ao3_specials2.h"
@@ -140,6 +140,7 @@ bool jfAO3PairFilter::isEmpty() const {
 // string conversion
 //----------------------------------
 bool jfAO3PairFilter::FromString(const QString& sourcedata) {
+    const QString fname = "jfAO3PairFilter::FromString";
   validdata = false;
   if (pnames!=NULL) delete pnames;
   // parsing
@@ -164,9 +165,14 @@ bool jfAO3PairFilter::SetNamesData(const QString& sourcedata) {
   QVector<jfAO3Pairing*>* nnames = NULL;
   // parsing the input
   QString qnames = sourcedata.trimmed();
-  if (qnames.isEmpty()) return false;
-  nnames = ParsePairs(qnames);
-  if (nnames == NULL) return false;
+  if (qnames.isEmpty()) {
+      nnames = new QVector<jfAO3Pairing*>();
+  }
+  else {
+      nnames = ParsePairs(qnames);
+      if (nnames == NULL) return false;
+  }
+
   // setting the input
   if (pnames!=NULL) delete pnames;
   pnames = nnames;
