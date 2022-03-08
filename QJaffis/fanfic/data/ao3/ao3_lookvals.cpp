@@ -178,7 +178,8 @@ AO3TagExcludeMake::AO3TagExcludeMake() {
                        "Masturbation" << "Explicit Sexual Content";
     other_excludes << "Reader" << "Alternate Universe - Soulmates" << "Alternate Universe - Merpeople" <<
                       "Alternate Universe - Dragons" << "Pack Dynamics" << "Alternate Universe - Shifters" <<
-                      "Shifter AU" << "Mermaids" << "Vampire AU" << "Wingfic";
+                      "Shifter AU" << "Mermaids" << "Vampire AU" << "Wingfic" << "Selkies" <<
+                      "Hanahaki Disease";
     emo_excludes << "Suicidal Thoughts" << "Angst" << "Hurt/Comfort" << "Implied/Referenced Self-Harm" <<
                     "Touch-Starved" << "Mental Breakdown" << "Panic Attacks" << "Implied/Referenced Suicide" <<
                     "Hurt No Comfort" << "Anxiety" << "Dissociation" << "Feral" << "Eating Disorders" <<
