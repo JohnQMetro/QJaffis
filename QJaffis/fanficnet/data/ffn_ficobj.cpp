@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net item object
 // Created:     May 25, 2010
 // Conversion to Qt Started September 25, 2013
-// Updated:     September 4, 2020 (increase font size for display html)
+// Updated:     March 19, 2022 (parsing bugfixes)
 /////////////////////////////////////////////////////////////////////////////
 #ifndef JFFNFICOBJ
   #include "ffn_ficobj.h"
@@ -176,10 +176,13 @@ void jfFFNItemCore::ProcessDescription() {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfFFNItemCore::ExtractDescription(jfStringParser &zparser, QString &parserr) {
-  // going ahed
-  if (!(zparser.GetDelimited("<div class='z-indent z-padtop'>","<div ",description))) {
-    return failMsg(parserr,"Description not found!");
-  }
+    // going ahed
+    if (!zparser.MovePastAlt("<div class=\"z-indent z-padtop\">","<div class='z-indent z-padtop'>")) {
+        return failMsg(parserr,"Could not find start of description!");
+    }
+    if (!zparser.GetMovePast("<div ",description)) {
+        return failMsg(parserr,"Could not find end of description!");
+    }
   return true;
 }
 //-------------------------------------------------
@@ -236,9 +239,13 @@ bool jfFFNItemCore::Dates_and_Completion(jfStringParser &zparser, QString &parse
   uset = false;
   // next is the optional Updated Section
   if (zparser.MovePast("Updated:")) {
-    if (!zparser.GetDelimitedULong("<span data-xutime='","'>",xoutval,xoerr)) {
-      return failMsg(parserr,"Problem with Updated Date :" + xoerr);
-    }
+      if (!zparser.MovePastAlt("<span data-xutime=\"","<span data-xutime='")) {
+          return failMsg(parserr,"Cannot find start of Updated Date");
+      }
+      if (!zparser.GetMovePastAltULong("\">","'>",xoutval,xoerr)) {
+          return failMsg(parserr,"Problem with Updated Date :" + xoerr);
+      }
+
     xdatetime.setTime_t((uint)(xoutval));
     updated_date = xdatetime.date();
     uset = true;
@@ -247,9 +254,13 @@ bool jfFFNItemCore::Dates_and_Completion(jfStringParser &zparser, QString &parse
   if (!zparser.MovePast("Published:")) {
     return failMsg(parserr,"Published section is not found!");
   }
-  if (!zparser.GetDelimitedULong("<span data-xutime='","'>",xoutval,xoerr)) {
-    return failMsg(parserr,"Problem with Published Date :" + xoerr);
+  if (!zparser.MovePastAlt("<span data-xutime=\"","<span data-xutime='")) {
+      return failMsg(parserr,"Cannot find start of Published Date");
   }
+  if (!zparser.GetMovePastAltULong("\">","'>",xoutval,xoerr)) {
+      return failMsg(parserr,"Problem with Published Date :" + xoerr);
+  }
+
   xdatetime.setTime_t((uint)(xoutval));
   published = xdatetime.date();
   if (!uset) updated_date = published;
@@ -402,7 +413,8 @@ bool jfFFNItem::SetCatLink(const jfFFN_CategoryCore* cat_linkin) {
 	<div class='z-indent z-padtop'>what if Harry grows up in the Shinobi world with Naruto, and what will happen to Hogwarts when he gets their?<div class='z-padtop2' style='color:gray;'>Rated: T - English - Chapters: 1 - Words: 598 - Published: 6-6-12 - Harry P. & Naruto U.
 */
 bool jfFFNItem::SetFromString(const QString& instr, const jfFFN_CategoryCore* cat_linkin, QString& parserr) {
-  // local variables
+    const QString fname = "jfFFNItem::SetFromString";
+    // local variables
   QString buffer, oerr;
   unsigned long qval;
   jfStringParser xparser;
@@ -413,9 +425,12 @@ bool jfFFNItem::SetFromString(const QString& instr, const jfFFN_CategoryCore* ca
   if (cat_linkin==NULL) return failMsg(parserr,"Category Link is NULL");
   else cat_link = cat_linkin;
   // start parsing
+  /**/JDEBUGLOG(fname,1);
   xparser.ChangeData(instr);
   // processing fic id, title, and making the link
+  /**/JDEBUGLOGS(fname,2,parserr);
   if (!GetLinkTitle(xparser,parserr)) return false;
+  /**/JDEBUGLOG(fname,3);
   // the author id
   if (!xparser.GetDelimitedULong("<a href=\"/u/","/",qval,oerr)) {
     /* in fanfiction.net, you can sometimes comes across unreachable stories with
@@ -424,22 +439,26 @@ bool jfFFNItem::SetFromString(const QString& instr, const jfFFN_CategoryCore* ca
     included = false;
     return failMsg(parserr,oerr + " When getting author id.");
   }
+  /**/JDEBUGLOG(fname,4);
   author_id = qval;
   // the author
   if (!(xparser.GetDelimited("\">","</a>",buffer)))return failMsg(parserr,"Author not found!");
   author_name = buffer;
+  /**/JDEBUGLOGS(fname,5,buffer);
   // next, the description!
   if (!ExtractDescription(xparser,parserr)) return false;
   // next, the rating, language, genres, chapter count, and word count
   if (!Rating2Words(xparser,parserr)) return false;
-
+/**/JDEBUGLOG(fname,6);
   // we skip past the reviews
   if (!xparser.MovePast("Reviews:")) {
     // this is okay, sometimes there are no reviews
   }
+  /**/JDEBUGLOG(fname,7);
   if (!Dates_and_Completion(xparser,parserr)) return false;
   // done with all the parsing, just some finishing up...
   author_url = MakeAuthorUrl();
+  /**/JDEBUGLOG(fname,8);
   validdata = true;
   return true;
 }
@@ -517,20 +536,29 @@ jfAuthorInfo* jfFFNItem::GetAuthorInfo() const {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // parsing helper methods
 bool jfFFNItem::GetLinkTitle(jfStringParser& zparser, QString& parseerr) {
+    const QString fname = "jfFFNItem::GetLinkTitle";
+    /**/JDEBUGLOG(fname,1);
   // variables
   unsigned long qval;
   QString buffer, oerr;
   bool tval;
   // starting
   rank = 0;
+  /**/JDEBUGLOGB(fname,2, cat_link == NULL);
   tval = (cat_link->GetName()).contains("SEGA");
   // next up is the story id
-  if (!zparser.MovePastAlt("<a  class=stitle href=\"/s/", "<a class=stitle href=\"/s/")) {
-    return failMsg(parseerr,"Start of Fic ID not found!");
+/**/JDEBUGLOG(fname,3);
+  if (!zparser.MovePast("<a class=\"stitle\" href=\"/s/")) {
+      if (!zparser.MovePastAlt("<a  class=stitle href=\"/s/", "<a class=stitle href=\"/s/")) {
+        return failMsg(parseerr,"Start of Fic ID not found!");
+      }
   }
+
+  /**/JDEBUGLOG(fname,4);
   if (!zparser.GetMovePastULong("/",qval,oerr)) {
     return failMsg(parseerr,oerr + " When getting fic id.");
   }
+  /**/JDEBUGLOG(fname,3);
   num_id = qval;
   // we get the rest of the url
   if (!zparser.GetMovePast("\">",buffer)) return failMsg(parseerr,"End of fic link not found!");

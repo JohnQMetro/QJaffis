@@ -3,7 +3,7 @@ Name    :   ffnitem_parser.cpp
 Author  :   John Q Metro
 Purpose :   Parser for Fanfiction.Net Category pages, to get lists of fanfics
 Created :   July 22, 2016
-Updated :   June 17, 2021
+Updated :   March 19, 2022 (fixing some parsing)
 ******************************************************************************/
 #ifndef FFNITEM_PARSER_H
   #include "ffnitem_parser.h"
@@ -67,10 +67,19 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
 
   /**/lpt->tLog(fname,6);
   // next up is parsing the items
-  while (xparser.GetDelimited("<div class=\'z-list ","</div></div></div>",buffer)) {
+  //
+
+  while (xparser.MovePastAlt("<div class=\"z-list ","<div class=\'z-list ")) {
+      if (!xparser.GetMovePast("</div></div></div>", buffer)) {
+          parseErrorMessage = "Failed to find end of fic info";
+          lpt->tLog(fname,7,parseErrorMessage);
+          delete page_results;
+          page_results =NULL;
+          return;
+      }
     temp = new jfFFNItem();
     temp->SetFromString(buffer,this_category,outerr);
-    /**/lpt->tLog(fname,7);
+    /**/lpt->tLog(fname,8,buffer);
     // the item is okay
     if (temp->IsValid()) {
       // checking the date limit
@@ -78,14 +87,14 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
         limitreached = true;
         break;
       }
-      // adding
+      // addingx
       page_results->push_back(temp);
       if (newfic) temp->SetNew(true);
     }
     // the item is not okay
     else {
       parseErrorMessage = "Parsing Error : " + outerr + " : IN\n" + buffer;
-      /**/lpt->tLog(fname,7,parseErrorMessage);
+      /**/lpt->tLog(fname,9,parseErrorMessage);
       if (!(temp->included)) delete temp;
       else {
         delete temp;
@@ -95,21 +104,21 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
       }
     }
   }
-  /**/lpt->tLog(fname,8);
+  /**/lpt->tLog(fname,10);
   // done with the items
   if (!(page_results->empty())) {
-      /**/lpt->tLog(fname,9);
+      /**/lpt->tLog(fname,11);
     firstid = (*page_results)[0]->GetID();
     // post page processing and getting the result
-    /**/lpt->tLog(fname,10);
+    /**/lpt->tLog(fname,12);
     PostPageProcessing();
-    /**/lpt->tLog(fname,11);
+    /**/lpt->tLog(fname,13);
   }
   else {
       firstid = 0;
   }
   page_parsed = true;
-  /**/lpt->tLog(fname,12);
+  /**/lpt->tLog(fname,14);
 }
 
 //----------------------------------

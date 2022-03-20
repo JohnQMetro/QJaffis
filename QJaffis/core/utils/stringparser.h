@@ -4,8 +4,8 @@ Basic   : String parsing class
 Author  : John Q Metro
 Started : August 21, 2012 (spit from utils2.h)
 Conversion to QT started : March 2, 2013
-Updated : October 12, 2019
-Notes   : Added GetDelimitedEndPairULong
+Updated : March 22, 2019
+Notes   : Added GetMovePastAltULong
 
 ******************************************************************************/
 #ifndef STRINGPARSER_H_INCLUDED
@@ -61,6 +61,7 @@ class jfStringParser {
     bool GetUpto(QString end, QString& outres);
     // similar to get move past, but tries to get a number
     bool GetMovePastULong(QString end, ulong& outval, QString& outerr);
+    bool GetMovePastAltULong(QString end1, QString end2, ulong& outval, QString& outerr);
     /* a combination of MovePast and GetMovePast, return the value between <start> and
     <end> (if found), and move the end past <end> */
     bool GetDelimited(QString start, QString end, QString& outbuf);

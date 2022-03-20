@@ -4,7 +4,7 @@ Basic   : String parsing class
 Author  : John Q Metro
 Started : August 21, 2012 (split from utils2.cpp)
 Conversion to QT started : March 2, 2013
-Updated : June 20, 2021 (fixing a bug in MovePastTwo)
+Updated : March 19, 2022 (adding GetMovePastAltULong)
 Notes   :
 
 ******************************************************************************/
@@ -374,6 +374,30 @@ bool jfStringParser::GetMovePastULong(QString end, ulong& outval, QString& outer
   }
   return true;
 }
+//------------------------
+bool jfStringParser::GetMovePastAltULong(QString end1, QString end2, ulong& outval, QString& outerr) {
+    // constants
+    QString err_endnotfound = "The specified end of the field was not found!";
+    QString err_notaninteger = "The field was found, but is not an integer!";
+    // local variables
+    QString buffer;
+    size_t oindex;
+    // we start...
+    oindex = mainindex;
+    if (!GetMovePastPair(end1,end2,buffer)) {
+      outerr = err_endnotfound;
+      return false;
+    }
+    buffer = buffer.trimmed();
+    // numeric conversion
+    if (!Str2ULongC(buffer,outval)) {
+      outerr = err_notaninteger;
+      mainindex = oindex;
+      return false;
+    }
+    return true;
+}
+
 //--------------------------------------------------------------------------
 /* a combination of MovePast and GetMovePast, return the value between <start> and
 <end> (if found), and move the end past <end> */
