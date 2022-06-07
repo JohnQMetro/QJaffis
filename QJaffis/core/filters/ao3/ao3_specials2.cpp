@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   AO3 pairing and warning filters
 Created :   October 4, 2012
 Conversion to Qt Started Oct 2, 2013
-Updated :   March 6, 2022 (Bugfixing)
+Updated :   June 1, 2022 (Bugfixing)
 ******************************************************************************/
 #ifndef AO3_SPECIALS2_H_INCLUDED
   #include "ao3_specials2.h"
@@ -61,16 +61,23 @@ QString jfAO3Pairing::toString() const {
     return first + ((is_platonic)? '&' : '/') + second;
 }
 //----------------------------
+int jfAO3Pairing::posMin(int a, int b) {
+    if (a < 0) return b;
+    else if (b < 0) return a;
+    else return (a < b) ? a : b;
+}
+//----------------------------
 jfAO3Pairing* jfAO3Pairing::ParsePairing(const QString& source) {
-    int slpos = source.indexOf(sl);
-    int ampos = source.indexOf(am);
-    if ((slpos < 0) && (ampos < 0)) return NULL;
+
+    int slpos = source.indexOf(sl);  // /
+    int ampos = source.indexOf(am); // &
+    int slpos2 = source.indexOf(" x ",Qt::CaseInsensitive);
+    if ((slpos < 0) && (ampos < 0) && (slpos2 < 0)) return NULL;
+
     // getting the split position and type
-    int pos_split = 0;
-    if (slpos < 0) pos_split = ampos;
-    else if (ampos < 0) pos_split = slpos;
-    else pos_split = (slpos < ampos) ? slpos : ampos;
+    int pos_split = posMin(posMin( slpos, ampos), slpos2);
     bool is_plat = (pos_split == ampos);
+
     // extracting the parts
     QString partA = source.left(pos_split).trimmed();
     if (partA.isEmpty()) return NULL;

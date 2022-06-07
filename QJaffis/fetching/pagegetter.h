@@ -3,12 +3,13 @@ Name    : pagegetter.h
 Basic   : Declares my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 15, 2013
-Updated : September 7, 2020 (rate limit bypass attempt)
+Updated : May 23, 2022 (removing python fetcher)
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
 #define PAGEGETTER_H
 #endif // PAGEGETTER_H
+
 //---------------------------------
 #include <QString>
 #include <QNetworkAccessManager>

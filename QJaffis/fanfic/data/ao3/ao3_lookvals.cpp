@@ -183,9 +183,8 @@ AO3TagExcludeMake::AO3TagExcludeMake() {
     emo_excludes << "Suicidal Thoughts" << "Angst" << "Hurt/Comfort" << "Implied/Referenced Self-Harm" <<
                     "Touch-Starved" << "Mental Breakdown" << "Panic Attacks" << "Implied/Referenced Suicide" <<
                     "Hurt No Comfort" << "Anxiety" << "Dissociation" << "Feral" << "Eating Disorders" <<
-                    "Guilt" << "Childhood Trauma" << "Sad" << "Implied/Referenced Suicide" <<
-                    "Emotional Hurt" << "Hurt No Comfort" << "Suicide Attempt" << "Self-Harm" <<
-                    "Self-Esteem Issues" << "Anorexia";
+                    "Guilt" << "Childhood Trauma" << "Sad" << "Emotional Hurt" << "Hurt No Comfort" <<
+                    "Suicide Attempt" << "Self-Harm" << "Self-Esteem Issues" << "Anorexia";
     fluff_excludes << "Fluff" << "Family Feels" << "Family Bonding" << "Family Fluff" <<
                       "Sibling Bonding" << "Cute" << "Brotherly Bonding" << "Batfamily Feels" <<
                       "Age Regression" << "Adorable" << "Soft" << "Snuggling & Cuddling" << "Cuddle Pollen";

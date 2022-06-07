@@ -3,8 +3,7 @@ Name    : pagegetter.cpp
 Basic   : Defines my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 16, 2013
-Updated : January 2, 2021
-Started attempts to get past Cloudflare
+Updated : May 23, 2022
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
@@ -78,6 +77,7 @@ bool jfFetchPage::SetURL(const QString& inurl, const size_t& url_index) {
   fetch_this.setEncodedUrl(inurl.toLatin1());
   testsDelegate->setPageIndex(url_index);
   use_cloudscrape = (fetch_this.isValid() && (fetch_this.host() == "www.fanfiction.net"));
+  // use_cloudscrape = (fetch_this.isValid()) && inurl.startsWith("https://www.fanfiction.net/s",Qt::CaseInsensitive);
   return fetch_this.isValid();
 }
 //--------------------------
@@ -325,6 +325,7 @@ jfFetchPage::~jfFetchPage() {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++
 // --- [ PROTECTED METHODS for jfFetchPage ] ---
+
 bool jfFetchPage::TestPageDelegates() {
     const QString fname = "jfFetchPage::TestPageDelegates";
     /**/JDEBUGLOG(fname,1)

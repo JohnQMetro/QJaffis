@@ -37,6 +37,7 @@ class jfAO3Pairing {
 
     QString toString() const;
 
+    static int posMin(int a, int b);
     static jfAO3Pairing* ParsePairing(const QString& source);
     static bool ComparePairing(const jfAO3Pairing& pattern,const jfAO3Pairing& target, bool notype, bool either);
 };
