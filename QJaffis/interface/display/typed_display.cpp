@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    Typed HTML Listbox results
 Created:     April 27, 2011
 Conversion to Qt started, November 2013
-Updated:     October 6, 2015 (added HandleResultsOnePanel and HandleResultsMultiPanel)
+Updated:     June 4, 2022
 ******************************************************************************/
 #ifndef TYPED_DISPLAY_H_INCLUDED
   #include "typed_display.h"
@@ -12,9 +12,7 @@ Updated:     October 6, 2015 (added HandleResultsOnePanel and HandleResultsMulti
 #ifndef LOGGING_H_INCLUDED
   #include "../../core/utils/logging.h"
 #endif // LOGGING_H_INCLUDED
-#ifndef DOWNLOAD2_H
-  #include "../../fetching/download2.h"
-#endif // DOWNLOAD2_H
+
 //-------------------------------------------
 #include <assert.h>
 /*****************************************************************************/
@@ -28,7 +26,7 @@ void jfHtmlResultCollectionBasic::HandleNewResults(jfResultUnitVector* inresults
   else HandleResultsMultiPanel(inresults);
   // finishing
   UpdateResultsLabel();
-  (inresults->source)->WakeAfter();
+  inresults->WakeAfter();
 }
 //---------------------------------------
 void jfHtmlResultCollectionBasic::HandleIncreaseCount(size_t nitem_count) {

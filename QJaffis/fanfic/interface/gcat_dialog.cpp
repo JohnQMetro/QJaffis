@@ -71,7 +71,7 @@ bool jfGenCat_DownDialog::SetupDownloaderAndThread() {
   main_downloader->moveToThread(fetch_thread);
   // connecting signals and slots
   bool testoo = mainstatus->ConnectAndSetPauser(main_downloader);
-  /**/jfAssertLog(testoo,fname,"Connecting and Setting Pauser FAILED!!!!");
+  jerror::AssertLog(testoo,fname,"Connecting and Setting Pauser FAILED!!!!");
 
   // standard thread/downloader connections
   connect(fetch_thread, SIGNAL(started()),main_downloader ,SLOT(StartProcessing()));

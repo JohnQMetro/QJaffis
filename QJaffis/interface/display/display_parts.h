@@ -3,7 +3,7 @@ Name    :   display_parts.h
 Author  :   John Q Metro
 Purpose :   Declares core parts and base classes for the search/filter interface
 Created :   August 23, 2009 (originally from display_base.h)
-Updated :   November 22, 2013 (Qt and redistrib)
+Updated :   July 16, 2022
 ******************************************************************************/
 #ifndef DISPLAY_PARTS_H
 #define DISPLAY_PARTS_H
@@ -21,9 +21,7 @@ Updated :   November 22, 2013 (Qt and redistrib)
 #ifndef RESULTCOLLECT_H_INCLUDED
   #include "../../core/structs/resultcollect.h"
 #endif // RESULTCOLLECT_H_INCLUDED
-#ifndef DOWNLOAD2_H
-  #include "../../fetching/download2.h"
-#endif // DOWNLOAD2_H
+
 //-------------------------------
 #include <QWidget>
 #include <QLabel>
@@ -71,19 +69,29 @@ class jfSearchOptionsBase : public QWidget {
 };
 
 //============================================================================
-// base class for the custom first panel
-class jfSearchPanelBase : public QWidget {
+// an even more base class for the custom first panel, to allow more freedom
+class jfSearchPanelRoot : public QWidget {
   public:
-    jfSearchPanelBase(jfSearchCore* obj_data,bool noteb, bool svert, size_t prop, QWidget* parent = NULL);
+    jfSearchPanelRoot(jfSearchCore* obj_data, QWidget* parent = NULL);
     virtual bool LoadToObj() =0;
     virtual bool ChangeObj(jfSearchCore* obj_data) =0;
     void ReloadObj();
   protected:
+    // internal links
+    jfSearchCore* mainobj;
+
+};
+// ===========================================================================
+// (no longer) base class for the custom first panel
+class jfSearchPanelBase : public jfSearchPanelRoot {
+  public:
+    jfSearchPanelBase(jfSearchCore* obj_data,bool noteb, bool svert, size_t prop, QWidget* parent = NULL);
+    virtual bool LoadToObj() =0;
+    virtual bool ChangeObj(jfSearchCore* obj_data) =0;
+  protected:
     // internal methods
     bool ArrangePanels();
     virtual jfDefaultFilterEditorBase* MakeTypedFilEdit() = 0;
-    // internal links
-    jfSearchCore* mainobj;
     // gui elements
     jfDefaultFilterEditorBase* filt_panel;
     jfSearchOptionsBase* SearchPanel;
@@ -104,10 +112,10 @@ class jfSearchGroupingCore : public QWidget {
     // the constructor
     jfSearchGroupingCore(QWidget* parent = NULL);
     // custom  methods
-    virtual jfSearchPanelBase*  MakeFirstPanel() = 0;
+    virtual jfSearchPanelRoot*  MakeFirstPanel() = 0;
     virtual jfSearchCore*       MakeTypedSearch() const = 0;
     virtual jfResultCollection* MakeTypedCollection() const = 0;
-    virtual jfBaseItemDownloader*   MakeTypedThread() const = 0;
+    virtual jfDownloadRootItems* MakeTypedThread() const = 0;
     // returning data
     jfSearchCore* GetSearchObj();
     virtual bool UpdateSearchData() = 0;
@@ -116,7 +124,7 @@ class jfSearchGroupingCore : public QWidget {
   protected:
     virtual void FinishConstruction() = 0;
     // the main panels
-    jfSearchPanelBase*        panel1;
+    jfSearchPanelRoot* search_and_filter_panel;
     // the sizer
     QBoxLayout* top_sizer;
     // internal data

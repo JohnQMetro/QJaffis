@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    Guess
 // Created:     By QtCreator, forgot when
-// Updated:     March 30, 2018
+// Updated:     March 27, 2022
 //***************************************************************************
 #ifndef MAINWINDOW_H
   #include "mainwindow.h"
@@ -19,6 +19,7 @@
 #include <QFileDialog>
 #include <assert.h>
 #include <QMessageBox>
+#include <QScreen>
 #include <iostream>
 
 //***************************************************************************
@@ -43,15 +44,16 @@ jfMainWindow::jfMainWindow(QWidget *parent):QMainWindow(parent) {
   main_display = new QTabWidget(this);
   main_display->setTabPosition(QTabWidget::West);
   setCentralWidget(main_display);
+
   // setting up the size
-  QRect qval = QApplication::desktop()->availableGeometry();
-  if ((qval.width()<1024) || (qval.height()<768)) {
+  QRect qval = QGuiApplication::primaryScreen()->availableGeometry();
+  if ((qval.width()<1024) || (qval.height()<750)) {
     showMaximized();
   }
   else {
     QSize thesize = size();
     thesize.setWidth(1200);
-    thesize.setHeight(768);
+    thesize.setHeight(750);
     resize(thesize);
   }
   ptracker = new jfPageTracker();
@@ -144,7 +146,7 @@ void jfMainWindow::openSavedSearch() {
     }
     // the load failed, we show a message before exiting
     else {
-      /**/JDEBUGLOG(fname,8)
+      jerror::Log(fname,outerr);
       QMessageBox::critical(this,"File Open failed!",outerr);
     }
     /**/JDEBUGLOG(fname,9);
@@ -224,7 +226,7 @@ void jfMainWindow::doExit() {
   text_msg = new jfTextStatusDialog(this, cmsg, wmsg, dsize);
   text_msg->show();
   QCoreApplication::processEvents();
-  wafr = jglobal::settings.WriteAtFinish();
+  wafr = jglobal::startstop.WriteAtFinish();
   assert(wafr);
   text_msg->close();
   delete ptracker;
@@ -398,22 +400,19 @@ bool jfMainWindow::GetJSSFilename(QString& outname, bool save) {
   // variables
   QString result,xfilen,savestring;
   jfMainSearchGroup* qsearch;
-  bool is_google;
   int sresult;
   // options
   if (save) {
     qsearch = dynamic_cast<jfMainSearchGroup*>(main_display->currentWidget());
     xfilen = qsearch->GetDisplayName() + ".jss";
     sresult = main_display->currentIndex();
-    is_google = ((ptracker->GetType(sresult))==jftl_GOOGSEARCH);
-    if (is_google) savestring = jglobal::settings.GetDirectory(jglobal::GoogleFiles);
-    else savestring = jglobal::settings.GetDirectory(jglobal::FanficSaveFiles);
+    savestring = jglobal::settings.paths.GetPathFor(jglobal::SAVED_SEARCHES);
     savestring += QDir::separator() + xfilen;
     result = QFileDialog::getSaveFileName(this,savemsg,savestring,wildstr);
 
   }
   else {
-    QString odir = jglobal::settings.GetDirectory(jglobal::OpenFile);
+    QString odir = jglobal::settings.paths.GetPathFor(jglobal::SAVED_SEARCHES);
     result = QFileDialog::getOpenFileName(this,openmsg,odir,wildstr);
   }
   // handing the result
@@ -456,17 +455,21 @@ void jfMainWindow::ConnectSearch(jfMainSearchGroup* newpanel) {
 //------------------------------------------------------
 bool jfMainWindow::PrepNewSearch(jfMainSearchGroup* nsearch, jf_tlPageType stype, bool usname, const QString& site_name) {
     const QString fname = "jfMainWindow::PrepNewSearch";
-  // special checks
+    // special checks
     /**/JDEBUGLOG(fname,1)
-  if (nsearch==NULL) return false;
-     /**/JDEBUGLOG(fname,2)
-  if (site_name.isEmpty()) return false;
-     /**/JDEBUGLOG(fname,3)
+    if (nsearch==NULL) {
+        jerror::Log(fname,"Search is null");
+        return false;
+    }
+    if (site_name.isEmpty()) {
+        jerror::Log(fname,"The site name is empty!");
+        return false;
+    }
   // variables
   int fimsw;
   QString tabname;
   searchcount++;
-   /**/JDEBUGLOG(fname,4)
+   /**/JDEBUGLOG(fname,2)
   tabname = site_name + " Search : ";
   if (usname) tabname += nsearch->GetSearchName();
   else tabname += QString::number(searchcount);

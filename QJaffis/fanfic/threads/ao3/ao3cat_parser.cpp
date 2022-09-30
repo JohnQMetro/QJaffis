@@ -74,7 +74,7 @@ void* jfAO3CatParser::getResults() {
   return catsection;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString* jfAO3CatParser::makeRedirectedURL(const QString& inPart) {
+QString* jfAO3CatParser::makeRedirectedURL(const QString& inPart) const{
   return NULL;
 }
 //---------------------------

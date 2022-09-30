@@ -34,6 +34,8 @@ jfSimpleExpr::jfSimpleExpr() {
 //-----------------------------------------------------
 jfSimpleExpr::jfSimpleExpr(const QString& sourcedata) {
   parsedinfo = NULL;
+  isempty = false;
+  valid = false;
   FromString(sourcedata);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -61,8 +63,8 @@ bool jfSimpleExpr::FromString(const QString& sourcedata) {
   /**/JDEBUGLOGS(fname,1,srcstring)
   theparser = new jfExpParserClass(srcstring,true,NULL);
   if (!theparser->ParseExpression(osize)) {
-    /**/JDEBUGLOGS(fname,2,theparser->parse_error)
-    parse_error = theparser->parse_error;
+      parse_error = theparser->parse_error;
+      jerror::ParseLog(fname,parse_error);
     delete theparser;
     return valid = false;
   }
@@ -78,9 +80,9 @@ bool jfSimpleExpr::FromString(const QString& sourcedata) {
   delete parsedinfo;
   /**/JDEBUGLOG(fname,6)
   if (pfix==NULL) {
-    /**/JDEBUGLOGS(fname,7,oerr)
-    parse_error = oerr;
-    return valid = false;
+      jerror::ParseLog(fname, oerr);
+        parse_error = oerr;
+        return valid = false;
   }
   // okay
   parsedinfo = pfix;
@@ -93,6 +95,33 @@ bool jfSimpleExpr::FromString(const QString& sourcedata) {
 bool jfSimpleExpr::InternalMatch(const QString& incheck) const {
   if (isempty) return true;
   return StringExprMatch(incheck,parsedinfo);
+}
+// -------------------------------------------------------------------------
+jfSimpleExpr* jfSimpleExpr::Copy() const {
+    jfSimpleExpr* result = new jfSimpleExpr();
+    result->parse_error = parse_error;
+    result->srcstring = srcstring;
+    result->valid = valid;
+    result->isempty = isempty;
+    if (parsedinfo != NULL) {
+        result->parsedinfo = parsedinfo->Copy();
+    }
+    return result;
+}
+// -------------------------------------------------------------------------
+QString jfSimpleExpr::MakePList() const {
+  // local variables
+  size_t index,maxc;
+  QString result;
+  if (parsedinfo == NULL) return "";
+  // starting
+  maxc = (parsedinfo->size());
+  // the loop
+  for (index = 0;index<maxc;index++) {
+    result+= ((*parsedinfo)[index])->String();
+  }
+  // done
+  return result;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // info
@@ -114,23 +143,24 @@ jfSimpleExpr::~jfSimpleExpr() {
 //----------------------------------------------------------------------
 // the basic constructor
 jfSimpleExpFilterCore::jfSimpleExpFilterCore():jfBaseFilter() {
-  loaded = false;
-  parsedinfo = NULL;
-  validdata = false;
+    parsed_expression = NULL;
+    validdata = false;
 }
 //----------------------------------------------------------------------
 jfSimpleExpFilterCore::jfSimpleExpFilterCore(const QString& sourcedata) {
-  parsedinfo = NULL;
-  FromString(sourcedata);
+    parsed_expression = NULL;
+    validdata = false;
+    FromString(sourcedata);
 }
 //----------------------------------------------------------------------
 jfSimpleExpFilterCore::jfSimpleExpFilterCore(jfSimpleExpr* in_source) {
-  parsedinfo = NULL;
-  FromExpr(in_source);
+    parsed_expression = NULL;
+    validdata = false;
+    FromExpr(in_source);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfSimpleExpFilterCore::isEmpty() const {
-	return (parsedinfo==NULL)||(parsedinfo->size()==0);
+    return (parsed_expression == NULL) || (parsed_expression->isEmpty());
 }
 //-----------------------------------------------------------------------------
 // returns a general filter type. The default is 0, unless overriden
@@ -141,109 +171,55 @@ size_t jfSimpleExpFilterCore::GetFilType() const { return 1;}
 bool jfSimpleExpFilterCore::FromString(const QString& sourcedata) {
   // constants
   const QString fname = "jfSimpleExpFilterCore::FromString";
-  // local data
-  jfExpParserClass* theparser;
-  jfElemArray* pfix;
-  QString oerr;
-  size_t osize;
-  // setting the source
-  /**/JDEBUGLOG(fname,1)
-  srcstring = sourcedata.trimmed();
-  // clearing out the old
-  if (parsedinfo!=NULL) delete parsedinfo;
-  parsedinfo = NULL;
-  loaded = false;
-  parse_error.clear();
-  // producing the new
-  theparser = new jfExpParserClass(srcstring,true,NULL);
-  if (!theparser->ParseExpression(osize)) {
-    /**/JDEBUGLOGS(fname,2,theparser->parse_error)
-    parse_error = theparser->parse_error;
-    delete theparser;
-    return validdata = false;
+
+  if (parsed_expression != NULL) {
+      delete parsed_expression;
+      parsed_expression = NULL;
   }
-  // parsed okay
-  parsedinfo = theparser->GetResult();
-  assert(parsedinfo!=NULL);
-  delete theparser;
-  // next, we postfixize it
-  pfix = MakeExprPostfix(parsedinfo,oerr);
-  delete parsedinfo;
-  if (pfix==NULL) {
-    /**/JDEBUGLOGS(fname,3,oerr)
-    parse_error = oerr;
-    return validdata = false;
-  }
-  // postfixed okay
-  parsedinfo = pfix;
-  // done
-  validdata = true;
-  loaded = true;
-  return true;
+  parsed_expression = new jfSimpleExpr(sourcedata);
+  validdata = parsed_expression->IsValid();
+  return validdata;
 }
 //----------------------------------------------------------------------
 QString jfSimpleExpFilterCore::ToString() const {
-  return srcstring;
+    if (parsed_expression == NULL) return "";
+    else return parsed_expression->GetSrc();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // modifying and checking the contents
 //----------------------------------------------------------------------
 bool jfSimpleExpFilterCore::FromExpr(jfSimpleExpr* in_source) {
   if (in_source==NULL) return false;
-  validdata = in_source->valid;
-  if (validdata) {
-    parsedinfo = in_source->parsedinfo;
-    in_source->parsedinfo = NULL;
-    in_source->valid = false;
+  else {
+      parsed_expression = in_source->Copy();
+      validdata = parsed_expression->IsValid();
   }
-  srcstring = in_source->srcstring;
-  parse_error = in_source->parse_error;
-  if (validdata) loaded = true;
   return true;
 }
 //----------------------------------------------------------------------
 // returning a string representation of the parsed contents
 QString jfSimpleExpFilterCore::MakePList() const {
-  // local variables
-  size_t index,maxc;
-  QString result;
-  // starting
-  maxc = (parsedinfo->size());
-  // the loop
-  for (index = 0;index<maxc;index++) {
-    result+= ((*parsedinfo)[index])->String();
-  }
-  // done
-  return result;
+    if (parsed_expression == NULL) return "";
+    else return parsed_expression->MakePList();
 }
 //-----------------------------------------------------------------------
 // sort of like load string, except the string is empty
 void jfSimpleExpFilterCore::EmptyFilter() {
-  // setting the source
-  srcstring = "";
-  // clearing out the old
-  if (parsedinfo!=NULL) delete parsedinfo;
-  // creating the empty data
-  parsedinfo = new jfElemArray();
-  // done
-  validdata = true;
-  parse_error.clear();
-  loaded = true;
+    if (parsed_expression != NULL) {
+        delete parsed_expression;
+        parsed_expression = NULL;
+    }
+    validdata = true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the destructor
 jfSimpleExpFilterCore::~jfSimpleExpFilterCore() {
-  if (parsedinfo!=NULL) delete parsedinfo;
-  parsedinfo = NULL;
+    EmptyFilter();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfSimpleExpFilterCore::InternalMatch(const QString& incheck) const {
-  return StringExprMatch(incheck,parsedinfo);
-}
-//-----------------------------------------------------------------------
-// check for validity
-void jfSimpleExpFilterCore::SetValid() {
-  validdata = loaded;
+    if (parsed_expression == NULL) return true;
+    else return parsed_expression->InternalMatch(incheck);
 }
 //-----------------------------------------------------------------------
 size_t jfSimpleExpFilterCore::ExtraLines() const {
@@ -255,7 +231,8 @@ bool jfSimpleExpFilterCore::AddRestToFile(QTextStream* outfile) const {
   // checking and special conditions
   if (outfile==NULL) return false;
   // composing line 4
-  buffer = EscapeNL(srcstring,IO_DELIMS);
+  QString src = (parsed_expression == NULL) ? "" : parsed_expression->GetSrc();
+  buffer = EscapeNL(src,IO_DELIMS);
   (*outfile) << buffer << "\n";
   return true;
 }
@@ -270,7 +247,7 @@ bool jfSimpleExpFilterCore::ReadRestFromFile(jfFileReader* infile) {
   assert(infile!=NULL);
   /**/JDEBUGLOG(funcname,2)
   if (!infile->ReadUnEsc(cline,funcname)) return false;
-  // there is only one line, and one filed, so this is pretty simple
+  // there is only one line, and one field, so this is pretty simple
   /**/JDEBUGLOGS(funcname,3,cline)
   resx = FromString(cline);
   /**/JDEBUGLOGB(funcname,4,resx)
@@ -282,14 +259,13 @@ void jfSimpleExpFilterCore::CoreCopy(const jfSimpleExpFilterCore& source) {
   // copying the most basic items
   name = source.name;
   validdata = source.validdata;
-  parse_error = source.parse_error;
-  // copying expression filter specific stuff
-  srcstring = source.srcstring;
-  loaded = source.loaded;
-  if (source.parsedinfo!=NULL) {
-    parsedinfo = (source.parsedinfo)->Copy();
+  // we just re-parse
+  if (parsed_expression != NULL) {
+      delete parsed_expression;
+      parsed_expression = NULL;
   }
-  else parsedinfo = NULL;
-
+  if (source.parsed_expression != NULL) {
+      parsed_expression = source.parsed_expression->Copy();
+  }
 }
 //*******************************************************************************************

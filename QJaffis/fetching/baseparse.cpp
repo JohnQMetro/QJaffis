@@ -3,7 +3,7 @@ Name    : baseparse.cpp
 Basic   : Defines a base class that handles page parsing (and redirection)
 Author  : John Q Metro
 Started : June 13, 2016
-Updated : March 24, 2018
+Updated : August 6, 2022: Filtering using QtConcurrent
 
 ******************************************************************************/
 #ifndef BASEPARSE_H
@@ -15,37 +15,36 @@ Updated : March 24, 2018
 //-----------------------------------
 #include <assert.h>
 
+#include <QtConcurrent/QtConcurrent>
+
 /*****************************************************************************/
 // a base abstract class for parsing downloaded pages
 //++++++++++++++++++++++++++++++++++++++++++++++++
-jfPageParserBase::jfPageParserBase() {
+jfPageParserCore::jfPageParserCore() {
   page_parsed = false;
   pagecount = 0;
 }
-jfPageParserBase::~jfPageParserBase() {}
+jfPageParserCore::~jfPageParserCore() {}
 //--------------------------------------------
-void jfPageParserBase::SetLogPointer(jfLoggBase* in_ptr) {
+void jfPageParserCore::SetLogPointer(jfLoggBase* in_ptr) {
   lpt = in_ptr;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++
 // getting results
 //--------------------------------------------
-// default does nothing
-bool jfPageParserBase::setPageIndex(const size_t& page_index) { return true; }
-//----------------------------------------------------
-bool jfPageParserBase::isPageParsed() const {
+bool jfPageParserCore::isPageParsed() const {
   return page_parsed;
 }
 //--------------------------------------------
-QString jfPageParserBase::getParseErrorMessage() const {
+QString jfPageParserCore::getParseErrorMessage() const {
   return parseErrorMessage;
 }
 //--------------------------------------------
-size_t jfPageParserBase::getPageCount() const {
+size_t jfPageParserCore::getPageCount() const {
   return pagecount;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++
-bool jfPageParserBase::NewData(const QString& inPage) {
+bool jfPageParserCore::NewData(const QString& inPage) {
   const QString fname = "jfPageParserBase::NewData";
   /**/lpt->tLog(fname,1);
   xparser.ChangeData(inPage);
@@ -57,10 +56,20 @@ bool jfPageParserBase::NewData(const QString& inPage) {
   return (!inPage.isEmpty());
 }
 //--------------------------------------------
-bool jfPageParserBase::parsErr(const QString& err_in) {
+bool jfPageParserCore::parsErr(const QString& err_in) {
   parseErrorMessage = err_in;
   return false;
 }
+//==============================================================
+// a base abstract class for parsing downloaded pages
+//++++++++++++++++++++++++++++++++++++++++++++++++
+jfPageParserBase::jfPageParserBase():jfPageParserCore() { }
+jfPageParserBase::~jfPageParserBase() { }
+//++++++++++++++++++++++++++++++++++++++++++++++++
+// getting results
+//--------------------------------------------
+// default does nothing
+bool jfPageParserBase::setPageIndex(const size_t& page_index) { return true; }
 //============================================================================
 jfItemsPageParserBase::jfItemsPageParserBase():jfPageParserBase() {
   page_results = NULL;
@@ -94,40 +103,66 @@ jfResultUnitVector* jfItemsPageParserBase::MakeResults() {
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// a 'function object' for use in parallel filtering
+struct FilterApplyer {
+    FilterApplyer(const jfFilterMap* filters_to_use):filters(filters_to_use) {}
+
+    void operator()(jfBasePD* &item) {
+        item->included = filters->MatchAll(item);
+    }
+
+    const jfFilterMap* filters;
+    size_t passed_count = 0;
+};
+
+// -------------------------------------------------------
 // filtering and removing from the current page
-size_t jfItemsPageParserBase::FilterByList() {
+size_t jfItemsPageParserBase::FilterByList() const {
   // constants
   const QString fname = "jfItemsPageParserBase::FilterByList";
   // variables and checks
   size_t fsize,rcount;
+  /**/lpt->tAssert(page_results!=NULL,fname,"Page Results are NULL");
+  /**/lpt->tAssert(search_ptr->Check(),fname,"Search check failed");
   /**/lpt->tLog(fname,1);
-  assert(page_results!=NULL);
-  /**/lpt->tLog(fname,2);
-  assert(search_ptr->Check());
-  /**/lpt->tLog(fname,3);
   jfBasePD* tvector;
   QStringList* scheck;
   // the constructor of the items should have them be included by default
-  /**/lpt->tLog(fname,4);
+  /**/lpt->tLog(fname,2);
+
+
   // we use a special cases first
   if ((search_ptr->def_filtermap)==NULL) return start_itemcount;
   fsize = (search_ptr->def_filtermap)->GetCount();
   if (fsize==0) return start_itemcount;
-  /**/lpt->tLogS(fname,5,fsize);
+  /**/lpt->tLogS(fname,3,fsize);
   rcount = 0;
   scheck = search_ptr->def_filtermap->GetNameList();
   delete scheck;
   /**/lpt->tLog(fname,6);
+  FilterApplyer applyer = FilterApplyer(search_ptr->def_filtermap);
+
+  QtConcurrent::blockingMap(*page_results, applyer);
+
+
   // we assume pr_size is correct
+    /*
   for (size_t pr_index = 0 ; pr_index < start_itemcount ; pr_index++) {
     // and then we test against the filter list
     tvector = (*page_results)[pr_index];
-    /**/lpt->tLogL(fname,7,pr_index);
-    /**/lpt->tLog(fname,8,tvector->GetName());
+    // lpt->tLogL(fname,7,pr_index);
+    // lpt->tLog(fname,8,tvector->GetName());
     tvector->included = (search_ptr->def_filtermap)->MatchAll(tvector);
-    /**/lpt->tLogB(fname,9,tvector->included);
+    // lpt->tLogB(fname,9,tvector->included);
     if (tvector->included) rcount++;
   }
+  */
+
+  for (size_t pr_index = 0; pr_index < start_itemcount; pr_index++) {
+      tvector = (*page_results)[pr_index];
+      if (tvector->included) rcount++;
+  }
+
   return rcount;
 }
 //-----------------------------------------

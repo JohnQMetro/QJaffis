@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares fanfic objects that hold fanfic info
 Created :   April 2, 2012
 // Conversion to QT started : April 20, 2013
-Updated :   December 28, 2014
+Updated :   August 9, 2022
 // Renamed from ficobj2.h
 ******************************************************************************/
 #ifndef FICBASE_H
@@ -20,6 +20,10 @@ Updated :   December 28, 2014
 #ifndef FICEXTRACT_H_INCLUDED
   #include "../../ficdown/data/ficextract.h"
 #endif // FICEXTRACT_H_INCLUDED
+
+#ifndef DISPLAYHTMLSPEC_H
+    #include "displayhtmlspec.h"
+#endif // DISPLAYHTMLSPEC_
 //****************************************************************************
 class jfGenericFanfic : public jfBasePD {
   public:
@@ -48,6 +52,7 @@ class jfGenericFanfic : public jfBasePD {
     void StoreToCopy(jfGenericFanfic* destination) const;
     QString MakeUStatus() const;
     QString DisplayHTMLHeader(size_t mindex) const;
+    QString DisplayHTMLHeader(size_t mindex, const jfDisplayHTMLHelper* helper ) const;
     // special methods
     virtual jfFicExtract* MakeExtract() const = 0;
     virtual void LoadIntoExtract(jfFicExtract* into) const = 0;

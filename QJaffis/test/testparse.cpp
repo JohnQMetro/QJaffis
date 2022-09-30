@@ -40,7 +40,7 @@ void jfTestWrapParser::ParseDownloadedPage(const QString& inPage, size_t pageind
     page_parsed = (*parsers)[test_index]->isPageParsed();
     /**/lpt->tLogB(fname,5,page_parsed);
     parseErrorMessage = (*parsers)[test_index]->getParseErrorMessage();
-    /**/lpt->tLog(fname,6,parseErrorMessage);
+    /**/lpt->tParseError(fname,parseErrorMessage);
 }
 //----------------------------------------------------------------
 void* jfTestWrapParser::getResults() {
@@ -48,7 +48,7 @@ void* jfTestWrapParser::getResults() {
 }
 //------------------------------------------------------------
 // handling redirection, NULL result if faliure
-QString* jfTestWrapParser::makeRedirectedURL(const QString& inPart) {
+QString* jfTestWrapParser::makeRedirectedURL(const QString& inPart) const {
     return (*parsers)[test_index]->makeRedirectedURL(inPart);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

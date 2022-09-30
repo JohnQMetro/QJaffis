@@ -435,7 +435,6 @@ bool jfFanfic::StartResult() {
   for (lindex=0;lindex<(sdata->pcount);lindex++) {
     maindata[lindex]->LoadCoreValues(output_manager->parse);
     work_text = output_manager->MakeResult(output_manager->base->item_skel);
-    /**/JDEBUGLOGS(fname,7,work_text);
     split_manager->AddParts(work_text);
   }
   // the parts are done, we now get and set the number of files
@@ -476,16 +475,16 @@ bool jfFanfic::WriteFile(size_t findex_in) {
   // constants
   const QString fname = "jfFanfic::WriteFile";
   // asserts
-  /**/jfAssertLog(output_started,fname,"output_started is false");
-  /**/jfAssertLog(findex_in!=0,fname,"the fic file index is 0");
-  /**/jfAssertLog(findex_in<=(split_manager->GetFilecount()),fname,"the fic file index is out of bounds");
+  /**/jerror::AssertLog(output_started,fname,"output_started is false");
+  /**/jerror::AssertLog(findex_in!=0,fname,"the fic file index is 0");
+  /**/jerror::AssertLog(findex_in<=(split_manager->GetFilecount()),fname,"the fic file index is out of bounds");
   // variables
   QString work_text, bundle_text;
   size_t pindex;
   size_t part_start, part_end, part_count;
   bool sfres;
   // we need to initialize 2 values
-  /**/jfAssertLog(output_manager != NULL,fname,"The output manager is NULL!");
+  /**/jerror::AssertLog(output_manager != NULL,fname,"The output manager is NULL!");
   assert(output_manager->GetFilename(work_text,findex_in));
   output_manager->parse->AddText("OFILE_FILENAME",work_text);
   output_manager->parse->AddText("OFILE_LABEL",PLabelMaker(findex_in));

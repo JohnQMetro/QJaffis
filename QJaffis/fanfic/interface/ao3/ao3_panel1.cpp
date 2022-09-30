@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     January 27, 2022
+// Updated:     July 16, 2022
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
   #include "ao3_panel1.h"
@@ -34,49 +34,47 @@
 #endif // AO3_SPECIALS1_H_INCLUDED
 //--------------------------------------
 #include <assert.h>
+#include <QSizePolicy>
 //**************************************************************************
 // the constructor
-jfAO3_DFE::jfAO3_DFE(jfAO3Search* inobj, QWidget* parent):jfDefaultFilterEditorBase(inobj,1,1,parent) {
+jfAO3_DFE::jfAO3_DFE(jfAO3Search* inobj, QWidget* parent):jfDefaultFilterEditorBase(inobj,1,0,parent) {
 
-  // the author and character filters
-  auth_fillabel = new QLabel("Author Filter :");
-  char_fillabel = new QLabel("Character Filter :");
-  auth_filedit = new jfSimpleExprEdit(false);
-  char_filedit = new jfSimpleExprEdit(false);
-  lsizer1 = new QGridLayout();
-  lsizer1->addWidget(auth_fillabel,0,0,Qt::AlignVCenter|Qt::AlignRight);
-  lsizer1->addWidget(auth_filedit,0,1);
-  lsizer1->addWidget(char_fillabel,1,0,Qt::AlignVCenter);
-  lsizer1->addWidget(char_filedit,1,1);
-  lsizer1->setColumnStretch(1,1);
-  // word count and kudo count
-  wc_picker = new jfZeroToMaxEditor("Word Count Range",true,false);
-  kc_picker = new jfZeroToMaxEditor("Kudo Count Range",true,false);
-  lsizer2 = new QHBoxLayout();
-  lsizer2->addWidget(wc_picker,1);
-  lsizer2->addWidget(kc_picker,1);
-  // the completed filter editor
-  cpicker = new jfComplFiltEdit(NULL);
-  // additional rating and orientation filter
-  ratpicker = new jfCharCheckBoxGroup("Ratings", 5,ratinglist,ao3con::rating_ac,0);
-  // extra tags filter
-  taglabel = new QLabel("Extra Tags Filter :");
-  tag_filedit = new jfSimpleExprEdit(false);
-  // arranging
-  lsizer3 = new QVBoxLayout();
-  lsizer3->addLayout(lsizer2);
-  lsizer3->addWidget(cpicker,0);
-  lsizer3->addWidget(ratpicker,0);
-  lsizer3->addSpacing(8);
-  lsizer3->addWidget(taglabel,0,Qt::AlignLeft);
-  lsizer3->addWidget(tag_filedit,0);
-  lsizer3->addStretch(2);
-  top_sizer->addLayout(lsizer3,1);
-  // arranging the extra filters
-  // adding to the main sizer
-  main_sizer->addLayout(lsizer1,0);
-  // finishing off
-  ChangeSearch(inobj);
+    // the column on the right
+    lsizer3 = new QVBoxLayout();
+    //  kudo count
+    kc_picker = new jfZeroToMaxEditor("Kudo Count Range",true,true);
+    lsizer3->addWidget(kc_picker);
+
+    // author and character filters
+    auth_fillabel = new QLabel("Author Filter :");
+    char_fillabel = new QLabel("Character Filter :");
+    auth_filedit = new jfSimpleExprEdit(false);
+    char_filedit = new jfSimpleExprEdit(false);
+
+    lsizer3->addSpacing(8);
+    lsizer3->addWidget(auth_fillabel,0,Qt::AlignLeft);
+    lsizer3->addWidget(auth_filedit,0);
+    lsizer3->addSpacing(8);
+    lsizer3->addWidget(char_fillabel,0,Qt::AlignLeft);
+    lsizer3->addWidget(char_filedit,0);
+
+
+    // the extra tags filter
+    lsizer1 = new QGridLayout();
+    // extra tags filter
+    taglabel = new QLabel("Extra Tags Filter :");
+    tag_filedit = new jfSimpleExprEdit(false);
+    lsizer1->addWidget(taglabel,0,0,Qt::AlignLeft);
+    lsizer1->addWidget(tag_filedit,0,1);
+    lsizer1->setColumnStretch(1,1);
+
+
+    top_sizer->addLayout(lsizer3,1);
+    // arranging the extra filters
+    // adding to the main sizer
+    main_sizer->addLayout(lsizer1,0);
+    // finishing off
+    ChangeSearch(inobj);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // special methods
@@ -84,10 +82,7 @@ void jfAO3_DFE::Disable(bool yes) {
   // extra internal gui items
   auth_filedit->setEnabled(!yes);
   char_filedit->setEnabled(!yes);
-  wc_picker->setEnabled(!yes);
   kc_picker->setEnabled(!yes);
-  cpicker->setEnabled(!yes);
-  ratpicker->setEnabled(!yes);
   tag_filedit->setEnabled(!yes);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -100,8 +95,6 @@ bool jfAO3_DFE::SaveFiltersExtended() {
   jfSimpleExpr* exprval;
   jfAuthExprFilter* author_filter;
   jfCharExprFilter* char_filter;
-  jfWordCountFilter* wc_filter;
-  jfCompletedFilter* cm_filter;
   jfExtraTagFilter* et_filter;
   jfAO3KudoFilter* kc_filter;
   size_t wmin, wmax;
@@ -117,26 +110,14 @@ bool jfAO3_DFE::SaveFiltersExtended() {
   char_filter = new jfCharExprFilter(exprval);
   char_filter->SetName(DEF_ao3chars_name);
   embedded_filters->ReplaceSame(char_filter,oindex);
-  // the word count filter
-  wmin = wc_picker->GetMin();
-  wmax = wc_picker->GetMax();
-  wc_filter = new jfWordCountFilter(wmin,wmax);
-  wc_filter->SetName(DEF_ao3wc_name);
-  embedded_filters->ReplaceSame(wc_filter,oindex);
+
   // the kudo count filter
   wmin = kc_picker->GetMin();
   wmax = kc_picker->GetMax();
   kc_filter = new jfAO3KudoFilter(wmin,wmax);
   kc_filter->SetName(DEF_ao3kudof_name);
   embedded_filters->ReplaceSame(kc_filter,oindex);
-  // completed filter
-  cm_filter = cpicker->GetValue();
-  cm_filter->SetName(DEF_ao3com_name);
-  embedded_filters->ReplaceSame(cm_filter,oindex);
-  // the rating filter
-  jfAO3RatingFilter* rat_filter = new jfAO3RatingFilter(ratpicker->GetStringValue());
-  rat_filter->SetName(DEF_ao3rat_name);
-  embedded_filters->ReplaceSame(rat_filter,oindex);
+
   // extra tags filter
   exprval = tag_filedit->CheckFilter(omsg);
   assert(exprval!=NULL);
@@ -153,10 +134,7 @@ bool jfAO3_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   QString omsg;
   jfAuthExprFilter* author_filter;
   jfCharExprFilter* char_filter;
-  jfWordCountFilter* wc_filter;
-  jfCompletedFilter* cm_filter;
-  jfAO3RatingFilter* rat_filter;
-  jfAO3OrientationFilter* ori_filter;
+
   jfExtraTagFilter* et_filter;
   jfAO3KudoFilter* kc_filter;
   jfIntPair* xvalue;
@@ -174,14 +152,7 @@ bool jfAO3_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
     atest = char_filedit->SetData(char_filter->ToString(),omsg);
     assert(atest);
   }
-  // the word count filter
-  wc_filter = dynamic_cast<jfWordCountFilter*>(embedded_filters->GetItem(DEF_ao3wc_name));
-  if (wc_filter!=NULL) {
-    xvalue = wc_filter->GetMinMax();
-    atest = wc_picker->SetMinMax(xvalue);
-    assert(atest);
-    delete xvalue;
-  }
+
   // the kudo count filter
   kc_filter = dynamic_cast<jfAO3KudoFilter*>(embedded_filters->GetItem(DEF_ao3kudof_name));
   if (kc_filter!=NULL) {
@@ -190,19 +161,7 @@ bool jfAO3_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
     assert(atest);
     delete xvalue;
   }
-  // the completed filter
-  cm_filter = dynamic_cast<jfCompletedFilter*>(embedded_filters->GetItem(DEF_ao3com_name));
-  if (cm_filter!=NULL) {
-    atest = cpicker->LoadValue(cm_filter);
-    assert(atest);
-  }
-  // ratingd filter
-  rat_filter = dynamic_cast<jfAO3RatingFilter*>(embedded_filters->GetItem(DEF_ao3rat_name));
-  if (rat_filter!=NULL) {
-    atest = ratpicker->SetFromString(rat_filter->ToString());
-    assert(atest);
-  }
-  else ratpicker->CheckAll();
+
   // The extra tags filter
   et_filter = dynamic_cast<jfExtraTagFilter*>(embedded_filters->GetItem(DEF_ao3etf_name));
   if (et_filter!=NULL) {
@@ -247,18 +206,14 @@ bool jfAO3_ESearchOptions::SaveToSearch(jfAO3Search* outsearch) const {
     outsearch->SetOrder(result_order->currentIndex());
     // warning excludes
     outsearch->SetWarningExcludes(wx_violence->isChecked(), wx_death->isChecked(), wx_rape->isChecked(), wx_underage_sex->isChecked());
-    // tag excludes
-    outsearch->SetTagExcludes(excluded_tags->GetText(), etag_template->GetText());
-    // predefined tag excludes
-    outsearch->SetPredefinedExcludes(tag_excl_gendex->isChecked(), tag_excl_emo->isChecked(), tag_excl_other->isChecked(), tag_excl_fluff->isChecked());
-    // includes
-    /**/JDEBUGLOGS(fname,1,extratags->GetText())
-    outsearch->SetIncludes(extratags->GetText());
     // word min and max
     outsearch->SetWordLimits(words_min->GetValue(), words_max->GetValue());
     // other stuff
     outsearch->SetExtras(completed->isChecked(), english_only->isChecked());
     outsearch->SetCrossoverOnly(crossover_only->isChecked());
+
+    // tags
+    tag_parameters->SaveToSearch(outsearch);
 
   return true;
 }
@@ -276,16 +231,7 @@ bool jfAO3_ESearchOptions::LoadFromSearch(jfAO3Search* insearch) {
   wx_death->setChecked(insearch->GetExcludedDeath());
   wx_rape->setChecked(insearch->GetExcludedRape());
   wx_underage_sex->setCheckable(insearch->GetExcludedUnderageSex());
-  // excluded tags
-  excluded_tags->SetText(insearch->GetExcludedTagsList());
-  etag_template->SetText(insearch->GetExcludeReplacer());
-  // predefined excludes
-  tag_excl_gendex->setChecked(insearch->IsGendSexExcluded());
-  tag_excl_emo->setChecked(insearch->IsEmoStuffExcluded());
-  tag_excl_other->setChecked(insearch->IsOtherStuffExcluded());
-  tag_excl_fluff->setChecked(insearch->IsFluffStuffExcluded());
-  // includes
-  extratags->SetText(insearch->GetIncludedTagsList());
+
   // min max word count
   words_min->SetValue(insearch->GetMinWordCount());
   words_max->SetValue(insearch->GetMaxWordCount());
@@ -293,6 +239,10 @@ bool jfAO3_ESearchOptions::LoadFromSearch(jfAO3Search* insearch) {
   english_only->setChecked(insearch->IsEnglishOnly());
   completed->setChecked(insearch->IsCompletedOnly());
   crossover_only->setChecked(insearch->IsCrossoverOnly());
+
+  tag_parameters->LoadFromSearch(insearch);
+
+  adjustSize();
   // done
   return true;
 }
@@ -313,7 +263,6 @@ void jfAO3_ESearchOptions::Disable(bool dis) {
   completed->setEnabled(!dis);
   ratings->setEnabled(!dis);
   result_order->setEnabled(!dis);
-  extratags->setEnabled(!dis);
   orient_entry->setEnabled(!dis);
   ratings->setEnabled(!dis);
   result_order->setEnabled(!dis);
@@ -321,19 +270,16 @@ void jfAO3_ESearchOptions::Disable(bool dis) {
   wx_death->setEnabled(!dis);
   wx_rape->setEnabled(!dis);
   wx_underage_sex->setEnabled(!dis);
-  excluded_tags->setEnabled(!dis);
-  etag_template->setEnabled(!dis);
-  tag_excl_gendex->setEnabled(!dis);
-  tag_excl_emo->setEnabled(!dis);
-  tag_excl_other->setEnabled(!dis);
-  tag_excl_fluff->setEnabled(!dis);
-  extratags->setEnabled(!dis);
+
   words_min->setEnabled(!dis);
   words_max->setEnabled(!dis);
   english_only->setEnabled(!dis);
   completed->setEnabled(!dis);
   crossover_only->setEnabled(!dis);
+
+  tag_parameters->Disable(dis);
 }
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // setup methods
 //------------------------------
@@ -343,14 +289,19 @@ void jfAO3_ESearchOptions::CreateSizers() {
     topwrap = new QHBoxLayout();
     sbwrapper = new QGroupBox("Built-in Archive Of Our Own Filters");
     sbwrapper->setContentsMargins(0,0,0,0);
-    sbwrapper->setMaximumHeight(150);
+
+    #ifdef Q_OS_WIN
+        sbwrapper->setMaximumHeight(220);
+    #else
+        sbwrapper->setMaximumHeight(250);
+    #endif
   }
   else {
     topwrap = NULL;
     sbwrapper = NULL;
   }
-  // the grid sizer
-  mainsizer = new QHBoxLayout();
+  // primary grid, 3 columns, 2 rows
+  mainsizer = new QGridLayout();
   mainsizer->setContentsMargins(5,5,5,5);
   // possible nesting
   if (wrapped) {
@@ -358,21 +309,24 @@ void jfAO3_ESearchOptions::CreateSizers() {
     topwrap->addWidget(sbwrapper,1);
   }
   // making some of the columns
-  column2 = new QVBoxLayout();
   warnex_wrapper = new QGroupBox("Exclude Warnings");
   warnex_wrapper->setContentsMargins(0,0,0,0);
   warnex_column = new QVBoxLayout();
   warnex_column->setContentsMargins(10,5,10,5);
   warnex_column->setSpacing(0);
   warnex_wrapper->setLayout(warnex_column);
-  tagbox = new QGridLayout();
-  column5 = new QVBoxLayout();
+
+  // the top row
+  toprow = new QHBoxLayout();
+
 
 }
 //------------------------------
 void jfAO3_ESearchOptions::MakeControls() {
 
-   orient_entry = new jfTagStatusPicker("Sex Orientation",false);
+   orient_entry = new jfTagStatusPicker("Sex Orientation",false, true);
+
+
    // rating combo picker
    rat_label = new QLabel("Ratings :");
    ratings = new QComboBox();
@@ -386,16 +340,6 @@ void jfAO3_ESearchOptions::MakeControls() {
    wx_death = new QCheckBox("Major Character Death");
    wx_rape = new QCheckBox("Rape");
    wx_underage_sex = new QCheckBox("Underage Sex");
-   // excluded tag inputs
-   excluded_tags = new jfLabeledEdit(NULL,"Tags to Exclude",false);
-   etag_template = new jfLabeledEdit(NULL, "Exclude Insert", false);
-   // predefined excluded tag checkboxes
-   tag_excl_gendex = new QCheckBox("Gender/Sex");
-   tag_excl_emo = new QCheckBox("Emotional");
-   tag_excl_other = new QCheckBox("Other");
-   tag_excl_fluff = new QCheckBox("Fluff");
-
-   extratags = new jfLabeledEdit(NULL,"Tags to Require", true);
 
    words_min = new jfLabeledIntEdit(NULL,"Min Words",true,0,2000000000);
    words_max = new jfLabeledIntEdit(NULL, "Max Words", true, 0, 2000000000);
@@ -404,128 +348,43 @@ void jfAO3_ESearchOptions::MakeControls() {
    completed = new QCheckBox("Completed Only");
    crossover_only = new QCheckBox("Crossover Only");
 
+   tag_parameters = new jfAO3_TagParameters();
+
 }
 //------------------------------
 void jfAO3_ESearchOptions::ArrangeControls() {
-    mainsizer->addWidget(orient_entry, 3, Qt::AlignRight);
-    // column2
-    column2->addWidget(rat_label,0,Qt::AlignTop | Qt::AlignLeft);
-    column2->addWidget(ratings, 0 , Qt::AlignTop | Qt::AlignLeft);
-    column2->addSpacing(3);
-    column2->addWidget(reso_label, 0, Qt::AlignTop | Qt::AlignLeft);
-    column2->addWidget(result_order, 0, Qt::AlignTop | Qt::AlignLeft);
-    column2->addStretch(1);
-    // column2->addSpacerItem();
-    mainsizer->addLayout(column2, 2);
+    int rowspace = 10;
+    // filling in the top row
+    toprow->addWidget(rat_label, 0, Qt::AlignLeft);
+    toprow->addWidget(ratings, 0, Qt::AlignLeft);
+    toprow->addSpacing(rowspace);
+    toprow->addWidget(reso_label, 0, Qt::AlignLeft);
+    toprow->addWidget(result_order, 0 , Qt::AlignLeft);
+    toprow->addSpacing(rowspace);
+    toprow->addWidget(words_min);
+    toprow->addWidget(words_max);
+    toprow->addSpacing(rowspace);
+    toprow->addWidget(completed);
+    toprow->addWidget(english_only);
+    toprow->addWidget(crossover_only);
+
+    mainsizer->addLayout(toprow,0,0,1,3);
+
+    // first column is orientation
+    mainsizer->addWidget(orient_entry,1,0);
+
     // warning excludes
     warnex_column->addWidget(wx_violence, 0);
     warnex_column->addWidget(wx_death, 0);
     warnex_column->addWidget(wx_rape, 0);
     warnex_column->addWidget(wx_underage_sex, 0);
-    mainsizer->addWidget(warnex_wrapper, 2);
-    // excludes and includes
-    tagbox->addWidget(excluded_tags, 0, 0, 1, 3);
-    tagbox->addWidget(etag_template, 0, 3);
-    tagbox->addWidget(tag_excl_gendex, 1, 0);
-    tagbox->addWidget(tag_excl_emo, 1, 1);
-    tagbox->addWidget(tag_excl_other, 1, 2);
-    tagbox->addWidget(tag_excl_fluff, 1, 3);
-    tagbox->addWidget(extratags, 2, 0, 1, 4);
-    tagbox->setColumnStretch(0,1);
-    tagbox->setColumnStretch(1,1);
-    tagbox->setColumnStretch(2,1);
-    tagbox->setColumnStretch(3,1);
-    mainsizer->addLayout(tagbox,9);
-    // column5
-    column5->addWidget(words_min);
-    column5->addWidget(words_max);
-    column5->addWidget(completed);
-    column5->addWidget(english_only);
-    column5->addWidget(crossover_only);
-    mainsizer->addLayout(column5, 2);
+    mainsizer->addWidget(warnex_wrapper,1,1);
+
+    // tags
+    mainsizer->addWidget(tag_parameters,1,2);
+    mainsizer->setColumnStretch(2,1);
+    mainsizer->setRowStretch(1,1);
 
 }
-//=========================================================================
-jfAO3_SearchOptions::jfAO3_SearchOptions(jfAO3Search* insearch, QWidget* parent):jfSearchOptionsBase(parent) {
-  assert(insearch!=NULL);
-  istore = insearch;
-  main_picker = new jf_Gen_CatPicker(insearch->GetHolder() ,insearch->GetSelector(),7);
-  soptions = new jfAO3_ESearchOptions(insearch,true,false);
-  mlayout = new QVBoxLayout();
-  mlayout->addWidget(main_picker,2);
-  mlayout->addWidget(soptions,0);
-  setLayout(mlayout);
-}
 
-//+++++++++++++++++++++++++++++++++++++++++++++++
-// methods
-//---------------------
-bool jfAO3_SearchOptions::LoadFrom(jfSearchCore* insearch) {
-  const QString fname = "jfAO3_SearchOptions::LoadFrom";
-
-  // starting...
-  istore = dynamic_cast<jfAO3Search*>(insearch);
-  main_picker->ChangeSelector(istore->GetSelector());
-  soptions->LoadFromSearch(istore);
-  // done
-  return true;
-}
-//---------------------
-bool jfAO3_SearchOptions::StoreTo(jfSearchCore* outsearch) {
-  const QString fname = "jfAO3_SearchOptions::StoreTo";
-  // local variables
-  jfAO3Search* temp;
-  size_t ncats;
-  // setting the category selection
-  main_picker->SaveFilters();
-  temp = dynamic_cast<jfAO3Search*>(outsearch);
-  soptions->SaveToSearch(temp);
-  temp->ApplySelection();
-  ncats = temp->GetNumCats();
-  return (ncats!=0);
-}
-
-//=========================================================================
-// the constructor
-jfAO3_Panel1::jfAO3_Panel1(jfAO3Search* insearch, QWidget* parent):jfSearchPanelBase(insearch,true,true,0,parent) {
-// constants
-  const QString fname="jfAO3_Panel1::jfAO3_Panel1";
-  // start
-  SearchPanel = new jfAO3_SearchOptions(insearch);
-  // sizer arranging
-  filt_panel = MakeTypedFilEdit();
-  ArrangePanels();
-  // finishing off
-  ChangeObj(mainobj);
-
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// other external methods
-bool jfAO3_Panel1::LoadToObj() {
-  const QString fname = "jfAO3_Panel1::LoadToObj";
-  // starting
-  if (mainobj==NULL) return false;
-  if (!filt_panel->SaveFilters()) return false;
-  return SearchPanel->StoreTo(mainobj);
-}
-//-----------------------------------------------------------------------
-bool jfAO3_Panel1::ChangeObj(jfSearchCore* obj_data) {
-  const QString fname = "jfAO3_Panel1::ChangeObj";
-  // local variables
-  jfAO3Search* temp;
-  // starting...
-  temp = dynamic_cast<jfAO3Search*>(obj_data);
-  mainobj = obj_data;
-  // filters
-  filt_panel->ChangeSearch(obj_data);
-  SearchPanel->LoadFrom(obj_data);
-  // done
-  return true;
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-jfDefaultFilterEditorBase* jfAO3_Panel1::MakeTypedFilEdit() {
-  jfAO3_DFE* result;
-  result = new jfAO3_DFE(dynamic_cast<jfAO3Search*>(mainobj));
-  return result;
-}
 //**************************************************************************

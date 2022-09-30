@@ -74,7 +74,7 @@ bool jfGeneralCategory::AddMiddleToFile(QTextStream* outfile) const {
   resval << primarylink << section_names.count();
   (*outfile) << resval << "\n";
   // line 4
-  resval.clear();
+  resval.FullClear();
   resval << section_names;
   (*outfile) << resval << "\n";
   return true;

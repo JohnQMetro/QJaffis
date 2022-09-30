@@ -638,7 +638,7 @@ bool jfFFN_Categories::ReadRestFromFile(jfFileReader* infile) {
 }
 //***************************************************************************
 jfFFN_CatManager* ffn_catorganizer::main_manager;
-const QString ffn_catorganizer::fname = "ffnscat.dat";
+const QString ffn_catorganizer::fname = "config/ffnscat.dat";
 //==================================================================
 
 
@@ -760,6 +760,7 @@ bool jfFFN_CatManager::ReadFromFile() {
     return true;
   }
   else {
+      jerror::Log(fname,"Failed to open FFN category file.");
     /**/JDEBUGLOG(fname,7);
     delete infile;
     return false;

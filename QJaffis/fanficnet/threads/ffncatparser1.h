@@ -3,7 +3,7 @@ Name    : ffncatparser1.h
 Basic   : Fanfiction.Net category parsing, base and non-crossover versions
 Author  : John Q Metro
 Started : July 19, 2016
-Updated : July 19, 2016
+Updated : September 5, 2022
 
 ******************************************************************************/
 #ifndef FFNCATPARSER1_H
@@ -17,6 +17,8 @@ Updated : July 19, 2016
 #ifndef CAT_COLLECTIONS_H
   #include "../categories/cat_collections.h"
 #endif // CAT_COLLECTIONS_H
+
+#include "ffncatparser_exp1.h"
 /*****************************************************************************/
 class jfFFNCatParserBase : public jfPageParserBase {
   public:
@@ -28,11 +30,13 @@ class jfFFNCatParserBase : public jfPageParserBase {
     virtual bool ParsePageCore(size_t pageindex) = 0;
     virtual void* getResults() = 0;
     // implemented methods (pretty trivial)
-    virtual QString* makeRedirectedURL(const QString& inPart);
+    virtual QString* makeRedirectedURL(const QString& inPart) const;
     virtual bool testMissing(const QString *page) const;
     virtual bool testIncomplete(const QString *page) const;
     virtual QString getCookie() const;
   protected:
+
+    jfFFNCategory_ParserExpressions regex;
 
 };
 //========================================================================

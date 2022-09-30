@@ -11,7 +11,7 @@ Updated :   October 15, 2019
 #endif // FIM_PANEL1_H_INCLUDED
 //--------------------------------------
 #ifndef WIDGETS2_H_INCLUDED
-  #include "../../../interface/misc/widgets2.h"
+  #include "../../../interface/controls/widgets2.h"
 #endif // WIDGETS2_H_INCLUDED
 #ifndef FIM_SEARCH_H_INCLUDED
   #include "../../data/fim/fim_search.h"
@@ -32,10 +32,10 @@ Updated :   October 15, 2019
   #include "../../../interface/filters/base/sexpr_edit.h"
 #endif // SEXPR_EDIT_H_INCLUDED
 #ifndef TAG_WIDGETS_H
-  #include "../../../interface/misc/tag_widgets.h"
+  #include "../../../interface/controls/tag_widgets.h"
 #endif // TAG_WIDGETS_H
 #ifndef TAG_WIDGETS2_H
-  #include "../../../interface/misc/tag_widgets2.h"
+  #include "../../../interface/controls/tag_widgets2.h"
 #endif // TAG_WIDGETS2_H
 //-------------------------------------
 #include <QComboBox>

@@ -3,7 +3,7 @@ Name    :   ffnitems_thread.cpp
 Author  :   John Q Metro
 Purpose :   Downloader class for FFN fic listings
 Created :   July 24, 2016
-Updated :   Febuary 11, 2018
+Updated :   July 9, 2022
 ******************************************************************************/
 #ifndef FFNITEMS_THREAD_H
   #include "ffnitems_thread.h"
@@ -12,19 +12,18 @@ Updated :   Febuary 11, 2018
 #ifndef FFN_ITEMCOLL
   #include "../data/ffn_itemcoll.h"
 #endif
-#ifndef FFNITEM_PARSER_H
-  #include "ffnitem_parser.h"
-#endif // FFNITEM_PARSER_H
+
 //-----------------------------------
 #include <math.h>
 /*****************************************************************************/
 // --- [ Methods for jfFFNDownloader ] --------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-jfFFNDownloader::jfFFNDownloader(size_t in_max_threads):jfMultiCatBaseDownloader(in_max_threads) {
+jfFFNDownloader::jfFFNDownloader():jfMultiCatRootDownloader() {
   current_category = NULL;
   ffn_search = NULL;
   tlogname = "FFNItemDownloader";
   skip_cat_on_fail = true;
+  ffn_parser = NULL;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // virtual category related methods
@@ -38,6 +37,7 @@ bool jfFFNDownloader::NextCategory() {
   newcoll->SetName((ffn_search->GetCatName())+" Result Fics");
   newcoll->SetID(current_category->GetID());
   current_collection = newcoll;
+  ffn_parser->SetCategory(current_category);
   return true;
 }
 //-----------------------------------------
@@ -71,7 +71,14 @@ jfItemsPageParserBase* jfFFNDownloader::makeItemParser() {
   result->SetCategory(current_category);
   return result;
 }
-
+// ----------------------------------------
+jfParseFetchPackage* jfFFNDownloader::MakeParserFetcher() {
+    ffn_parser = dynamic_cast<jfFFNItemParser*>(makeParser());
+    if (ffn_parser == NULL) return NULL;
+    jfParseFetchPackage* result = DefaultParseFetchMaker(jfft_FFN, jglobal::FPT_LISTING_PAGE, ffn_parser);
+    if (result == NULL) delete ffn_parser;
+    return result;
+}
 //-----------------------------------------
 QString* jfFFNDownloader::makeURLforPage(size_t index) const {
   return new QString(ffn_search->GetIndexUrl(index));

@@ -4,7 +4,7 @@
 // Purpose :    Defines some expression element classes
 // Created:     26.12.06
 // Conversion to QT Started April 8, 2013
-// Updated:     Febuary 16, 2012
+// Updated:     August 6, 2022 (added jfWholeStringElem)
 /////////////////////////////////////////////////////////////////////////////
 
 // ----------------------------------------------------------------------------
@@ -32,7 +32,7 @@
 #include <assert.h>
 //****************************************************************************
 const QString expr_operators = "&|%~";
-const QString expr_operands = "smtqlge";
+const QString expr_operands = "smtqzlge";
 const QString expr_scitems = expr_operators + "()";
 const QString expr_precstring = "&3|3%3~5";
 //****************************************************************************
@@ -41,7 +41,7 @@ jfExprElem* CopyElement(jfExprElem* source) {
 	// global variables
 	jfExprElem *rtype;
 	jfOperandElem* tempo;
-  QChar gtype;
+    QChar gtype;
 	// basic checking...
 	assert(source!=NULL);
 	// the main two way divisiton
@@ -51,21 +51,23 @@ jfExprElem* CopyElement(jfExprElem* source) {
 		// another two way division
 		if (tempo->IsString()) {
 			// handling duplication of string elements
-      if ((gtype=='s') || (gtype=='t')) {
+            if ((gtype=='s') || (gtype=='t')) {
 				rtype = new jfSubstringElem(*(dynamic_cast<jfSubstringElem*>(source)));
 			}
-      else if ((gtype=='m') || (gtype=='q')) {
+            else if ((gtype=='m') || (gtype=='q')) {
 				rtype = new jfTokenMElem(*(dynamic_cast<jfTokenMElem*>(source)));
 			}
+            else if (gtype=='z') {
+                rtype = new jfWholeStringElem(*(dynamic_cast<jfWholeStringElem*>(source)));
+            }
 			else assert(false);
-
 		}
 		else {
 			// handling duplication of filter elements
-      if (gtype == 'l') {
+            if (gtype == 'l') {
 				rtype = new jfLocalFilterElem(*(dynamic_cast<jfLocalFilterElem*>(source)));
 			}
-      else if (gtype == 'g') {
+            else if (gtype == 'g') {
 				rtype = new jfGlobalFilterElem(*(dynamic_cast<jfGlobalFilterElem*>(source)));
 			}
 			else {
@@ -84,18 +86,18 @@ jfExprElem* CopyElement(jfExprElem* source) {
 // getting precedence
 size_t GetPrec(const QChar& intype) {
 	// local variables
-  QString xchar;
-  int xres;
-  unsigned long xval;
+    QString xchar;
+    int xres;
+    unsigned long xval;
 	// looking
-  xres = expr_precstring.indexOf(intype,0);
+    xres = expr_precstring.indexOf(intype,0);
 	// checking the result...
-  assert(xres>=0);
+    assert(xres>=0);
 	assert((xres%2)==0);
 	// now we get the precedence char
 	xchar = expr_precstring[xres+1];
 	// converting...
-  if (Str2ULong(xchar,xval)) return xval;
+    if (Str2ULong(xchar,xval)) return xval;
 	// the conversion has failed...
 	else {
 		assert(false);
@@ -311,6 +313,7 @@ jfNameVerif::~jfNameVerif() {
 }
 //============================================================================
 QChar jfExprElem::GetType() const { return type; }
+jfExprElem::~jfExprElem() { }
 //============================================================================
 // the constructor for operators
 jfOperatorElem::jfOperatorElem(QChar typestr) {
@@ -481,6 +484,44 @@ jfTokenMElem::~jfTokenMElem() {
 		tdata = NULL;
 	}
 }
+//===========================================================================
+// the entire string matching element
+// the constructor is below
+jfWholeStringElem::jfWholeStringElem(const QString& newpattern, bool newcs) {
+    // loading the basics
+    pattern = newpattern.trimmed();
+    assert(!(pattern.isEmpty()));
+    // setting the values
+    casesen = newcs;
+    valid = true;
+    title = false;
+    type = 'z';
+}
+//---------------------------------------------------------------------------
+// the copy constructor
+jfWholeStringElem::jfWholeStringElem(const jfWholeStringElem& source) {
+    type = source.type;
+    pattern = source.pattern;
+    casesen = source.casesen;
+    title = source.title;
+    valid = source.valid;
+}
+//---------------------------------------------------------------------------
+// entire string matching
+bool jfWholeStringElem::Match(const QString& base) const {
+    QString newbase, newpattern;
+    // special checking
+    newbase = base.trimmed();
+    if (newbase.isEmpty()) return false;
+    // converting by case sensetivity
+    if (!casesen) {
+      newpattern = pattern.toLower();
+      newbase = newbase.toLower();
+    }
+    else newpattern = pattern;
+    // performing the check
+    return (newbase == newpattern);
+}
 //==========================================================================
 /* Operand class for embedded filters literals. We disallow embedded expression
  filters (they are redundant). This simplifies things quite a bit. */
@@ -490,15 +531,16 @@ jfTokenMElem::~jfTokenMElem() {
 jfLiteralFilterElem::jfLiteralFilterElem(const QString& ftype, const QString& rawdata) {
 	bool testx;
 	// basic assignments
-  type = 'e';
+    type = 'e';
 	valid = false;
 	filttype = ftype;
 	source = rawdata;
 	thefilter = NULL;
+
 	// checking
 	assert(filttype!=EXP_FIL_TAG);
 	// we try to create the filter
-  thefilter = MakeFilter(ftype,"tempnamex1");
+    thefilter = MakeFilter(ftype,"tempnamex1");
 	if (thefilter!=NULL) {
 		testx = thefilter->FromString(rawdata);
 		if (!testx) {
@@ -693,7 +735,7 @@ jfLocalFilterElem::jfLocalFilterElem(jfFilterMap* inlocalmap, const QString& fil
 	// starting
 	assert(inlocalmap!=NULL);
 	// settling the basic values
-  type = 'l';
+    type = 'l';
 	filter_name = filtername;
 	localmap = inlocalmap;
 	thefilter = NULL;

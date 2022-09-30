@@ -14,7 +14,7 @@ Updated :   October 14, 2019
   #include "../../../core/filters/fim/fimfilters1.h"
 #endif // FIMFILTERS1_H_INCLUDED
 #ifndef WIDGETS3_H_INCLUDED
-  #include "../../misc/widgets3.h"
+  #include "../../controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
 #ifndef BFILT_EDIT_H_INCLUDED
   #include "../base/bfilt_edit.h"

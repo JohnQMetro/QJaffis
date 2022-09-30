@@ -17,7 +17,7 @@ Updated:     August 21, 2012 (adding jfFileReader)
 #endif // BASECOLLECT_H_INCLUDED
 #include <vector>
 /*****************************************************************************/
-const QString skelg_fname = "htmlskel.dat";
+const QString skelg_fname = "config/htmlskel.dat";
 
 //----------------------------------------------------------------
 class jfSkelVector : public std::vector<jfSkeletonCore*> {};

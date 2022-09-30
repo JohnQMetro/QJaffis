@@ -11,7 +11,7 @@ Updated :   July 29, 2016 (big reorganization)
 #endif // FILTERS_EDIT1_H_INCLUDED
 //--------------------------------------------
 #ifndef WIDGETS3_H_INCLUDED
-  #include "../../misc/widgets3.h"
+  #include "../../controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
 #ifndef BFILT_EDIT_H_INCLUDED
   #include "../base/bfilt_edit.h"
@@ -21,10 +21,10 @@ Updated :   July 29, 2016 (big reorganization)
   #include "../../../core/filters/extended/morefilters1.h"
 #endif
 #ifndef TAG_WIDGETS_H
-  #include "../../../interface/misc/tag_widgets.h"
+  #include "../../../interface/controls/tag_widgets.h"
 #endif // TAG_WIDGETS_H
 #ifndef TAG_WIDGETS2_H
-  #include "../../../interface/misc/tag_widgets2.h"
+  #include "../../../interface/controls/tag_widgets2.h"
 #endif // TAG_WIDGETS2_H
 //--------------------------------------------
 //******************************************************************************/

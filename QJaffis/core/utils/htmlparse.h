@@ -19,7 +19,7 @@ Updated : August 6, 2015 (added ConvertNewlines)
 #include <QStringList>
 /*****************************************************************************/
 namespace htmlparse {
-  const QString entity_fname = "html_entities.dat";
+  const QString entity_fname = "config/html_entities.dat";
   extern QStringList* entity_names;
   extern QString entity_chars;
   extern bool loaded;

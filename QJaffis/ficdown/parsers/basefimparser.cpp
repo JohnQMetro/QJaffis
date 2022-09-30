@@ -62,7 +62,7 @@ jfFIM_FicPartParser::jfFIM_FicPartParser():jfStoryPartParseBase() {}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // virual methods that are implemented
 //------------------------------------
-QString* jfFIM_FicPartParser::makeRedirectedURL(const QString& inPart){
+QString* jfFIM_FicPartParser::makeRedirectedURL(const QString& inPart) const {
   return NULL;
 }
 //------------------------------------

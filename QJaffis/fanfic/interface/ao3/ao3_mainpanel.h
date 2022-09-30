@@ -4,7 +4,7 @@
 // Purpose :    Archiveofourown.org search interface
 // Created:     September 3, 2012
 // Conversion to Qt started April 12, 2014
-// Updated:     April 13, 2014
+// Updated:     June 4, 2022
 //**************************************************************************
 #ifndef AO3_MAINPANEL_H_INCLUDED
 #define AO3_MAINPANEL_H_INCLUDED
@@ -26,10 +26,10 @@
     // the constructor
     jfAO3SearchGrp(jfAO3Search* searchin, jfMainSearchGroup* holder , QWidget* parent = NULL);
     // custom  methods
-    virtual jfSearchPanelBase*  MakeFirstPanel();
-    virtual jfSearchCore*       MakeTypedSearch() const;
-    virtual jfResultCollection* MakeTypedCollection() const;
-    virtual jfBaseItemDownloader*    MakeTypedThread() const;
+    virtual jfSearchPanelRoot*   MakeFirstPanel();
+    virtual jfSearchCore*        MakeTypedSearch() const;
+    virtual jfResultCollection*  MakeTypedCollection() const;
+    virtual jfDownloadRootItems* MakeTypedThread() const;
     // special methods
     int GetSearchIndex() const;
   protected:
@@ -43,10 +43,10 @@
     // the constructor
     jfAO3OnePanelSearch(jfAO3Search* searchin, jfMainSearchGroup* holder, QWidget* parent = NULL);
     // custom  methods
-    virtual jfSearchPanelBase*  MakeFirstPanel();
-    virtual jfSearchCore*       MakeTypedSearch() const;
-    virtual jfResultCollection* MakeTypedCollection() const;
-    virtual jfBaseItemDownloader*    MakeTypedThread() const;
+    virtual jfSearchPanelRoot*   MakeFirstPanel();
+    virtual jfSearchCore*        MakeTypedSearch() const;
+    virtual jfResultCollection*  MakeTypedCollection() const;
+    virtual jfDownloadRootItems* MakeTypedThread() const;
     // special methods
     int GetSearchIndex() const;
   protected:

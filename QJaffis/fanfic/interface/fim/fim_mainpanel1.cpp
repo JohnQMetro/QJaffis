@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines the main interface for fimfiction.net searching
 Created :   June 27, 2012
 Conversion to Qt started February 3, 2014
-Updated :   February 22, 2014
+Updated :   June 4, 2022
 ******************************************************************************/
 #ifndef FIM_MAINPANEL1_H_INCLUDED
   #include "fim_mainpanel1.h"
@@ -56,7 +56,7 @@ jfFIMSearchGrp::jfFIMSearchGrp(jfFIMSearch* searchin, QWidget* parent):jfSearchG
     typed_search = searchin;
   }
   // making panel 1
-  panel1 = MakeFirstPanel();
+  search_and_filter_panel = MakeFirstPanel();
   custinit = true;
   // finishing off
   FinishConstruction();
@@ -71,7 +71,8 @@ jfSearchCore*       jfFIMSearchGrp::MakeTypedSearch() const {
   temp = new jfFIMSearch();
   temp->MakeEmpty();
   temp->categories->SetUseDefault(true);
-  temp->categories->base_outputdir = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+  QString search_path = jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
+  temp->categories->base_outputdir = search_path;
   return temp;
 }
 //----------------------------------------------------------------------------
@@ -80,8 +81,8 @@ jfResultCollection* jfFIMSearchGrp::MakeTypedCollection() const {
   return new jfFIMResColl(typed_search);
 }
 //----------------------------------------------------------------------------
-jfBaseItemDownloader* jfFIMSearchGrp::MakeTypedThread() const {
-  return new jfFIMItemDownloader(2);
+jfDownloadRootItems* jfFIMSearchGrp::MakeTypedThread() const {
+  return new jfFIMItemDownloader();
 }
 /*****************************************************************************/
 // the constructor
@@ -103,7 +104,7 @@ jfFIMOnePanelSearch::jfFIMOnePanelSearch(jfFIMSearch* searchin, QWidget* parent)
   }
     /**/JDEBUGLOG(fname,5)
   // making panel 1
-  panel1 = MakeFirstPanel();
+  search_and_filter_panel = MakeFirstPanel();
     /**/JDEBUGLOG(fname,6)
   custinit = true;
   // finishing off
@@ -120,7 +121,8 @@ jfSearchCore*       jfFIMOnePanelSearch::MakeTypedSearch() const {
   temp = new jfFIMSearch();
   temp->MakeEmpty();
   temp->categories->SetUseDefault(true);
-  temp->categories->base_outputdir = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+  QString search_path = jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
+  temp->categories->base_outputdir = search_path;
   return temp;
 }
 //----------------------------------------------------------------------------
@@ -129,8 +131,8 @@ jfResultCollection* jfFIMOnePanelSearch::MakeTypedCollection() const {
   return new jfFIMResColl(typed_search);
 }
 //----------------------------------------------------------------------------
-jfBaseItemDownloader* jfFIMOnePanelSearch::MakeTypedThread() const {
-  return new jfFIMItemDownloader(3);
+jfDownloadRootItems* jfFIMOnePanelSearch::MakeTypedThread() const {
+  return new jfFIMItemDownloader();
 }
 /*****************************************************************************/
 jfFIMMain::jfFIMMain(jfSearchCore* searchin, bool notebook, QWidget* parent):

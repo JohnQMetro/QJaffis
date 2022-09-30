@@ -4,7 +4,7 @@
 // Purpose :    Split off from category_editor, handles multipl category edits
 // Created:     October 23, 2009
 // Conversion to Qt started October 22, 2013
-// Updated:     January 1, 2011
+// Updated:     August 10, 2022 (fix category delete)
 ******************************************************************************/
 #ifndef CATEGORY_LISTEDIT_H_INCLUDED
   #include "category_listedit.h"
@@ -56,8 +56,10 @@ bool jfCategoryEditorsNotebook::DeleteCategory(size_t cindex) {
   // starting up...
   ccount = datalink->GetCount();
   assert(cindex<ccount);
+  // the tab index may not be the same as the category index
+  size_t tab_index = (incl_default)? cindex + 1 : cindex;
   // we then remove and destroy associated editor
-  mainbook->removeTab(cindex);
+  mainbook->removeTab(tab_index);
   // we delete the physical data object
   datalink->DeleteAtIndex(cindex);
   delete catedits[cindex];

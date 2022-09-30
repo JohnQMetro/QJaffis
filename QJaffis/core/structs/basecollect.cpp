@@ -206,7 +206,7 @@ bool jfFilterMap::MatchAll(const jfBasePD* inval) const {
   bool iresult;
   QString mstring;
   // a check
-  /**/jfAssertLog(inval!=NULL,fname,"MatchAll parameter is not null");
+  jerror::AssertLog(inval!=NULL,fname,"MatchAll parameter is not null");
   // the loop
   for (findex = coredata.begin(); findex!=coredata.end(); findex++) {
     mstring = (findex->second)->ToString();
@@ -280,6 +280,17 @@ jfBaseFilter* jfFilterMap::GetItem(const size_t& findex) {
   for (loopind=0;loopind<findex;loopind++) xfindex++;
   // getting the item
   return xfindex->second;
+}
+//-----------------------------------------------------------------------------
+const jfBaseFilter* jfFilterMap::GetItemConst(const size_t& findex) const {
+    stl_FilterMap::const_iterator xfindex;
+    size_t loopind;
+    if (findex>=GetCount()) return NULL;
+    // finding the item
+    xfindex=coredata.begin();
+    for (loopind=0;loopind<findex;loopind++) xfindex++;
+    // getting the item
+    return xfindex->second;
 }
 //-----------------------------------------------------------------------------
 bool jfFilterMap::DeleteByName(const QString& findname) {
@@ -744,13 +755,16 @@ bool jfFilterMap::ReadRestFromFile(jfFileReader* infile) {
       else exp_item->SetFiltermapLink(this);
     }
     /**/JDEBUGLOGS(fname,6,newitem->GetTypeDescription())
-    if (newitem==NULL) return infile->BuildError("Unrecognized Filter type!");
+    if (newitem==NULL) {
+        jerror::Log(fname,"Unrecognized Filter type!");
+        return infile->BuildError("Unrecognized Filter type!");
+    }
     assert(newitem!=NULL);
     /**/JDEBUGLOG(fname,7)
     // and then load
     if (!newitem->GetFromFile(infile)) {
       delete newitem;
-      /**/JDEBUGLOG(fname,8)
+       jerror::Log(fname,"Filtermap load from file failed.");
       return false;
     }
     /**/JDEBUGLOGS(fname,9,newitem->GetName())

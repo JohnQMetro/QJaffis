@@ -3,16 +3,14 @@ Name    : ffncatthread.cpp
 Basic   : Fanfiction.Net category downloading
 Author  : John Q Metro
 Started : July 21, 2016
-Updated : September 4, 2016
+Updated : September 25, 2022
 
 ******************************************************************************/
 #ifndef FFNCATTHREAD_H
   #include "ffncatthread.h"
 #endif // FFNCATTHREAD_H
 //------------------------------------
-#ifndef DOWNLOAD_H
-  #include "../../fetching/download.h"
-#endif // DOWNLOAD_H
+
 #ifndef CATGROUP_H
   #include "../categories/catgroup.h"
 #endif // CATGROUP_H
@@ -22,6 +20,20 @@ Updated : September 4, 2016
 #ifndef FFNCATPARSER2_H
   #include "ffncatparser2.h"
 #endif // FFNCATPARSER2_H
+
+#ifndef DEFAULTPATHS_H
+    #include "../../defaultpaths.h"
+#endif // DEFAULTPATHS_H
+#ifndef FICEXTRACT_H_INCLUDED
+  #include "../../ficdown/data/ficextract.h"
+#endif // FICEXTRACT_H_INCLUDED
+#ifndef GLOBALSETTINGS_H
+    #include "../../globalsettings.h"
+#endif // GLOBALSETTINGS_H
+
+#ifndef INITEND_H_INCLUDED
+  #include "../../initend.h"
+#endif // INITEND_H_INCLUDED
 //------------------------------
 #include <assert.h>
 /*****************************************************************************/
@@ -29,12 +41,13 @@ Updated : September 4, 2016
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // constructors and data setters
 //-----------------------------------
-jfFFN_CategoryDownloader::jfFFN_CategoryDownloader(size_t in_max_threads):jfBaseDownloader(in_max_threads) {
+jfFFN_CategoryDownloader::jfFFN_CategoryDownloader():jfDownloadRoot() {
   phase = 0;
   catman_ptr = NULL;
   category_data = NULL;
   csection_index = 0;
   updatemode = false;
+  crossover_parser = NULL;
 }
 //-----------------------------------
 bool jfFFN_CategoryDownloader::SetCatManagerPtr(jfFFN_CatManager* in_catman_ptr, bool doupdate) {
@@ -60,7 +73,6 @@ void jfFFN_CategoryDownloader::StartProcessing() {
   size_t esec_count = (updatemode)?4:3;
   size_t seccount = jfFFN_SECDATA::scount + esec_count;
   emit SendSectionCount(seccount);
-
   // downloading non-crossover sections
   bool xresult = DoSections(false);
   /**/tLogB(fname,3,xresult);
@@ -82,6 +94,7 @@ void jfFFN_CategoryDownloader::StartProcessing() {
         skip_on_fail = true;
         /**/tLog(fname,5);
         category_data->MakeCrossStore();
+        SetupWorkers(false);
         sectiondata.startaction = "Getting";
         sectiondata.part_count = jfFFN_SECDATA::scount;
         sectiondata.item_label = "Crossover Section";
@@ -91,6 +104,8 @@ void jfFFN_CategoryDownloader::StartProcessing() {
           xresult = DoCrossoverSection();
           if (!xresult) break;
         }
+        crossover_parser = NULL;
+        ClearWorkers(true);
       }
     }
 
@@ -127,6 +142,7 @@ bool jfFFN_CategoryDownloader::DoSections(bool iscrossover) {
   // initial setup
   /**/tLogB(fname,1,iscrossover);
   phase = (iscrossover)?2:1;
+  SetupWorkers(false);
   sectiondata.startaction = "Getting";
   sectiondata.part_count= -1;
   sectiondata.item_index = -1;
@@ -135,14 +151,15 @@ bool jfFFN_CategoryDownloader::DoSections(bool iscrossover) {
   /**/tLog(fname,3);
   emit SendNewSection(sectiondata);
   pagecount = jfFFN_SECDATA::scount;
+  /**/tLog(fname,4);
   emit SendItemCount(pagecount);
   url_page_index = result_page_index = 0;
-  /**/tLog(fname,4);
-  SetupThreads(false);
   // doing it
   /**/tLog(fname,5);
-  bool do_result = LoopGet();
+  SetupWorkers(false);
+  bool do_result = xLoopGet();
   /**/tLogB(fname,6,do_result);
+  ClearWorkers(true);
   // checking afterwards
   if (do_result) emit SendSectionDone(false);
   else emit SendSectionFail();
@@ -154,6 +171,8 @@ bool jfFFN_CategoryDownloader::DoCrossoverSection() {
   // initial
   category_data->UrlIndexToStart(csection_index);
   // section info signal
+  QString csecname = jfFFN_SECDATA::section_names[csection_index];
+  crossover_parser->SetHoldingSectionName(csecname);
   sectiondata.item_index = csection_index+1;
   sectiondata.item_name = jfFFN_SECDATA::crossover_names[csection_index];
   emit SendNewSection(sectiondata);
@@ -161,11 +180,9 @@ bool jfFFN_CategoryDownloader::DoCrossoverSection() {
   pagecount = category_data->ItemsInSection(csection_index);
   url_page_index = result_page_index = 0;
   emit SendItemCount(pagecount);
-  // finishing setup
-  SetupThreads(false);
 
   // doing
-  bool do_result = LoopGet();
+  bool do_result = xLoopGet();
 
   // checking afterards
   if (do_result) emit SendSectionDone(false);
@@ -184,7 +201,7 @@ bool jfFFN_CategoryDownloader::UpdateMarking() {
   // getting and setting the old data
   jfFFN_Categories* oldata = catman_ptr->GetHolder();
   if (oldata == NULL) {
-    tLog(fname,2,"The old data must not be NULL in update mode!");
+      tError(fname,"The old data must not be NULL in update mode!");
     emit SendSectionFail();
     return false;
   }
@@ -212,15 +229,13 @@ QString* jfFFN_CategoryDownloader::makeURLforPage(size_t index) const {
   /**/tLog(fname,1);
   if (phase < 3) {
     /**/tLogS(fname,2,index);
-    assert((index >= 1) && (index <= jfFFN_SECDATA::scount));
-    /**/tLog(fname,3);
+      tAssert( (index >= 1) && (index <= jfFFN_SECDATA::scount) ,fname,"Index has an invalid value");
     if (phase == 1) return new QString(jfFFN_SECDATA::IndexToURL(index-1,false));
     if (phase == 2) return new QString(jfFFN_SECDATA::IndexToURL(index-1,true));
   }
   else if (phase == 3) {
     /**/tLogS(fname,4,csection_index);
     return category_data->CurrentCrossoverURL(csection_index);
-    /**/tLog(fname,4);
   }
   assert(phase!=0);
   return NULL;
@@ -345,11 +360,32 @@ jfPageParserBase* jfFFN_CategoryDownloader::makeParser() {
   else if (phase==3) {
     jfFFNCrossoverParser* result = new jfFFNCrossoverParser();
     result->SetCrossoverStoragePointer(category_data->GetCrossoverStoragePtr());
-    QString csecname = jfFFN_SECDATA::section_names[csection_index];
-    result->SetHoldingSectionName(csecname);
+    crossover_parser = result;
     return result;
   }
   else assert(false);
   return NULL;
+}
+
+// -----------------------------------------------------------
+jfParseFetchPackage* jfFFN_CategoryDownloader::MakeParserFetcher() {
+
+    jfPageParserBase* page_parser = makeParser();
+    if (page_parser == NULL) return NULL;
+    jfParseFetchPackageMaker* parse_fetch_maker = jglobal::settings.getFetchPackageMaker();
+    if (parse_fetch_maker == NULL) {
+        delete page_parser;
+        return NULL;
+    }
+    else {
+        jglobal::jfFetchBasics fetch_type = jglobal::settings.FindFetchTypeFor(jfft_FFN, jglobal::FPT_CATEGORY_PAGE);
+        if (fetch_type.IsValid()) {
+            return parse_fetch_maker->makeFetchPackage(fetch_type, page_parser);
+        }
+        else {
+            return parse_fetch_maker->makeGeneralFetchPackage(page_parser);
+        }
+    }
+
 }
 /*****************************************************************************/

@@ -3,7 +3,7 @@ Name    : ffncatparser1.cpp
 Basic   : Fanfiction.Net category parsing, base and non-crossover versions
 Author  : John Q Metro
 Started : July 19, 2016
-Updated : July 19, 2016
+Updated : September 11, 2022
 
 ******************************************************************************/
 #ifndef FFNCATPARSER1_H
@@ -25,7 +25,7 @@ void jfFFNCatParserBase::ParseDownloadedPage(const QString& inPage, size_t pagei
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented methods (pretty trivial)
 //--------------------------
-QString* jfFFNCatParserBase::makeRedirectedURL(const QString& inPart) {
+QString* jfFFNCatParserBase::makeRedirectedURL(const QString& inPart) const {
   return NULL;
 }
 //--------------------------
@@ -36,9 +36,11 @@ bool jfFFNCatParserBase::testMissing(const QString *page) const {
 //--------------------------
 bool jfFFNCatParserBase::testIncomplete(const QString *page) const {
   assert(page != NULL);
+  const QString no_footer = "An error has occurred while processing your request.<br><br>";
   const QString footer1 = "<div id=p_footer class=maxwidth";
   const QString footer2 = "<div id=\"p_footer\" class=\"maxwidth\"";
-  if (page->contains(footer1)) return true;
+  if (page->contains(no_footer)) return false;
+  else if (page->contains(footer1)) return true;
   else return page->contains(footer2);
 }
 //--------------------------
@@ -58,8 +60,6 @@ jfFFNSectionParser::jfFFNSectionParser():jfFFNCatParserBase() {
 bool jfFFNSectionParser::ParsePageCore(size_t pageindex) {
   // constants
   const QString fname = "jfFFNSection::SetFromPage";
-  const QString header1 = "<div style='width:100%;' class=xcontrast_outer id=content_parent>";
-  const QString colhead = "<TD VALIGN=TOP style='line-height:150%;'>";
   // script.png' or arrow_switch.png'
   // local variables
   QString buffer, secname, outerr;
@@ -78,7 +78,7 @@ bool jfFFNSectionParser::ParsePageCore(size_t pageindex) {
     temp->SetFromSource(secname,buffer,outerr);
     // the category is in error
     if (!temp->IsValid()) {
-      /**/lpt->tLog(fname,10,outerr);
+        /**/lpt->tParseError(fname,outerr);
       delete temp;
       delete result_data;
       result_data = NULL;
@@ -88,7 +88,7 @@ bool jfFFNSectionParser::ParsePageCore(size_t pageindex) {
     else {
       if ((result_data->GetCatByName(temp->GetName()))!=NULL) {
         outerr = "Two Categories in the same Section with the SAME NAME! : " + temp->GetName();
-        /**/lpt->tLog(fname,11,outerr);
+        /**/lpt->tParseError(fname,outerr);
         delete temp;
         delete result_data;
         result_data = NULL;
@@ -110,47 +110,42 @@ void* jfFFNSectionParser::getResults() {
 bool jfFFNSectionParser::ParseStart(QString& out_section_name) {
   // constants
   const QString fname = "jfFFNSectionParser::ParseStart";
-  const QString header1 = "<div style='width:100%;' class=xcontrast_outer id=content_parent>";
-  const QString header2 = "<div style=\"width:100%;\" class=\"xcontrast_outer\" id=\"content_parent\">";
-  const QString colhead1 = "<td style=\"line-height:150%\" valign=\"TOP\">";
-  const QString colhead2 = "<TD VALIGN=TOP style='line-height:150%";
-  const QString colhead3 = "<td style=\"line-height:150%;\" valign=\"TOP\">";
   // script.png' or arrow_switch.png'
   // local variables
   QString buffer;
   // parsing begins
   out_section_name = "";
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePastAlt(header2,header1)) {
-    /**/lpt->tLog(fname,2);
+  if (!xparser.MovePast(regex.section_headerA)) {
+    /**/lpt->tParseError(fname,"Cannot find critical header string");
     return parsErr("Cannot find critical header string");
   }
   /**/lpt->tLog(fname,3);
   // once here, we extract the name...
-  if (!xparser.GetDelimited("align=\"absmiddle\">","<",buffer)) {
-      /**/lpt->tLog(fname,4);
-      if (!xparser.GetDelimited("align=absmiddle>","<",buffer)) {
-          return parsErr("Problems getting the name!");
-      }
+  if (!xparser.GetUsingRegex(regex.section_name, true, buffer)) {
+      /**/lpt->tParseError(fname,"Problems getting the name!");
+      return parsErr("Problems getting the name!");
   }
   // checking the name
   buffer = buffer.trimmed();
   /**/lpt->tLog(fname,6,buffer);
   if (buffer.isEmpty()) {
+      /**/lpt->tParseError(fname,"The section name must not be empty!");
     return parsErr("The section name must not be empty!");
   }
   /**/lpt->tLog(fname,7,buffer);
   // next up is processing the list...
-  if (!xparser.MovePastAlt(colhead1,colhead2)) {
-      if (!xparser.MovePast(colhead3)) {
-          /**/lpt->tLog(fname,8,xparser.GetBlock(3000));
-            return parsErr("Cannot find start of first category column!");
+  if (!xparser.MovePast(regex.section_column_headerB)) {
+      if (!xparser.MovePast(regex.section_column_headerA)) {
+          /**/lpt->tParseError(fname,"Cannot find start of first category column!");
+          /**/lpt->tParseError(fname, "BLOCK: " + xparser.GetBlock(1000));
+          return parsErr("Cannot find start of first category column!");
       }
   }
-  /**/lpt->tLog(fname,9);
+  /**/lpt->tLog(fname,8);
   // chopping the post list off
   if (!xparser.ChopAfter("</td></tr></tbody></table>",true)) {
-    /**/lpt->tLog(fname,10);
+    /**/lpt->tLog(fname,9);
     return parsErr("Cannot find end of categories!");
   }
   out_section_name = buffer;

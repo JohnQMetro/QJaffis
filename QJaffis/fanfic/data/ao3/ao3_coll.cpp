@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines category results collection for AO3
 Created :   September 1, 2012
 Conversion to Qt Started March 29, 2014
-Updated :   July 17, 2016
+Updated :   April 3, 2022
 ******************************************************************************/
 #ifndef AO3_COLL_H_INCLUDED
   #include "ao3_coll.h"
@@ -31,7 +31,7 @@ jfAO3_FicList::jfAO3_FicList(const jfAO3_Category* cat_linkin):jfTypedCollection
   // constants
   const QString fname = "jfAO3_FicList::jfAO3_FicList";
   // checks
-  /**/jfAssertLog(cat_linkin!=NULL,fname,"The input category link is NULL!");
+  /**/jerror::AssertLog(cat_linkin!=NULL,fname,"The input category link is NULL!");
   /*jerror::AssertLog(cat_linkin!=NULL,fname,"The input category link is NULL!");*/
   // category link
   cat_link = cat_linkin;
@@ -205,8 +205,7 @@ void jfAO3ResColl::WriteHtmlHeader(jfHtmlParams* indata) {
   QString skeldata;
   jfAO3_FicList* temp;
   // the usual checks
-  /* jerror::AssertLog(indata->CheckOk(),fname,indata->errmsg); */
-  /**/jfAssertLog(indata->CheckOk(),fname,indata->errmsg);
+  jerror::AssertLog(indata->CheckOk(),fname,indata->errmsg);
   // loading values
   // the start of the header
   buffer = indata->MakeResult(indata->base->header_skel);

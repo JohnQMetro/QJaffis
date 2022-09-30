@@ -14,13 +14,13 @@ Updated :   September 9, 2020
   #include "../../../core/filters/ao3/ao3_specials2.h"
 #endif // AO3_SPECIALS2_H_INCLUDED
 #ifndef WIDGETS3_H_INCLUDED
-  #include "../../misc/widgets3.h"
+  #include "../../controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
 #ifndef BFILT_EDIT_H_INCLUDED
   #include "../base/bfilt_edit.h"
 #endif // BFILT_EDIT_H_INCLUDED
 #ifndef CHARO_EDITOR_H_INCLUDED
-  #include "../../misc/charo_editor.h"
+  #include "../../controls/charo_editor.h"
 #endif // CHARO_EDITOR_H_INCLUDED
 /*****************************************************************************/
 class jfAO3PairingPanel : public QWidget {

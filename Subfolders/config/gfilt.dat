@@ -1,0 +1,39 @@
+﻿###jfFilterMap;0;true
+FilterGroup;Testoree
+7
+###ExprFilter;0;true
+CommonCrossover;Tell-tale crossover phrases in the description
+1
+crossover | xover | m\;cross-over | m\;cross over | m\;x over | m\;x-over | m\;cross with | m\;x with
+###
+###ExprFilter;0;true
+FemSlash;
+1
+(femslash &~ not femslash) | femmeslash | fem slash | femme slash | m\;f/f | female/female | fem/fem | girl/girl | m\;g/g | lesbian | sappho | yuri | shojoai | shoujo | lezzie | sapphi | fslash | girlslash | m\;ff slash | femmslash | t\;fem slash | t\;femslash
+###
+###CategoryFilter;0;true
+HighCats;
+1
+battletech | terry brooks | suikoden | call of duty | boy meets world | doctor who
+###
+###ExprFilter;0;true
+Highlander;
+1
+@FilterGroup\;Highlander1@ | @FilterGroup\;Highlander2@
+###
+###ExprFilter;0;true
+Highlander1;Highlander keywords
+1
+methos | t\;methos | duncan macleod | duncan mcloud | duncan mccleod | connor macleod | richie ryan | ritchie ryan | nick wolfe | m\;kurgan
+###
+###ExprFilter;0;true
+Highlander2;
+1
+((c\;Quickening &~ (witchs quickening|witch's quickening|@FilterGroup\;HighCats@)) | ((t\;highlander | m\;highlander) &~ (age of edward|@FilterGroup\;HighCats@))) | (@FilterGroup\;CommonCrossover@ & (c\;Quickening|t\;Highlander|m\;Highlander))
+###
+###ExprFilter;0;true
+SlashTest;Looking for telltale slash phrases
+1
+( m\;slash &~ ( m\;no slash | m\;not slash | m\;non slash | m\;not a slash | m\;slash free)) | (m\;slashy &~ ( m\;not slashy )) | m\;mpreg | malemale | m\;male male | ( m\;yaoi &~ ( m\;not yaoi | m\;no yaoi | m\;non yaoi | m\;not a yaoi | m\;yaoi free )) | boyslash | preslash | beardslash | ( slashfic &~ (not a slashfic | not slashfic | non slashfic)) | slashiness | slashfluff | (m\;slashes &~ m\;no slashes) | m\;boy boy | m\;boyboy | t\;yaoi | mc\;MM
+###
+###

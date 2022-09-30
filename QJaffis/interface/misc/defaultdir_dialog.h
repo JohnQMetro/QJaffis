@@ -4,7 +4,7 @@
  * Author:    John Q Metro
  * Created:   December 18, 2011
  * Conversion to Qt : Started September 7, 2013
- * Updated:   March 3, 2012
+ * Updated:   March 27, 2022
  *
 **************************************************************/
 #ifndef DEFAULTDIR_DIALOG_H_INCLUDED
@@ -15,7 +15,7 @@
   #include "../../initend.h"
 #endif // INITEND_H_INCLUDED
 #ifndef WIDGETS3_H_INCLUDED
-  #include "widgets3.h"
+  #include "../controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
 //-------------------------------------
 #include <QWidget>
@@ -45,11 +45,12 @@ class jfDefaultDirDisplay : public QWidget {
     void MakeLabels();
     void MakeRest();
     bool InsertRow(size_t rowval);
-    // GUI ELEMENTS
-    QLabel* labels[jglobal::NUMDIRS];
-    QLabel* colons[jglobal::NUMDIRS];
-    QLineEdit*   displays[jglobal::NUMDIRS];
-    QPushButton*     dirpickers[jglobal::NUMDIRS];
+    // GUI ELEMENTS (the + 1 is the python transfer/script folder)
+
+    QLabel* labels[jglobal::path_type_count];
+    QLabel* colons[jglobal::path_type_count];
+    QLineEdit*   displays[jglobal::path_type_count];
+    QPushButton*     dirpickers[jglobal::path_type_count];
     // other things
     QGridLayout* main_sizer;
 };

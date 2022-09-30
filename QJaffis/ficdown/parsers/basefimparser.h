@@ -25,7 +25,7 @@ class jfStoryPartParseBase : public jfPageParserBase {
     virtual void ParseDownloadedPage(const QString& inPage, size_t pageindex);
     virtual void* getResults();
     // virual methods that still haveto be implemented
-    virtual QString* makeRedirectedURL(const QString& inPart) = 0;
+    virtual QString* makeRedirectedURL(const QString& inPart) const = 0;
     virtual bool testMissing(const QString *page) const = 0;
     virtual bool testIncomplete(const QString *page) const = 0;
     virtual QString getCookie() const = 0;
@@ -46,7 +46,7 @@ class jfFIM_FicPartParser : public jfStoryPartParseBase {
   public:
     jfFIM_FicPartParser();
     // virual methods that are implemented
-    virtual QString* makeRedirectedURL(const QString& inPart);
+    virtual QString* makeRedirectedURL(const QString& inPart) const;
     virtual bool testMissing(const QString *page) const;
     virtual bool testIncomplete(const QString *page) const;
     virtual QString getCookie() const;

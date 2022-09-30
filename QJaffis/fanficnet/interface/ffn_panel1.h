@@ -18,10 +18,10 @@
   #include "../../interface/display/display_parts.h"
 #endif // DISPLAY_PARTS_H
 #ifndef WIDGETS2_H_INCLUDED
-  #include "../../interface/misc/widgets2.h"
+  #include "../../interface/controls/widgets2.h"
 #endif // WIDGETS2_H_INCLUDED
 #ifndef WIDGETS3_H_INCLUDED
-  #include "../../interface/misc/widgets3.h"
+  #include "../../interface/controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
 
 #ifndef FILTERS_EDIT1_H_INCLUDED

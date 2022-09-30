@@ -52,7 +52,7 @@ void jfFIMGroupParser::ParseDownloadedPage(const QString& inPage, size_t pageind
       /**/lpt->tLog(func,5);
       parseErrorMessage = "ParseError: " + perror_out + " in :\n";
       parseErrorMessage += buffer;
-      /**/lpt->tLog(func,6,parseErrorMessage);
+      /**/lpt->tParseError(func,parseErrorMessage);
       delete page_results;
       page_results = NULL;
     }
@@ -61,7 +61,7 @@ void jfFIMGroupParser::ParseDownloadedPage(const QString& inPage, size_t pageind
     parseErrorMessage = "ParseError: Missing contents!";
     delete page_results;
     page_results = NULL;
-    /**/lpt->tLog(func,7,parseErrorMessage);
+    /**/lpt->tParseError(func,parseErrorMessage);
   }
    // done with the items
   /**/lpt->tLog(func,8);
@@ -77,7 +77,7 @@ void* jfFIMGroupParser::getResults() {
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // handling redirection, NULL result if faliure
-QString* jfFIMGroupParser::makeRedirectedURL(const QString& inPart) {
+QString* jfFIMGroupParser::makeRedirectedURL(const QString& inPart) const {
   // because fim groups does not use redirecton
   return NULL;
 }

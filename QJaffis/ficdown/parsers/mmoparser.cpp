@@ -22,7 +22,7 @@ jfMMO_FicPartParser::jfMMO_FicPartParser():jfStoryPartParseBase() {}
 // virual methods that are implemented
 //------------------------------------
 // mediaminer.org no longer does redirections
-QString* jfMMO_FicPartParser::makeRedirectedURL(const QString& inPart) {
+QString* jfMMO_FicPartParser::makeRedirectedURL(const QString& inPart) const {
   return NULL;
 }
 //------------------------------------

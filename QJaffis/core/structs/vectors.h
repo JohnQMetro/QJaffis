@@ -4,11 +4,12 @@ Author :     John Q Metro
 Purpose :    vector declarations
 Created:     April 29, 2009
 Conversion to QT started : April 18, 2013
-Updated:     August 10, 2016
+Updated:     June 4 (result unit vector change due to downloader changes)
 ******************************************************************************/
 #ifndef VECTORS_H_INCLUDED
 #define VECTORS_H_INCLUDED
 #endif // VECTORS_H_INCLUDED
+
 //-------------------------------------------------------------------------------
 #include <vector>
 #include <QString>
@@ -18,9 +19,9 @@ Updated:     August 10, 2016
 #include <map>
 /******************************************************************************/
 // forward declarations
-
 class jfResultUnit;
-class jfBaseItemDownloader;
+class jfDownloadRootItems;
+
 // first off, a vector of result units
 class jfResultUnitVector : public std::vector<jfResultUnit*> {
   public:
@@ -29,10 +30,17 @@ class jfResultUnitVector : public std::vector<jfResultUnit*> {
     bool limitreached; // ffn updating, reached point where old results start if true
     size_t stotal;  // total number of item item sparsed frompage, before filtering
     size_t firstid; //ffn, id of first item parsed
-    jfBaseItemDownloader* source;  // used by display to tell downloader it is done
+
 
     // constructor
     jfResultUnitVector();
+    void setWake(jfDownloadRootItems* wake_target);
+    bool WakeAfter();
+  protected:
+    // used by display to tell downloader it is done
+    jfDownloadRootItems* source_new;
+
+
 };
 
 Q_DECLARE_METATYPE(jfResultUnitVector);

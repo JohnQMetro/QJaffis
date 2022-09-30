@@ -3,7 +3,7 @@ Name    : baseparse.h
 Basic   : Declares a base class that handles page parsing (and redirection)
 Author  : John Q Metro
 Started : June 13, 2016
-Updated : March 24, 2018
+Updated : June 21, 2022
 
 ******************************************************************************/
 #ifndef BASEPARSE_H
@@ -23,41 +23,55 @@ Updated : March 24, 2018
   #include "threadbase.h"
 #endif // THREADBASE_H
 /*****************************************************************************/
+/* a lower abstract parser class than jfPageParserBase, no redirection / truncate */
+class jfPageParserCore {
+public:
+  // constructor
+  jfPageParserCore();
+  virtual ~jfPageParserCore();
+  virtual void SetLogPointer(jfLoggBase* in_ptr);
+  // custom parse method
+  virtual void ParseDownloadedPage(const QString& inPage, size_t pageindex) = 0;
+  virtual void* getResults() = 0;
+  // getting results
+  virtual bool setPageIndex(const size_t& page_index) = 0;
+  bool isPageParsed() const;
+  QString getParseErrorMessage() const;
+  size_t getPageCount() const;
+protected:
+  bool NewData(const QString& inPage);
+  bool parsErr(const QString& err_in);
+  // internal data
+  jfStringParser xparser;
+  bool page_parsed;
+  QString parseErrorMessage;
+  size_t pagecount;
+  // external pointer
+ jfLoggBase* lpt;
+
+};
+
+//===========================================================
 // A base abstract class for parsing downloaded pages.
 // Also handles redirection, and checking for truncated/missing pages
-class jfPageParserBase {
+class jfPageParserBase: public virtual jfPageParserCore {
   public:
     // constructor
     jfPageParserBase();
     virtual ~jfPageParserBase();
-    virtual void SetLogPointer(jfLoggBase* in_ptr);
     // custom parse method
     virtual void ParseDownloadedPage(const QString& inPage, size_t pageindex) = 0;
     virtual void* getResults() = 0;
     // handling redirection, NULL result if faliure
-    virtual QString* makeRedirectedURL(const QString& inPart) = 0;
+    virtual QString* makeRedirectedURL(const QString& inPart) const = 0;
     // test methods
     virtual bool testMissing(const QString *page) const = 0;
     virtual bool testIncomplete(const QString *page) const = 0;
     // getting results
     virtual bool setPageIndex(const size_t& page_index);
-    bool isPageParsed() const;
-    QString getParseErrorMessage() const;
-    size_t getPageCount() const;
     // also
     virtual QString getCookie() const = 0;
     // virtual uint getPause() const = 0;
-  protected:
-    bool NewData(const QString& inPage);
-    bool parsErr(const QString& err_in);
-    // internal data
-    jfStringParser xparser;
-    bool page_parsed;
-    QString parseErrorMessage;
-    size_t pagecount;
-    // external pointer
-   jfLoggBase* lpt;
-
 };
 //===============================================================================
 /* A still abstract derived class, for searches that produce lists of jfBasePD
@@ -71,7 +85,7 @@ class jfItemsPageParserBase : public jfPageParserBase {
     // helper methods
     jfResultUnitVector* MakeResults();
     // filtering and removing from the current page
-    size_t FilterByList();
+    size_t FilterByList() const;
     size_t CategorySort();
     size_t Condense();
     void PostPageProcessing();

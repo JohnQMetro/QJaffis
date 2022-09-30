@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares Basic types for downloading fanfics
 Created :   March 15, 2012
 Conversion to QT started : April 18, 2013
-Updated :   August 4, 2016
+Updated :   July 2, 2022 (harrypotterfanfiction is dead)
 ******************************************************************************/
 #ifndef FICEXTRACT_H_INCLUDED
   #define FICEXTRACT_H_INCLUDED
@@ -21,13 +21,14 @@ Updated :   August 4, 2016
 const QString STARTINFO_HEADER = "$##@ FANFIC STARTINFO $##@";
 //===========================================================================
 /* jfft_FFN is Fanfiction.Net, jfft_AO3 is An Archive of Our Own, jfft_MMO is Mediaminer.org,
-jfft_FIM is Frienship is Magic fiction, jfft_HPF is Harry Potter Fanfic */
-enum jf_FICTYPE { jfft_FFN, jfft_AO3, jfft_MMO, jfft_FIM, jfft_HPF};
+jfft_FIM is Frienship is Magic fiction */
+enum jf_FICTYPE { jfft_FFN = 0, jfft_AO3 = 1, jfft_MMO = 2, jfft_FIM = 3};
 //===========================================================================
 // fictype into string and vice versa
 QString Fictype2String(jf_FICTYPE intype);
 bool String2FicType(const QString& inval, jf_FICTYPE& resval);
 bool SiteHasIndexpage(const jf_FICTYPE intype);
+bool IsValidFictype(const jf_FICTYPE& intype);
 //========================================================================
 // step 1 in string to fic extract conversion
 jfLineParse* ParseExtractSource(const QString& inval, jf_FICTYPE& resval);
@@ -52,6 +53,7 @@ class jfFicExtract {
     // constructors
     jfFicExtract();
     jfFicExtract(const jfFicExtract& source);
+    virtual ~jfFicExtract();
     // virtual methods
     virtual QString MakeUrl(size_t inval) const = 0;
     virtual QString FirstUrl() const = 0;
@@ -124,26 +126,9 @@ class jfFicExtract_cids : public jfFicExtract {
     virtual QString EvenMoreTextForm() const = 0;
     virtual bool EvenMoreFromText(jfLineParse* lparser_in) = 0;
 };
+
 //===========================================================================
-// harry potter fanfic
-class jfFicExtract_HPF : public jfFicExtract_cids {
-  public:
-    // constructors
-    jfFicExtract_HPF();
-    jfFicExtract_HPF(const jfFicExtract_HPF& source);
-    // virtual methods
-    virtual QString MakeUrl(size_t inval) const;
-    virtual QString FirstUrl() const;
-    virtual QString MakeAuthlink() const;
-    virtual jf_FICTYPE GetFicType() const;
-  private:
-    // more virtual methods to augment core methods
-    virtual void LoadEvenMoreValues(jfSkeletonParser* inparser) const;
-    virtual QString EvenMoreTextForm() const;
-    virtual bool EvenMoreFromText(jfLineParse* lparser_in);
-};
-//===========================================================================
-// mediaminoer.org
+// mediaminer.org
 class jfFicExtract_MMO : public jfFicExtract_cids {
   public:
     QString url_cname_part;

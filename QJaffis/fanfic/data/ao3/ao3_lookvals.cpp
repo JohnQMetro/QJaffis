@@ -3,7 +3,7 @@ Name    :   ao3_lookvals.cpp
 Author  :   John Q Metro
 Purpose :   Some constants and utility functions for making AO3 searches
 Created :   June 12, 2021
-Updated :   March 6, 2022
+Updated :   August 27, 2022
 ******************************************************************************/
 #ifndef AO3_LOOKVALS_H
     #include "ao3_lookvals.h"
@@ -11,6 +11,9 @@ Updated :   March 6, 2022
 #ifndef LOGGING_H_INCLUDED
   #include "../../../core/utils/logging.h"
 #endif // LOGGING_H_INCLUDED
+#ifndef UTILS2_H_INCLUDED
+  #include "../../../core/utils/utils2.h"
+#endif // UTILS2_H_INCLUDED
 //-----------------------------------
 #include <assert.h>
 #include <QUrl>
@@ -35,7 +38,7 @@ jfTagListing* AO3OrientMake::MakeOrientationListing(size_t choice) const {
         // no relationships means exclude everything but gen
         // (this still allows cases where orientation is unmarked)
         res->insert(std::pair<QString,jfTAG_STATUS>(orientation_labels.first(), jfts_NONE));
-        for (size_t odex = 1; odex < orientation_labels.count(); odex++) {
+        for (int odex = 1; odex < orientation_labels.count(); odex++) {
             res->insert(std::pair<QString,jfTAG_STATUS>(orientation_labels.at(odex), jfts_EXCLUDE));
         }
     }
@@ -58,7 +61,7 @@ jfTagListing* AO3OrientMake::MakeOrientationPickOne(size_t which) const {
     return res;
 }
 QString AO3OrientMake::OrientationLookupID(const QString& tomatch) const {
-    for (size_t sdex = 0; sdex < orientation_labels.length(); sdex++) {
+    for (int sdex = 0; sdex < orientation_labels.length(); sdex++) {
         if (tomatch == orientation_labels[sdex]) {
             return orientation_ids.at(sdex);
         }
@@ -73,7 +76,7 @@ QString AO3OrientMake::OrientationListingToQueryPart(const jfTagListing* source)
     // looping through the labels
     QString outurl = "";
     outurl.reserve(200);
-    for(size_t odex = 0; odex < orientation_labels.length(); odex++) {
+    for(int odex = 0; odex < orientation_labels.length(); odex++) {
         jfTagListing::const_iterator vp = source->find(orientation_labels[odex]);
         if (vp == source->end()) continue;
         jfTAG_STATUS stat = vp->second;
@@ -113,7 +116,7 @@ AO3OrientMake::~AO3OrientMake() {
     ( codes are "10","11","12","13","9"). You can pick one, or exclude any combo that does not include
     unspecified. 
     Special Strings: ~ starts an exclude, otherwise we treat it as include
-    choices: G T GT ~ME M ~E E _
+    choices: G T GT ~ME M ~E ME E _
     */
 AO3RatingMake::AO3RatingMake() {
     // char to code
@@ -124,10 +127,11 @@ AO3RatingMake::AO3RatingMake() {
     code_lookup.insert(QChar('_'),QString("9"));
 
     choice_labels << "General" << "Teen" << "General & Teen" << "No Mature & Porn" <<
-                                 "Mature" << "No Porn" << "Porn" << "Unspecified";
-    choice_codes << "G" << "T" << "~ME_" << "~ME" << "M" << "~E" << "E" << "_";
+                                 "Mature" << "No Porn" << "Mature & Porn" << "Porn" << "Unspecified";
+    choice_codes << "G" << "T" << "~ME_" << "~ME" << "M" << "~E" << "~GT_" << "E" << "_";
 }
 QString AO3RatingMake::MakeIncludeQuery(QChar includeCode) const {
+
     if (code_lookup.contains(includeCode)) {
         QString code = code_lookup.value(includeCode);
         return ao3values::PercentEncode("include_work_search[rating_ids][]") + "=" + code;
@@ -163,12 +167,13 @@ QStringList AO3RatingMake::GetPredefined() const {
     return choice_labels;
 }
 QString AO3RatingMake::MakeUsingPredefined(size_t index) const {
-    if (index >= choice_codes.size()) return "";
+    if (index >= (size_t)choice_codes.size()) return "";
     else return MakeQuery(choice_codes.at(index));
 }
 AO3RatingMake::~AO3RatingMake() {
 
 }
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 AO3TagExcludeMake::AO3TagExcludeMake() {
     gensex_excludes << "Alpha/Beta/Omega Dynamics" << "Coming Out" << "Trans Character" <<
@@ -230,14 +235,7 @@ QString AO3TagExcludeMake::MakeFullExcludeQuery(bool gensex, bool emo, bool othe
     QStringList base_list;
     if (has_flag_excludes) base_list = MakePredefinedExcludes(gensex, emo, other, fluff);
     if (has_template_list) {
-        QStringList user_list = template_list.split(",",QString::SkipEmptyParts);
-        // trim any whitespace in the parts
-        QStringList excl_list;
-        for(size_t pos = 0; pos < user_list.length(); pos++) {
-            QString trimp = user_list.at(pos).trimmed();
-            if (trimp.isEmpty()) continue;
-            else excl_list.append(trimp);
-        }
+        QStringList excl_list = SplitAndTrim(template_list);
         // after...
         if (excl_list.isEmpty()) return QueryPart(base_list);
         else return QueryPartWithTemplate(base_list, excl_list, insert);
@@ -246,6 +244,38 @@ QString AO3TagExcludeMake::MakeFullExcludeQuery(bool gensex, bool emo, bool othe
         return QueryPart(base_list);
     }
     else return "";
+}
+QString AO3TagExcludeMake::MakeFullExcludeQuery(const QList<const jfGeneralTagList*>& exclude_list, const QString& template_list, const QString& insert) const {
+    bool has_pre_excludes = (exclude_list.size() > 0);
+    bool has_template_list = template_list.length() > 0;
+    QStringList base_list;
+    if (has_pre_excludes) {
+        for(int pdl_dex = 0; pdl_dex < exclude_list.size(); pdl_dex++) {
+            base_list.append(*(exclude_list.at(pdl_dex)->getList()));
+        }
+    }
+    if (has_template_list) {
+        QStringList excl_list = SplitAndTrim(template_list);
+        // after...
+        if (excl_list.isEmpty()) return QueryPart(base_list);
+        else return QueryPartWithTemplate(base_list, excl_list, insert);
+    }
+    else if (has_pre_excludes) {
+        return QueryPart(base_list);
+    }
+    else return "";
+}
+//--------------------------------------------------------------
+QStringList AO3TagExcludeMake::SplitAndTrim(const QString source) const {
+    QStringList user_list = source.split(",",QString::SkipEmptyParts);
+    // trim any whitespace in the parts
+    QStringList excl_list;
+    for(int pos = 0; pos < user_list.length(); pos++) {
+        QString trimp = user_list.at(pos).trimmed();
+        if (trimp.isEmpty()) continue;
+        else excl_list.append(trimp);
+    }
+    return excl_list;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 AO3MoreMake::AO3MoreMake() {
@@ -276,7 +306,7 @@ QStringList AO3MoreMake::GetOrderingList() const {
     return ordering_labels;
 }
 QString AO3MoreMake::GetOrderingQuery(size_t order_choice) const {
-    if (order_choice >= ordering_ids.length()) return "";
+    if (order_choice >= (size_t)ordering_ids.length()) return "";
     else return ao3values::PercentEncode("work_search[sort_column]") + "=" + ordering_ids.at((int)order_choice);
 }
 QString AO3MoreMake::QueryTagInclude(const QString raw_include) const {

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines fanfic object data of archoveofourown.org
 Created :   August 26, 2012
 Conversion to Qt Started September 28, 2013
-Updated :   December 26, 2021
+Updated :   August 31, 2022
 ******************************************************************************/
 #ifndef AO3_FICOBJ_H_INCLUDED
   #include "ao3_ficobj.h"
@@ -19,10 +19,19 @@ Updated :   December 26, 2021
 #ifndef AO3_CONSTS_H_INCLUDED
   #include "ao3_consts.h"
 #endif // AO3_CONSTS_H_INCLUDED
+#ifndef HTMLPARSE_H_INCLUDED
+  #include "../../../core/utils/htmlparse.h"
+#endif // HTMLPARSE_H_INCLUDED
+
+#ifndef DISPLAYHTMLSPEC_H
+    #include "../displayhtmlspec.h"
+#endif // DISPLAYHTMLSPEC_
 //-------------------------------------
 #include <assert.h>
 #include <QRegExp>
+#include <QRegularExpression>
 //**************************************************************************
+const QRegularExpression breaks = QRegularExpression("<br/?>[\\s\\-*]*<br/?>([\\s\\-*]*<br/?>)*",QRegularExpression::CaseInsensitiveOption);
 
 // default constructors
 //----------------------------
@@ -32,6 +41,7 @@ jfAO3Fanfic::jfAO3Fanfic():jfGenericFanfic2() {
   kudcount = 0;
   series_index = 0;
   x_parser = NULL;
+  english_locale = QLocale(QLocale::English, QLocale::UnitedStates);
 }
 //----------------------------
 jfAO3Fanfic::jfAO3Fanfic(const jfAO3Fanfic& src):jfGenericFanfic2(src) {
@@ -50,6 +60,7 @@ jfAO3Fanfic::jfAO3Fanfic(const jfAO3Fanfic& src):jfGenericFanfic2(src) {
   series_url = src.series_url;
   cats.assign(src.cats.begin(),src.cats.end());
   x_parser = NULL;
+  english_locale = QLocale(QLocale::English, QLocale::UnitedStates);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // other methods
@@ -73,7 +84,7 @@ bool jfAO3Fanfic::SetFromString(QString inval, const jfAO3_Category* incat, QStr
     }
   }
   if (!success) {
-    parse_err = parser_error;;
+    parse_err = parser_error;
     JDEBUGLOGS(fxname,1, parse_err)
   }
   else delete x_parser;
@@ -108,7 +119,11 @@ QString jfAO3Fanfic::GetRelationships() const { return relationships; }
 //----------------------------
 QString jfAO3Fanfic::GetCharacters() const { return characters; }
 //----------------------------
-QString jfAO3Fanfic::GetExtraTags() const { return extratags; }
+const QStringList& jfAO3Fanfic::GetExtraTags() const { return extratags; }
+//----------------------------
+QString jfAO3Fanfic::GetJoinedExtraTags() const {
+    return extratags.join(',');
+}
 //----------------------------
 bool jfAO3Fanfic::InSeries() const { return (series_index!=0); }
 //----------------------------
@@ -182,7 +197,7 @@ QString jfAO3Fanfic::ToText() const {
   }
   // tags
   if (!extratags.isEmpty()) {
-    result += " - Tags: " + extratags;
+    result += " - Tags: " + GetJoinedExtraTags();
   }
   if (completed) {
     result += " - Complete";
@@ -196,64 +211,51 @@ QString jfAO3Fanfic::ToText() const {
 QString jfAO3Fanfic::ToDisplayHTML() const {
   const QString fname = "jfAO3Fanfic::ToDisplayHTML";
   QString result,buffer,optline;
+
+  const jfDisplayHTMLHelper* helper = HTMLHelpers::ao3_item_helper;
   // we start with the table
-  result = DisplayHTMLHeader(1);
+  result = DisplayHTMLHeader(1, helper);
   // fandom display
-  result += "<br>\n<font color=\"green\" size=+1>";
-  result += GetFandoms() + "</font>";
+  result += "<br>\n" + helper->WrapText("fandoms", GetFandoms());
   result += "</td></tr>\n";
   // next line: link display
   result += "<tr><td>";
-  result += "<font color=\"green\" size=+1>";
-  result += primarylink + "</font><br>\n";
+  result += helper->WrapText("ficlink", primarylink, false);
+
   // adding the main description
-  result += "<font color=\"#010101\" size=+2>" + description + "</font><br>\n";
+  result += "<div style=\"margin-left:10px;\">";
+  QString rdesc = (description.length() > 1000) ? (description.left(1000) + "...") : description;
+  result += helper->WrapTextNoEsc("description",rdesc,false);
+  result += "</div>";
+
   // series
   if (InSeries()) {
-    result += "<font color=\"darkviolet\" size=+1>Part ";
-    result += QString::number(series_index) + " of the " + series_name;
-    result += " Series.</font><br>\n";
+      QString series = "Part " + QString::number(series_index) + " of the " + series_name + " Series";
+      result += helper->WrapText("series", series, true);
   }
-  // next up.. three extra lines
-  result += "<font color=\"gray\" size=+1>Updated: " + updated_date.toString("MM-dd-yyyy");
-  result += " - Rating: " + RatingToString();
-  result += " - Orientation";
-  result += (orientations.contains(","))?"s: ":": ";
-  result += orientations;
+  // standard metadata
+  QString mdata = "Updated: " + updated_date.toString("MM-dd-yyyy") + " - Rating: " + RatingToString();
+  mdata += " - Orientation";
+  mdata += ((orientations.contains(","))?"s: ":": ") + orientations;
   // part count and word count
-  result += " - Parts: " + QString::number(part_count);
-  result += " - Words: " + QString::number(word_count);
+  mdata += " - Parts: " + QString::number(part_count);
+  mdata += " - Words: " + QString::number(word_count);
   // kudos
-  result += " - Kudos: " + QString::number(kudcount);
+  mdata += " - Kudos: " + QString::number(kudcount);
   if (completed) {
-    result += " - Complete";
+    mdata += " - Complete";
   }
+  result += helper->WrapText("basicinfo", mdata, true);
+
   // final info
-  result += "</font>";
-  buffer = WarnToString();
-  if (!buffer.isEmpty()) {
-    optline = "<font color=\"red\">Warnings: " + WarnToString();
-    optline += "</font>";
-  }
-  if (!characters.isEmpty()) {
-    if (!optline.isEmpty()) optline += " &nbsp;&mdash;&nbsp; ";
-    optline += "<font color=\"darkblue\">Characters: " + characters;
-    optline += "</font>";
-  }
-  if (!relationships.isEmpty()) {
-    if (!optline.isEmpty()) optline += " &nbsp;&mdash;&nbsp; ";
-    optline += "Pairings: " + relationships;
-  }
-  if (!optline.isEmpty()) {
-    result += "<br>\n<font color=olive size=+1>";
-    result += optline;
-    result += "</font>";
-  }
-  if (!extratags.isEmpty()) {
-    result += "<br>\n<font color=teal size=+1>Tags : ";
-    result += extratags;
-    result += "</font>";
-  }
+  optline = helper->ConditionalWrapText("warnings",false,"Warnings: ", true, WarnToString());
+  optline += helper->ConditionalWrapText("characters", !optline.isEmpty(), "Characters: ", true, characters);
+  optline += helper->ConditionalWrapText("pairings", !optline.isEmpty(), "Pairings: ", true, relationships);
+  if (!optline.isEmpty()) result += optline + "<br>\n";
+
+  // extra tags
+  result += helper->ConditionalWrapText("tags", false, "", false, GetJoinedExtraTags());
+
   // finishing off
   result += "</td></tr>\n</table>";
   // done
@@ -280,7 +282,7 @@ bool jfAO3Fanfic::LoadValues(jfSkeletonParser* inparser) const {
   // the strings
   inparser->AddText("ITEMF_CHARACTERS",characters);
   inparser->AddText("ITEMF_RELATIONSHIPS",relationships);
-  inparser->AddText("ITEMF_EXTRATAGS",extratags);
+  inparser->AddText("ITEMF_EXTRATAGS",GetJoinedExtraTags());
   inparser->AddText("ITEMF_FANDOMS",GetFandoms());
   // series stuff
   inparser->AddBool("ITEMF_INSERIES",InSeries());
@@ -295,6 +297,15 @@ void jfAO3Fanfic::ProcessDescription() {
   if (!description.isEmpty()) {
     description = description.trimmed();
     description = description.mid(3,description.length()-7);
+    // post processing
+    description.replace("</p><p><hr></p>","<br>\n",Qt::CaseInsensitive);
+    description.replace("<hr />","<br>\n",Qt::CaseInsensitive);
+    description.replace("</p><p>","<br>\n",Qt::CaseInsensitive);
+    description.replace("</p>","<br>\n",Qt::CaseInsensitive);
+    description.replace("<p>"," ",Qt::CaseInsensitive);
+    description.replace(breaks,"<br>\n");
+
+    description = description.simplified();
   }
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -361,6 +372,7 @@ bool jfAO3Fanfic::ParseStart() {
   primarylink += "?view_adult=true";
   // title
   if (!x_parser->GetMovePast("</a>",name)) return parseError("Could not extract title!");
+  name = htmlparse::ConvertEntities(name, false);
   // can be rather complicated because we can have anonymous stories with no link
   if (!x_parser->Find1stPair("<a rel=\"author\"","Anonymous",aloc,bloc)) {
     return parseError("Could not get author!");
@@ -378,6 +390,7 @@ bool jfAO3Fanfic::ParseStart() {
     if (!x_parser->GetDelimited(">","</a>",author_name)) {
       return parseError("Error in getting author name!");
     }
+    author_name = htmlparse::ConvertEntities(author_name, false);
   }
   else {
     author_name = "Anonymous";
@@ -405,8 +418,10 @@ bool jfAO3Fanfic::ParseStart() {
 // special flags and date
 bool jfAO3Fanfic::ParseMiddle() {
   // constants
+
   // variables
   QString buffer;
+  QString whatwarn = "";
   // starting...
   assert(x_parser!=NULL);
   // rating
@@ -419,8 +434,8 @@ bool jfAO3Fanfic::ParseMiddle() {
   else if (buffer=="mature rating") rating = 'M';
   else if (buffer=="notrated rating") rating = '_';
   else return parseError("Rating unrecognized!");
+
   // warning flag
-  // rating
   if (!x_parser->GetDelimited("<span class=\"warning-","\"",buffer)) {
     return parseError("Cannot find warning flag!");
   }
@@ -429,6 +444,13 @@ bool jfAO3Fanfic::ParseMiddle() {
   else if (buffer=="choosenotto warnings") warn = 'N';
   else if (buffer=="mature rating") warn = 'E';
   else return parseError("Warning Flags unrecognized!");
+  // we try to get the actual warning
+  if (warn == 'W') {
+      if (x_parser->GetDelimited("title=\"","\">",buffer)) {
+          whatwarn = buffer.trimmed().replace("\\'","'");;
+      }
+  }
+
   // orientation
   if (!x_parser->MovePastTwo("<span class=\"category-","\"")) {
       return parseError("Cannot start of find orientation!");
@@ -437,20 +459,10 @@ bool jfAO3Fanfic::ParseMiddle() {
       return parseError("Cannot find orientation!");
   }
   if (buffer == "No category") orientations = "";
-  else orientations = buffer.trimmed();
-  /*
-  if (!x_parser->GetDelimited("<span class=\"category-","\"",buffer)) {
-    return parseError("Cannot find orientation!");
+  else {
+      orientations = buffer.trimmed();
   }
-  if (buffer=="het category") orient = 'H';
-  else if (buffer=="slash category") orient = 'S';
-  else if (buffer=="multi category") orient = 'M';
-  else if (buffer=="femslash category") orient = 'F';
-  else if (buffer=="gen category") orient = 'G';
-  else if (buffer=="other category") orient = 'O';
-  else if (buffer=="none category") orient = '_';
-  else return parseError("Orientation unrecognized!");
-  */
+
   // completed flag
   if (!x_parser->GetDelimited("<span class=\"complete-","\"",buffer)) {
     return parseError("Cannot find completion status!");
@@ -462,8 +474,9 @@ bool jfAO3Fanfic::ParseMiddle() {
   }
   // converting the date
   buffer = buffer.trimmed();
-  updated_date = QDate::fromString(buffer,"d MMM yyyy");
-  if (!updated_date.isValid()) return parseError("Date Conversion failed!");
+  updated_date = english_locale.toDate(buffer,"d MMM yyyy");
+  // updated_date = QDate::fromString(buffer,"d MMM yyyy");
+  if (!updated_date.isValid()) return parseError("Date Conversion failed! " + buffer);
   return true;
 }
 //-------------------------------------------
@@ -480,6 +493,7 @@ bool jfAO3Fanfic::ParseTags() {
     if (!x_parser->GetDelimited("\">","</a>",buffer2)) {
       return parseError("Cannot find final part of tag!");
     }
+    buffer2 = htmlparse::ConvertEntities(buffer2, false);
     // here, we've got the tag strings, just sort them!
     if (buffer1=="warnings") {
       if (buffer2=="Underage") warntags += 'P';
@@ -502,14 +516,12 @@ bool jfAO3Fanfic::ParseTags() {
 
     }
     else if (buffer1=="freeforms") {
-      if (!extratags.isEmpty()) extratags += ", ";
-      extratags += buffer2;
+        extratags.append(buffer2.trimmed());
     }
     else return parseError("Unrecognized Tag Type! (" + buffer1 + ")");
   }
   characters = characters.trimmed();
   relationships = relationships.trimmed();
-  extratags = extratags.trimmed();
   if (!extrawarn.isEmpty()) {
     if (!extratags.isEmpty()) extratags += ", ";
     extratags += extrawarn;
@@ -545,7 +557,7 @@ bool jfAO3Fanfic::ParseEnd() {
     if (!x_parser->GetMovePast("</a>",buffer1)) {
       return parseError("Problems getting series name!");
     }
-    series_name = buffer1;
+    series_name = htmlparse::ConvertEntities(buffer1, false);
   }
   else series_index = 0;
   // words
@@ -624,15 +636,15 @@ bool jfAO3Fanfic::AddRestToFile(QTextStream* outfile) const {
   // preparing line 4
   xresult << author_name << author_url;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // doing line 5
   xresult << part_count << updated_date << word_count << completed;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // long line 6
   xresult << series_index << series_name << series_url;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // chapter finders (line 7)
   cfinders = new QStringList();
   for (chloop=0;chloop<cats.size();chloop++) {
@@ -699,19 +711,19 @@ bool jfAO3Fanfic::AddExtraStuff(QTextStream* outfile) const {
   // preparing line 8
   xresult << rating << orientations << warn << warntags << eccount << kudcount;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // doing line 9
   xresult << characters;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // doing line 10
   xresult << relationships;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // doing line 11
   xresult << extratags;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // done
   return true;
 }
@@ -738,7 +750,9 @@ bool jfAO3Fanfic::ReadExtraStuff(jfFileReader* infile) {
   // lines 9, 10, 11
   if (!infile->ReadUnEsc(characters)) return infile->BuildError("Could not get characters!");
   if (!infile->ReadUnEsc(relationships)) return infile->BuildError("Could not get pairings!");
-  if (!infile->ReadUnEsc(extratags)) return infile->BuildError("Could not get tags!");
+  QString joined_extra_tags;
+  if (!infile->ReadUnEsc(joined_extra_tags)) return infile->BuildError("Could not get tags!");
+  extratags = joined_extra_tags.split(',');
   // finally
   return true;
 }

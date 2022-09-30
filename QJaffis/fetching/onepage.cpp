@@ -27,7 +27,7 @@ jfOnePageGetter::~jfOnePageGetter() {
 bool jfOnePageGetter::setParameters(const QString& url, jfPageParserBase* parser, size_t retries) {
     if (parser == NULL) return false;
     QUrl tempurl;
-    tempurl.setEncodedUrl(url.toLatin1());
+    tempurl.setUrl(url);
     if (!tempurl.isValid()) return false;
     downurl = url;
     parser_ptr = parser;

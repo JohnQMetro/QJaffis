@@ -132,7 +132,7 @@ const QString caturls[AO3_SECCOUNT] = {
   "https://archiveofourown.org/media/Uncategorized%20Fandoms/fandoms"
   };
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-const QString ao3_catdata::aname = "ao3mmcat.dat";
+const QString ao3_catdata::aname = "config/ao3mmcat.dat";
 //---------------------------------
 jfGenSecData* ao3_catdata::ao3_nameslinks = NULL;
 //-----------------------------------

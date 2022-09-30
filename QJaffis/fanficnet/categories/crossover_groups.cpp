@@ -20,10 +20,16 @@ bool jfFFN_CrossCatOtherMap::ContainsTag(const QString& intag) const {
 //---------------------------------------------------------------
 bool jfFFN_CrossCatOtherMap::AddCheck(size_t this_id, jfFFN_CrossoverCategory* toadd) {
   const QString fname = "jfFFN_CrossCatOtherMap::AddCheck";
-  if (toadd==NULL) return false;
-  if (!toadd->ContainsID(this_id)) return false;
+  if (toadd==NULL) {
+      return false;
+  }
+  if (!toadd->ContainsID(this_id)) {
+      return false;
+  }
   QString xtag = toadd->GetOtherCombo(this_id);
-  if (count(xtag)!=0) return false;
+  if (count(xtag)!=0) {
+      return false;
+  }
   (*this)[xtag] = toadd;
   return true;
 }
@@ -1076,6 +1082,7 @@ bool jfFFN_CrossoverSection::ReadRestFromFile(jfFileReader* infile) {
   bool xres;
   jfFFN_CrossSectionMap::iterator ridx;
   jfFFN_CrossoverGroup* cgroup;
+  jfFFN_CrossoverGroup* old_cgroup;
   jfFFN_HalfCrossover* hcross;
   // starting
   assert(infile!=NULL);
@@ -1105,6 +1112,7 @@ bool jfFFN_CrossoverSection::ReadRestFromFile(jfFileReader* infile) {
       }
       // otherwise, we stick it in
       (ridx->second).grouplink = cgroup;
+      old_cgroup = cgroup;
       ridx++;
     }
   }

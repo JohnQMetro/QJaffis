@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines Basic types for downloading fanfics
 Created :   March 16, 2012
 Conversion to QT started : April 18, 2013
-Updated :   April 18, 2018
+Updated :   January 16, 2022 (harrypotterfanfiction is dead)
 ******************************************************************************/
 #ifndef FICEXTRACT_H_INCLUDED
   #include "ficextract.h"
@@ -21,7 +21,6 @@ QString Fictype2String(jf_FICTYPE intype) {
   else if (intype==jfft_AO3) result="AO3";
   else if (intype==jfft_MMO) result="MMO";
   else if (intype==jfft_FIM) result="FIM";
-  else if (intype==jfft_HPF) result="HPF";
   else result = "UNKNOWN!";
   return result;
 }
@@ -32,13 +31,15 @@ bool String2FicType(const QString& inval, jf_FICTYPE& resval) {
   else if (inval=="AO3") resval=jfft_AO3;
   else if (inval=="MMO") resval=jfft_MMO;
   else if (inval=="FIM") resval=jfft_FIM;
-  else if (inval=="HPF") resval=jfft_HPF;
   else result = false;
   return result;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool SiteHasIndexpage(const jf_FICTYPE intype) {
-  return (intype==jfft_MMO) || (intype == jfft_FIM) || (intype == jfft_HPF);
+  return (intype==jfft_MMO) || (intype == jfft_FIM);
+}
+bool IsValidFictype(const jf_FICTYPE& intype) {
+    return (intype == jfft_FFN) || (intype == jfft_AO3) || (intype == jfft_FIM) || (intype == jfft_MMO);
 }
 
 //========================================================================
@@ -79,6 +80,9 @@ jfFicExtract::jfFicExtract(const jfFicExtract& source) {
   complete = source.complete;
   partnames = source.partnames;
   fnamelist = NULL;
+}
+jfFicExtract::~jfFicExtract() {
+
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -175,7 +179,6 @@ QString jfFicExtract::ToLabelString() {
   else if (ft==jfft_FIM) resval += "Fimfiction.Net";
   else if (ft==jfft_MMO) resval += "MediaMiner.org";
   else if (ft==jfft_AO3) resval += "An Archive of our Own";
-  else if (ft==jfft_HPF) resval += "HarryPotterFanficion.com";
   else resval += "Unknown";
   resval += ".";
   return resval;
@@ -322,50 +325,6 @@ bool jfFicExtract_cids::MoreFromText(jfLineParse* lparser_in) {
 }
 //===========================================================================
 // constructors
-jfFicExtract_HPF::jfFicExtract_HPF():jfFicExtract_cids() {}
-//-----------------------------------
-jfFicExtract_HPF::jfFicExtract_HPF(const jfFicExtract_HPF& source):jfFicExtract_cids(source) {}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// virtual methods
-//-----------------------------------------------------
-QString jfFicExtract_HPF::MakeUrl(size_t inval) const {
-  QString result = "https://harrypotterfanfiction.com/viewstory.php?chapterid=";
-  assert(inval<=chapterids.size());
-  result += QString::number(chapterids[inval-1]);
-  return result + "&showRestricted";
-}
-//-----------------------------------------------------
-QString jfFicExtract_HPF::FirstUrl() const {
-  QString result = "https://harrypotterfanfiction.com/viewstory.php?psid=";
-  result += QString::number(fic_id);
-  return result + "&showRestricted";
-}
-//-----------------------------------------------------
-QString jfFicExtract_HPF::MakeAuthlink() const {
-  QString result = "https://harrypotterfanfiction.com/viewuser.php?showuid=";
-  result += QString::number(auth_id);
-  return result + "&showRestricted";
-}
-//-----------------------------------------------------
-jf_FICTYPE jfFicExtract_HPF::GetFicType() const {
-  return jfft_HPF;
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// more virtual methods to augment core methods
-//-----------------------------------------------------
-void jfFicExtract_HPF::LoadEvenMoreValues(jfSkeletonParser* inparser) const {
-}
-//-----------------------------------------------------
-QString jfFicExtract_HPF::EvenMoreTextForm() const {
-  return "";
-}
-//-----------------------------------------------------
-bool jfFicExtract_HPF::EvenMoreFromText(jfLineParse* lparser_in) {
-  assert(lparser_in!=NULL);
-  return true;
-}
-//===========================================================================
-// constructors
 //---------------------------
 jfFicExtract_MMO::jfFicExtract_MMO():jfFicExtract_cids() {}
 //---------------------------
@@ -473,7 +432,6 @@ jfFicExtract* CopyExtract(jfFicExtract* source) {
   jfFicExtract_AO3* ao3_temp;
   jfFicExtract_FIM* fim_temp;
   jfFicExtract_FFN* ffn_temp;
-  jfFicExtract_HPF* hpf_temp;
   jfFicExtract_MMO* mmo_temp;
 
   if (source ==NULL) return NULL;
@@ -488,10 +446,6 @@ jfFicExtract* CopyExtract(jfFicExtract* source) {
   else if (source->GetFicType() == jfft_FIM) {
     fim_temp = dynamic_cast<jfFicExtract_FIM*>(source);
     return new jfFicExtract_FIM(*fim_temp);
-  }
-  else if (source->GetFicType() == jfft_HPF) {
-    hpf_temp = dynamic_cast<jfFicExtract_HPF*>(source);
-    return new jfFicExtract_HPF(*hpf_temp);
   }
   else if (source->GetFicType() == jfft_MMO) {
     mmo_temp = dynamic_cast<jfFicExtract_MMO*>(source);

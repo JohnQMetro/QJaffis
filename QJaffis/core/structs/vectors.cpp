@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    vector declarations
 Created:     April 29, 2009
 Conversion to QT started : April 18, 2013
-Updated:     August 7, 2015
+Updated:     June 4, 2022
 ******************************************************************************/
 #ifndef VECTORS_H_INCLUDED
   #include "vectors.h"
@@ -15,6 +15,9 @@ Updated:     August 7, 2015
 #ifndef BASEOBJ_H_INCLUDED
   #include "../objs/baseobj.h"
 #endif // BASEOBJ_H_INCLUDED
+#ifndef DOWNLOADROOT2_H
+    #include "../../fetching/loopget/downloadroot2.h"
+#endif // DOWNLOADROOT2_H
 
 #include <assert.h>
 /******************************************************************************/
@@ -22,8 +25,18 @@ Updated:     August 7, 2015
 jfResultUnitVector::jfResultUnitVector():std::vector<jfResultUnit*>() {
   stotal = 0;
   firstid = 0;
-  source = NULL;
+  source_new = NULL;
   limitreached = false;
+}
+void jfResultUnitVector::setWake(jfDownloadRootItems* wake_target) {
+    if (wake_target != NULL) {
+        source_new = wake_target;
+    }
+}
+bool jfResultUnitVector::WakeAfter() {
+    if (source_new != NULL) source_new->WakeAfter();
+    else return false;
+    return true;
 }
 //==============================================================================
 QString jfIndexVector::ToDelimString(QChar dval) const {

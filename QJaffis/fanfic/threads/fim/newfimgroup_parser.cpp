@@ -41,7 +41,7 @@ void jfNewFIMGroupParser::ParseDownloadedPage(const QString& inPage, size_t page
         parseErrorMessage = "ParseError: Missing 'card-list' contents!";
         delete page_results;
         page_results = NULL;
-        /**/lpt->tLog(func,3,parseErrorMessage);
+        /**/lpt->tParseError(func,parseErrorMessage);
     }
     else {
         while (xparser.GetDelimited("<li>","</div> </div>",buffer)) {
@@ -59,7 +59,7 @@ void jfNewFIMGroupParser::ParseDownloadedPage(const QString& inPage, size_t page
                 /**/lpt->tLog(func,6);
                 parseErrorMessage = "ParseError: " + perror_out + " in :\n";
                 parseErrorMessage += buffer;
-                /**/lpt->tLog(func,7,parseErrorMessage);
+                /**/lpt->tParseError(func,parseErrorMessage);
                 delete page_results;
                 page_results = NULL;
                 break;
@@ -92,7 +92,7 @@ void* jfNewFIMGroupParser::getResults() {
 }
 //------------------------------------------------------------
 // handling redirection, NULL result if faliure
-QString* jfNewFIMGroupParser::makeRedirectedURL(const QString& inPart) {
+QString* jfNewFIMGroupParser::makeRedirectedURL(const QString& inPart) const{
     return NULL; // fimfiction.net does not use redirection (normally)
 }
 //------------------------------------------------------------

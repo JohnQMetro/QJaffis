@@ -3,20 +3,24 @@ Name    : testthread.h
 Basic   : Thread Download/Parse for testing (testing download and parse for sites)
 Author  : John Q Metro
 Started : March 25, 2018
-Updated : March 29, 2018
+Updated : May 8, 2022
 ******************************************************************************/
 #ifndef TESTTHREAD_H
   #define TESTTHREAD_H
 #endif // TESTTHREAD_H
 //-----------------------------------------------
-#ifndef DOWNLOAD_H
-  #include "../fetching/download.h"
-#endif // DOWNLOAD_H
+#ifndef DOWNLOADROOT_H
+    #include "../fetching/loopget/downloadroot.h"
+#endif // DOWNLOADROOT_H
+#ifndef TESTPARSE_H
+    #include "testparse.h"
+#endif // TESTPARSE_H
 /*****************************************************************************/
-class jfTestDownloader : public jfBaseDownloader {
+class jfTestDownloader : public jfDownloadRoot {
     Q_OBJECT
   public:
-    jfTestDownloader(size_t in_max_threads);
+    jfTestDownloader();
+    virtual ~jfTestDownloader();
   public slots:
     virtual void StartProcessing();
   protected:
@@ -27,7 +31,10 @@ class jfTestDownloader : public jfBaseDownloader {
     virtual void PrepareItemInfo(size_t pageIndex);
     virtual bool advanceFetchIndex();
     virtual bool advanceResultIndex();
-    virtual jfPageParserBase* makeParser();
+
+    virtual jfParseFetchPackage* MakeParserFetcher();
+
+    jfTestWrapParser* wrap_parser;
 
 };
 /*****************************************************************************/

@@ -278,7 +278,7 @@ bool jfResultCollection::ReadMiddleFromFile(jfFileReader* infile) {
     /**/JDEBUGLOGST(fname,3,iloop)
     tcoll = MakeEmptyCollection();
     if (!tcoll->GetFromFile(infile)) {
-      /**/JDEBUGLOGS(fname,4,infile->err)
+        jerror::Log(fname,infile->err);
       delete tcoll;
       return false;
     }

@@ -98,7 +98,7 @@ void jfFFN_CatDownDialog::HandleStart() {
   // starting
   // basically, we create the thread...
   bool update = update_cbox->isChecked();
-  downloader = new jfFFN_CategoryDownloader(3);
+  downloader = new jfFFN_CategoryDownloader();
   downloader->SetCatManagerPtr(ffn_catorganizer::main_manager,update);
   SetupDownloaderAndThread();
   thread_object->start();
@@ -131,7 +131,7 @@ bool jfFFN_CatDownDialog::SetupDownloaderAndThread() {
   downloader->moveToThread(thread_object);
   // connecting signals and slots
   bool testoo = mpanel->ConnectAndSetPauser(downloader);
-  /**/jfAssertLog(testoo,fname,"Connecting and Setting Pauser FAILED!!!!");
+  /**/jerror::AssertLog(testoo,fname,"Connecting and Setting Pauser FAILED!!!!");
 
   // standard thread/downloader connections
   connect(thread_object, SIGNAL(started()),downloader ,SLOT(StartProcessing()));

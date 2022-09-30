@@ -3,7 +3,7 @@ Name    : progress_panel.h
 Basic   : Defines abstract panel with progress bar that shows download info
 Author  : John Q Metro
 Started : March 31, 2013
-Updated : April 17, 2018
+Updated : July 4, 2021 (waiting and stopped waiting)
 
 ******************************************************************************/
 #ifndef PROGRESS_PANEL_H
@@ -55,6 +55,10 @@ class jfProgressPanelBase : public QWidget {
       void HandlePaused(bool is_after);
       void HandleStopping(bool is_after);
       void HandleStopped(jfFETCH_AFTERMATH final_error);
+    // slots for waiting and stopped waiting
+      void HandleWaiting(int amount);
+      void HandleStoppedWaiting();
+
     // slots for handling thread messages
       void HandleStart(bool all_okay);
       void HandleItemCount(int eitemcount);

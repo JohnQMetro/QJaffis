@@ -15,7 +15,7 @@
 //=============================================================================
 //===========================================================================
 namespace filterglobals {
-  const QString fnamex = "gfilt.dat";
+  const QString fnamex = "config/gfilt.dat";
   const size_t ITEM_NLIST = 9;
   extern QStringList* fclist[];
   extern jfMapOfFiltermaps* global_filters;

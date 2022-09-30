@@ -14,7 +14,7 @@ Updated :   December 27, 2021 (Changing Orientation filter to tags)
   #include "../base/bfilt_edit.h"
 #endif // BFILT_EDIT_H_INCLUDED
 #ifndef CHARO_EDITOR_H_INCLUDED
-  #include "../../misc/charo_editor.h"
+  #include "../../controls/charo_editor.h"
 #endif // CHARO_EDITOR_H_INCLUDED
 #ifndef FILTERS_EDIT1_H_INCLUDED
   #include "../extended/filters_edit1.h"

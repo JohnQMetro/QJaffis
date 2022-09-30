@@ -32,7 +32,7 @@ void* jfFIMTag_Extractor::getResults() {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // fimfiction.net doies not (currently) do redirection.
-QString* jfFIMTag_Extractor::makeRedirectedURL(const QString& inPart) {
+QString* jfFIMTag_Extractor::makeRedirectedURL(const QString& inPart) const {
     return NULL;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++

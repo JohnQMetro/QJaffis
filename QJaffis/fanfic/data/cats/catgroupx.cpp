@@ -316,7 +316,7 @@ bool jfCatGroupCollection::CategoryInGroupAtIndex(const jfGeneralCategory* categ
 }
 //----------------------------
 jfCategoryGroup* jfCatGroupCollection::GroupContainingCategory(jfGeneralCategory* categ_in) {
-  if (categ_in == NULL) return false;
+  if (categ_in == NULL) return NULL;
   if (idequiv) {
     if (0 == id_lookup.count(categ_in->GetID())) return NULL;
     else return id_lookup[categ_in->GetID()];

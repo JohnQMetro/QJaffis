@@ -4,7 +4,7 @@ Basic   : Separates out logging from the other stuff
 Author  : John Q Metro
 Started : January 13, 2011
 Conversion to QT started : February 25, 2013
-Updated : March 9, 2013
+Updated : July 16, 2022
 Notes   :
 
 ******************************************************************************/
@@ -20,6 +20,7 @@ Notes   :
 #endif // UTILS1_H_INCLUDED
 
 #include <QDateTime>
+#include <QDir>
 
 #include <assert.h>
 
@@ -30,17 +31,20 @@ Notes   :
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // constructors
 //---------------------------
-jfQLogger::jfQLogger() {
+jfQLogger::jfQLogger(QString logfolder) {
   xostream = NULL;
   ofile = NULL;
   llinecount = 0;
+  subfolder = logfolder;
 }
 //---------------------------
-jfQLogger::jfQLogger(QString inname) {
+jfQLogger::jfQLogger(QString logfolder, QString inname, bool opennow) {
   xostream = NULL;
   ofile = NULL;
   llinecount = 0;
-  open(inname);
+  subfolder = logfolder;
+  if (opennow) open(inname);
+  else lfilename = inname;
 }
 
 //---------------------------
@@ -48,7 +52,15 @@ bool jfQLogger::open(QString inname) {
   // basic starting steps
   if (inname.isEmpty()) return false;
   if (isOpen()) close();
-  lfilename = inname;
+  // folder
+  if (subfolder.isEmpty()) {
+      lfilename = inname;
+  }
+  else {
+      makeFolder();
+      lfilename = subfolder + "/" + inname;
+  }
+  //
   // opening
   ofile = new QFile(lfilename);
   if (!ofile->open(QIODevice::WriteOnly | QIODevice::Text| QIODevice::Truncate)) {
@@ -88,6 +100,18 @@ bool jfQLogger::logLine(QString outstring) {
   ++llinecount;
   return true;
 }
+//-----------------------------------
+/* differs from logLine in that there is no datetime, and a separate
+ * open is not needed */
+bool jfQLogger::logError(QString outstring) {
+    if (!isOpen()) {
+        if (!open(lfilename)) return false;
+    }
+    (*xostream) << outstring << '\n';
+    xostream->flush();
+    ++llinecount;
+    return true;
+}
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // destructors
@@ -111,9 +135,16 @@ bool jfQLogger::close() {
 jfQLogger::~jfQLogger() {
   close();
 }
+//++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfQLogger::makeFolder() const {
+    QDir dir = QDir();
+    if (dir.exists(subfolder)) return true;
+    else return dir.mkdir(subfolder);
+}
 
 //===================================================================
 // one logfile and some associated variables
+const QString jlog::logfoldername = "logs";
 const QString jlog::logfilename = "trace0.txt";
 jfQLogger* jlog::logtarget = NULL;
 QMutex jlog::locklog;
@@ -123,8 +154,8 @@ bool jlog::dologging = true;
 void jlog::InitLog() {
   QMutexLocker lk(&locklog);
   if (logtarget!=NULL) delete logtarget;
-  if (dologging) logtarget = new jfQLogger(logfilename);
-  else logtarget = new jfQLogger();
+  if (dologging) logtarget = new jfQLogger(logfoldername,logfilename, true);
+  else logtarget = new jfQLogger(logfoldername);
 }
 
 // closes and deletes the logger
@@ -137,7 +168,7 @@ void jlog::CloseLog() {
 }
 
 //========================================================
-void jfLogMessage(QString funcname,size_t index, QString info) {
+void jfLogxMessage(QString funcname,size_t index, QString info) {
   assert(!funcname.isEmpty());
   QMutexLocker lk(&jlog::locklog);
   QString res_msg = BLogCore(funcname,index,true);
@@ -145,7 +176,7 @@ void jfLogMessage(QString funcname,size_t index, QString info) {
   jlog::logtarget->logLine(res_msg);
 }
 //---------------------------------------------------------------------------
-void jfLogMessageS(QString funcname,size_t index, size_t data) {
+void jfLogxMessageS(QString funcname,size_t index, size_t data) {
   assert(!funcname.isEmpty());
   QMutexLocker lk(&jlog::locklog);
   QString res_msg = BLogCore(funcname,index,true);
@@ -153,7 +184,7 @@ void jfLogMessageS(QString funcname,size_t index, size_t data) {
   jlog::logtarget->logLine(res_msg);
 }
 //-----------------------------------------------------------------------
-void jfLogMessageI(QString funcname,size_t index, int data) {
+void jfLogxMessageI(QString funcname,size_t index, int data) {
   assert(!funcname.isEmpty());
   QMutexLocker lk(&jlog::locklog);
   QString res_msg = BLogCore(funcname,index,true);
@@ -161,7 +192,7 @@ void jfLogMessageI(QString funcname,size_t index, int data) {
   jlog::logtarget->logLine(res_msg);
 }
 //-----------------------------------------------------------------------
-void jfLogMessageU(QString funcname,size_t index, ulong data) {
+void jfLogxMessageU(QString funcname,size_t index, ulong data) {
   assert(!funcname.isEmpty());
   QMutexLocker lk(&jlog::locklog);
   QString res_msg = BLogCore(funcname,index,true);
@@ -169,7 +200,7 @@ void jfLogMessageU(QString funcname,size_t index, ulong data) {
   jlog::logtarget->logLine(res_msg);
 }
 //--------------------------------------------------------------------
-void jfLogMessageB(QString funcname,size_t index, bool data) {
+void jfLogxMessageB(QString funcname,size_t index, bool data) {
   assert(!funcname.isEmpty());
   QMutexLocker lk(&jlog::locklog);
   QString res_msg = BLogCore(funcname,index,true);
@@ -177,14 +208,14 @@ void jfLogMessageB(QString funcname,size_t index, bool data) {
   jlog::logtarget->logLine(res_msg);
 }
 //--------------------------------------------------------------------
-void jfLogMessage(QString funcname,size_t index) {
+void jfLogxMessage(QString funcname,size_t index) {
   assert(!funcname.isEmpty());
   QMutexLocker lk(&jlog::locklog);
   QString res_msg = BLogCore(funcname,index,false);
   jlog::logtarget->logLine(res_msg);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfLogMessage2S(QString funcname,size_t index, size_t data1, size_t data2) {
+void jfLogxMessage2S(QString funcname,size_t index, size_t data1, size_t data2) {
   assert(!funcname.isEmpty());
   QMutexLocker lk(&jlog::locklog);
   QString res_msg = BLogCore(funcname,index,true);
@@ -193,7 +224,7 @@ void jfLogMessage2S(QString funcname,size_t index, size_t data1, size_t data2) {
   jlog::logtarget->logLine(res_msg);
 }
 //-----------------------------------------------------------------------------
-void jfLogMessageBytes(QString funcname, size_t index, const QByteArray* indata, size_t iindex, size_t length) {
+void jfLogxMessageBytes(QString funcname, size_t index, const QByteArray* indata, size_t iindex, size_t length) {
   assert(!funcname.isEmpty());
   assert(indata!=NULL);
   QMutexLocker lk(&jlog::locklog);
@@ -218,13 +249,13 @@ QString BLogCore(QString funcname, size_t index, bool more) {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // log just a string
-void jfXLogString(QString in_msg) {
+void jfLogString(QString in_msg) {
   QMutexLocker lk(&jlog::locklog);
   jlog::logtarget->logLine(in_msg);
 }
 //---------------------------
 // conditional log
-void jfCLogMessage(bool cond, QString funcname, size_t index, QString info) {
+void jfCLogxMessage(bool cond, QString funcname, size_t index, QString info) {
   assert(!funcname.isEmpty());
   QMutexLocker lk(&jlog::locklog);
   if (cond) {
@@ -233,20 +264,42 @@ void jfCLogMessage(bool cond, QString funcname, size_t index, QString info) {
     jlog::logtarget->logLine(res_msg);
   }
 }
-
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// assert with logging
-void jfAssertLog(bool condition, QString funcname, QString outmsg) {
-  QString result;
-  if (!condition) {
-    jlog::locklog.lock();
-    result = "Assertion failed in ";
-    result += funcname;
-    result += " : ";
-    result += outmsg;
-    jlog::logtarget->logLine(result);
-    jlog::locklog.unlock();
-    assert(false);
-  }
+//==============================================================
+// error log
+const QString jerror::errfilename = "errors.txt";
+jfQLogger* jerror::errtarget = NULL;
+QMutex jerror::lockerr;
+//---------------------------------------
+// creates the error log object
+void jerror::InitELog() {
+    QMutexLocker lk(&lockerr);
+    if (errtarget != NULL) delete errtarget;
+    errtarget = new jfQLogger(jlog::logfoldername,errfilename, false);
+}
+// closes and deletes the logger
+void jerror::CloseELog() {
+    QMutexLocker lk(&lockerr);
+    if (errtarget != NULL) {
+        delete errtarget;
+        errtarget = NULL;
+    }
+}
+//--------------------------------------
+void jerror::Log(QString funcname, QString errmsg) {
+    QMutexLocker lk(&lockerr);
+    errtarget->logError(funcname + "| " + errmsg);
+}
+//--------------------------------------
+void jerror::ParseLog(QString funcname, QString errmsg) {
+    QMutexLocker lk(&lockerr);
+    errtarget->logError(funcname + "| " + "Parse: " + errmsg);
+}
+//--------------------------------------
+void jerror::AssertLog(bool condition, QString funcname, QString outmsg) {
+    QMutexLocker lk(&lockerr);
+    if (!condition) {
+        errtarget->logError(funcname + "| " + outmsg);
+        qFatal("%s",outmsg.toLocal8Bit().constData());
+    }
 }
 //*****************************************************************************

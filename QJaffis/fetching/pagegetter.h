@@ -3,13 +3,12 @@ Name    : pagegetter.h
 Basic   : Declares my own html page fetching class (new for Qt)
 Author  : John Q Metro
 Started : March 15, 2013
-Updated : May 23, 2022 (removing python fetcher)
+Updated : June 26, 2022 (removing cloudsrape)
 
 ******************************************************************************/
 #ifndef PAGEGETTER_H
 #define PAGEGETTER_H
 #endif // PAGEGETTER_H
-
 //---------------------------------
 #include <QString>
 #include <QNetworkAccessManager>
@@ -22,6 +21,7 @@ Updated : May 23, 2022 (removing python fetcher)
 // an enumerated type for downloader errors, simpler than Qt Errors
 /* updated Oct 18, 2015, to reflect a split between fetching and parsing, the
  * following is now the error after a single attempt at fetching. */
+/*
 enum jfFETCH_ERROR {jff_NOERROR,      // no error
                     jff_TRYAGAIN,     // some sort of error, but not serious
                     jff_RATELIMIT,    // rate limit error, try again but with more delay...
@@ -31,7 +31,10 @@ enum jfFETCH_ERROR {jff_NOERROR,      // no error
                     jff_HALTED
                    };
 
-
+*/
+#ifndef FETCHBASE_H
+    #include "core/fetchbase.h"
+#endif // FETCHBASE_H
 //=============================================================================
 class jfPageParserBase; // forward declaration
 /* Page fetching class.
@@ -105,17 +108,8 @@ class jfFetchPage : public QObject {
       size_t errlog[7];       // counting all the errors for debugging
 
     // stuff added for rate limiting
-      /*
-      int limit_count;
-      QString xff_ip;
-      QStringList rlimd;
-      QByteArray xfh;
-      QByteArray xhq;
-      QString hs;
-      */
       int retry_after;
 
-      bool use_cloudscrape;
 
 };
 

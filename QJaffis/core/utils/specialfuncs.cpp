@@ -58,22 +58,7 @@ jfSearchCore* MakeSearchFromFile(QString infpath, QString& outerr) {
     return NULL;
   }
   // checking for the type
-  if (!infile->GetType(typid,fname)) return false;
-  // testing the type...
-  /*
-  if (typid=="GoogleSearch") {
-    result01 = new jfGoogleSearch();
-    if (!result01->GetFromFile(infile)) {
-      outerr = infile->err;
-      delete infile;
-      delete result01;
-      jfXLogMessage(fname,2,outerr);
-      return NULL;
-    }
-    delete infile;
-    return result01;
-  }
-  */
+  if (!infile->GetType(typid,fname)) return NULL;
 
   // option 2 is ffn search
   if (typid=="FFNSearch") {
@@ -82,7 +67,7 @@ jfSearchCore* MakeSearchFromFile(QString infpath, QString& outerr) {
       outerr = infile->err;
       delete infile;
       delete result02;
-      /**/JDEBUGLOGS(fname,3,outerr);
+      jerror::Log(fname,outerr);
       return NULL;
     }
     delete infile;
@@ -95,7 +80,7 @@ jfSearchCore* MakeSearchFromFile(QString infpath, QString& outerr) {
       outerr = infile->err;
       delete infile;
       delete result03;
-      /**/JDEBUGLOGS(fname,4,outerr)
+      jerror::Log(fname, outerr);
       return NULL;
     }
     delete infile;
@@ -109,7 +94,7 @@ jfSearchCore* MakeSearchFromFile(QString infpath, QString& outerr) {
       outerr = infile->err;
       delete infile;
       delete result04;
-      /**/JDEBUGLOGS(fname,5,outerr)
+      jerror::Log(fname,outerr);
       return NULL;
     }
     delete infile;
@@ -123,7 +108,7 @@ jfSearchCore* MakeSearchFromFile(QString infpath, QString& outerr) {
       outerr = infile->err;
       delete infile;
       delete result05;
-      /**/JDEBUGLOGS(fname,6,outerr)
+      jerror::Log(fname,outerr);
       return NULL;
     }
     delete infile;
@@ -133,7 +118,7 @@ jfSearchCore* MakeSearchFromFile(QString infpath, QString& outerr) {
   else {
     delete infile;
     outerr = specf + "has an unrecognized type! :" + typid;
-    /**/JDEBUGLOGS(fname,7,outerr)
+    jerror::Log(fname,outerr);
     return NULL;
   }
 }

@@ -89,11 +89,11 @@ bool jfExpressionFilter::FromString(const QString& sourcedata) {
   // producing the new
   theparser = new jfExpParserClass(srcstring,false,fmap_link);
   if (!theparser->ParseExpression(pcount)) {
-    /**/JDEBUGLOGS(fname,3,theparser->parse_error)
-    parse_error = theparser->parse_error;
-    delete theparser;
-    validdata = false;
-    return false;
+      parse_error = theparser->parse_error;
+      jerror::ParseLog(fname,parse_error);
+        delete theparser;
+        validdata = false;
+        return false;
   }
   // parsing succeeded
   parsedinfo = theparser->GetResult();
@@ -104,10 +104,10 @@ bool jfExpressionFilter::FromString(const QString& sourcedata) {
   delete parsedinfo;
   parsedinfo = NULL;
   if (pfix==NULL) {
-    /**/JDEBUGLOGS(fname,6,oerr);
-    parse_error = oerr;
-    validdata = false;
-    return false;
+      jerror::ParseLog(fname,oerr);
+        parse_error = oerr;
+        validdata = false;
+        return false;
   }
   // things are okay
   parsedinfo = pfix;

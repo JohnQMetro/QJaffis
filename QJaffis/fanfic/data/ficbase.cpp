@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines base fanfic objects that hold fanfic info
 Created :   April 2, 2012
 Conversion to QT started : April 20, 2013
-Updated :   December 28, 2014
+Updated :   August 9, 2022
 Renamed from ficobj2.cpp
 ******************************************************************************/
 #ifndef FICBASE_H
@@ -172,6 +172,26 @@ QString jfGenericFanfic::DisplayHTMLHeader(size_t mindex) const {
   }
   return result;
 }
+QString jfGenericFanfic::DisplayHTMLHeader(size_t mindex, const jfDisplayHTMLHelper* helper ) const {
+    assert(mindex<3);
+    assert(validdata);
+    // varibales
+    QString result,texmpx;
+    // building the result
+    // we start with the table
+    result = "<table width=99%";
+    // background color based on fic marks...
+    texmpx = helper->GetMarkColor(mindex);
+    if (!texmpx.isEmpty()) result += " bgcolor=\"#" + texmpx + "\"";
+    result += "><tr><td>";
+    // building the title line
+    result += helper->WrapHyperlink(primarylink,"fictitle",  name);
+    // adding the author stuff
+    result += helper->WrapText("fictitle", " by " + author_name);
+    // status
+    result += helper->UpdateStatus(ustatus);
+    return result;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // core extract methods
 void jfGenericFanfic::LoadIntoExtractCore(jfFicExtract* into) const {
@@ -261,11 +281,11 @@ bool jfGenericFanfic3::AddRestToFile(QTextStream* outfile) const {
   // preparing line 4
   xresult << author_id << author_name << author_url;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // doing line 5
   xresult << part_count << genres << updated_date;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // doing line 6
   xresult << word_count << completed;
   (*outfile) << xresult << "\n";

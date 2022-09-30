@@ -3,7 +3,7 @@ Name    : progress_panel2.h
 Basic   : Child classes of progress panel which are still somewhat generic
 Author  : John Q Metro
 Started : November 17, 2013
-Updated : August 2, 2016
+Updated : April 22, 2022
 ******************************************************************************/
 #ifndef PROGRESS_PANEL2_H
   #define PROGRESS_PANEL2_H
@@ -12,12 +12,13 @@ Updated : August 2, 2016
 #ifndef PROGRESS_PANEL_H
   #include "progress_panel.h"
 #endif // PROGRESS_PANEL_H
-#ifndef DOWNLOAD_H
-  #include "../download.h"
-#endif // DOWNLOAD_H
-#ifndef DOWNLOAD2_H
-  #include "../download2.h"
-#endif // DOWNLOAD2_H
+
+#ifndef DOWNBASE_H
+    #include "../downbase.h"
+#endif // DOWNBASE_H
+#ifndef MULTICATROOT_H
+    #include "../loopget/multicatroot.h"
+#endif // MULTICATROOT_H
 //-------------------------------------
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -46,7 +47,7 @@ class jfProgressPanelSingle : public jfProgressPanelOne {
   public:
     jfProgressPanelSingle(bool sidelayout, QWidget* parent = NULL);
     // specials
-    bool ConnectAndSetPauser(jfBaseDownloader* the_downloader);
+    bool ConnectAndSetPauser(jfDownloaderBase* the_downloader);
   protected:
 };
 
@@ -92,7 +93,7 @@ class jfProgPanelMultiple : public jfProgPanelMultiBase {
   public:
     // constructor
     jfProgPanelMultiple(size_t loption, QWidget* parent = NULL);
-    bool ConnectAndSetPauser(jfMultiCatBaseDownloader* the_downloader);
+    bool ConnectAndSetPauser(jfMultiCatRootDownloader* the_downloader);
 };
 
 /*****************************************************************************/

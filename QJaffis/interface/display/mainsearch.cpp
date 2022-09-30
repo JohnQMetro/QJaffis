@@ -265,8 +265,7 @@ QString jfMainSearchGroup::GSearchName() const {
 bool jfMainSearchGroup::ConsStepTwo(const QStringList* infclist) {
   const QString fname = "jfMainSearchGroup::ConsStepTwo";
   // asserts and checks
-  /**/JDEBUGLOG(fname,1)
-  assert(p_search!=NULL);
+  jerror::AssertLog(p_search!=NULL,fname,"seatch object is NULL");
   assert(infclist);
   // assifgning search data
   search_data = p_search->GetSearchObj();
@@ -275,9 +274,9 @@ bool jfMainSearchGroup::ConsStepTwo(const QStringList* infclist) {
     nedit =  new jfNameEdit("Name for this Search",search_data->GetName(),5);
     int sh = 30;
     nedit->setMinimumHeight(sh);
-    /**/jfLogMessageI(fname,2,sh);
+    /**/JDEBUGLOGI(fname,2,sh);
     nedit->setMinimumWidth(500);
-    /**/jfLogMessageI(fname,3,(nedit->sizeHint()).width());
+    /**/JDEBUGLOGI(fname,3,(nedit->sizeHint()).width());
     // nedit->setFixedWidth(300);
     QTabBar* tb = container->findChild<QTabBar *>(QLatin1String("qt_tabwidget_tabbar"));
     tb->setObjectName("SearchTopTabBar");

@@ -24,7 +24,7 @@ class jfAO3CatParser : public jfPageParserBase {
     virtual void ParseDownloadedPage(const QString& inPage, size_t pageindex);
     virtual void* getResults();
     // handling redirection, NULL result if faliure
-    virtual QString* makeRedirectedURL(const QString& inPart);
+    virtual QString* makeRedirectedURL(const QString& inPart) const;
     virtual QString getCookie() const;
     // test methods
     virtual bool testMissing(const QString *page) const;

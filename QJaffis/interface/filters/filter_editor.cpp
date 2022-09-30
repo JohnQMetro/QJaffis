@@ -225,10 +225,13 @@ jfFilterMapEditor::jfFilterMapEditor(jfFilterMap* inlink,bool in_global, const Q
   editing_panel = NULL;
   isblank = true;
   // arranging that
-  top_sizer = new QHBoxLayout();
-  top_sizer->addLayout(side_sizer,1);
-  top_sizer->addWidget(blank_panel,local_ratio);
-  setLayout(top_sizer);
+  topq_sizer = new QHBoxLayout();
+  topq_sizer->addLayout(side_sizer,1);
+  edit_stack = new QVBoxLayout();
+  edit_stack->addWidget(blank_panel, edit_size_ratio);
+  edit_stack->addStretch(3);
+  topq_sizer->addLayout(edit_stack, local_ratio);
+  setLayout(topq_sizer);
   // connections
   connect(new_button, SIGNAL(clicked(bool)), this, SLOT(NewPressed(bool)));
   connect(del_button, SIGNAL(clicked(bool)), this, SLOT(DeletePressed(bool)));
@@ -290,9 +293,9 @@ void jfFilterMapEditor::SetNoFilter() {
   if (!isblank) {
     assert(editing_panel!=NULL);
     // replacing
-    top_sizer->removeWidget(editing_panel);
+    edit_stack->removeWidget(editing_panel);
     editing_panel->hide();
-    top_sizer->addWidget(blank_panel,local_ratio);
+    edit_stack->insertWidget(0,blank_panel,edit_size_ratio);
     blank_panel->show();
     // removing the old panel
     delete editing_panel;
@@ -449,13 +452,11 @@ bool jfFilterMapEditor::LoadSelected() {
   QString tfiltype;
   jfBaseFilterEditor* eholder;
   // checks
-  /**/JDEBUGLOG(fname,1)
-  assert(picker->IsFilterSelected());
+  jerror::AssertLog(picker->IsFilterSelected(),fname,"No filter is selected!");
   /**/JDEBUGLOGS(fname,2,picker->SelectedName())
   // we get the filter in question
   tfilter = fdata->GetItem(picker->SelectedName());
-  /**/JDEBUGLOG(fname,3)
-  assert(tfilter!=NULL);
+  jerror::AssertLog(tfilter!=NULL,fname,"Seletec filter is null!");
   /**/JDEBUGLOG(fname,4)
   // we get the type in question
   tfiltype = tfilter->GetTypeID();
@@ -477,15 +478,15 @@ bool jfFilterMapEditor::LoadSelected() {
     // how we replace it depends on whether it is blank
     if (isblank) {
       /**/JDEBUGLOG(fname,11)
-      top_sizer->removeWidget(blank_panel);
+      edit_stack->removeWidget(blank_panel);
       blank_panel->hide();
-      top_sizer->addWidget(eholder,local_ratio);
+      edit_stack->insertWidget(0,eholder,edit_size_ratio);
       isblank = false;
     }
     else {
       /**/JDEBUGLOG(fname,12)
-      top_sizer->removeWidget(editing_panel);
-      top_sizer->addWidget(eholder,local_ratio);
+      edit_stack->removeWidget(editing_panel);
+      edit_stack->insertWidget(0,eholder,edit_size_ratio);
       delete editing_panel;
     }
     // finializing steps

@@ -3,57 +3,29 @@ Name    : threadbase.h
 Basic   : Core thread class, with per thread logging and signals
 Author  : John Q Metro
 Started : October 16, 2015
-Updated : August 8, 2016
+Updated : May 22, 2021
 
 ******************************************************************************/
 #ifndef THREADBASE_H
 #define THREADBASE_H
 #endif // THREADBASE_H
 //----------------------------------------
-#ifndef LOGGING_H_INCLUDED
-  #include "../core/utils/logging.h"
-#endif // LOGGING_H_INCLUDED
 #ifndef CONNECT_HELPERS_H
 #include "connect_helpers.h"
 #endif // CONNECT_HELPERS_H
 #ifndef PAGEGETTER_H
   #include "pagegetter.h"
 #endif // PAGEGETTER_H
+#ifndef LOGBASE_H
+    #include "logbase.h"
+#endif // LOGBASE_H
 //----------------------------------------
 #include <QObject>
 #include <QString>
 #include <QSemaphore>
 #include <QThread>
 /*****************************************************************************/
-// base class with log methods
-class jfLoggBase : public QObject {
-    Q_OBJECT
-  public:
-    jfLoggBase();
-    virtual ~jfLoggBase();
-  // log methods
-    void tLog(const QString &funcname, size_t index) const;
-    void tLog(const QString &funcname, size_t index, const QString& msg) const;
-    void tLogB(const QString &funcname, size_t index, bool value) const;
-    void tLog2B(const QString &funcname, size_t index, bool value1, bool value2) const;
-    void tLogS(const QString &funcname, size_t index, size_t value) const;
-    void tLog2S(const QString &funcname, size_t index, size_t value1, size_t value2) const;
-    void tLogI(const QString &funcname, size_t index, int value) const;
-    void tLog2I(const QString &funcname, size_t index, int value1, int value2) const;
-    void tLogL(const QString &funcname, size_t index, size_t loop_index) const;
-  protected:
-    // core per thread logging
-    // methods
-    bool initLog(const QString& tname);
-    QString buildLog(const QString &funcname, const size_t& inindex) const;
-    void CloseLog();
 
-    // data
-    static int tcount;
-    mutable QMutex tcr;
-    mutable jfQLogger* thislog;
-
-};
 
 //============================================================================
 /* Base class for action threads. The signals are intended for progress

@@ -21,7 +21,7 @@ Updated :   January 7, 2018 (changing to the new fimfiction.net group search).
   #include "../../data/fim/fim_groupsearch.h"
 #endif // FIM_GROUPSEARCH_H_INCLUDED
 #ifndef WIDGETS3_H_INCLUDED
-  #include "../../../interface/misc/widgets3.h"
+  #include "../../../interface/controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
 
 //*****************************************************************************

@@ -24,7 +24,7 @@ class jfAO3_FicPartParser : public jfStoryPartParseBase {
   public:
     jfAO3_FicPartParser();
     // virual methods that are implemented
-    virtual QString* makeRedirectedURL(const QString& inPart);
+    virtual QString* makeRedirectedURL(const QString& inPart) const;
     virtual bool testMissing(const QString *page) const;
     virtual bool testIncomplete(const QString *page) const;
     virtual QString getCookie() const;

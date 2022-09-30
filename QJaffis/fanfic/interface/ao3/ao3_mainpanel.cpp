@@ -4,12 +4,15 @@
 // Purpose :    Archiveofourown.org search interface
 // Created:     September 3, 2012
 // Conversion to Qt started April 13, 2014
-// Updated:     July 17, 2016
+// Updated:     April 3, 2022
 //**************************************************************************
 #ifndef AO3_MAINPANEL_H_INCLUDED
   #include "ao3_mainpanel.h"
 #endif // AO3_MAINPANEL_H_INCLUDED
 //-----------------------------------------------
+#ifndef AO3_SEARCHFILTER_PANEL_H
+    #include "ao3_searchfilter_panel.h"
+#endif // AO3_SEARCHFILTER_PANEL_H
 #ifndef JFILTERGLOBALS
   #include "../../../core/filters/filter_globals.h"
 #endif
@@ -28,6 +31,9 @@
 #ifndef AO3ITEM_THREAD_H
   #include "../../threads/ao3/ao3item_thread.h"
 #endif // AO3ITEM_THREAD_H
+#ifndef AO3_SEARCHFILTER_PANEL_H
+    #include "ao3_searchfilter_panel.h"
+#endif // AO3_SEARCHFILTER_PANEL_H
 //------------------------------------------
 #include <assert.h>
 
@@ -50,14 +56,14 @@ jfAO3SearchGrp::jfAO3SearchGrp(jfAO3Search* searchin, jfMainSearchGroup* holder,
   }
   typed_search->SetData(ao3_catdata::ao3_catmanager->GetData(), sval);
   // making panel 1
-  panel1 = MakeFirstPanel();
+  search_and_filter_panel = MakeFirstPanel();
   custinit = true;
   // finishing off
   FinishConstruction();
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-jfSearchPanelBase*  jfAO3SearchGrp::MakeFirstPanel(){
-  return new jfAO3_Panel1(typed_search);
+jfSearchPanelRoot*  jfAO3SearchGrp::MakeFirstPanel(){
+  return new jfAO3_SearchFilterPanel(typed_search);
 }
 //----------------------------------------------------------------------------
 jfSearchCore*       jfAO3SearchGrp::MakeTypedSearch() const {
@@ -65,7 +71,8 @@ jfSearchCore*       jfAO3SearchGrp::MakeTypedSearch() const {
   temp = new jfAO3Search();
   temp->MakeEmpty();
   temp->categories->SetUseDefault(true);
-  QString bod = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+
+  QString bod = jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
   temp->categories->base_outputdir = bod;
   return temp;
 }
@@ -75,8 +82,8 @@ jfResultCollection* jfAO3SearchGrp::MakeTypedCollection() const {
   return new jfAO3ResColl(typed_search);
 }
 //----------------------------------------------------------------------------
-jfBaseItemDownloader* jfAO3SearchGrp::MakeTypedThread() const {
-  return new jfAO3FandomItemDownloader(3);
+jfDownloadRootItems* jfAO3SearchGrp::MakeTypedThread() const {
+  return new jfAO3FandomItemDownloader();
 }
 //----------------------------------------------------------------------------
 int jfAO3SearchGrp::GetSearchIndex() const {
@@ -101,14 +108,14 @@ jfAO3OnePanelSearch::jfAO3OnePanelSearch(jfAO3Search* searchin, jfMainSearchGrou
   }
   typed_search->SetData(ao3_catdata::ao3_catmanager->GetData(), sval);
   // making panel 1
-  panel1 = MakeFirstPanel();
+  search_and_filter_panel = MakeFirstPanel();
   custinit = true;
   // finishing off
   FinishConstruction();
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-jfSearchPanelBase*  jfAO3OnePanelSearch::MakeFirstPanel(){
-  return new jfAO3_Panel1(typed_search);
+jfSearchPanelRoot*  jfAO3OnePanelSearch::MakeFirstPanel(){
+  return new jfAO3_SearchFilterPanel(typed_search);
 }
 //----------------------------------------------------------------------------
 jfSearchCore*       jfAO3OnePanelSearch::MakeTypedSearch() const {
@@ -116,7 +123,7 @@ jfSearchCore*       jfAO3OnePanelSearch::MakeTypedSearch() const {
   temp = new jfAO3Search();
   temp->MakeEmpty();
   temp->categories->SetUseDefault(true);  
-  QString bod = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+  QString bod = jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
   temp->categories->base_outputdir = bod;
   return temp;
 }
@@ -126,8 +133,8 @@ jfResultCollection* jfAO3OnePanelSearch::MakeTypedCollection() const {
   return new jfAO3ResColl(typed_search);
 }
 //----------------------------------------------------------------------------
-jfBaseItemDownloader* jfAO3OnePanelSearch::MakeTypedThread() const {
-  return new jfAO3FandomItemDownloader(3);
+jfDownloadRootItems* jfAO3OnePanelSearch::MakeTypedThread() const {
+  return new jfAO3FandomItemDownloader();
 }
 //----------------------------------------------------------------------------
 int jfAO3OnePanelSearch::GetSearchIndex() const {

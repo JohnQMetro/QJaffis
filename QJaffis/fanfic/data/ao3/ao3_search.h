@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares search object of AO3
 Created :   August 28, 2012
 Conversion to Qt Started March 29, 2014
-Updated :   January 27, 2022
+Updated :   July 17, 2022 (replacing hardcoded predefined excludes)
 ******************************************************************************/
 #ifndef AO3_SEARCH_H_INCLUDED
 #define AO3_SEARCH_H_INCLUDED
@@ -43,7 +43,7 @@ class jfAO3Search : public jfSearchCore {
     void SetRatingIndex(size_t in_rindex);
     void SetWarningExcludes(bool in_violence, bool in_death, bool in_rape, bool in_underage);
     void SetTagExcludes(const QString& in_excludes, const QString& in_replacer);
-    void SetPredefinedExcludes(bool in_gensex, bool in_emo, bool in_other, bool in_fluff);
+    void SetPredefinedExcludes(const QStringList& predefined_excludes);
     void SetIncludes(const QString& in_includes);
     void SetWordLimits(int in_words_from, int in_words_to);
     void SetExtras(bool in_completed_only, bool in_english_only);
@@ -62,10 +62,7 @@ class jfAO3Search : public jfSearchCore {
     bool GetExcludedUnderageSex() const;
     QString GetExcludedTagsList() const;
     QString GetExcludeReplacer() const;
-    bool IsGendSexExcluded() const;
-    bool IsEmoStuffExcluded() const;
-    bool IsOtherStuffExcluded() const;
-    bool IsFluffStuffExcluded() const;
+    QStringList GetPredefinedExcludes() const;
     QString GetIncludedTagsList() const;
     int GetMinWordCount() const;
     int GetMaxWordCount() const;
@@ -119,7 +116,8 @@ class jfAO3Search : public jfSearchCore {
 
     QString excludes; // raw list of exclude tags
     QString template_replacer; // used with excludes
-    bool gensex; bool emo; bool other; bool fluff; // pre-defined exclude lists
+    QStringList predef_excludes;
+
     QString includes; // raw list of include tags
     bool conly;  // completed only
     bool eng_only; // english only

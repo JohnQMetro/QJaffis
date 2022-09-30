@@ -4,7 +4,7 @@
  * Author:    John Q Metro (davidj_faulks@yahoo.ca)
  * Created:   December 18, 2011
  * Conversion to Qt : Started September 7, 2013
- * Updated:   March 3, 2012
+ * Updated:   July 1, 2022
  *
 **************************************************************/
 #ifndef DEFAULTDIR_DIALOG_H_INCLUDED
@@ -28,7 +28,7 @@ jfDefaultDirDisplay::jfDefaultDirDisplay(QWidget* parent):QWidget(parent) {
   MakeRest();
   // creating the sizer
   main_sizer = new QGridLayout();
-  for(size_t loopv = 0; loopv < jglobal::NUMDIRS ; loopv++) {
+  for(size_t loopv = 0; loopv < jglobal::path_type_count ; loopv++) {
     InsertRow(loopv);
   }
   main_sizer->setColumnStretch(2,1);
@@ -41,33 +41,33 @@ jfDefaultDirDisplay::jfDefaultDirDisplay(QWidget* parent):QWidget(parent) {
 void jfDefaultDirDisplay::LoadValues() {
   size_t lloop;
   QString currdir;
-  jglobal::GDIR_TYPE  xdirtype;
-  for (lloop=0; jglobal::NUMDIRS ;lloop++) {
-    xdirtype = static_cast<jglobal::GDIR_TYPE>(lloop);
-    currdir = jglobal::settings.GetDirectory(xdirtype);
+  jglobal::DEFAULT_PATH_TYPE  xdirtype;
+  for (lloop=0; lloop < jglobal::path_type_count ;lloop++) {
+    xdirtype = static_cast<jglobal::DEFAULT_PATH_TYPE>(lloop);
+    currdir = jglobal::settings.paths.GetPathFor(xdirtype);
     displays[lloop]->setText(currdir);
   }
 }
 //---------------------------------------------
 void jfDefaultDirDisplay::SaveValues() const {
   size_t lloop;
-  jglobal::GDIR_TYPE  xdirtype;
+  jglobal::DEFAULT_PATH_TYPE  xdirtype;
   QString ctext;
   // the saving loop
-  for (lloop=0 ; lloop < jglobal::NUMDIRS ; lloop++) {
-    xdirtype = static_cast<jglobal::GDIR_TYPE>(lloop);
+  for (lloop=0 ; lloop < jglobal::path_type_count ; lloop++) {
+    xdirtype = static_cast<jglobal::DEFAULT_PATH_TYPE>(lloop);
     ctext = displays[lloop]->text();
-    jglobal::settings.SetDirectory(xdirtype,ctext);
+    jglobal::settings.paths.SetPathFor(xdirtype,ctext);
   }
 }
 //---------------------------------------------
 QString jfDefaultDirDisplay::GetValue(size_t tindex) const {
-  if (tindex >= jglobal::NUMDIRS) return "";
+  if (tindex > jglobal::path_type_count) return "";
   else return displays[tindex]->text();
 }
 //---------------------------------------------
 bool jfDefaultDirDisplay::SetValue(size_t tindex, QString inval) {
-  if (tindex >= jglobal::NUMDIRS) return false;
+  if (tindex > jglobal::path_type_count) return false;
   displays[tindex]->setText(inval);
   return true;
 }
@@ -78,12 +78,12 @@ int jfDefaultDirDisplay::TestDirs() const {
   QString tval;
   QDir zval;
   // the test loop
-  for (lloop=0 ; lloop < jglobal::COUNT_DIR_MUSTEXIST ; lloop++) {
+  for (lloop=0 ; lloop < jglobal::path_type_count ; lloop++) {
     tval = displays[lloop]->text();
     zval.setPath(tval);
     if (!zval.exists()) break;
   }
-  if (lloop == jglobal::COUNT_DIR_MUSTEXIST) return -1;
+  if (lloop == jglobal::path_type_count) return -1;
   else return lloop;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -98,7 +98,7 @@ void jfDefaultDirDisplay::HandleDisplayDirpicker(bool ischecked) {
   // getting the specified control
   source_button = dynamic_cast<QPushButton*>(sender());
   event_zindex = -1;
-  for ( btn_idx = 0 ; btn_idx < jglobal::NUMDIRS ; btn_idx++) {
+  for ( btn_idx = 0 ; btn_idx < jglobal::path_type_count ; btn_idx++) {
     if (source_button==dirpickers[btn_idx]) {
       event_zindex = btn_idx;
       break;
@@ -115,21 +115,25 @@ void jfDefaultDirDisplay::HandleDisplayDirpicker(bool ischecked) {
 void jfDefaultDirDisplay::MakeLabels() {
   // variables
   size_t lloop;
+  QString label;
+  jglobal::DEFAULT_PATH_TYPE path_type;
   // the label making loop
-  for (lloop = 0; lloop < jglobal::NUMDIRS ; lloop++) {
-    labels[lloop] = new QLabel(jglobal::dirlabels[lloop]);
-    colons[lloop] = new QLabel(" : ");
+  for (lloop = 0; lloop < jglobal::path_type_count ; lloop++) {
+      path_type = static_cast<jglobal::DEFAULT_PATH_TYPE>(lloop);
+      label = jglobal::settings.paths.LabelFor(path_type);
+      labels[lloop] = new QLabel(label);
+      colons[lloop] = new QLabel(" : ");
   }
 }
 //---------------------------------------------
 void jfDefaultDirDisplay::MakeRest() {
   // variables
   size_t lloop;
-  jglobal::GDIR_TYPE  xdirtype;
+  jglobal::DEFAULT_PATH_TYPE  xdirtype;
   // the label making loop
-  for (lloop = 0 ; lloop < jglobal::NUMDIRS ; lloop++) {
-    xdirtype = static_cast<jglobal::GDIR_TYPE>(lloop);
-    displays[lloop]   = new QLineEdit(jglobal::settings.GetDirectory(xdirtype));
+  for (lloop = 0 ; lloop < jglobal::path_type_count ; lloop++) {
+    xdirtype = static_cast<jglobal::DEFAULT_PATH_TYPE>(lloop);
+    displays[lloop]   = new QLineEdit(jglobal::settings.paths.GetPathFor(xdirtype));
     dirpickers[lloop] = new QPushButton("Pick...");
     connect(dirpickers[lloop],SIGNAL(clicked(bool)),this,SLOT(HandleDisplayDirpicker(bool)));
   }
@@ -137,7 +141,7 @@ void jfDefaultDirDisplay::MakeRest() {
 //---------------------------------------------
 bool jfDefaultDirDisplay::InsertRow(size_t rowval) {
   // the usual asserts
-  assert(rowval < jglobal::NUMDIRS);
+  assert(rowval < jglobal::path_type_count);
   assert(main_sizer!=NULL);
   // after that, we assume things are okay
   main_sizer->addWidget(labels[rowval],rowval,0,Qt::AlignVCenter);
@@ -155,7 +159,7 @@ jfDefaultDirsDialog::jfDefaultDirsDialog(QWidget* parent):QDialog(parent) {
   main_sizer = new QVBoxLayout();
   // the topbar values
   loggingon_cb = new QCheckBox("Do Logging (changes take effect after restart)");
-  loggingon_cb->setChecked(jglobal::settings.dologging_next);
+  loggingon_cb->setChecked(jglobal::settings.DoLogging());
   shint = new jfLabeledIntEdit(this,"Default filesize hint",true,30,30000);
   shint->SetValue(jglobal::settings.ficsize_hint);
   // adding to the topbar
@@ -174,6 +178,7 @@ jfDefaultDirsDialog::jfDefaultDirsDialog(QWidget* parent):QDialog(parent) {
   connect(saveclose_btn,SIGNAL(clicked(bool)),this,SLOT(HandleSaveButton(bool)));
   QSize thesize = size();
   thesize.setWidth(thesize.width()*3);
+  contents->LoadValues();
   resize(thesize);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -185,7 +190,7 @@ void jfDefaultDirsDialog::HandleSaveButton(bool ischecked) {
   // starting
   if (indexval<0) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    jglobal::settings.dologging_next = loggingon_cb->isChecked();
+    jglobal::settings.SetDoLogging(loggingon_cb->isChecked());
     xres = shint->GetValue();
     jglobal::settings.ficsize_hint = xres;
     contents->SaveValues();
@@ -198,7 +203,7 @@ void jfDefaultDirsDialog::HandleSaveButton(bool ischecked) {
 void jfDefaultDirsDialog::ShowErrorMessage(int dindex) {
   // asserts
   assert(dindex>=0);
-  assert(dindex < jglobal::COUNT_DIR_MUSTEXIST);
+  assert(dindex < jglobal::path_type_count);
   // constants
   const QString main_title = "Save Aborted";
   const QString errpart1 = "Error: The directory '";

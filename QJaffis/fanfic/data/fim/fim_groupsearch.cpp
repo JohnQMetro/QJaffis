@@ -121,7 +121,7 @@ bool jfFIMGroupSearch::AddMiddleToFile(QTextStream* outfile) const {
   // building the first output line
   resline << sstring << order;
   (*outfile) << resline << '\n';
-  resline.clear();
+  resline.FullClear();
   // done
   return true;
 }

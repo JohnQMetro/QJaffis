@@ -4,7 +4,7 @@
 // Purpose :    Defines global filter map groupings and associated stuff
 // Created:     01.08.06
 // Started conversion to Qt June 23, 2013
-// Updated:     December 28, 2021
+// Updated:     July 24, 2022
 /////////////////////////////////////////////////////////////////////////////
 // headers
 // ----------------------------------------------------------------------------
@@ -62,6 +62,10 @@
 #ifndef FFN_SPECIAL1_H
   #include "ffn/ffn_special1.h"
 #endif // FFN_SPECIAL1_H
+
+#ifndef AO3_PERCENT_TAGS_FILTER_H
+    #include "ao3/ao3_percent_tags_filter.h"
+#endif // AO3_PERCENT_TAGS_FILTER_H
 
 
 //-----------------------------------------
@@ -136,6 +140,7 @@ jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname) {
   else if (typestring=="AO3PairFilter") result = new jfAO3PairFilter();
   else if (typestring=="AO3WarnFilter") result = new jfAO3WarnFilter();
   else if (typestring=="AO3KudoCountFilter") result = new jfAO3KudoFilter();
+  else if (typestring=="AO3ExtraTagsPercentFilter") result = new jfAO3ExtraTagsPercentFilter();
   else if (typestring=="FFNFavsFilter") result = new jfFFNFavsFilter();
   else if (typestring=="FimThumbPercentFilter") result = new jfFimThumbPercentFilter();
   else if (typestring=="FIMGroupSCFilter") result = new jfFIMGroupSCFilter();

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Fanfic object for fimfiction.net
 Created :   May 8, 2012
 Conversion to QT started : April 20, 2013
-Updated :   September 4, 2020
+Updated :   September 7, 2022
 ******************************************************************************/
 #ifndef FIM_FICOBJ_H_INCLUDED
   #include "fim_ficobj.h"
@@ -30,6 +30,7 @@ Updated :   September 4, 2020
 //=============================================================================
 jfFIM_Fanfic::jfFIM_Fanfic():jfGenericFanfic3() {
   xparser = NULL;
+  english_locale = QLocale(QLocale::English, QLocale::UnitedStates);
 }
 //----------------------------------------------
 jfFIM_Fanfic::jfFIM_Fanfic(const jfFIM_Fanfic& src):jfGenericFanfic3(src) {
@@ -43,6 +44,7 @@ jfFIM_Fanfic::jfFIM_Fanfic(const jfFIM_Fanfic& src):jfGenericFanfic3(src) {
   content_types = src.content_types;
 
   xparser = NULL;
+  english_locale = QLocale(QLocale::English, QLocale::UnitedStates);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // special meta-information
@@ -288,12 +290,6 @@ jfFicExtract_FIM* jfFIM_Fanfic::ExtractFromString(QString inval, QString& parse_
 
   // skipping past more crud and unecessary stuff
   /**/JDEBUGLOG(fname,3);
-  /* Unfortunatly, this does not always work...
-  if (!xparser->MovePast("<hr class=\"sidebar-hr\" />")) {
-    return ExtractError(parse_err,"Missing Header Tabs");
-  }
-  */
-  /**/JDEBUGLOG(fname,4);
   // extracting the main contents
   if (!xparser->GetDelimited(partstart,partend,buffer)) {
     buffer = xparser->GetBlock(2000);
@@ -433,82 +429,55 @@ QString jfFIM_Fanfic::ToText() const {
 //----------------------------------------------
 QString jfFIM_Fanfic::ToDisplayHTML() const {
   const QString fname = "jfFFNItem::ToDisplayHTML";
+
   QString result,buffer;
+
+  const jfDisplayHTMLHelper* helper = HTMLHelpers::fim_item_helper;
   // we start with the table
-  result = "<table width=99%><tr><td>";
-  // building the title line
-  result += "<font size=+3><a href=\"";
-  result += primarylink + "\">";
-  result += name + "</a>";
-  // adding the author stuff
-  result += " by " + author_name;
-  result += "</font> ";
-  // status
-  if (ustatus!=jud_NONE) {
-    result += "<font size=+2 color=";
-    if (ustatus==jud_UPDATED) result += "lime><b>[Updated";
-    else if (ustatus==jud_MISSING) result += "red><b>[Missing";
-    else if (ustatus==jud_NEW) result += "aqua><b>[New";
-    else if (ustatus==jud_AUTHORNC) result += "yellow><b>[Author Name Change";
-    result += "!]</b></font>";
-  }
+  result = DisplayHTMLHeader(1, helper);
   result += "</td></tr>\n";
   // next line: link display
   result += "<tr><td>";
-  result += "<font color=green size=+1>";
-  result += primarylink + "</font><br>\n";
+  // next line: link display
+  result += helper->WrapText("ficlink", primarylink, true);
+
   // adding the main description
-  result +=  "<font color=#010101 size=+2>" + GetDescExtract(6,750) + "<br>\n";
-  // next up.. two extra lines
-  result += "<font color=gray size=+1>Published: " + pubdate.toString("MM-dd-yyyy");
-  result += " - Updated: " + updated_date.toString("MM-dd-yyyy");
-  result += " - Rating: " + rating;
+  result += "<div style=\"margin-left:10px;\">";
+  QString rdesc = GetDescExtract(6,1000);
+  result += helper->WrapTextNoEsc("description",rdesc,false);
+  result += "</div>\n";
+
+  // next up.. metadata
+  QString mdata = "Published: " + pubdate.toString("MM-dd-yyyy");
+  mdata += " - Updated: " + updated_date.toString("MM-dd-yyyy");
+  mdata += " - Rating: " + rating;
   // part count and word count
-  result += " - Parts: " + QString::number(part_count);
-  result += " - Words: " + QString::number(word_count);
+  mdata += " - Parts: " + QString::number(part_count);
+  mdata += " - Words: " + QString::number(word_count);
   // thumbs up and down
-  if (thumbsup < 0) result += " - Rating Disabled";
+  if (thumbsup < 0) mdata += " - Rating Disabled";
   else {
-    result += " - Thumbs Up: " + QString::number(thumbsup);
-    result += " - Thumbs Down: " + QString::number(thumbsdown);
+    mdata += " - Thumbs Up: " + QString::number(thumbsup);
+    mdata += " - Thumbs Down: " + QString::number(thumbsdown);
   }
-  result += "</font><br>\n";
+  result += "<div>";
+  result += helper->WrapText("basicinfo", mdata, false);
+  if (completed) {
+      result += helper->WrapTextNoEsc("basicinfo"," - <b>Complete</b>",false);
+  }
+  result += "<br>\n";
+
   // genres and content type...
-  bool hasGenre = !genres.isEmpty();
-  bool hasCT = !content_types.isEmpty();
-  bool hasWarn = !warnings.isEmpty();
-  // final info,
-  if (hasGenre) {
-      result += "<font color=green size=+1><b>Genres:</b> ";
-      result += genres + "</font>";
-  }
-  if (hasCT) {
-      if (hasGenre) result += " &middot; ";
-      result += "<font color=gray size=+1><b>Types:</b> ";
-      result += content_types + "</font>";
-  }
-  // warnings
-  if (hasWarn) {
-      if (hasGenre || hasCT) result += " &middot; ";
-      result += "<font color=red size=+2><b>Warnings:</b> ";
-      result += warnings + "</font>";
-  }
-  if (hasGenre || hasCT || hasWarn) result += "<br>\n";
-  // characters and completion status
-  bool hasChar = !characters.isEmpty();
-  if (hasChar || completed) {
-      result += "<font color=blue size=+1>";
-      if (hasChar) {
-          result += "<b>Characters:</b> " + characters;
-      }
-      if (completed) {
-          if (hasChar) result += " &middot; ";
-          result += "<b>Complete</b>";
-      }
-      result += "</font>";
-  }
+  result += helper->ConditionalWrapText("genres", false, "Genres: ", true, genres, false);
+  result += helper->ConditionalWrapText("basicinfo", true, "Types: ", true, content_types, false);
+  result += helper->ConditionalWrapText("warnings", true, "Warnings: ", true, warnings, false);
+
+  result += "<br>\n";
+  // characters
+  result += helper->ConditionalWrapText("characters", false, "Characters: ", true, characters, false);
+
   // finishing off
-  result += "</font></td></tr>\n</table>";
+  result += "</div></td></tr>\n</table>";
   // done
   return result;
 }
@@ -587,7 +556,8 @@ bool jfFIM_Fanfic::ParseFIMDate(QString insrc, QDate& out) {
   split1.chop(2);
   // rebuilding, after which we can use QDate::ParseFormat
   insrc = split1 + " " + split2;
-  out = QDate::fromString(insrc,"d MMM yyyy");
+  out = english_locale.toDate(insrc,"d MMM yyyy");
+  // out = QDate::fromString(insrc,"d MMM yyyy");
   // returning the success
   return (out.isValid());
 }
@@ -619,9 +589,11 @@ bool jfFIM_Fanfic::ParseError(QString& perror,const QString& message) {
 }
 //----------------------------------------------
 jfFicExtract_FIM* jfFIM_Fanfic::ExtractError(QString& perror,const QString& message) {
+    const QString fname = "jfFIM_Fanfic::ExtractError";
   if (xparser != NULL) delete xparser;
   xparser = NULL;
   perror = "PARSE ERROR: " + message;
+  jerror::ParseLog(fname,perror);
   return NULL;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -636,15 +608,15 @@ bool jfFIM_Fanfic::AddExtraStuff(QTextStream* outfile) const {
   // preparing next line, characters
   xresult << characters;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // content type and warnings
   xresult << content_types << warnings;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // line after that is more complicated
   xresult << rating << thumbsup << thumbsdown << pubdate;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // compact summary line
   xresult << compact_summary;
   (*outfile) << xresult << "\n";

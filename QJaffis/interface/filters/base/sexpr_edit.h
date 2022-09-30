@@ -14,7 +14,7 @@ Updated :   Febrary 12, 2018 (fixes for checking)
   #include "../../../core/filters/base/sexp_filters.h"
 #endif // SEXP_FILTERS_H_INCLUDED
 #ifndef WIDGETS4_H
-    #include "../../misc/widgets4.h"
+    #include "../../controls/widgets4.h"
 #endif // WIDGETS4_H
 //----------------------------------------------
 #include <QWidget>

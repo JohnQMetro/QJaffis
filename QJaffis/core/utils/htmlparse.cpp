@@ -4,7 +4,7 @@ Basic   : Declares some utility functions and things used in manipulating html
 Author  : John Q Metro
 Started : September 13, 2009
 Conversion to QT started : March 9, 2013
-Updated : August 6, 2015
+Updated : August 7, 2022
 
 ******************************************************************************/
 #ifndef HTMLPARSE_H_INCLUDED
@@ -206,6 +206,8 @@ QString htmlparse::Text2BasicHTML(const QString& inval) {
   result.replace("&","&amp;");
   result.replace("<","&lt;");
   result.replace(">","&gt;");
+  result.replace("\"","&quot;");
+  result.replace("\'","&#039;");
   result.replace("\n","<br>\n");
   return result;
 }

@@ -143,29 +143,25 @@ void jfFFNResColl::WriteHtmlHeader(jfHtmlParams* indata) {
   QString skeldata;
   jfFFNItemCollection* temp;
   // the usual checks
-  /**/JDEBUGLOG(fname,1)
-  assert(indata!=NULL);
-  if (!indata->CheckOk()) {
-    /**/JDEBUGLOGS(fname,2,indata->errmsg);
-    assert(false);
-  }
+  jerror::AssertLog(indata!=NULL,fname,"The input data is NULL!");
+  jerror::AssertLog(indata->CheckOk(),fname,"The input data failed checks!");
   // loading values
   // the start of the header
-  /**/JDEBUGLOG(fname,3)
+  /**/JDEBUGLOG(fname,1)
   buffer = indata->MakeResult(indata->base->header_skel);
   (*(indata->outfile)) << buffer << "\n";
   firstdone = false;
-  /**/JDEBUGLOG(fname,4)
+  /**/JDEBUGLOG(fname,2)
   // category links
   for (ccloop=0; ccloop<itemcount; ccloop++) {
-    /**/JDEBUGLOGST(fname,5,ccloop)
+    /**/JDEBUGLOGST(fname,3,ccloop)
     // getting the collection and loading the values...
     temp = dynamic_cast<jfFFNItemCollection*>((*collections)[ccloop]);
-    /**/JDEBUGLOGS(fname,6,temp->GetCatName())
+    /**/JDEBUGLOGS(fname,4,temp->GetCatName())
     lvres = temp->LoadValues(indata->parse,indata->GetResCat());
-    assert(lvres);
+      jerror::AssertLog(lvres,fname,"Item Collection load values failed! " + QString::number(ccloop));
     numres = temp->CountRCategory(indata->GetResCat());
-    /**/JDEBUGLOGST(fname,7,numres)
+    /**/JDEBUGLOGST(fname,5,numres)
     // the cat link
     if (numres>0) {
       // the cat separator

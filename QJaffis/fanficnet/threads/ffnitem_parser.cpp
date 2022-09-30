@@ -3,12 +3,15 @@ Name    :   ffnitem_parser.cpp
 Author  :   John Q Metro
 Purpose :   Parser for Fanfiction.Net Category pages, to get lists of fanfics
 Created :   July 22, 2016
-Updated :   March 19, 2022 (fixing some parsing)
+Updated :   Sreptember 28, 2022
 ******************************************************************************/
 #ifndef FFNITEM_PARSER_H
   #include "ffnitem_parser.h"
 #endif // FFNITEM_PARSER_H
 //-----------------------------------
+#ifndef HTMLPARSE_H_INCLUDED
+  #include "../../core/utils/htmlparse.h"
+#endif // HTMLPARSE_H_INCLUDED
 
 #include <assert.h>
 #include <math.h>
@@ -21,6 +24,12 @@ jfFFNItemParser::jfFFNItemParser():jfItemsPageParserBase() {
   newfic = false;
   limit = NULL;
   limitreached = false;
+
+  page_header = QRegularExpression("\\s+class=['\"]?xcontrast_outer['\"]?\\s+id=['\"]?content_parent['\"]?>");
+  cross_link = QRegularExpression("<a\\s+href=['\"]/crossovers/");
+  pagehead = QRegularExpression("<center\\s+style=['\"]?margin-top:5px;margin-bottom:5px;?['\"]?>",QRegularExpression::CaseInsensitiveOption);
+  zlist_start = QRegularExpression("<div\\s+class=['\"]?z-list\\s",QRegularExpression::CaseInsensitiveOption);
+  item_ico = QRegularExpression("/static/fi?cons/");
 }
 //------------------------------------------------------
 bool jfFFNItemParser::SetCategory(const jfFFN_CategoryCore* in_category){
@@ -48,9 +57,15 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
   /**/lpt->tLog(fname,1);
   NewData(inPage);
   limitreached = false;
+  // skipping past header gunk
+  if (!xparser.MovePastAlt("</form>","</FORM>")) {
+      /**/lpt->tLog(fname,2,xparser.GetBlock(2000));
+      parseErrorMessage = "Could not find end of form";
+      return;
+  }
   // we check names first
   if (!CheckNames()) {
-    /**/lpt->tLog(fname,2);
+      /**/lpt->tParseError(fname,"Could not get names!");
     parseErrorMessage = "Could not get names!";
     return;
   }
@@ -58,7 +73,7 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
   // next, we check the item count and thus get the page count
   if (!PageAndItemCount(newcount)) {
     size_t pindex = xparser.GetIndex();
-    /**/lpt->tLogS(fname,4,pindex);
+    /**/lpt->tParseError(fname,"Failed to get page and item count: " + QString::number(pindex));
     return;
   }
   /**/lpt->tLog(fname,5);
@@ -69,7 +84,7 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
   // next up is parsing the items
   //
 
-  while (xparser.MovePastAlt("<div class=\"z-list ","<div class=\'z-list ")) {
+  while (xparser.MovePast(zlist_start)) {
       if (!xparser.GetMovePast("</div></div></div>", buffer)) {
           parseErrorMessage = "Failed to find end of fic info";
           lpt->tLog(fname,7,parseErrorMessage);
@@ -79,7 +94,7 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
       }
     temp = new jfFFNItem();
     temp->SetFromString(buffer,this_category,outerr);
-    /**/lpt->tLog(fname,8,buffer);
+    /**/lpt->tLog(fname,8);
     // the item is okay
     if (temp->IsValid()) {
       // checking the date limit
@@ -87,14 +102,14 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
         limitreached = true;
         break;
       }
-      // addingx
+      // adding
       page_results->push_back(temp);
       if (newfic) temp->SetNew(true);
     }
     // the item is not okay
     else {
       parseErrorMessage = "Parsing Error : " + outerr + " : IN\n" + buffer;
-      /**/lpt->tLog(fname,9,parseErrorMessage);
+      /**/lpt->tParseError(fname,parseErrorMessage);
       if (!(temp->included)) delete temp;
       else {
         delete temp;
@@ -104,21 +119,21 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
       }
     }
   }
-  /**/lpt->tLog(fname,10);
+  /**/lpt->tLog(fname,8);
   // done with the items
   if (!(page_results->empty())) {
-      /**/lpt->tLog(fname,11);
+      /**/lpt->tLog(fname,9);
     firstid = (*page_results)[0]->GetID();
     // post page processing and getting the result
-    /**/lpt->tLog(fname,12);
+    /**/lpt->tLog(fname,10);
     PostPageProcessing();
-    /**/lpt->tLog(fname,13);
+    /**/lpt->tLog(fname,11);
   }
   else {
       firstid = 0;
   }
   page_parsed = true;
-  /**/lpt->tLog(fname,14);
+  /**/lpt->tLog(fname,12);
 }
 
 //----------------------------------
@@ -131,7 +146,7 @@ void* jfFFNItemParser::getResults() {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // custom methods for download
 //----------------------------------
-QString* jfFFNItemParser::makeRedirectedURL(const QString& inPart) {
+QString* jfFFNItemParser::makeRedirectedURL(const QString& inPart) const {
   // fanfiction.net does no redirects
   return NULL;
 }
@@ -162,34 +177,36 @@ QString jfFFNItemParser::getCookie() const {
 bool jfFFNItemParser::CheckNames() {
   // constants
   const QString fname = "jfFFNItemParser::CheckNames";
-  const QString header1 = "<div style='width:100%;' class=xcontrast_outer id=content_parent>";
-  const QString header2 = "<div style=\"width:100%;\" class=\"xcontrast_outer\" id=\"content_parent\">";
-  const QString itmico1 = "/static/ficons/";
-  const QString itmico2 = "/static/fcons/";
 
   const QString chev_sym1 = " icon-chevron-right xicon-section-arrow\"></span>";
   // variables
   QString buffer1,buffer2;
   // checks and asserts
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePastAlt(header2,header1)) return false;
-  if (!xparser.MovePastAlt(itmico1,itmico2)) return false;
+  if (!xparser.MovePast(page_header)) {
+      /**/lpt->tLog(fname,2,xparser.GetBlock(2000));
+      return false;
+  }
+  if (!xparser.MovePast(item_ico)) {
+      /**/lpt->tLog(fname,3,xparser.GetBlock(2000));
+      return false;
+  }
   // the crossover version
-  /**/lpt->tLog(fname,2);
+  /**/lpt->tLog(fname,4);
   if ((this_category->GetCatType())==jfx_CROSS) {
     if (!CheckCrossoverName()) {
-      /**/lpt->tLog(fname,3,xparser.GetBlock(3000));
+        /**/lpt->tParseError(fname,"Crossover Name Check Failed!");
       return false;
     }
   }
   // the non crossover version
   else {
-    /**/lpt->tLog(fname,4);
+    /**/lpt->tLog(fname,5);
     if (!xparser.GetDelimited(chev_sym1,"<div ",buffer1)) return false;
     buffer1 = buffer1.trimmed();
     buffer2 = this_category->GetName();
     buffer2 = buffer2.trimmed();
-    /**/lpt->tLog(fname,5);
+    /**/lpt->tLog(fname,6);
     if (buffer1!=buffer2) return false;
   }
   return true;
@@ -209,10 +226,12 @@ bool jfFFNItemParser::CheckCrossoverName() {
   name1 = ccat->GetCatPart(true);
   name2 = ccat->GetCatPart(false);
   // extracting the names from the parser
-  if(!xparser.MovePastAlt("<a href=\"/crossovers/","<a href=\'/crossovers/")) return false;
+  if(!xparser.MovePast(cross_link)) return false;
   if(!xparser.GetDelimited(">","</a>",buffer1)) return false;
-  if(!xparser.MovePastAlt("<a href=\"/crossovers/","<a href=\'/crossovers/")) return false;
+  buffer1 = htmlparse::HTML2Text(buffer1).replace("shoppingmode","");;
+  if(!xparser.MovePast(cross_link)) return false;
   if(!xparser.GetDelimited(">","</a>",buffer2)) return false;
+  buffer2 = htmlparse::HTML2Text(buffer2).replace("shoppingmode","");;
   // checking the match
   option1 = (name1==buffer1) && (name2==buffer2);
   option2 = (name1==buffer2) && (name2==buffer1);
@@ -223,8 +242,6 @@ bool jfFFNItemParser::CheckCrossoverName() {
 bool jfFFNItemParser::PageAndItemCount(size_t& itemcount) {
   // constants
   const QString fname = "jfFFNItemCollectionCore::PageAndItemCount";
-  const QString pagehead1 = "<center style=\"margin-top:5px;margin-bottom:5px;\">";
-  const QString pagehead2 = "<center style='margin-top:5px;margin-bottom:5px;'>";
   // local variables
   QString cname;
   QString buffer;
@@ -236,9 +253,10 @@ bool jfFFNItemParser::PageAndItemCount(size_t& itemcount) {
   // starting up things
   /**/lpt->tLog(fname,1);
   // next, numeric data
-  if (xparser.MovePastAlt(pagehead1,pagehead2)) {
+  if (xparser.MovePast(pagehead)) {
     /**/lpt->tLog(fname,2);
     if (!xparser.GetMovePast(" | ",buffer)) {
+        /**/lpt->tParseError(fname,"Could not get itemcount! \n" + xparser.GetBlock(200));
       return parsErr("Could not get itemcount! \n" + xparser.GetBlock(200));
     }
     buffer = buffer.trimmed();
@@ -246,6 +264,7 @@ bool jfFFNItemParser::PageAndItemCount(size_t& itemcount) {
     llen = buffer.length();
     isk = (buffer[llen-1]=='K');
     if (!Count2ULong(buffer,outval)) {
+        /**/lpt->tParseError(fname,"Could not convert itemcount! \n" + xparser.GetBlock(200));
       return parsErr("Could not convert itemcount! \n" + xparser.GetBlock(200));
     }
     itemcount = outval;
@@ -257,15 +276,15 @@ bool jfFFNItemParser::PageAndItemCount(size_t& itemcount) {
             if (!xparser.GetDelimitedFromEndULong("&p=","'>Last",outval,outerr,"</center>")) {
                 // next works near the end
                 if (!xparser.GetDelimitedFromEndULong("&amp;p=","\">Next",outval,outerr,"</center>")) {
-                    if (!xparser.GetDelimitedFromEndULong("&p=","'>Next",outval,outerr,"</center>")) {
+        if (!xparser.GetDelimitedFromEndULong("&p=","'>Next",outval,outerr,"</center>")) {
                         // for the very last page
-                        if (!xparser.GetDelimitedFromEndULong("<b>","</b>",outval,outerr,"</center>")) {
-                            return parsErr("Could not determine pagecount! \n" + xparser.GetBlock(400));
+          if (!xparser.GetDelimitedFromEndULong("<b>","</b>",outval,outerr,"</center>")) {
+            return parsErr("Could not determine pagecount! \n" + xparser.GetBlock(400));
                         }
                     }
-                }
-            }
+          }
         }
+      }
       /**/lpt->tLogS(fname,6,outval);
     }
     else {

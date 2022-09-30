@@ -50,7 +50,7 @@ void* jfFFNAuthorPageParser::getResults() {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // handling redirection, NULL result if faliure
-QString* jfFFNAuthorPageParser::makeRedirectedURL(const QString& inPart) {
+QString* jfFFNAuthorPageParser::makeRedirectedURL(const QString& inPart) const {
   return NULL;  // FFN does not do any redirection on valid pages (currently)
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

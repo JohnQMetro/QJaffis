@@ -19,11 +19,11 @@ size_t ffn_consts::fr_idlist[frcount] = {10,3,2,1,12,13,14};
 const QString ffn_consts::fr_names[frcount] = {"Any","K \u2192 T","K and K+","K","K+","T","M"};
 const QStringList* ffn_consts::fr_list;
 // genre
-size_t ffn_consts::gen_idlist[gencount] = {0,6,10,18,4,19,14,21,1,8,3,20,7,9,5,3,12,15,11,12,16,17};
-const QString ffn_consts::gen_names[gencount] = {"Any","Adventure","Angst","Crime","Drama",
-                  "Family","Fantasy","Friendship","General","Horror","Humour","Hurt/Comfort",
-                  "Mystery","Parody","Poetry","Romance","Sci-Fi","Spiritual","Supernatural",
-                  "Suspense","Tragedy","Western"};
+size_t ffn_consts::gen_idlist[gencount] = {0,6,10,18,4,19,14,21,1,8,3,20,7,9,5,2,13,15,11,12,16,17};
+const QString ffn_consts::gen_names[gencount] = {"All", "Adventure","Angst", "Crime", "Drama", "Family",
+                        "Fantasy", "Friendship", "General", "Horror", "Humor", "Hurt/Comfort", "Mystery",
+                        "Parody", "Poetry", "Romance", "Sci-Fi", "Spiritual", "Supernatural", "Suspense",
+                        "Tragedy", "Western"};
 const QStringList* ffn_consts::gen_list;
 const QStringList* ffn_consts::taggen_list;
 // wordcount

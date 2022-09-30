@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net search interface
 // Created:     July 1, 2010
 // conversion to Qt started July 29, 2014
-// Updated:     July 29, 2014
+// Updated:     June 4, 2022
 //**************************************************************************
 #define FFN_MAINPANEL
 
@@ -26,10 +26,10 @@ class jfFFNMain;
     // the constructor
     jfFFNSearchGrp(jfFFNSearch* searchin, jfFFNMain* tholder, QWidget* parent = NULL);
     // custom  methods
-    virtual jfSearchPanelBase*  MakeFirstPanel();
-    virtual jfSearchCore*       MakeTypedSearch() const;
-    virtual jfResultCollection* MakeTypedCollection() const;
-    virtual jfBaseItemDownloader*    MakeTypedThread() const;
+    virtual jfSearchPanelBase*   MakeFirstPanel();
+    virtual jfSearchCore*        MakeTypedSearch() const;
+    virtual jfResultCollection*  MakeTypedCollection() const;
+    virtual jfDownloadRootItems* MakeTypedThread() const;
     // special methods
     int GetSearchIndex() const;
   protected:
@@ -43,10 +43,10 @@ class jfFFNMain;
     // the constructor
     jfFFNSearchOnePanel(jfFFNSearch* searchin, jfFFNMain* tholder, QWidget* parent = NULL);
     // custom  methods
-    virtual jfSearchPanelBase*  MakeFirstPanel();
-    virtual jfSearchCore*       MakeTypedSearch() const;
-    virtual jfResultCollection* MakeTypedCollection() const;
-    virtual jfBaseItemDownloader*    MakeTypedThread() const;
+    virtual jfSearchPanelBase*   MakeFirstPanel();
+    virtual jfSearchCore*        MakeTypedSearch() const;
+    virtual jfResultCollection*  MakeTypedCollection() const;
+    virtual jfDownloadRootItems* MakeTypedThread() const;
     // special methods
     int GetSearchIndex() const;
   protected:

@@ -216,7 +216,7 @@ bool jfSkeletonFicPart::AddRestToFile(QTextStream* outfile) const {
   o_str << grouplink << grouplink_separator;
   (*outfile) << o_str << '\n';
   // adding the part line
-  o_str.clear();
+  o_str.FullClear();
   o_str << partlink << partlink_separator;
   (*outfile) << o_str << '\n';
   // done

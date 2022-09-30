@@ -346,11 +346,11 @@ bool jfFIMSearch::AddMiddleToFile(QTextStream* outfile) const {
   // building the first output line
   resline << completed << QString(rating) << order << ssearch;
   (*outfile) << resline << "\n";
-  resline.clear();
+  resline.FullClear();
   // second output line
   resline << min_wc << max_wc << viewmature << ((size_t)eg_status);
   (*outfile) << resline << "\n";
-  resline.clear();
+  resline.FullClear();
   // third output line
   AddTagListingToFile(genres_filter,outfile);
   // fourth output line

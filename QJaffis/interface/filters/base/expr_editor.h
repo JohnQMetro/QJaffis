@@ -21,7 +21,7 @@ Updated :   February 12, 2018 (Filter Check fixes)
   #include "../../../core/filters/base/filterbase.h"
 #endif
 #ifndef WIDGETS4_H
-    #include "../../misc/widgets4.h"
+    #include "../../controls/widgets4.h"
 #endif // WIDGETS4_H
 //------------------------------------------------------------------
 #include <QWidget>

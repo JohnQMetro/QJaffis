@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   AO3 pairing and warning filters
 Created :   October 4, 2012
 Conversion to Qt Started Oct 2, 2013
-Updated :   June 1, 2022 (Bugfixing)
+Updated :   June 25, 2022 (Revise pair filter)
 ******************************************************************************/
 #ifndef AO3_SPECIALS2_H_INCLUDED
   #include "ao3_specials2.h"

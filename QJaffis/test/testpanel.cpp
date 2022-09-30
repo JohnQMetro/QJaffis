@@ -101,7 +101,7 @@ void jfTestDisplay::HandleStart() {
   if (launched) Reset();
   launched = true;
   // fic parameters
-  downloader = new jfTestDownloader(1);
+  downloader = new jfTestDownloader();
   // setting the info and launching
   /**/JDEBUGLOG(fname,2)
   SetupDownloaderAndThread();
@@ -174,7 +174,7 @@ bool jfTestDisplay::SetupDownloaderAndThread() {
   downloader->moveToThread(thread_object);
   // connecting signals and slots
   bool testoo = progress_bar->ConnectAndSetPauser(downloader);
-  /**/jfAssertLog(testoo,fname,"Connecting FAILED!!!!");
+  /**/jerror::AssertLog(testoo,fname,"Connecting FAILED!!!!");
   // standard thread/downloader connections
   connect(thread_object, SIGNAL(started()),downloader ,SLOT(StartProcessing()));
   connect(downloader,SIGNAL(AllFinished()),thread_object,SLOT(quit()));

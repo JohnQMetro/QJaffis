@@ -257,9 +257,13 @@ bool jfFIMTag_Collection::parseTagBlock(QString rawSource) {
         spos = rawSource.indexOf('{',npos);
         if (spos < 0) break;
         epos = rawSource.indexOf('}',spos+1);
-        if (epos < 0) return false;
+        if (epos < 0) {
+            return false;
+        }
         buffer = rawSource.mid(spos+1,epos-spos-1).trimmed();
-        if (!parseAndAddTag(buffer)) return false;
+        if (!parseAndAddTag(buffer)) {
+            return false;
+        }
         npos = epos+1;
         counter++;
     }

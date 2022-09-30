@@ -3,7 +3,7 @@
  * Purpose:   Fanfic downloader thread for one fanfic
  * Author:    John Q Metro
  * Created:   July 12, 2016
- * Updated:   July 12, 2016
+ * Updated:   July 7, 2022
  *
  **************************************************************/
 #ifndef FICDOWN_SINGLE_H
@@ -22,12 +22,12 @@ jfFicDownParameters::jfFicDownParameters() {
   extract = NULL;
   sizeguide = jglobal::settings.ficsize_hint;
   filename_base = "TheFic";
-  write_to_directory = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+  write_to_directory = jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
 }
 //----------------------------------------
 jfFicDownParameters::jfFicDownParameters(jfFicExtract* extract_in) {
   sizeguide = jglobal::settings.ficsize_hint;;
-  write_to_directory = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+  write_to_directory = jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
   extract = extract_in;
   if (extract !=NULL) {
     filename_base = extract->fname_core;
@@ -38,7 +38,7 @@ jfFicDownParameters::jfFicDownParameters(jfFicExtract* extract_in) {
 //==================================
 // -- [ METHODS for jfSingleFicDownloader ] ------------------------
 // constructor
-jfSingleFicDownloader::jfSingleFicDownloader(size_t in_max_threads):jfFicDownloaderBase(in_max_threads) {
+jfSingleFicDownloader::jfSingleFicDownloader():jfFicDownloaderBase() {
   params = NULL;
 }
 //---------------------------
@@ -60,8 +60,10 @@ void jfSingleFicDownloader::StartProcessing() {
   emit SendStart(true);
   /**/tLog(fname,1);
   started = true;
-  bool dresult = DownloadFic();
+  SetupWorkers(true);
+  bool dresult = xDownloadFic();
   /**/tLogB(fname,2,dresult);
+  ClearWorkers(true);
   // done
   AllDone(dresult);
 }

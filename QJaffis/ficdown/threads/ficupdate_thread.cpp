@@ -3,7 +3,7 @@
  * Purpose:   Downloaded fanfic updater thread
  * Author:    John Q Metro
  * Created:   July 25, 2016
- * Updated:   December 23, 2021
+ * Updated:   July 5, 2022
  *
  **************************************************************/
 #ifndef FICUPDATE_THREAD_H
@@ -12,6 +12,9 @@
 #ifndef UTILS3_H_INCLUDED
   #include "../../core/utils/utils3.h"
 #endif // UTILS3_H_INCLUDED
+#ifndef UPDATE_FETCHER_H
+    #include "update_fetcher.h"
+#endif // UPDATE_FETCHER_H
 //------------------------------
 #include <assert.h>
 #include <QDir>
@@ -108,7 +111,7 @@ jf_FICTYPE jfFicExtractArray::GetFtype(size_t index) const {
   assert(index<size());
   return (*this)[index]->GetFicType();
 }
-//£££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
+//Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£Â£
 
 
 
@@ -117,7 +120,7 @@ jf_FICTYPE jfFicExtractArray::GetFtype(size_t index) const {
 /*******************************************************************************************/
 // --- [METHODS for jfFicUpdateThread] -----------------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++
-jfFicUpdateThread::jfFicUpdateThread(size_t in_max_threads):jfFicDownloaderBase(in_max_threads) {
+jfFicUpdateThread::jfFicUpdateThread():jfFicDownloaderBase() {
   phase = 0;
   fic_index = 0;
   filelist = NULL;
@@ -126,6 +129,7 @@ jfFicUpdateThread::jfFicUpdateThread(size_t in_max_threads):jfFicDownloaderBase(
   halting = false;
   docomplete = false;
   skipffn = false;
+  update_parser = NULL;
 }
 //-------------------------------------
 bool jfFicUpdateThread::SetParams(const QString& indir, const size_t& in_sizeguide, bool in_docomplete, bool skip_ffn) {
@@ -329,7 +333,6 @@ jfFicExtract* jfFicUpdateThread::MakeExtract(jf_FICTYPE& outtype, QString ficcor
   // determining the type
   if (outtype==jfft_FFN) testdata = new jfFicExtract_FFN();
   else if (outtype==jfft_FIM) testdata = new jfFicExtract_FIM();
-  else if (outtype==jfft_HPF) testdata = new jfFicExtract_HPF();
   else if (outtype==jfft_MMO) testdata = new jfFicExtract_MMO();
   else if (outtype==jfft_AO3) testdata = new jfFicExtract_AO3();
   else {
@@ -358,6 +361,9 @@ bool jfFicUpdateThread::DoAllFanfics() {
   section_msg_data.startaction = "Checking";
   section_msg_data.item_label = "Fanfic";
   section_msg_data.part_count = ficcount;
+  // setup
+  SetupWorkers(true);
+
   // the fic handling loop
   for (fic_index = 1; fic_index <= ficcount; fic_index++) {
     // getting the info
@@ -380,11 +386,15 @@ bool jfFicUpdateThread::DoAllFanfics() {
     }
     // doing the fic
     fictype = fic_data->GetFicType();
-    res = DownloadFic();
+    update_parser->SetFicType(fictype);
+    res = xDownloadFic();
     // handling the results
     halting = HandleFanficResult(res);
     if (halting) break;
   }
+  ClearWorkers(false);
+  delete update_parser;
+  update_parser = NULL;
   return (halting);
 }
 //------------------------------------------
@@ -453,6 +463,25 @@ bool jfFicUpdateThread::SetFileBase() {
   if (subdirs==NULL) return false;
   fanfic->SetFileBase((*ficlist)[fic_index-1]->fname_core,(*subdirs)[fic_index-1],sizeguide);
   return true;
+}
+//========================================================================================================
+// some custom overridden methods
+
+jfPageParserBase* jfFicUpdateThread::makeParser() {
+    // using a new custom parser
+    return new jfFanficUpdateWrapParser();
+}
+//-------------------------------------
+jfParseFetchPackage* jfFicUpdateThread::MakeParserFetcher() {
+
+    jfFanficFetcherPack* fetcher_pack = MakeFetcherPack(NULL);
+    if (fetcher_pack == NULL) return NULL;
+    jfFanficUpdateFetcher* update_fetcher = new jfFanficUpdateFetcher(fetcher_pack);
+    update_parser = dynamic_cast<jfFanficUpdateWrapParser*>(makeParser());
+    update_parser->SetLogPointer(this);
+
+    jfParseFetchPackage* result = new jfParseFetchPackage(update_parser, update_fetcher, true);
+    return result;
 }
 
 /**************************************************************/

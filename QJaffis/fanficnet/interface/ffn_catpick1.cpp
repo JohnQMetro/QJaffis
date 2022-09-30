@@ -192,10 +192,9 @@ void jfFFN_SectionPicker::HanFirstChecked(size_t which, Qt::CheckState what) {
   bool dcheck;
   QStringList* xcat_list;
   // some quick asserts
+  jerror::AssertLog(what!=Qt::PartiallyChecked,fname,"Check state is prtially checked (bad)!");
+  jerror::AssertLog(which<(first_list->count()),fname,"which parameter has a bad value!");
   /**/JDEBUGLOG(fname,1);
-  assert(what!=Qt::PartiallyChecked);
-  assert(which<(first_list->count()));
-  /**/JDEBUGLOG(fname,2);
   // assigning some values
   dcheck = (what==Qt::Checked);
   csec_name = jfFFN_SECDATA::section_names[which];
@@ -435,8 +434,7 @@ void jfFFN_CrossGroupPicker::LoadSection() {
   // loading the individual crossover cat list
   cg_name = first_list->currentItem()->text();
   xcat_list = mcatdata->GetCrossoverCategories(section_index,cg_name);
-  /**/JDEBUGLOG(fname,3);
-  assert(xcat_list!=NULL);
+  jerror::AssertLog(xcat_list!=NULL,fname,"The crossover category list is null!");
   cat_list->replaceItems(*xcat_list);
   cat_list->setSelectionNS(0);
   /**/JDEBUGLOG(fname,4);

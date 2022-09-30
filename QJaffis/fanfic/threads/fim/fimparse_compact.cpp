@@ -87,7 +87,7 @@ void* jfFIMCompactParser::getResults(){
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++
 // FIM currently does not do redirection,ifit does, parsing must be re-written
-QString* jfFIMCompactParser::makeRedirectedURL(const QString& inPart) {
+QString* jfFIMCompactParser::makeRedirectedURL(const QString& inPart) const {
   return NULL;
 }
 //------------------------------

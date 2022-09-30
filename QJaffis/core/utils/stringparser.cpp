@@ -4,7 +4,7 @@ Basic   : String parsing class
 Author  : John Q Metro
 Started : August 21, 2012 (split from utils2.cpp)
 Conversion to QT started : March 2, 2013
-Updated : March 19, 2022 (adding GetMovePastAltULong)
+Updated : July 11, 2022
 Notes   :
 
 ******************************************************************************/
@@ -20,6 +20,7 @@ Notes   :
 #endif // LOGGING_H_INCLUDED
 //----------------------------------------
 #include <assert.h>
+#include <QRegularExpressionMatch>
 /*****************************************************************************/
 // the constructors
 jfStringParser::jfStringParser() {
@@ -31,7 +32,7 @@ jfStringParser::jfStringParser() {
   // Unicode literals cannot be used
   QString xo = "\\n|\\r\\n|\\r|\\n\\r|";
   xo += QString(QChar(0x2028)) + "|" + QChar(0x2029) + "|" + QChar(0x0085);
-  xendl = QRegExp(xo);
+  xendl = QRegularExpression(xo);
 }
 //--------------------------------------------------------------------------
 jfStringParser::jfStringParser(QString indata, bool incasesen) {
@@ -40,7 +41,7 @@ jfStringParser::jfStringParser(QString indata, bool incasesen) {
   // Unicode literals cannot be used
   QString xo = "\\n|\\r\\n|\\r|\\n\\r|";
   xo += QString(QChar(0x2028)) + "|" + QChar(0x2029) + "|" + QChar(0x0085);
-  xendl = QRegExp(xo);
+  xendl = QRegularExpression(xo);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // change indata
@@ -120,21 +121,20 @@ bool jfStringParser::MovePast(QString find) {
     return true;
   }
 }
-//---------------------------------------------------------------------
-bool jfStringParser::MovePast(const QRegExp& find) {
-    // local variables
-    int fpos;
-    // basic check
-    if (!ready) return false;
-    if (find.isEmpty()) return false;
-    // looking...
-    fpos = find.indexIn(rawdata,mainindex);
-    if (fpos == -1) return false;
-    else {
-      skipped_data = rawdata.mid(mainindex,fpos-mainindex);
-      SetIndex(fpos + find.matchedLength());
-      return true;
+// ------------------------------------------------------------------
+bool jfStringParser::MovePast(const QRegularExpression& find) {
+    if (CheckRegex(find)) {
+        QRegularExpressionMatch match = find.match(rawdata, mainindex);
+        if (match.hasMatch()) {
+            int startpos = match.capturedStart();
+            int matchlen = match.capturedLength();
+            skipped_data = rawdata.mid(mainindex,startpos-mainindex);
+            SetIndex(startpos + match.capturedLength());
+            return true;
+        }
+        else return false;
     }
+    else return false;
 }
 
 //------------------------------------------------------------------------
@@ -276,6 +276,19 @@ bool jfStringParser::GetMovePast(QString end, QString& outbuf) {
     return true;
   }
 }
+bool jfStringParser::GetMovePast(const QRegularExpression end, QString& outbuf) {
+    if (CheckRegex(end)) {
+        QRegularExpressionMatch match = end.match(rawdata, mainindex);
+        if (match.hasMatch()) {
+            int startpos = match.capturedStart();
+            outbuf = rawdata.mid(mainindex,startpos-mainindex);
+            SetIndex(startpos + match.capturedLength());
+            return true;
+        }
+        else return false;
+    }
+    else return false;
+}
 //------------------------------------------------------------------------
 bool jfStringParser::MovePastOrEnd(QString endval, QString& outbuf) {
   // returning false
@@ -404,6 +417,54 @@ bool jfStringParser::GetMovePastAltULong(QString end1, QString end2, ulong& outv
 bool jfStringParser::GetDelimited(QString start, QString end, QString& outbuf) {
   if (!MovePast(start)) return false;
   return GetMovePast(end,outbuf);
+}
+//--------------------------------------------------------------------------
+// regular expression extract
+bool jfStringParser::GetUsingRegex(const QRegularExpression& regex, bool first_capture, QString& outbuf) {
+    if (CheckRegex(regex)) {
+        if (first_capture && (regex.captureCount() < 1)) return false;
+        QRegularExpressionMatch match = regex.match(rawdata, mainindex);
+        if (match.hasMatch()) {
+            int startpos = match.capturedStart();
+            outbuf = match.captured((first_capture) ? 1 : 0);
+            SetIndex(startpos + match.capturedLength());
+            return true;
+        }
+        else return false;
+
+    }
+    else return false;
+}
+//--------------------------------------------------------------------------
+bool jfStringParser::GetULongUsingRegex(const QRegularExpression& regex, bool first_capture, ulong& outval, QString& outerr) {
+    if (CheckRegex(regex)) {
+        if (first_capture && (regex.captureCount() < 1)) {
+            outerr = "The regx contains no capture groups, but first_capture is true!";
+            return false;
+        }
+        QRegularExpressionMatch match = regex.match(rawdata, mainindex);
+        if (match.hasMatch()) {
+            int startpos = match.capturedStart();
+            QString capture = match.captured((first_capture) ? 1 : 0);
+            // numeric conversion
+            if (Str2ULongC(capture,outval)) {
+                SetIndex(startpos + match.capturedLength());
+                return true;
+            }
+            else {
+                outerr = "The captured value could not be converted to an integer!";
+                return false;
+            }
+        }
+        else {
+            outerr = "No match was found";
+            return false;
+        }
+    }
+    else {
+        outerr = "Parameter error, the regex is defective OR the index is past the end of the string.";
+        return false;
+    }
 }
 //------------------------------------------------------------------------------------
 // similar to GetDelimited, but tries to get a number.
@@ -979,6 +1040,13 @@ size_t jfStringParser::CalcSkipAmount(const size_t& lpos) const {
         else if ((nlchar=='\n') && (nlchar2=='\r')) skipamount = 2;
     }
     return skipamount;
+}
+// -------------------------
+bool jfStringParser::CheckRegex(const QRegularExpression& toMatch) const {
+    if (!ready) return false;
+    else if (toMatch.isValid() == false) return false;
+    else if (mainindex >= rawdata.length()) return false;
+    else return true;
 }
 
 /*****************************************************************************/

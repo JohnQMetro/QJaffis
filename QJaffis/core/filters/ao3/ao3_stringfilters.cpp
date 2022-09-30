@@ -19,7 +19,7 @@
 //----------------------------------------------------------
 jfExtraTagFilter::jfExtraTagFilter():jfSimpleExpFilterCore() {}
 //----------------------------------------------------------
-jfExtraTagFilter::jfExtraTagFilter(const jfExtraTagFilter& source) {
+jfExtraTagFilter::jfExtraTagFilter(const jfExtraTagFilter& source):jfSimpleExpFilterCore() {
   CoreCopy(source);
 }
 //----------------------------------------------------------
@@ -50,7 +50,7 @@ bool jfExtraTagFilter::CoreMatch(const jfBasePD* testelem) const {
   // checks and starts
   assert(testelem!=NULL);
   typed_item = dynamic_cast<const jfAO3Fanfic*>(testelem);
-  datainfo = typed_item->GetExtraTags();
+  datainfo = typed_item->GetJoinedExtraTags();
   return InternalMatch(datainfo);
 }
 //****************************************************************************

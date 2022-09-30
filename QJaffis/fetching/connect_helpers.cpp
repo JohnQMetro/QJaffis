@@ -3,7 +3,7 @@ Name    : connect_helpers.cpp
 Basic   : Defines auxiliary classes and types for downloading
 Author  : John Q Metro
 Started : March 20, 2013
-Updated : April 6, 2013
+Updated : June 27, 2022
 
 ******************************************************************************/
 #ifndef CONNECT_HELPERS_H
@@ -19,18 +19,21 @@ Updated : April 6, 2013
 //****************************************************************************
 // fetch error to string
 QString jf_FetchErr2String(jfFETCH_ERROR inval, bool limit) {
-  switch (inval) {
-    case jff_NOERROR  : return "No Error";
-    case jff_TRYAGAIN :
-      if (limit) return "Retry Limit Reached";
-      else return "Retryable Error";
-    case jff_REDIRECTION :
-      if (limit) return "Retry Limit Reached with Redirection";
-      else return "Request Redirected";
-    case jff_MISSING    : return "Page is Missing";
-    case jff_FALIURE    : return "Non-Temporary Error";
-    default : return "Halted by User";
-  }
+    switch (inval) {
+        case jff_BADURL   : return "URL is invalid";
+        case jff_BUSY     : return "Busy";
+        case jff_NOERROR  : return "No Error";
+        case jff_TRYAGAIN : return "Retryable Error";
+        case jff_RATELIMIT : return "Too Many Requests";
+        case jff_REDIRECTION :
+            if (limit) return "Retry Limit Reached with Redirection";
+            else return "Request Redirected";
+        case jff_MISSING    : return "Page is Missing";
+        case jff_BLOCKED    : return "Blocked";
+        case jff_FALIURE    : return "Non-Temporary Error";
+        case jff_HALTED     : return "Halted by User";
+        default: return "Internal Problem";
+    }
 }
 
 //============================================================================
@@ -200,7 +203,16 @@ bool jfPauseStop::CheckPauseStopAfter() {
     return false;
   }
 }
-
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void jfPauseStop::SignalWaiting(int amount) {
+    QMutexLocker lk(&protect_data);
+    emit SendWaiting(amount);
+}
+//---------------------
+void jfPauseStop::SignalStoppedWaiting() {
+    QMutexLocker lk(&protect_data);
+    emit SendStoppedWaiting();
+}
 //---------------------
 // used to set the status to stop
 void jfPauseStop::RegisterStop(jfFETCH_AFTERMATH finalerr) {

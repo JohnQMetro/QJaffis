@@ -104,7 +104,7 @@ void jfFetchAndParsePage::StartProcessing() {
       // parsing did not go okay
       else {
         parse_err = parser->getParseErrorMessage();
-        /**/tLog(fname,10,parse_err);
+        tParseError(fname,parse_err);
         resultStore = new jfDownloadResults();
         (resultStore->fetchResults).why_more = parse_err;
         (resultStore->fetchResults).why = jfa_PARSEERR;
@@ -200,9 +200,12 @@ jfFETCH_ERROR jfFetchAndParsePage::DownloadMethod(uint pre_pause) {
       }
       // rate limit error...
       else if (currError == jff_RATELIMIT) {
-          if (sleep_time < 10) sleep_time = 10;
-          else if (sleep_time > 80) sleep_time += downloader->GetRetryAfter();
-          else sleep_time = sleep_time * 2;
+          int retry_after = downloader->GetRetryAfter();
+          if (retry_after > 0) sleep_time = retry_after;
+          else {
+              if (sleep_time < 10) sleep_time = 10;
+              else sleep_time = sleep_time * 2;
+          }
           /**/tLog(fname,6);
           downloader->Reset();
       }

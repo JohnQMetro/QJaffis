@@ -4,7 +4,7 @@ Basic   : Separates out logging from the other stuff
 Author  : John Q Metro
 Started : January 13, 2011
 Conversion to QT started : February 25, 2013
-Updated : July 19, 2016 (renamed again, added Macros)
+Updated : July 15, 2022 (logfolder)
 Notes   :
 
 ******************************************************************************/
@@ -26,8 +26,8 @@ Notes   :
 class jfQLogger {
   public:
     // constructors
-    jfQLogger();
-    jfQLogger(QString inname);
+    jfQLogger(QString logfolder);
+    jfQLogger(QString logfolder, QString inname, bool opennow);
     bool open(QString inname);
     // info methods
     bool isOpen() const;
@@ -35,10 +35,14 @@ class jfQLogger {
     QString getFilename() const;
     // logging methods
     bool logLine(QString outstring);
+    bool logError(QString outstring);
     // destructors
     bool close();
     ~jfQLogger();
   protected:
+    bool makeFolder() const;
+
+    QString subfolder;
     QString lfilename;
     QTextStream* xostream;
     QFile* ofile;
@@ -47,6 +51,7 @@ class jfQLogger {
 //===================================================================
 // the primary log file.
 namespace jlog {
+  extern const QString logfoldername;
   extern const QString logfilename;
   extern jfQLogger* logtarget;
   extern QMutex locklog;
@@ -57,15 +62,16 @@ namespace jlog {
   // closes and deletes the logger
   void CloseLog();
 }
+
 //================================================================
 // using pre-processor macros to optionally remove most logging messages
 #ifdef QT_DEBUG
-  #define JDEBUGLOG(a,b) jfLogMessage(a,b);
-  #define JDEBUGLOGS(a,b,c) jfLogMessage(a,b,c);
-  #define JDEBUGLOGB(a,b,c) jfLogMessageB(a,b,c);
-  #define JDEBUGLOGST(a,b,c) jfLogMessageS(a,b,c);
-  #define JDEBUGLOGI(a,b,c) jfLogMessageI(a,b,c);
-  #define JDEBUGLOGU(a,b,c) jfLogMessageU(a,b,c);
+  #define JDEBUGLOG(a,b) jfLogxMessage(a,b);
+  #define JDEBUGLOGS(a,b,c) jfLogxMessage(a,b,c);
+  #define JDEBUGLOGB(a,b,c) jfLogxMessageB(a,b,c);
+  #define JDEBUGLOGST(a,b,c) jfLogxMessageS(a,b,c);
+  #define JDEBUGLOGI(a,b,c) jfLogxMessageI(a,b,c);
+  #define JDEBUGLOGU(a,b,c) jfLogxMessageU(a,b,c);
 #else
   #define JDEBUGLOG(a,b)
   #define JDEBUGLOGS(a,b,c)
@@ -77,23 +83,38 @@ namespace jlog {
 
 //======================================================================
 // logging methods that include a function name and index
-void jfLogMessage(QString funcname,size_t index, QString info);
-void jfLogMessageS(QString funcname,size_t index, size_t data);
-void jfLogMessageI(QString funcname,size_t index, int data);
-void jfLogMessageU(QString funcname,size_t index, ulong data);
-void jfLogMessageB(QString funcname,size_t index, bool data);
-void jfLogMessage(QString funcname,size_t index);
-void jfLogMessage2S(QString funcname,size_t index, size_t data1, size_t data2);
-void jfLogMessageBytes(QString funcname,size_t index, const QByteArray* indata, size_t iindex, size_t length);
+void jfLogxMessage(QString funcname,size_t index, QString info);
+void jfLogxMessageS(QString funcname,size_t index, size_t data);
+void jfLogxMessageI(QString funcname,size_t index, int data);
+void jfLogxMessageU(QString funcname,size_t index, ulong data);
+void jfLogxMessageB(QString funcname,size_t index, bool data);
+void jfLogxMessage(QString funcname,size_t index);
+void jfLogxMessage2S(QString funcname,size_t index, size_t data1, size_t data2);
+void jfLogxMessageBytes(QString funcname,size_t index, const QByteArray* indata, size_t iindex, size_t length);
 //-------------------------------------------------------------
 // a core methods that handles building the first part of the above result
 QString BLogCore(QString funcname, size_t index, bool more);
 //----------------------------------------------------------------------------------------
 // log just a string
-void jfXLogString(QString in_msg);
+void jfLogString(QString in_msg);
 // conditional log
-void jfCLogMessage(bool cond, QString funcname, size_t index, QString info);
+void jfCLogxMessage(bool cond, QString funcname, size_t index, QString info);
 //============================================================
 // assert with logging
-void jfAssertLog(bool condition, QString funcname, QString outmsg);
+// error log
+namespace jerror {
+  extern const QString errfilename;
+  extern jfQLogger* errtarget;
+  extern QMutex lockerr;
+
+  // creates the error log object
+  void InitELog();
+  // closes and deletes the logger
+  void CloseELog();
+
+  void Log(QString funcname, QString errmsg);
+  void ParseLog(QString funcname, QString errmsg);
+  void AssertLog(bool condition, QString funcname, QString outmsg);
+}
+
 //*****************************************************************************

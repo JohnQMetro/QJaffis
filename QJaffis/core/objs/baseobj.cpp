@@ -83,7 +83,7 @@ bool jfBaseObj::AddToFile(QTextStream* outfile) const {
   s_out << GetTypeID() << num_id << validdata;
   qbuf = "###" + QString(s_out);
   (*outfile) << qbuf << '\n';
-  s_out.clear();
+  s_out.FullClear();
   // line 2
   s_out << name << description;
   (*outfile) << s_out << '\n';
@@ -259,7 +259,7 @@ QString jfBasePD::GetDescExtract(size_t lines, size_t maxlen) const {
     }
   }
   if (truncated) runres += " ...";
-  runres += "</u></a></p>\n";
+  runres += "</u></a></p>";
   return runres;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

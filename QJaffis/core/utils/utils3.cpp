@@ -220,7 +220,7 @@ QString QueryEncode(const QString invalue, bool encodetilde) {
   // converting
   if (encodetilde) ba = QUrl::toPercentEncoding(invalue,QByteArray(),"~");
   else ba = QUrl::toPercentEncoding(invalue);
-  result = QString::fromAscii(ba.data());
+  result = QString::fromLatin1(ba.data());
   return result;
 }
 //=================================================================

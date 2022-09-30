@@ -48,8 +48,8 @@ bool jfFFN_UpdateBundle::SameCategory(size_t index, const jfFFN_CategoryCore* te
   const jfFFN_CategoryCore* test1;
   // checks
   /**/JDEBUGLOGST(fname,1,index);
-  assert(result_data!=NULL);
-  assert(testee!=NULL);
+  jerror::AssertLog(result_data!=NULL,fname,"Result Data is NULL!");
+  jerror::AssertLog(testee!=NULL,fname,"CategoryCore parameter is null");
   /**/JDEBUGLOGST(fname,2,(result_data->CollectionCount()));
   /**/JDEBUGLOGS(fname,3,testee->GetName());
   if (index==(result_data->CollectionCount())) return false;

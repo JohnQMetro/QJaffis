@@ -208,7 +208,7 @@ bool jfGenCat_PickData::RemoveByString(const QString& inval) {
     return false;
   }
   // removing
-  if (parser->Num()==2) fval=FindItem(floc,parser->GetT(0),parser->GetT(1));
+  if (parser->Num() == 2) fval=FindItem(floc,parser->GetT(0),parser->GetT(1));
   // next up..
   delete parser;
   if (!fval) return false;
@@ -306,7 +306,7 @@ bool jfGenCat_PickData::AddRestToFile(QTextStream* outfile) const {
   for (size_t loopc=0; loopc<item_count; loopc++) {
       result << sec_name[loopc] << cat_name[loopc];
       (*outfile) << result << "\n";
-      result.clear();
+      result.FullClear();
   }
   return true;
 }

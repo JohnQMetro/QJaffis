@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    Decfines a panel for displaying search results
 Created:     July 26, 2009
 Conversion to Qt Started November 20, 2013
-Updated:     June 24, 2016
+Updated:     May 6, 2022 : change multi-download class
 ******************************************************************************/
 #ifndef RESULT_PANEL_H_INCLUDED
   #include "result_panel.h"
@@ -60,7 +60,7 @@ jfResultDisplay::jfResultDisplay(rtype_enum rinval, header_enum hinval, QWidget*
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // creating the result displays and returning the links
-bool jfResultDisplay::LaunchParameters(jfResultCollection* results, jfBaseItemDownloader* in_downloader) {
+bool jfResultDisplay::LaunchParameters(jfResultCollection* results, jfDownloadRootItems* in_downloader) {
   const QString fname = "jfResultDisplay::LaunchParameters";
   // local variables
   bool svres;
@@ -92,7 +92,7 @@ void jfResultDisplay::ClearOld() {
   progpanel->DoReset();
   started = false;
   disconnect(search_data,0,mainviewer, 0);
-  jfBaseItemDownloader* ptrx = (multicat)?(download_ptr_multi):(download_ptr_single);
+  jfDownloadRootItems* ptrx = (multicat)?(download_ptr_multi):(download_ptr_single);
   progpanel->DisConnectThread(ptrx);
   data_collection = NULL;
   download_ptr_multi = NULL;
@@ -134,7 +134,7 @@ void jfResultDisplay::HandleDone(bool) {
 }
 //-------------------------------------------------
 void jfResultDisplay::ThreadDone() {
-  jfBaseItemDownloader* ptrx = (multicat)?(download_ptr_multi):(download_ptr_single);
+  jfDownloadRoot* ptrx = (multicat)?(download_ptr_multi):(download_ptr_single);
   disconnect(thread_object, SIGNAL(started()),ptrx ,SLOT(StartProcessing()));
   disconnect(ptrx,SIGNAL(AllFinished()),thread_object,SLOT(quit()));
   disconnect(thread_object,SIGNAL(finished()),this,SLOT(ThreadDone()));
@@ -145,7 +145,7 @@ void jfResultDisplay::ThreadDone() {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // helper methods for lauch parameters
 //---------------------------------------
-bool jfResultDisplay::SetupValues(jfResultCollection* results, jfBaseItemDownloader* in_downloader) {
+bool jfResultDisplay::SetupValues(jfResultCollection* results, jfDownloadRootItems* in_downloader) {
   // constants and variables
   const QString fname = "jfResultDisplay::SetupValues";
   bool svres;
@@ -158,7 +158,7 @@ bool jfResultDisplay::SetupValues(jfResultCollection* results, jfBaseItemDownloa
   search_data = results->GetSearch();
   if (search_data == NULL) return false;
   in_downloader->SetDataAndSearch(results);
-  if (multicat) download_ptr_multi = dynamic_cast<jfMultiCatBaseDownloader*>(in_downloader);
+  if (multicat) download_ptr_multi = dynamic_cast<jfMultiCatRootDownloader*>(in_downloader);
   else download_ptr_single = in_downloader;
   svres = mainviewer->SetupViewers(search_data->categories);
   return svres;
@@ -187,7 +187,7 @@ bool jfResultDisplay::ConnectSignalsAndSlots() {
     typpan2->ConnectAndSetPauser(download_ptr_multi);
   }
   // connecting thread object and downloader
-  jfBaseItemDownloader* ptrx = (multicat)?(download_ptr_multi):(download_ptr_single);
+  jfDownloadRootItems* ptrx = (multicat)?(download_ptr_multi):(download_ptr_single);
   connect(thread_object, SIGNAL(started()),ptrx ,SLOT(StartProcessing()));
   connect(ptrx,SIGNAL(AllFinished()),thread_object,SLOT(quit()));
   connect(thread_object,SIGNAL(finished()),this,SLOT(ThreadDone()));

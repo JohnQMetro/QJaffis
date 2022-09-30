@@ -3,25 +3,29 @@ Name    :   fimitem_thread.h
 Author  :   John Q Metro
 Purpose :   FIM Groups search thread
 Created :   June 30, 3016
-Updated :   June 30, 2016
+Updated :   June 11, 2022
 ******************************************************************************/
 #ifndef FIMITEM_THREAD_H
   #define FIMITEM_THREAD_H
 #endif // FIMITEM_THREAD_H
 //-------------------------------------------------
-#ifndef DOWNLOAD2_H
-  #include "../../../fetching/download2.h"
-#endif // DOWNLOAD2_H
+
 #ifndef FIM_SEARCH_H_INCLUDED
   #include "../../data/fim/fim_search.h"
 #endif // FIM_SEARCH_H_INCLUDED
 #ifndef VECTORS_H_INCLUDED
   #include "../../../core/structs/vectors.h"
 #endif // VECTORS_H_INCLUDED
+#ifndef DOWNLOADROOT2_H
+    #include "../../../fetching/loopget/downloadroot2.h"
+#endif // DOWNLOADROOT2_H
+#ifndef BASEPARSE_H
+  #include "../../../fetching/baseparse.h"
+#endif // BASEPARSE_H
 /*****************************************************************************/
-class jfFIMItemDownloader : public jfBaseItemDownloader {
+class jfFIMItemDownloader : public jfDownloadRootItems {
   public:
-    jfFIMItemDownloader(size_t in_max_threads);
+    jfFIMItemDownloader();
   public slots:
     virtual void StartProcessing();
   protected:
@@ -38,6 +42,8 @@ class jfFIMItemDownloader : public jfBaseItemDownloader {
     // implemented virtual methods
     virtual QString* makeURLforPage(size_t index) const;
     virtual void PrepareItemInfo(size_t pageIndex);
+
+    virtual jfParseFetchPackage* MakeParserFetcher();
 
     // internal data
     size_t est_itemcount;

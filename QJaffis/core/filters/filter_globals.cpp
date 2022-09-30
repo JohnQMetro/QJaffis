@@ -4,7 +4,7 @@
 // Purpose :    Defines global filter constants & stuff
 // Created:     30.07.06
 // Conversion to QT Started April 11, 2013
-// Updated:     January 21, 2018
+// Updated:     July 24, 2022
 /////////////////////////////////////////////////////////////////////////////
 // headers
 // ----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ namespace filterstrd {
         QString("FimRatingFilter,FimThumbPercentFilter,FIMShortDescFilter,") +
           "FIMDualDescFilter,FIMContentTypeFilter,FIMWarningFilter";
   const QString newao3fils = QString("ExtraTagFilter,AO3FandomFilter,AO3RatingFilter,") +
-        "AO3OrientationFilter,AO3PairFilter,AO3WarnFilter,AO3KudoCountFilter";
+        "AO3OrientationFilter,AO3PairFilter,AO3WarnFilter,AO3KudoCountFilter,AO3ExtraTagsPercentFilter";
   const QString fimgfils = "FIMGroupSCFilter,FIMGroupMCFilter";
   // filters compatible with jfBasePD
   const QString basepd_fc = "ExprFilter";

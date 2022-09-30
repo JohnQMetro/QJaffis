@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines the main interface for fimfiction.net group searching
 Created :   August 10, 2013
 // conversion to Qt satrted August 4, 2015
-Updated :   July 1, 2015
+Updated :   March 27, 2022
 ******************************************************************************/
 #ifndef FIMGROUP_MAINPANEL1_H_INCLUDED
   #include "fimgroup_mainpanel1.h"
@@ -43,7 +43,7 @@ jfFIMGroupSearchGrp::jfFIMGroupSearchGrp(jfFIMGroupSearch* searchin, QWidget* pa
     typed_search = searchin;
   }
   // making panel 1
-  panel1 = MakeFirstPanel();
+  search_and_filter_panel = MakeFirstPanel();
   custinit = true;
   // finishing off
   FinishConstruction();
@@ -58,7 +58,8 @@ jfSearchCore*       jfFIMGroupSearchGrp::MakeTypedSearch() const {
   temp = new jfFIMGroupSearch();
   temp->MakeEmpty();
   temp->categories->SetUseDefault(true);
-  temp->categories->base_outputdir = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+  QString search_path = jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
+  temp->categories->base_outputdir = search_path;
   return temp;
 }
 //----------------------------------------------------------------------------
@@ -67,8 +68,8 @@ jfResultCollection* jfFIMGroupSearchGrp::MakeTypedCollection() const {
   return new jfFIMGroupResColl(typed_search);
 }
 //----------------------------------------------------------------------------
-jfBaseItemDownloader* jfFIMGroupSearchGrp::MakeTypedThread() const {
-  return new jfFIMGroup_DownThread(4);
+jfDownloadRootItems* jfFIMGroupSearchGrp::MakeTypedThread() const {
+  return new jfFIMGroup_DownThread();
 }
 /*****************************************************************************/
 // the constructor
@@ -85,7 +86,7 @@ jfFIMGroupOnePanelSearch::jfFIMGroupOnePanelSearch(jfFIMGroupSearch* searchin, Q
     typed_search = searchin;
   }
   // making panel 1
-  panel1 = MakeFirstPanel();
+  search_and_filter_panel = MakeFirstPanel();
   custinit = true;
   // finishing off
   FinishConstruction();
@@ -100,7 +101,8 @@ jfSearchCore*       jfFIMGroupOnePanelSearch::MakeTypedSearch() const {
   temp = new jfFIMGroupSearch();
   temp->MakeEmpty();
   temp->categories->SetUseDefault(true);
-  temp->categories->base_outputdir = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+  QString search_path = jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
+  temp->categories->base_outputdir = search_path;
   return temp;
 }
 //----------------------------------------------------------------------------
@@ -109,8 +111,8 @@ jfResultCollection* jfFIMGroupOnePanelSearch::MakeTypedCollection() const {
   return new jfFIMGroupResColl(typed_search);
 }
 //----------------------------------------------------------------------------
-jfBaseItemDownloader* jfFIMGroupOnePanelSearch::MakeTypedThread() const {
-  return new jfFIMGroup_DownThread(3);
+jfDownloadRootItems* jfFIMGroupOnePanelSearch::MakeTypedThread() const {
+  return new jfFIMGroup_DownThread();
 }
 /*****************************************************************************/
 jfFIMGroupMain::jfFIMGroupMain(jfSearchCore* searchin, bool notebook, QWidget* parent):

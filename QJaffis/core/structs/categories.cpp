@@ -4,7 +4,7 @@
 // Purpose :    Defines collections involving categorization
 // Created:     April 1, 2009
 // Conversion to QT started : September 5, 2013
-// Updated:     August 22, 2012
+// Updated:     March 27, 2022
 ******************************************************************************/
 #ifndef CATEGORIES_H_INCLUDED
   #include "categories.h"
@@ -45,7 +45,7 @@ jfCategories::jfCategories() : jfBaseCollection() {
   usedefault = false;
   fname_path[32]=NULL;
   frelative[32] = true;  
-  base_outputdir = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+  base_outputdir = jglobal::settings.paths.GetPathFor(jglobal::DEFAULT_PATH_TYPE::SAVED_RESULTS);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // creates an empty new filter as and makes it the last category
@@ -460,7 +460,9 @@ bool jfCategories::ReadMid2FromFile(jfFileReader* infile) {
     UnEscapeNL(buffer,IO_DELIMS);
     base_outputdir = buffer;
     xdir.setPath(base_outputdir);
-    if (!xdir.exists()) base_outputdir = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+    if (!xdir.exists()) {
+        base_outputdir = jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
+    }
   }
   else {
     infile->Backup();

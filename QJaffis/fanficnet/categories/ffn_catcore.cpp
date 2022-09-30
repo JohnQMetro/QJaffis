@@ -5,7 +5,7 @@
 //              jaffis_base.h
 // Created:     April 4, 2010
 // Conversion to Qt Started September 25, 2013
-// Updated:     August 23, 2014
+// Updated:     June 29, 2022
 /////////////////////////////////////////////////////////////////////////////
 #ifndef JFFFNSCATCORE
   #include "ffn_catcore.h"
@@ -19,6 +19,9 @@
 #ifndef UTILS3_H_INCLUDED
   #include "../../core/utils/utils3.h"
 #endif // UTILS3_H_INCLUDED
+#ifndef HTMLPARSE_H_INCLUDED
+  #include "../../core/utils/htmlparse.h"
+#endif // HTMLPARSE_H_INCLUDED
 //----------------------------------------------
 #include <assert.h>
 
@@ -176,15 +179,15 @@ bool jfFFN_SectionCategory::SetFromSource(const QString& sname, const QString& i
   // making the url
   CatLinkSub(buffer);
   primarylink = "https://www.fanfiction.net" + buffer;
-  // we use the title= to get the actual name because the link text is sometimes abbreviated
-  if (!xparser.GetDelimited("title=\"","\">",buffer)) {
-    parse_err = "Could not extract Category Name!";
-    return false;
+  // since the name inside the linke is sometimes abbreviated...
+  if (!xparser.GetDelimited("title=\"","\"",buffer)) {
+      parse_err = "Could not extract Category Name! " + inraw;
+      return false;
   }
+
   // setting the name
-  buffer = buffer.trimmed();
-  buffer.replace("\\'","'");
-  buffer.replace("\\\"","\"");
+  buffer = buffer.trimmed().replace("\\'","'").replace("  "," ");
+  buffer = htmlparse::ConvertEntities(buffer,false);
   name = buffer;
   // next up, we extract the number of items...
   if (xparser.GetDelimitedFloat("'gray'>(","K)",cfx_out,oerr)) ccount = cfx_out*1000;
@@ -192,6 +195,7 @@ bool jfFFN_SectionCategory::SetFromSource(const QString& sname, const QString& i
   else if (xparser.GetDelimitedULong("'gray'>(",")",ccount_out,oerr)) ccount = ccount_out;
   else if (xparser.GetDelimitedULong("\"gray\">(",")",ccount_out,oerr)) ccount = ccount_out;
   else {
+    QString testo = xparser.GetBlock(1000);
     parse_err = "Could not find number of items in category! : " + oerr;
     return false;
   }
@@ -256,22 +260,21 @@ bool jfFFN_HalfCrossover::SetFromSource(const QString& sname, const QString& inr
     return false;
   }
   num_id = idvalue;
-  /**/jfCLogMessage(num_id==8074,fname,1,inraw);
-  /**/jfCLogMessage(num_id==8074,fname,2,xparser.GetBlock(200));
+  /**/jfCLogxMessage(num_id==8074,fname,1,inraw);
+  /**/jfCLogxMessage(num_id==8074,fname,2,xparser.GetBlock(200));
   // building the link
   primarylink = "https://www.fanfiction.net/" + buffer + "-Crossovers/";
   primarylink += QString::number(idvalue) + "/0/";
   // we use the title= to get the actual name because the link text is sometimes abbreviated
-  if (!xparser.GetDelimited("title=\"","\">",buffer)) {
-    parse_err = "Could not extract Category Name!";
+  if (!xparser.GetDelimited("title=\"","\"",buffer)) {
+    parse_err = "Could not extract Category Name! " + inraw;
     return false;
   }
-  /**/jfCLogMessage(num_id==8074,fname,3,buffer);
+  /**/jfCLogxMessage(num_id==8074,fname,3,buffer);
   // setting the name
-  buffer = buffer.trimmed();
-  buffer.replace("\\'","'");
-  buffer.replace("\\\"","\"");
-  /**/jfCLogMessage(num_id==8074,fname,4,buffer);
+  buffer = buffer.trimmed().replace("\\'","'").replace("  "," ");
+  buffer = htmlparse::ConvertEntities(buffer,false);
+  /**/jfCLogxMessage(num_id==8074,fname,4,buffer);
   name = buffer;
   // next up, we extract the number of items...
   if (xparser.GetDelimitedULong("'gray'>(","K)",ccount_out,oerr)) ccount = ccount_out*1000;
@@ -401,10 +404,10 @@ bool jfFFN_CrossoverCategory::SetFromSource(const QString icatname, size_t icati
   // assigning names
   if (num_id==icatid) {
     cat1 = icatname;
-    cat2 = tempname;
+    cat2 = htmlparse::ConvertEntities(tempname,false);
   }
   else if (cat2_id==icatid) {
-    cat1 = tempname;
+    cat1 = htmlparse::ConvertEntities(tempname,false);
     cat2 = icatname;
   }
   else {
@@ -450,7 +453,9 @@ int jfFFN_CrossoverCategory::GetOtherID(size_t cid) const {
 QString jfFFN_CrossoverCategory::GetOtherCombo(size_t cid) const {
   if (num_id==cid) return cat2 + " (" + section2 + ")";
   else if (cat2_id==cid) return cat1 + " (" + section1 + ")";
-  else assert(false);
+  else {
+      assert(false);
+  }
   return "";
 }
 //-----------------------------------------------------------

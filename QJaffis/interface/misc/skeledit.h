@@ -11,10 +11,10 @@ Updated :   September 18, 2013
 #endif
 //-----------------------------------------------------------------
 #ifndef WIDGETS1_H_INCLUDED
-  #include "widgets1.h"
+  #include "../controls/widgets1.h"
 #endif // WIDGETS1_H_INCLUDED
 #ifndef WIDGETS2_H_INCLUDED
-  #include "widgets2.h"
+  #include "../controls/widgets2.h"
 #endif // WIDGETS2_H_INCLUDED
 #ifndef SKELSTORE_H_INCLUDED
   #include "../../core/objs/skelstore.h"

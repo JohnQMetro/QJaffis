@@ -133,7 +133,7 @@ bool jfTagFilterCore::MatchVsData(const QString& incheck) const {
   if (emptyc==1) return true;
   // parsing the inout to check against
   delimlist = ListToStrArr(incheck,cm[0]);
-  if ((delimlist==NULL)) return nullresult;
+  if (delimlist == NULL) return nullresult;
   else if (delimlist->isEmpty()) {
     delete delimlist;
     return nullresult;
@@ -214,8 +214,7 @@ bool jfTagFilterCore::VerifyTags(size_t NUMTAGIN, const QString intags[], QStrin
   QString ctag;
   bool tfound;
   // checks
-  /**/JDEBUGLOG(fname,1)
-  jfAssertLog(intags!=NULL,fname,"input is NULL");
+  jerror::AssertLog(intags!=NULL,fname,"input is NULL");
   if (thedata==NULL) return false;
   /**/JDEBUGLOG(fname,2)
   // we start

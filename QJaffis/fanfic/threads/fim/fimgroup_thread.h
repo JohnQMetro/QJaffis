@@ -3,15 +3,15 @@ Name    :   fimgroup_thread.h
 Author  :   John Q Metro
 Purpose :   FIM Groups search thread
 Created :   August 4, 2015
-Updated :   January 17, 2018
+Updated :   June 11, 2022
 ******************************************************************************/
 #ifndef FIMGROUP_THREAD_H
 #define FIMGROUP_THREAD_H
 #endif // FIMGROUP_THREAD_H
 //----------------------------------------------
-#ifndef DOWNLOAD2_H
-  #include "../../../fetching/download2.h"
-#endif // DOWNLOAD2_H
+#ifndef DOWNLOADROOT2_H
+    #include "../../../fetching/loopget/downloadroot2.h"
+#endif // DOWNLOADROOT2_H
 #ifndef FIM_GROUPSEARCH_H_INCLUDED
   #include "../../data/fim/fim_groupsearch.h"
 #endif // FIM_GROUPSEARCH_H_INCLUDED
@@ -33,10 +33,10 @@ extra detail: if do_card is true, we skip phase 2, and phase 1 gets it's results
 the display.
 */
 
-class jfFIMGroup_DownThread : public jfBaseItemDownloader {
+class jfFIMGroup_DownThread : public jfDownloadRootItems {
   public:
     // constructor and data setting
-    jfFIMGroup_DownThread(size_t in_max_threads);
+    jfFIMGroup_DownThread();
   public slots:
     virtual void StartProcessing();
   protected:
@@ -45,6 +45,7 @@ class jfFIMGroup_DownThread : public jfBaseItemDownloader {
     void DeleteCardStore();
     // custom virtual methods
     virtual jfItemsPageParserBase* makeItemParser();
+    virtual jfParseFetchPackage* MakeParserFetcher();
     virtual void makeFirstPageInfo();
     virtual void ProcessFirstPageResults(void* resultdata);
     // overriden methods

@@ -3,7 +3,7 @@ Name    : progress_panel2.cpp
 Basic   : Child classes of progress panel which are still somewhat generic
 Author  : John Q Metro
 Started : November 18, 2013
-Updated : August 2, 2016
+Updated : April 30, 2022
 ******************************************************************************/
 #ifndef PROGRESS_PANEL2_H
   #include "progress_panel2.h"
@@ -99,7 +99,7 @@ jfProgressPanelSingle::jfProgressPanelSingle(bool sidelayout, QWidget* parent):
   jfProgressPanelOne(sidelayout,parent) {}
 //-------------------------------------------------------------------
 // specials
-bool jfProgressPanelSingle::ConnectAndSetPauser(jfBaseDownloader* the_downloader) {
+bool jfProgressPanelSingle::ConnectAndSetPauser(jfDownloaderBase* the_downloader) {
   const QString fname = "jfProgressPanelOne::ConnectAndSetPauser";
   if (the_downloader == NULL) return false;
   bool pstatus = MakePauser();
@@ -270,7 +270,7 @@ jfProgPanelMultiple:: jfProgPanelMultiple(size_t loption, QWidget* parent):jfPro
 
 }
 //---------------------------------------------------------------------
-bool jfProgPanelMultiple::ConnectAndSetPauser(jfMultiCatBaseDownloader* the_downloader) {
+bool jfProgPanelMultiple::ConnectAndSetPauser(jfMultiCatRootDownloader* the_downloader) {
   if (the_downloader == NULL)  return false;
   bool pstatus = MakePauser();
   if (!pstatus) return false;

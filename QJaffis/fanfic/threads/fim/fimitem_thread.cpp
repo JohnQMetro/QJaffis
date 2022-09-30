@@ -3,7 +3,7 @@ Name    :   fimitem_thread.cpp
 Author  :   John Q Metro
 Purpose :   FIM Groups search thread
 Created :   June 30, 3016
-Updated :   June 30, 2016
+Updated :   July 7, 2022
 ******************************************************************************/
 #ifndef FIMITEM_THREAD_H
   #include "fimitem_thread.h"
@@ -20,7 +20,7 @@ Updated :   June 30, 2016
 #include <math.h>
 /*****************************************************************************/
 // the constructor
-jfFIMItemDownloader::jfFIMItemDownloader(size_t in_max_threads):jfBaseItemDownloader(in_max_threads){
+jfFIMItemDownloader::jfFIMItemDownloader():jfDownloadRootItems() {
   compact_phase = true;
   fim_search = NULL;
   shortsum_storage = NULL;
@@ -40,7 +40,9 @@ void jfFIMItemDownloader::StartProcessing() {
   /**/tLog(fname,2);
 
   // doing the compact fetching (to get short summaries)
-  bool result = FetchAllPages(2000);
+  SetupWorkers(false);
+  bool result = xFetchAllPages(2000);
+  ClearWorkers(true);
   /**/tLogB(fname,3,result);
   if (!result) {
     AllDone(false);
@@ -56,9 +58,11 @@ void jfFIMItemDownloader::StartProcessing() {
 
   // doing full search
   search_object->DispatchCategory();
-  result = FetchAllPages(est_pcount);
+  SetupWorkers(false);
+  result = xFetchAllPages(est_pcount);
   /**/tLogB(fname,6,result);
-
+  ClearWorkers(true);
+  /**/tLog(fname,7);
   // done
   delete shortsum_storage;
   AllDone(result);
@@ -106,7 +110,7 @@ void jfFIMItemDownloader::ProcessFirstPageResults(void* resultdata) {
   }
   // otherwise, we insert and dispatch items...
   else {
-    jfBaseItemDownloader::ProcessResults(resultdata);
+    jfDownloadRootItems::ProcessResults(resultdata);
   }
 }
 //---------------------------------------
@@ -134,7 +138,7 @@ bool jfFIMItemDownloader::ProcessResults(void* resultdata) {
   }
   // otherwise, we insert and dispatch items...
   else {
-    return jfBaseItemDownloader::ProcessResults(resultdata);
+    return jfDownloadRootItems::ProcessResults(resultdata);
   }
 }
 //---------------------------------------
@@ -144,7 +148,7 @@ void jfFIMItemDownloader::DisposeResults(void* resultdata) {
     jfIDStringStore* typed_data = static_cast<jfIDStringStore*>(resultdata);
     delete typed_data;
   }
-  else jfBaseItemDownloader::DisposeResults(resultdata);
+  else jfDownloadRootItems::DisposeResults(resultdata);
 }
 //---------------------------------------
 // creates the parser, we have 2 different types depending on phase
@@ -154,7 +158,7 @@ jfPageParserBase* jfFIMItemDownloader::makeParser() {
     cparser->SetDoMature(fim_search->GetMature());
     return cparser;
   }
-  else return jfBaseItemDownloader::makeParser();
+  else return jfDownloadRootItems::makeParser();
 }
 //+++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
@@ -179,5 +183,13 @@ QString* jfFIMItemDownloader::makeURLforPage(size_t index) const {
      infoToSend.item_label = "Full View Page";
      infoToSend.item_name = "";
    }
- }
+}
+// -----------------------------------------
+jfParseFetchPackage* jfFIMItemDownloader::MakeParserFetcher() {
+    jfPageParserBase* fim_parser = makeParser();
+    if (fim_parser == NULL) return NULL;
+    jfParseFetchPackage* result = DefaultParseFetchMaker(jfft_FIM, jglobal::FPT_LISTING_PAGE, fim_parser);
+    if (result == NULL) delete fim_parser;
+    return result;
+}
 /*****************************************************************************/

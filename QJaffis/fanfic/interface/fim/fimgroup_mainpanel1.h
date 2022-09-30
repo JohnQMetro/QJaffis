@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares the main interface for fimfiction.net group searching
 Created :   August 10, 2013
 // conversion to Qt satrted August 3, 2015
-Updated :   August 11, 2013
+Updated :   June 4, 2022
 ******************************************************************************/
 #ifndef FIMGROUP_MAINPANEL1_H_INCLUDED
 #define FIMGROUP_MAINPANEL1_H_INCLUDED
@@ -25,10 +25,10 @@ class jfFIMGroupSearchGrp : public jfSearchGrouping {
     // the constructor
     jfFIMGroupSearchGrp(jfFIMGroupSearch* searchin, QWidget* parent = NULL);
     // custom  methods
-    virtual jfSearchPanelBase*  MakeFirstPanel();
-    virtual jfSearchCore*       MakeTypedSearch() const;
-    virtual jfResultCollection* MakeTypedCollection() const;
-    virtual jfBaseItemDownloader*    MakeTypedThread() const;
+    virtual jfSearchPanelBase*   MakeFirstPanel();
+    virtual jfSearchCore*        MakeTypedSearch() const;
+    virtual jfResultCollection*  MakeTypedCollection() const;
+    virtual jfDownloadRootItems* MakeTypedThread() const;
   protected:
     jfFIMGroupSearch* typed_search;
 };
@@ -38,10 +38,10 @@ class jfFIMGroupOnePanelSearch : public jfOnePanelSearch {
     // the constructor
     jfFIMGroupOnePanelSearch(jfFIMGroupSearch* searchin, QWidget* parent = NULL);
     // custom  methods
-    virtual jfSearchPanelBase*  MakeFirstPanel();
-    virtual jfSearchCore*       MakeTypedSearch() const;
-    virtual jfResultCollection* MakeTypedCollection() const;
-    virtual jfBaseItemDownloader* MakeTypedThread() const;
+    virtual jfSearchPanelBase*   MakeFirstPanel();
+    virtual jfSearchCore*        MakeTypedSearch() const;
+    virtual jfResultCollection*  MakeTypedCollection() const;
+    virtual jfDownloadRootItems* MakeTypedThread() const;
   protected:
     jfFIMGroupSearch* typed_search;
 };

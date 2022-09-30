@@ -3,7 +3,7 @@ Name    :   ao3item_parser.cpp
 Author  :   John Q Metro
 Purpose :   Parser for AO3 fic licting pages
 Created :   July 16, 2016
-Updated :   April 2, 2021
+Updated :   August 27, 2022
 ******************************************************************************/
 #ifndef AO3ITEM_PARSER_H
   #include "ao3item_parser.h"
@@ -12,6 +12,9 @@ Updated :   April 2, 2021
 #ifndef AO3_FICOBJ_H_INCLUDED
   #include "../../data/ao3/ao3_ficobj.h"
 #endif // AO3_FICOBJ_H_INCLUDED
+
+#include "../../../core/tagfilter/base_tagfilters.h"
+
 #include <assert.h>
 #include <math.h>
 /*****************************************************************************/
@@ -20,6 +23,7 @@ Updated :   April 2, 2021
 // constructor
 jfAO3ItemParser::jfAO3ItemParser():jfItemsPageParserBase() {
   this_category = NULL;
+  extra_tag_counter = new jfStringCounter(true,true);
 }
 //------------------------------------------------------
 bool jfAO3ItemParser::SetCategory(const jfAO3_Category* in_category){
@@ -40,7 +44,7 @@ void jfAO3ItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
   /**/lpt->tLog(fname,2);
   // the start
   if (!ProcessStart(newcount)) {
-    /**/lpt->tLog(fname,3);
+      /**/lpt->tParseError(fname,"Processing the start failed");
     return;
   }
   // preparing for the loop
@@ -71,7 +75,7 @@ void* jfAO3ItemParser::getResults() {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // custom methods for download
 //----------------------------------
-QString* jfAO3ItemParser::makeRedirectedURL(const QString& inPart) {
+QString* jfAO3ItemParser::makeRedirectedURL(const QString& inPart) const {
   // the AO3 storiesmight redirect, but the AO3 fandom story listings do not
   return NULL;
 }
@@ -85,9 +89,26 @@ bool jfAO3ItemParser::testIncomplete(const QString *page) const {
   assert(page!=NULL);
   return page->contains("<!-- BEGIN footer -->");
 }
+//---------------------------------------
+// getting tag counts
+bool jfAO3ItemParser::SaveCounts() const {
+    // InnerReportMatchMisses();
+    if (extra_tag_counter != NULL) {
+        extra_tag_counter->SaveRecordedCounts("extra_tags.txt",5);
+        extra_tag_counter->SaveRecordedPairs("extra_tag_pairs.txt",5);
+    }
+    else return false;
+}
 //----------------------------------
 QString jfAO3ItemParser::getCookie() const {
   return "";
+}
+//----------------------------------
+jfAO3ItemParser::~jfAO3ItemParser() {
+    if (extra_tag_counter != NULL) {
+        delete extra_tag_counter;
+        extra_tag_counter = NULL;
+    }
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // helper methods for parsing
@@ -158,13 +179,25 @@ bool jfAO3ItemParser::FicParsingLoop() {
     temp = new jfAO3Fanfic();
     temp->SetFromString(buffer,this_category,errout);
     // success
-    if (temp->IsValid()) page_results->push_back(temp);
+    if (temp->IsValid()) {
+
+        // counting extra tags
+        if (extra_tag_counter != NULL) {
+            QStringList etags = temp->GetExtraTags();
+            if (!etags.isEmpty()) {
+                extra_tag_counter->RecordList(etags, true);
+            }
+        }
+
+        page_results->push_back(temp);
+    }
     // the item is not okay
     else {
       /**/lpt->tLog(funcname,1);
       if (!(temp->included)) delete temp;
       else {
-        /**/lpt->tLog(funcname,2,buffer);
+          /**/lpt->tParseError(funcname,buffer);
+          /**/lpt->tParseError(funcname,"AO3 item " + errout);
         delete temp;
         return parsErr("AO3 item " + errout);
       }
@@ -174,6 +207,7 @@ bool jfAO3ItemParser::FicParsingLoop() {
   // done
   return true;
 }
+
 
 /*****************************************************************************/
 

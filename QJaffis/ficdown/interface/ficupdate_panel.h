@@ -16,7 +16,7 @@
   #include "../threads/ficupdate_thread.h"
 #endif // FICUPDATE_THREAD_H
 #ifndef WIDGETS3_H_INCLUDED
-  #include "../../interface/misc/widgets3.h"
+  #include "../../interface/controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
 //--------------------------------------
 #include <QLabel>

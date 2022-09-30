@@ -35,8 +35,8 @@ jfFilterPickerBase::jfFilterPickerBase(bool three_cols, QWidget* parent):QTableW
   }
   else setColumnCount(2);
   setHorizontalHeaderLabels(collabels);
-  if (three_cols) horizontalHeader()->setResizeMode(2,QHeaderView::Stretch);
-  else horizontalHeader()->setResizeMode(1,QHeaderView::Stretch);
+  if (three_cols) horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
+  else horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
   // setting local variables
   fnames = NULL;
   ftypes = NULL;

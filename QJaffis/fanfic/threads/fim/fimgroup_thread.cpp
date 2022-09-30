@@ -3,7 +3,7 @@ Name    :   fimgroup_thread.cpp
 Author  :   John Q Metro
 Purpose :   FIM Groups search thread
 Created :   August 4, 2015
-Updated :   January 18, 2018
+Updated :   July 6, 2022
 ******************************************************************************/
 #ifndef FIMGROUP_THREAD_H
   #include "fimgroup_thread.h"
@@ -26,7 +26,7 @@ Updated :   January 18, 2018
 #include <assert.h>
 /*****************************************************************************/
 // the constructor
-jfFIMGroup_DownThread::jfFIMGroup_DownThread(size_t in_max_threads):jfBaseItemDownloader(in_max_threads) {
+jfFIMGroup_DownThread::jfFIMGroup_DownThread():jfDownloadRootItems() {
   maindata = NULL;
   current_collection = NULL;
   search_object = NULL;
@@ -48,7 +48,9 @@ void jfFIMGroup_DownThread::StartProcessing() {
     /**/tLogB(fname,2,do_card);
     // doing 'card' search first (36 groups per page, no descriptions)
     if (do_card) search->DispatchCategory();
-    bool result = FetchAllPages(2000);
+    SetupWorkers(false);
+    bool result = xFetchAllPages(2000);
+    ClearWorkers(true);
     /**/tLogB(fname,3,result);
     // handling the results of the card search
     if (!result) {
@@ -67,7 +69,9 @@ void jfFIMGroup_DownThread::StartProcessing() {
     /**/tLogS(fname,5,est_pcount);
     // doing full search
     search_object->DispatchCategory();
-    result = FetchAllPages(est_pcount);
+    SetupWorkers(false);
+    result = xFetchAllPages(est_pcount);
+    ClearWorkers(true);
     /**/tLogB(fname,6,result);
     // done
     DeleteCardStore();
@@ -122,6 +126,14 @@ jfItemsPageParserBase* jfFIMGroup_DownThread::makeItemParser() {
     else return new jfFIMGroupParser();
 }
 //------------------------------------------------
+jfParseFetchPackage* jfFIMGroup_DownThread::MakeParserFetcher() {
+    jfItemsPageParserBase* custom_parser = dynamic_cast<jfItemsPageParserBase*>(makeParser());
+    if (custom_parser != NULL) {
+        return DefaultParseFetchMaker(jfft_FIM, jglobal::FPT_CATEGORY_PAGE, custom_parser);
+    }
+    else return NULL;
+}
+//------------------------------------------------
 void jfFIMGroup_DownThread::makeFirstPageInfo() {
   PrepareItemInfo(1);
 }
@@ -142,12 +154,12 @@ bool jfFIMGroup_DownThread::ProcessResults(void* resultdata) {
     }
     // process and display the results as per normal...
     else {
-        return jfBaseItemDownloader::ProcessResults(resultdata);
+        return jfDownloadRootItems::ProcessResults(resultdata);
     }
 }
 //-----------------------------------
 void jfFIMGroup_DownThread::DisposeResults(void* resultdata) {
-    jfBaseItemDownloader::DisposeResults(resultdata);
+    jfDownloadRootItems::DisposeResults(resultdata);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods

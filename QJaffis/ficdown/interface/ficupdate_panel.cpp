@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    The interface for updating downloaded fanfics
 // Created:     July 26, 2016
-// Updated:     December 23, 2021
+// Updated:     June 11, 2022
 ******************************************************************************/
 #ifndef FICUPDATE_PANEL_H
   #include "ficupdate_panel.h"
@@ -75,7 +75,7 @@ jfFic_UpdateDisplay::jfFic_UpdateDisplay(QWidget* parent):QWidget(parent) {
 
   // we start with the GUI elemets
   const QString pickm = "Pick the Directory to search for fanfics to update";
-  QString ficdir = jglobal::settings.GetDirectory(jglobal::DownloadedFics);
+  QString ficdir = jglobal::settings.paths.GetPathFor(jglobal::SAVED_FANFIC_A);
   dir_pick = new jfDirPicker(NULL,false,true,pickm,ficdir);
   split_guide = new jfLabeledIntEdit(NULL,"File Size Guide (KB)",true,10,200000);
   split_guide->SetValue(jglobal::settings.ficsize_hint);
@@ -142,7 +142,7 @@ void jfFic_UpdateDisplay::HandleStart() {
   // fic parameters
   xvalue = split_guide->GetValue();
   xdir = dir_pick->GetPath();
-  downloader = new jfFicUpdateThread(3);
+  downloader = new jfFicUpdateThread();
   downloader->SetParams(xdir,xvalue,main_check->isChecked(), skip_ffn->isChecked());
   // setting the info and launching
   /**/JDEBUGLOG(fname,2)
@@ -245,7 +245,7 @@ bool jfFic_UpdateDisplay::SetupDownloaderAndThread() {
   downloader->moveToThread(thread_object);
   // connecting signals and slots
   bool testoo = main_display->ConnectAndSetPauser(downloader);
-  /**/jfAssertLog(testoo,fname,"Connecting and Setting Pauser FAILED!!!!");
+  /**/jerror::AssertLog(testoo,fname,"Connecting and Setting Pauser FAILED!!!!");
 
   // standard thread/downloader connections
   connect(thread_object, SIGNAL(started()),downloader ,SLOT(StartProcessing()));

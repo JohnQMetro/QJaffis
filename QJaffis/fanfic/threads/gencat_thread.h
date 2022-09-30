@@ -3,24 +3,28 @@ Name    :   gencat_thread.h
 Author  :   John Q Metro
 Purpose :   Base downloader class for sections & categories
 Created :   July 13, 2016
-Updated :   September 4, 2016
+Updated :   June 11, 2022
 ******************************************************************************/
 #ifndef GENCAT_THREAD_H
   #define GENCAT_THREAD_H
 #endif // GENCAT_THREAD_H
 //------------------------------------
-#ifndef DOWNLOAD_H
-  #include "../../fetching/download.h"
-#endif // DOWNLOAD_H
+#ifndef DOWNLOADROOT_H
+    #include "../../fetching/loopget/downloadroot.h"
+#endif // DOWNLOADROOT_H
+
 #ifndef CAT_MISC_H_INCLUDED
   #include "../data/cats/cat_misc.h"
 #endif // CAT_MISC_H_INCLUDED
+#ifndef DEFAULTPATHS_H
+    #include "../../defaultpaths.h"
+#endif // DEFAULTPATHS_H
 /*****************************************************************************/
-// core downloader thread base class, managing multiple downloader threads
-class jfGeneralCategoryDownloaderBase : public jfBaseDownloader {
+// core downloader thread base class
+class jfGeneralCategoryDownloaderBase : public jfDownloadRoot {
     Q_OBJECT
   public:
-    jfGeneralCategoryDownloaderBase(size_t in_max_threads);
+    jfGeneralCategoryDownloaderBase();
     bool SetCategoryDataPointers(jfGenCatManager* in_result_holder, jfGenSecData* in_url_source);
   public slots:
     // the top level process method
@@ -36,8 +40,9 @@ class jfGeneralCategoryDownloaderBase : public jfBaseDownloader {
     virtual bool advanceResultIndex();
     virtual void PrepareItemInfo(size_t pageIndex);
 
+    jfParseFetchPackage* CategoryParseFetchMaker(jf_FICTYPE site, jfPageParserBase* page_parser) const;
     // virtual methods that have to be implemented by derived threads
-    virtual jfPageParserBase* makeParser() = 0;
+    virtual jfParseFetchPackage* MakeParserFetcher() = 0;
 
     // custom data
     jfGenCatManager* result_holder;

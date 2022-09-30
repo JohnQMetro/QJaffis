@@ -3,25 +3,28 @@ Name    : ffncatthread.h
 Basic   : Fanfiction.Net category downloading
 Author  : John Q Metro
 Started : July 21, 2016
-Updated : August 5, 2016
+Updated : September 25, 2022
 
 ******************************************************************************/
 #ifndef FFNCATTHREAD_H
   #define FFNCATTHREAD_H
 #endif // FFNCATTHREAD_H
 //------------------------------------
-#ifndef DOWNLOAD_H
-  #include "../../fetching/download.h"
-#endif // DOWNLOAD_H
+#ifndef DOWNLOADROOT_H
+  #include "../../fetching/loopget/downloadroot.h"
+#endif // DOWNLOADROOT_H
 #ifndef CATGROUP_H
   #include "../categories/catgroup.h"
 #endif // CATGROUP_H
+#ifndef FFNCATPARSER2_H
+  #include "ffncatparser2.h"
+#endif // FFNCATPARSER2_H
 /*****************************************************************************/
 // core downloader thread base class, managing multiple downloader threads
-class jfFFN_CategoryDownloader : public jfBaseDownloader {
+class jfFFN_CategoryDownloader : public jfDownloadRoot {
     Q_OBJECT
   public:
-    jfFFN_CategoryDownloader(size_t in_max_threads);
+    jfFFN_CategoryDownloader();
     bool SetCatManagerPtr(jfFFN_CatManager* in_catman_ptr, bool doupdate);
   signals:
     void SendSectionCount(size_t ccount);
@@ -44,7 +47,11 @@ class jfFFN_CategoryDownloader : public jfBaseDownloader {
     virtual void PrepareItemInfo(size_t pageIndex);
     virtual bool advanceFetchIndex();
     virtual bool advanceResultIndex();
-    virtual jfPageParserBase* makeParser();
+
+    // parser
+    jfPageParserBase* makeParser();
+    virtual jfParseFetchPackage* MakeParserFetcher();
+    jfFFNCrossoverParser* crossover_parser;
 
       //custom data
     jfFFN_CatManager* catman_ptr;

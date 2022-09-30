@@ -11,7 +11,7 @@
 #endif // CATEGORY_EDITOR_H_INCLUDED
 //-----------------------------------------------------------------------------
 #ifndef WIDGETS1_H_INCLUDED
-  #include "../../misc/widgets1.h"
+  #include "../../controls/widgets1.h"
 #endif // WIDGETS1_H_INCLUDED
 #ifndef EXPR_EDITOR_H_INCLUDED
   #include "../base/expr_editor.h"

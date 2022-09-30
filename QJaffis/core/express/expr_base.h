@@ -4,7 +4,7 @@
 // Purpose :    Declares basic classes for expression elements
 // Created:     26.12.06
 // Conversion to QT Started April 8, 2013
-// Updated:     April 29, 2009
+// Updated:     August 6, 2022 (added jfWholeStringElem)
 /////////////////////////////////////////////////////////////////////////////
 // headers
 #ifndef JFBASEFILTER
@@ -97,6 +97,7 @@ public:
     QChar GetType() const;
     virtual bool IsOperand() const = 0;
     virtual QString String() const = 0;
+    virtual ~jfExprElem();
 protected:
     // internal base data
     QChar type;
@@ -153,6 +154,14 @@ public:
     ~jfTokenMElem();
 protected:
     QStringList* tdata;
+};
+//===========================================================================
+// USABLE, --- Match entire input string, meant for use with individual tags
+class jfWholeStringElem : public jfStrElem {
+public:
+    jfWholeStringElem(const QString& newpattern, bool newcs=false);
+    jfWholeStringElem(const jfWholeStringElem& source);
+    bool Match(const QString& base) const;
 };
 //=============================================================================
 /* Operand class for embedded filter literals. We disallow embedded expression

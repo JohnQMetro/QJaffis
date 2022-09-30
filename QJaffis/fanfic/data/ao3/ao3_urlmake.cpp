@@ -3,16 +3,25 @@ Name    :   ao3_urlmake.cpp
 Author  :   John Q Metro
 Purpose :   Defines a url generator for AO3 searches
 Created :   November 20, 2021
-Updated :   January 27, 2022
+Updated :   August 27, 2022
 ******************************************************************************/
 #ifndef AO3_URLMAKE_H
     #include "ao3_urlmake.h"
 #endif // AO3_URLMAKE_H
 //------------------------------------------
+#include "../../../core/tagfilter/taglist.h"
+#include "../../../core/tagfilter/tagmatch.h"
+
 #ifndef AO3_LOOKVALS_H
     #include "ao3_lookvals.h"
 #endif // AO3_LOOKVALS_H
 
+#ifndef INITEND_H_INCLUDED
+  #include "../../../initend.h"
+#endif // INITEND_H_INCLUDED
+#ifndef GLOBALSETTINGS_H
+    #include "../../../globalsettings.h"
+#endif // GLOBALSETTINGS_H
 /*****************************************************************************/
 AO3UrlMaker::AO3UrlMaker() {
     commited = false;
@@ -33,10 +42,16 @@ bool AO3UrlMaker::setOrientationListing(const jfTagListing* source) {
 }
 bool AO3UrlMaker::setRatingChoice(size_t index) {
     rating = ao3values::ratingMaker.MakeUsingPredefined(index);
-    return !orientation.isEmpty();
+    return !rating.isEmpty();
 }
 bool AO3UrlMaker::setFullExcludeQuery(bool gensex, bool emo, bool other, bool fluff, const QString& template_list, const QString& insert) {
     excludes = ao3values::excludeMaker.MakeFullExcludeQuery(gensex, emo, other, fluff, template_list, insert);
+    return !orientation.isEmpty();
+}
+bool AO3UrlMaker::setFullExcludeQuery(const QStringList& excludes_names, const QString& template_list, const QString& insert) {
+    QList<const jfGeneralTagList*> excludeSets = taglistings::excludeListsGroup->GetListsForNames(excludes_names);
+
+    excludes = ao3values::excludeMaker.MakeFullExcludeQuery(excludeSets, template_list, insert);
     return !orientation.isEmpty();
 }
 bool AO3UrlMaker::setWarningExcludes(bool violence, bool death, bool rape, bool underage) {
@@ -129,12 +144,12 @@ QString AO3UrlMaker::getUrlForPage(size_t page_index) const {
 -Take the name, replace & with *a*, . with *d*, ? with *q*, and / with *s* .
 -Convert to to utf-8 and then treat each byte separatly.
 -Characters of 128 or more, as well as selected characters less than than, are %
-encoded. Selected characters are %<>#{}\^`';/:@=$+()"
+encoded. Selected characters are %<>#{}\^`';/:@=$+()|"
 -Spaces are replaced with + */
 QString AO3UrlMaker::categoryNameEncode() const {
     // constants
-    const QByteArray dont_encode = QByteArray("!&*,/?[]| ");
-    const QString pesc_chars = "%<>#{}\\^`';/:@=$+()\"";
+    const QByteArray dont_encode = QByteArray("!&*,/?[] ");
+    const QString pesc_chars = "%<>#{}\\^`';/:@=$+()|\"";
     // special case
     QString inval = category_name;
     if (category_name.isEmpty()) return inval;

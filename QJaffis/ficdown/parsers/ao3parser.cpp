@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Archiveofourown.org
  * Author:    John Q Metro
  * Created:   July 6, 2016
- * Updated:   January 23, 2022
+ * Updated:   July 8, 2020
  *
  **************************************************************/
 #ifndef AO3PARSER_H
@@ -27,10 +27,10 @@ jfAO3_FicPartParser::jfAO3_FicPartParser():jfStoryPartParseBase() {
 //++++++++++++++++++++++++++++++++++++++++
 // virual methods that are implemented
 //------------------------------------
-QString* jfAO3_FicPartParser::makeRedirectedURL(const QString& inPart) {
+QString* jfAO3_FicPartParser::makeRedirectedURL(const QString& inPart) const {
   if (inPart=="https://archiveofourown.org/") return NULL;
   // AO3 redirects are pretty simple
-  QString* rresult = new QString(inPart);
+  QString* rresult = new QString("https://archiveofourown.org" + inPart);
   (*rresult) += "?view_adult=true";
   return rresult;
 }
@@ -74,9 +74,9 @@ bool jfAO3_FicPartParser::ParseFirstPage(const QString& indata) {
   // initial chapter info (plus the possible name of the first part!)
   jfFicExtract_AO3* ffresult = new jfFicExtract_AO3();
   if (!ExtractChapterFicIDs(ffresult,partname)) {
-    delete ffresult;
-    /**/lpt->tLog(fname,2);
-    return false;
+      delete ffresult;
+      /**/lpt->tParseError(fname,"Extracting Chapter IDs Failed");
+      return false;
   }
   // loading up on some of the fic part data
   tempfic.part_name = partname;
@@ -87,13 +87,13 @@ bool jfAO3_FicPartParser::ParseFirstPage(const QString& indata) {
   // skiping past more stuff to skip
   if (!xparser.MovePast("<dt class=\"stats\">Stats:</dt>")) {
     delete ffresult;
-    /**/lpt->tLog(fname,3);
+      /**/lpt->tParseError(fname,"Cannot find stats line!");
     return parsErr("Cannot find stats line!");
   }
 
   if (!DatesAndCompletion(ffresult)) {
     delete ffresult;
-    /**/lpt->tLog(fname,4);
+      /**/lpt->tParseError(fname,"Dates and completion failed to parse");
     return false;
   }
   /**/lpt->tLog(fname,5);
@@ -101,6 +101,7 @@ bool jfAO3_FicPartParser::ParseFirstPage(const QString& indata) {
   QString buffer;
   if (!xparser.GetDelimited("<h2 class=\"title heading\">","</h2>",buffer)) {
     delete ffresult;
+      /**/lpt->tParseError(fname,"Cannot find title");
     return parsErr("Cannot find title!");
   }
   ffresult->fic_title = buffer.trimmed();
@@ -108,10 +109,12 @@ bool jfAO3_FicPartParser::ParseFirstPage(const QString& indata) {
   // author name
   if (!xparser.MovePast("<a rel=\"author\"")) {
       delete ffresult;
+      /**/lpt->tParseError(fname,"AO3 Cannot find author name!");
       return parsErr("AO3 Cannot find author name!");
   }
   if (!xparser.GetDelimited("\">","</a>",buffer)) {
     delete ffresult;
+      /**/lpt->tParseError(fname,"AO3 Cannot extract author name!");
     return parsErr("AO3 Cannot extract author name!");
   }
   ffresult->author_name = buffer.trimmed();
@@ -124,11 +127,11 @@ bool jfAO3_FicPartParser::ParseFirstPage(const QString& indata) {
   // getting part contents
   // this is getting rather vague, so we'll try multiple methods
   if (!xparser.GetDelimitedEndPair(cstart1,"<!--/main-->","<!-- end cache -->",xbuffer)) {
-      /**/lpt->tLog(fname,9);
+    /**/lpt->tLog(fname,9);
       if (!xparser.GetDelimitedEndPair(cstart2,"<!--/main-->","<!-- end cache -->",xbuffer)) {
-        delete ffresult;
+      delete ffresult;
         return parsErr("AO3 P1x Cannot find contents!");
-      }
+    }
   }
   /**/lpt->tLog(fname,11);
   // here, there is no chance of faliure, so we set some results
@@ -164,6 +167,7 @@ bool jfAO3_FicPartParser::ParseOtherPage() {
   buffer = buffer.trimmed();
   /**/lpt->tLog(fname,2);
   if (!HandleChapters(buffer,thispart)) {
+      /**/lpt->tParseError(fname,"Could not process chapter info! : " + parseErrorMessage);
     return parsErr("Could not process chapter info! : " + parseErrorMessage);
   }
   thispart.startnotes = GetStartNotes();
@@ -172,15 +176,17 @@ bool jfAO3_FicPartParser::ParseOtherPage() {
   // single part
   if (partcount==1) {
     if (!xparser.GetDelimited(cstart2,"<!-- end cache -->",xbuffer)) {
+        /**/lpt->tParseError(fname,"AO3 POs Cannot find contents!");
       return parsErr("AO3 POs Cannot find contents!");
     }
   }
   else {
     if (!xparser.GetDelimited(cstart1,"<!--/main-->",xbuffer)) {
+        /**/lpt->tParseError(fname,"AO3 POm Cannot find contents!");
       return parsErr("AO3 POm Cannot find contents!");
     }
   }
-  /**/lpt->tLog(fname,4,xbuffer);
+  /**/lpt->tLog(fname,4);
   // getting special notes
   if (xparser.MovePast("<!--work endnotes-->")) {
     if (xparser.MovePast("<h3 class=\"heading\">Notes:</h3>")){
@@ -238,7 +244,7 @@ bool jfAO3_FicPartParser::ExtractChapterFicIDs(jfFicExtract_AO3* extract_ptr, QS
       extract_ptr->chapterids.push_back(qval);
       if (!xparser.MovePast(".")) return parsErr("Problems with start of part name!");
       if (!xparser.GetMovePast("</option>",buffer)) {
-        /**/lpt->tLog(fname,5);
+          /**/lpt->tParseError(fname,"Problems with end of part name!");
         return parsErr("Problems with end of part name!");
       }
       if (ccount == 1) out_partname = buffer.trimmed();
@@ -277,7 +283,7 @@ bool jfAO3_FicPartParser::DatesAndCompletion(jfFicExtract_AO3* extract_ptr) {
   /**/lpt->tLog(fname,1);
   // the date is somewhat complicated, as we have 3 successive options
   if (xparser.GetDelimited("Completed:</dt><dd class=\"status\">","</dd>",buffer)) {
-      buffer = buffer.trimmed();
+    buffer = buffer.trimmed();
       is_complete = true;
   }
   else if (xparser.GetDelimited("Updated:</dt><dd class=\"status\">","</dd>",buffer)) {

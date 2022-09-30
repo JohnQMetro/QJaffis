@@ -3,7 +3,7 @@
  * Purpose:   Base downloader thread for fanfic downloading (and writing)
  * Author:    John Q Metro
  * Created:   July 10, 2016
- * Updated:   July 10, 2016
+ * Updated:   July 7, 2022
  *
  **************************************************************/
 #ifndef FICDOWN_TBASE_H
@@ -16,7 +16,7 @@
 #include <assert.h>
 
 /**************************************************************/
-jfFicDownloaderBase::jfFicDownloaderBase(size_t in_max_threads):jfBaseFirstPageDownloader(in_max_threads) {
+jfFicDownloaderBase::jfFicDownloaderBase():jfDownloadRootFirstPage() {
   fic_data = NULL;
   fanfic = NULL;
   numfiles = 0;
@@ -63,6 +63,12 @@ void jfFicDownloaderBase::PrepareItemInfo(size_t pageIndex) {
 //-----------------------------------------
 jfPageParserBase* jfFicDownloaderBase::makeParser() {
   return MakeTypedFicParser(fictype);
+}
+//------------------------------
+jfParseFetchPackage* jfFicDownloaderBase::MakeParserFetcher() {
+    jfPageParserBase* parser = makeParser();
+    if (parser == NULL) return NULL;
+    return DefaultParseFetchMaker(fictype, jglobal::FPT_FICPART_PAGE, parser);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // first page  methods
@@ -152,7 +158,7 @@ void jfFicDownloaderBase::ClearData() {
 // implemented fic download *and writing it to a file!*
 /* For this, fictype must be correct, and either fic_data OR
  * firsturl must be set. */
-bool jfFicDownloaderBase::DownloadFic() {
+bool jfFicDownloaderBase::xDownloadFic() {
   const QString fname = "jfFicDownloaderBase::DownloadFic";
   /**/tLog(fname,1);
   if (fic_data != NULL) pagecount = fic_data->pcount;
@@ -162,7 +168,7 @@ bool jfFicDownloaderBase::DownloadFic() {
   // index page
   indexpage = SiteHasIndexpage(fictype);
   // fetching
-  bool result = FetchAllPages(pagecount);
+  bool result = xFetchAllPages(pagecount);
   /**/tLogB(fname,3,result);
   /**/tLogB(fname,4,abort_fetch);
   if (abort_fetch) return result;

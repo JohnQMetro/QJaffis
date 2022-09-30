@@ -229,12 +229,14 @@ QStringList* jfUrlFilter::GetAlternates() const {
 // ----------------------------------------------------------------------------
 // sets the exclude list
 size_t jfUrlFilter::SetExcludes(QStringList* excl, bool replace) {
+    const QString fname = "jfUrlFilter::SetExcludes";
   if (replace) {
     if (excludes!=NULL) delete excludes;
   }
-  if (excl==NULL) {
-    /**/jfXLogString("jfUrlFilter::SetExcludes");
+  if (excl == NULL) {
+     /**/JDEBUGLOGS(fname,1,"The excludes input was NULL.")
   }
+
   excludes = excl;
   SetValid();
   if (excl==NULL) return 0;

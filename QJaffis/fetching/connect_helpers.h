@@ -3,7 +3,7 @@ Name    : connect_helpers.h
 Basic   : Declares auxiliary classes and types for downloading
 Author  : John Q Metro
 Started : March 19, 2013
-Updated : June 17, 2016
+Updated : July 4, 2021, added waiting and stopped waiting
 
 ******************************************************************************/
 #ifndef CONNECT_HELPERS_H
@@ -52,6 +52,10 @@ class jfPauseStop : public QObject {
     // methods called by the thread
       bool CheckPauseStop();      // should be called frequently, if true, we halt
       bool CheckPauseStopAfter(); // called only after a category/section
+    // waiting and stopped waiting
+      void SignalWaiting(int amount); // after too many requests, we have to wait to fetch again
+      void SignalStoppedWaiting();
+
     // informational methods
       jfps_STATUS GetStatus() const;
       jfps_STATUS GetStatusAfter() const;
@@ -61,6 +65,8 @@ class jfPauseStop : public QObject {
       void SendPaused(bool is_after);
       void SendStopping(bool is_after);
       void SendStopped(jfFETCH_AFTERMATH final_error);
+      void SendWaiting(int amount);
+      void SendStoppedWaiting();
 
   protected:
     // the pause-resume mutexes

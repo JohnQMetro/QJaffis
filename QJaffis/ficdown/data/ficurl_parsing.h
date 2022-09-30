@@ -3,7 +3,7 @@ Name:        ficurl_parsing.h
 Author  :    John Q Metro
 Purpose :    When given a fic url to download, it has to be checked
 Created :    July 8, 2016
-Updated :    July 12, 2016 (conversion to Qt)
+Updated :    January 23, 2022 (remove harry potter)
 
 ****************************************************************************/
 #ifndef FICURL_PARSING_H_INCLUDED
@@ -29,7 +29,6 @@ class jfFicURLParser {
     bool HandleFFN(QStringList* urlarr);
     bool HandleFIM(QStringList* urlarr);
     bool HandleAO3(QStringList* urlarr);
-    bool HandleHPF(QStringList* urlarr);
     bool HandleMMO(QStringList* urlarr);
 
     // internal data

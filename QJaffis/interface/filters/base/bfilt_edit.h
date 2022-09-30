@@ -14,7 +14,7 @@ Updated :   August 5, 2015
   #include "../../../core/structs/basecollect.h"
 #endif // BASECOLLECT_H_INCLUDED
 #ifndef WIDGETS1_H_INCLUDED
-  #include "../../misc/widgets1.h"
+  #include "../../controls/widgets1.h"
 #endif // WIDGETS1_H_INCLUDED
 #ifndef EXPR_EDITOR_H_INCLUDED
   #include "expr_editor.h"
@@ -23,7 +23,7 @@ Updated :   August 5, 2015
   #include "../../../core/filters/extended/minmax.h"
 #endif // MINMAX_FILTER_H
 #ifndef WIDGETS3_H_INCLUDED
-  #include "../../misc/widgets3.h"
+  #include "../../controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
 #ifndef URLFILTER_EDITOR_H
   #include "urlfilter_editor.h"

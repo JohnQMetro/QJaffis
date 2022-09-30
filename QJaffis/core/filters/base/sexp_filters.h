@@ -4,7 +4,7 @@
 // Purpose :    Simple expression filters that work on specific string data
 // Created:     November 30, 2010
 // Conversion to Qt Started September 26, 2013
-// Updated:     August 22, 2012
+// Updated:     July 26, 2022
 //***************************************************************************
 #ifndef SEXP_FILTERS_H_INCLUDED
 #define SEXP_FILTERS_H_INCLUDED
@@ -21,7 +21,6 @@
 this is to avoid having a separate editor for each simple expression filter subtype,
 since the only real difference is what they match. */
 class jfSimpleExpr {
-    friend class jfSimpleExpFilterCore;
     friend class jfAO3FandomFilter;
   public:
     QString parse_error;
@@ -32,6 +31,8 @@ class jfSimpleExpr {
     bool FromString(const QString& sourcedata);
     // other methods
     bool InternalMatch(const QString& incheck) const;
+    jfSimpleExpr* Copy() const;
+    QString MakePList() const;
     // info
     bool IsValid() const;
     bool isEmpty() const;
@@ -50,7 +51,6 @@ class jfSimpleExpr {
  for either string matching/searching. */
 class jfSimpleExpFilterCore : public jfBaseFilter {
   public:
-    QString parse_error;
     // the constructors
     jfSimpleExpFilterCore();
     jfSimpleExpFilterCore(const QString& sourcedata);
@@ -70,14 +70,11 @@ class jfSimpleExpFilterCore : public jfBaseFilter {
   protected:
     // private methods
     bool InternalMatch(const QString& incheck) const;
-    virtual void SetValid();
     virtual size_t ExtraLines() const;
     virtual bool AddRestToFile(QTextStream* outfile) const;
     virtual bool ReadRestFromFile(jfFileReader* infile);
     void CoreCopy(const jfSimpleExpFilterCore& source);
     // private data
-    QString srcstring;
-    jfElemArray* parsedinfo;
-    bool loaded;
+    jfSimpleExpr* parsed_expression;
 };
 //***************************************************************************

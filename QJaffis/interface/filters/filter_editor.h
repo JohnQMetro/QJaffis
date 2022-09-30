@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares the interface for a local and global filter editor
 Created :   August 13, 2009
 Conversion to Qt Started Oct 24, 2013
-Updated :   March 11, 2013 (column resizing for jfFilterPicker2)
+Updated :   July 24, 2022
 ******************************************************************************/
 #ifndef FILTER_EDITOR_H_INCLUDED
 #define FILTER_EDITOR_H_INCLUDED
@@ -13,7 +13,7 @@ Updated :   March 11, 2013 (column resizing for jfFilterPicker2)
   #include "filter_picker.h"
 #endif // FILTER_WIDGETS_H_INCLUDED
 #ifndef WIDGETS3_H_INCLUDED
-  #include "../misc/widgets3.h"
+  #include "../controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
 #ifndef BFILT_EDIT_H_INCLUDED
   #include "base/bfilt_edit.h"
@@ -27,6 +27,7 @@ Updated :   March 11, 2013 (column resizing for jfFilterPicker2)
 /******************************************************************************/
 const size_t global_ratio = 5;
 const size_t local_ratio = 2;
+const size_t edit_size_ratio = 2;
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // a 2 columned filter picker
 class jfFilterPicker2 : public jfFilterPickerBase {
@@ -104,9 +105,10 @@ class jfFilterMapEditor : public QWidget {
     bool isblank;
     bool disablec;
     // sizers
-    QHBoxLayout* top_sizer;
+    QHBoxLayout* topq_sizer;
     QVBoxLayout* side_sizer;
     QHBoxLayout* btn_sizer;
+    QVBoxLayout* edit_stack;
     // other data
     jfFilterMap* fdata;
     QString oldtype;

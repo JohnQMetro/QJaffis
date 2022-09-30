@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   A filter editor creator, and anything else that comes to mind
 Created :   December 27, 2010
 Conversion to Qt Started Oct 24, 2013
-Updated :   December 27, 2021
+Updated :   July 24, 2022
 ******************************************************************************/
 #ifndef FILTER_UTILS_H_INCLUDED
   #include "filter_utils.h"
@@ -69,6 +69,10 @@ Updated :   December 27, 2021
 #ifndef AO3_SPECIALS3_H
   #include "../../core/filters/ao3/ao3_specials3.h"
 #endif // AO3_SPECIALS3_H
+#ifndef AO3_PERCENT_TAGS_FILTER_H
+    #include "../../core/filters/ao3/ao3_percent_tags_filter.h"
+#endif // AO3_PERCENT_TAGS_FILTER_H
+
 #ifndef FFN_SPECIAL1_H
   #include "../../core/filters/ffn/ffn_special1.h"
 #endif // FFN_SPECIAL1_H
@@ -83,6 +87,10 @@ Updated :   December 27, 2021
 #ifndef FFN_FILTEREDIT1_H
   #include "ffn/ffn_filteredit1.h"
 #endif // FFN_FILTEREDIT1_H
+
+#ifndef AO3_LIST_PERCENT_FILTER_EDITOR_H
+    #include "ao3/ao3_list_percent_filter_editor.h"
+#endif // AO3_LIST_PERCENT_FILTER_EDITOR_H
 
 //---------------------------------------------------
 #include <assert.h>
@@ -142,6 +150,7 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
 
   jfFIMContentTypeFilter* a33;
   jfFIMWarningsFilter* a34;
+  jfAO3ExtraTagsPercentFilter* a35;
 
 
   // filter link
@@ -284,6 +293,10 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
   else if (in_typeid=="FIMDualDescFilter") {
     a32 = dynamic_cast<jfFIM_DualDesc_ExprFilter*>(input_filter);
     result = new jfFIMDualDesc_FilterEditor(containing_map,a32,parent);
+  }
+  else if (in_typeid=="AO3ExtraTagsPercentFilter") {
+    a35 = dynamic_cast<jfAO3ExtraTagsPercentFilter*>(input_filter);
+    result = new jfAO3PercentExpressionTagFilterEditor(containing_map,a35,parent);
   }
 
   else assert(false);

@@ -11,7 +11,7 @@
 #endif // FFNDOWN_DIALOG_H_INCLUDED
 //-------------------------------------
 #ifndef WIDGETS3_H_INCLUDED
-  #include "../../interface/misc/widgets3.h"
+  #include "../../interface/controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
 #ifndef PROGRESS_PANEL2_H
   #include "../../fetching/panel/progress_panel2.h"

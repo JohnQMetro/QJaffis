@@ -4,7 +4,7 @@ Basic   : Defines some more utility functions and things used in the other files
 Author  : John Q Metro
 Started : May 13, 2009
 Conversion to QT started : February 23, 2013
-Updated : September 14, 2016
+Updated : August 20, 2022
 Notes   :
 
 ******************************************************************************/
@@ -148,6 +148,26 @@ bool jfLineParse::IIntVal(size_t index, int& outval) const {
   delete res;
   return res2;
 }
+// ----------------------------------------------------------
+bool jfLineParse::IBoundVal(size_t index, const int& lbound, const int& ubound, int& outval, QString& oerr) const {
+    int converted;
+    if (IIntVal(index, converted)) {
+        if (converted < lbound) {
+            oerr = "is too small!";
+            return false;
+        }
+        else if (converted >= ubound) {
+            oerr = "is too large!";
+            return false;
+        }
+        outval = converted;
+        return true;
+    }
+    else {
+        oerr = "is not a number!";
+        return false;
+    }
+}
 //------------------------------------------------------------
 bool jfLineParse::DateVal(size_t index, QDate& outval) const {
   QString buffer = UnEscStr(index);
@@ -260,6 +280,7 @@ size_t jfLineParse::UnEscAppendRest(size_t index, QStringList& destination) cons
 size_t jfLineParse::SetString(const QString& instr) {
   if (qres!=NULL) delete qres;
   qres = ListToStrArr(instr,';');
+  // if the input is empty, qres will be NULL
   return Num();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -272,50 +293,58 @@ jfLineParse::~jfLineParse() {
 overrides some of the operators already there... we use ';' as separators and escape
 string input... */
 //-----------------------------------------------------------------------------
+jfOutString::jfOutString():QString() {
+    item_added = false;
+}
 jfOutString& jfOutString::operator<< (const QString& toadd) {
-  if (!isEmpty()) {
+  if (item_added) {
     append(";");
   }
   append(EscapeNL(toadd,IO_DELIMS));
+  item_added = true;
   return *this;
 }
 //-----------------------------------------------------------------------------
 jfOutString& jfOutString::operator<< (const QChar* toadd) {
-  if (!isEmpty()) {
+  if (item_added) {
     append(";");
   }
   QString buf1 = (*toadd);
   append(EscapeNL(buf1,IO_DELIMS));
+  item_added = true;
   return *this;
 }
 //-----------------------------------------------------------------------------
 jfOutString& jfOutString::operator<< (const bool& toadd) {
-  if (!isEmpty()) {
+  if (item_added) {
     append(";");
   }
   if (toadd) append("true");
   else append("false");
+  item_added = true;
   return *this;
 }
 //-----------------------------------------------------------------------------
 jfOutString& jfOutString::operator<< (const size_t toadd) {
-  if (!isEmpty()) {
+  if (item_added) {
     append(";");
   }
   append(QString::number(toadd));
+  item_added = true;
   return *this;
 }
 //-----------------------------------------------------------------------------
 jfOutString& jfOutString::operator<< (const int toadd) {
-  if (!isEmpty()) {
+  if (item_added) {
     append(";");
   }
   append(QString::number(toadd));
+  item_added = true;
   return *this;
 }
 //---------------------------------------------------------------------------
 jfOutString& jfOutString::operator<< (const QDate& toadd) {
-  if (!isEmpty()) {
+  if (item_added) {
     append(";");
   }
   append(EscapeNL(toadd.toString("M'-'d'-'yy"),IO_DELIMS));
@@ -324,14 +353,20 @@ jfOutString& jfOutString::operator<< (const QDate& toadd) {
 //---------------------------------------------------------------------------
 jfOutString& jfOutString::operator<< (const QStringList& toadd) {
   assert(!toadd.isEmpty());
-  if (!isEmpty()) {
+  if (item_added) {
     append(";");
   }
   for (size_t add_idx = 0 ; add_idx < toadd.count() ; add_idx++) {
     append(EscapeNL(toadd[add_idx],IO_DELIMS));
     if (add_idx != toadd.count()-1) append(";");
   }
+  item_added = true;
   return *this;
+}
+//---------------------------------------------------------------------------
+void jfOutString::FullClear() {
+    clear();
+    item_added = false;
 }
 
 //******************************************************************************
@@ -573,7 +608,14 @@ bool jfFileReader::BuildError(QString inerr) {
 bool jfFileReader::AtEnd() const {
   return thefile->atEnd();
 }
-
+// --------------------
+bool jfFileReader::IsOpen() const {
+  return (inpfile != NULL);
+}
+// --------------------
+bool jfFileReader::IsOpenBeforeEnd() const {
+    return (inpfile != NULL) && (thefile != NULL) && (thefile->atEnd() == false);
+}
 //------------------------------
 jfFileReader::~jfFileReader() {
   CloseFile();
@@ -605,9 +647,8 @@ bool jfFileReader::StartRead(QString& outline) {
 //------------------------------
 bool jfFileReader::SetParse(const QString& inval, size_t check) {
   QString faname = "jfFileReader::SetParse";
-  assert(check!=0);
   lp.SetString(inval);
-  if (lp.NNotX(check)) {
+  if ((check > 0) && lp.NNotX(check)) {
     /**//**/JDEBUGLOG(faname,1);
     return BuildError("The line does not have " + QString::number(check) + " fields!");
   }

@@ -92,10 +92,19 @@ jfSearchOptionsBase::jfSearchOptionsBase(QWidget* parent):QWidget(parent) {
 
 }
 //=============================================================================
-jfSearchPanelBase::jfSearchPanelBase(jfSearchCore* obj_data,bool noteb, bool svert, size_t prop, QWidget* parent):QWidget(parent) {
+jfSearchPanelRoot::jfSearchPanelRoot(jfSearchCore* obj_data, QWidget* parent):QWidget(parent) {
   // starting...
   assert(obj_data!=NULL);
   mainobj = obj_data;
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void jfSearchPanelRoot::ReloadObj() {
+  bool cores = ChangeObj(mainobj);
+  assert(cores);
+}
+//=============================================================================
+jfSearchPanelBase::jfSearchPanelBase(jfSearchCore* obj_data,bool noteb, bool svert, size_t prop, QWidget* parent):jfSearchPanelRoot(obj_data,parent) {
+  // starting...
   propstore = prop;
   // notebook configuration
   if (noteb) {
@@ -119,11 +128,6 @@ jfSearchPanelBase::jfSearchPanelBase(jfSearchCore* obj_data,bool noteb, bool sve
     defil_box->setLayout(defil_sizer);
   }
   topsizer = new QBoxLayout((svert)?(QBoxLayout::TopToBottom):(QBoxLayout::LeftToRight));
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfSearchPanelBase::ReloadObj() {
-  bool cores = ChangeObj(mainobj);
-  assert(cores);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /* handles the task of arranging the top level panels, should be called at the
@@ -153,6 +157,7 @@ bool jfSearchPanelBase::ArrangePanels() {
 //=============================================================================
 jfSearchGroupingCore::jfSearchGroupingCore(QWidget* parent):QWidget(parent) {
   searchdata = NULL;
+  search_and_filter_panel = NULL;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 jfSearchCore* jfSearchGroupingCore::GetSearchObj() {
@@ -161,5 +166,5 @@ jfSearchCore* jfSearchGroupingCore::GetSearchObj() {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // causes panel1 to be updated from the search
 void jfSearchGroupingCore::ReloadPanel1() {
-  panel1->ReloadObj();
+  search_and_filter_panel->ReloadObj();
 }

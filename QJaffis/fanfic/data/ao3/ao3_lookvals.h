@@ -3,7 +3,7 @@ Name    :   ao3_lookvals.h
 Author  :   John Q Metro
 Purpose :   Some constants and utility functions for making AO3 searches
 Created :   June 12, 2021
-Updated :   March 6, 2022
+Updated :   August 27, 2022
 ******************************************************************************/
 #ifndef AO3_LOOKVALS_H
     #define AO3_LOOKVALS_H
@@ -12,6 +12,8 @@ Updated :   March 6, 2022
 #ifndef JFMISCTYPES1
     #include "../../../core/objs/misc_types1.h"
 #endif
+
+#include "../../../core/tagfilter/taglist.h"
 //-----------------------------------
 #include <QString>
 #include <QStringList>
@@ -63,7 +65,7 @@ Updated :   March 6, 2022
     ( codes are "10","11","12","13","9"). You can pick one, or exclude any combo that does not include
     unspecified. 
     Special Strings: ~ starts an exclude, otherwise we treat it as include
-    choices: G T GT ~ME M ~E E _
+    choices: G T GT ~ME M ~E ME E _
     */
     class AO3RatingMake {
       public:
@@ -80,6 +82,8 @@ Updated :   March 6, 2022
         QStringList choice_codes;
     };
 
+
+
     class AO3TagExcludeMake {
       public:
         AO3TagExcludeMake();
@@ -87,8 +91,10 @@ Updated :   March 6, 2022
         // make query exclude from 2 lists. In the second one, % is replaced by insert
         QString QueryPartWithTemplate(const QStringList& basic_list, const QStringList& template_list, const QString& insert) const;
         QStringList MakePredefinedExcludes(bool gensex, bool emo, bool other, bool fluff) const;
-        QString MakeFullExcludeQuery(bool gensex, bool emo, bool other, bool fluff, const QString& template_list, const QString& insert) const;
+        virtual QString MakeFullExcludeQuery(bool gensex, bool emo, bool other, bool fluff, const QString& template_list, const QString& insert) const;
+        virtual QString MakeFullExcludeQuery(const QList<const jfGeneralTagList*>& exclude_list, const QString& template_list, const QString& insert) const;
       protected:
+        QStringList SplitAndTrim(const QString source) const;
         QStringList gensex_excludes;
         QStringList other_excludes;
         QStringList emo_excludes;

@@ -4,18 +4,56 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network widgets concurrent
  CONFIG += console
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = QJaffis
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += /wd4018 /wd4100 /we4715 /we4002 /we4700
+QMAKE_CXXFLAGS += -Wno-deprecated-copy
 
 
 SOURCES += main.cpp\
+    core/filters/ao3/ao3_percent_tags_filter.cpp \
+    core/tagfilter/base_tagfilters.cpp \
+    core/tagfilter/multimatchmake.cpp \
+    core/tagfilter/stringcounter.cpp \
+    core/tagfilter/taglist.cpp \
+    core/tagfilter/tagmatch.cpp \
+    defaultpaths.cpp \
+    fanfic/data/ao3/ao3_lookvals.cpp \
+    fanfic/data/ao3/ao3_urlmake.cpp \
+    fanfic/data/displayhtmlspec.cpp \
+    fanfic/interface/ao3/ao3_searchfilter_panel.cpp \
+    fanfic/interface/ao3/ao3_tagparams.cpp \
+    fanficnet/threads/ffncatparser_exp1.cpp \
+    fetching/core/fetchbase.cpp \
+    fetching/core/fetchpython.cpp \
+    fetching/core/fetchqt.cpp \
+    fetching/core/fetchwrapbase.cpp \
+    fetching/core/pagefetch.cpp \
+    fetching/core/pythonpaths.cpp \
+    fetching/core/testswrapper.cpp \
+    fetching/downbase.cpp \
+    fetching/logbase.cpp \
+    fetching/loopget/downloadroot.cpp \
+    fetching/loopget/downloadroot2.cpp \
+    fetching/loopget/getpage.cpp \
+    fetching/loopget/multicatroot.cpp \
+    fetchparse/parsefetch_packagemaker.cpp \
+    ficdown/threads/update_fetcher.cpp \
+    globalsettings.cpp \
+    interface/controls/charo_editor.cpp \
+    interface/controls/tag_widgets.cpp \
+    interface/controls/tag_widgets2.cpp \
+    interface/controls/widgets1.cpp \
+    interface/controls/widgets2.cpp \
+    interface/controls/widgets3.cpp \
+    interface/controls/widgets4.cpp \
+    interface/filters/ao3/ao3_list_percent_filter_editor.cpp \
+    interface/filters/tagfilter/filter_match.cpp \
+    interface/filters/tagfilter/multimatch.cpp \
+    interface/filters/tagfilter/tag_match_filter_edits.cpp \
         mainwindow.cpp \
     initend.cpp \
     core/express/expr_structs.cpp \
@@ -90,8 +128,6 @@ SOURCES += main.cpp\
     fetching/threadbase.cpp \
     fetching/pagegetter.cpp \
     fetching/fetchandparse.cpp \
-    fetching/download2.cpp \
-    fetching/download.cpp \
     fetching/connect_helpers.cpp \
     fetching/baseparse.cpp \
     ficdown/data/ficurl_parsing.cpp \
@@ -101,7 +137,6 @@ SOURCES += main.cpp\
     ficdown/interface/ffndown_dialog.cpp \
     ficdown/parsers/mmoparser.cpp \
     ficdown/parsers/makeparser.cpp \
-    ficdown/parsers/hpfparser.cpp \
     ficdown/parsers/ffnparser.cpp \
     ficdown/parsers/basefimparser.cpp \
     ficdown/parsers/ao3parser.cpp \
@@ -137,14 +172,10 @@ SOURCES += main.cpp\
     interface/filters/filter_utils.cpp \
     interface/filters/filter_picker.cpp \
     interface/filters/filter_editor.cpp \
-    interface/misc/widgets3.cpp \
-    interface/misc/widgets2.cpp \
-    interface/misc/widgets1.cpp \
     interface/misc/skeledit.cpp \
     interface/misc/menu.cpp \
     interface/misc/global_skel.cpp \
     interface/misc/defaultdir_dialog.cpp \
-    interface/misc/charo_editor.cpp \
     fanfic/threads/ao3/ao3cat_thread.cpp \
     fanfic/interface/gcat_picker.cpp \
     fanfic/interface/gcat_dialog.cpp \
@@ -176,8 +207,6 @@ SOURCES += main.cpp\
     fanficnet/interface/ffn_mainpanel.cpp \
     ficdown/threads/ficupdate_thread.cpp \
     ficdown/interface/ficupdate_panel.cpp \
-    interface/misc/tag_widgets.cpp \
-    interface/misc/tag_widgets2.cpp \
     core/utils/dirupdate.cpp \
     ficdown/threads/dirupdate_thread.cpp \
     ficdown/interface/dirupdate_dialog.cpp \
@@ -194,16 +223,41 @@ SOURCES += main.cpp\
     fanfic/threads/fim/newfimgroup_parser.cpp \
     core/filters/fim/fimfilters3.cpp \
     interface/filters/fim/fim3_filedit.cpp \
-    interface/misc/widgets4.cpp \
+    test/testfetch.cpp \
     test/testparse.cpp \
     test/testurl.cpp \
     test/testthread.cpp \
-    test/testpanel.cpp \
-    fetching/cloudfget.cpp \
-    fanfic/data/ao3/ao3_lookvals.cpp \
-    fanfic/data/ao3/ao3_urlmake.cpp
+    test/testpanel.cpp
 
 HEADERS  += mainwindow.h \
+    core/filters/ao3/ao3_percent_tags_filter.h \
+    core/tagfilter/base_tagfilters.h \
+    core/tagfilter/multimatchmake.h \
+    core/tagfilter/stringcounter.h \
+    core/tagfilter/taglist.h \
+    core/tagfilter/tagmatch.h \
+    defaultpaths.h \
+    fanfic/data/ao3/ao3_lookvals.h \
+    fanfic/data/displayhtmlspec.h \
+    fanfic/interface/ao3/ao3_searchfilter_panel.h \
+    fanfic/interface/ao3/ao3_tagparams.h \
+    fanficnet/threads/ffncatparser_exp1.h \
+    fetching/core/fetchbase.h \
+    fetching/core/fetchpython.h \
+    fetching/core/fetchqt.h \
+    fetching/core/fetchwrapbase.h \
+    fetching/core/pagefetch.h \
+    fetching/core/pythonpaths.h \
+    fetching/core/testswrapper.h \
+    fetching/downbase.h \
+    fetching/logbase.h \
+    fetching/loopget/downloadroot.h \
+    fetching/loopget/downloadroot2.h \
+    fetching/loopget/getpage.h \
+    fetching/loopget/multicatroot.h \
+    fetchparse/parsefetch_packagemaker.h \
+    ficdown/threads/update_fetcher.h \
+    globalsettings.h \
     initend.h \
     core/express/expr_structs.h \
     core/express/expr_parse.h \
@@ -278,8 +332,6 @@ HEADERS  += mainwindow.h \
     fetching/threadbase.h \
     fetching/pagegetter.h \
     fetching/fetchandparse.h \
-    fetching/download2.h \
-    fetching/download.h \
     fetching/connect_helpers.h \
     fetching/baseparse.h \
     ficdown/data/ficurl_parsing.h \
@@ -289,12 +341,18 @@ HEADERS  += mainwindow.h \
     ficdown/interface/ffndown_dialog.h \
     ficdown/parsers/mmoparser.h \
     ficdown/parsers/makeparser.h \
-    ficdown/parsers/hpfparser.h \
     ficdown/parsers/ffnparser.h \
     ficdown/parsers/basefimparser.h \
     ficdown/parsers/ao3parser.h \
     ficdown/threads/ficdown_tbase.h \
     ficdown/threads/ficdown_single.h \
+    interface/controls/charo_editor.h \
+    interface/controls/tag_widgets.h \
+    interface/controls/tag_widgets2.h \
+    interface/controls/widgets1.h \
+    interface/controls/widgets2.h \
+    interface/controls/widgets3.h \
+    interface/controls/widgets4.h \
     interface/display/typed_display.h \
     interface/display/search_panels.h \
     interface/display/result_panel.h \
@@ -302,6 +360,7 @@ HEADERS  += mainwindow.h \
     interface/display/html_display.h \
     interface/display/displayindex.h \
     interface/display/display_parts.h \
+    interface/filters/ao3/ao3_list_percent_filter_editor.h \
     interface/filters/ao3/ao3_special3.h \
     interface/filters/ao3/ao3_special2.h \
     interface/filters/ao3/ao3_special1.h \
@@ -325,14 +384,13 @@ HEADERS  += mainwindow.h \
     interface/filters/filter_utils.h \
     interface/filters/filter_picker.h \
     interface/filters/filter_editor.h \
-    interface/misc/widgets3.h \
-    interface/misc/widgets2.h \
-    interface/misc/widgets1.h \
+    interface/filters/tagfilter/filter_match.h \
+    interface/filters/tagfilter/multimatch.h \
+    interface/filters/tagfilter/tag_match_filter_edits.h \
     interface/misc/skeledit.h \
     interface/misc/menu.h \
     interface/misc/global_skel.h \
     interface/misc/defaultdir_dialog.h \
-    interface/misc/charo_editor.h \
     mw_includes.h \
     fanfic/threads/ao3/ao3cat_thread.h \
     ficdown/interface/ffndown_dialog.h \
@@ -365,8 +423,6 @@ HEADERS  += mainwindow.h \
     fanficnet/interface/ffn_mainpanel.h \
     ficdown/threads/ficupdate_thread.h \
     ficdown/interface/ficupdate_panel.h \
-    interface/misc/tag_widgets.h \
-    interface/misc/tag_widgets2.h \
     core/utils/dirupdate.h \
     ficdown/threads/dirupdate_thread.h \
     ficdown/interface/dirupdate_dialog.h \
@@ -384,17 +440,17 @@ HEADERS  += mainwindow.h \
     fanfic/threads/fim/newfimgroup_parser.h \
     core/filters/fim/fimfilters3.h \
     interface/filters/fim/fim3_filedit.h \
-    interface/misc/widgets4.h \
+    test/testfetch.h \
     test/testparse.h \
     test/testurl.h \
     test/testthread.h \
     test/testpanel.h \
-    fanficnet/categories/catgroup.h \
-    fetching/cloudfget.h \
-    fanfic/data/ao3/ao3_lookvals.h \
-    fanfic/data/ao3/ao3_urlmake.h
+    fanficnet/categories/catgroup.h
 
 RC_FILE = qjaffis.rc
 
 OTHER_FILES += \
     todo.txt
+
+DISTFILES += \
+    interface/filters/tagfilter/ydhjdty.txt

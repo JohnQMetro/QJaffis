@@ -22,7 +22,7 @@ jfOnePanelSearch::jfOnePanelSearch(QWidget* parent):jfSearchGroupingCore(parent)
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the puropse of this method is to update the search data with GUI elements
 bool jfOnePanelSearch::UpdateSearchData() {
-  return panel1->LoadToObj();
+  return search_and_filter_panel->LoadToObj();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void jfOnePanelSearch::FinishConstruction() {
@@ -31,7 +31,7 @@ void jfOnePanelSearch::FinishConstruction() {
   // the notebook
   // top level arranging
   top_sizer = new QVBoxLayout();
-  top_sizer->addWidget(panel1,1);
+  top_sizer->addWidget(search_and_filter_panel,1);
   // finishing
   setLayout(top_sizer);
 }
@@ -47,7 +47,7 @@ jfSearchGrouping::jfSearchGrouping(const QStringList* infclist, QWidget* parent)
 bool jfSearchGrouping::UpdateSearchData() {
   const QString fname = "jfSearchGrouping::UpdateSearchData";
   if (searchdata!=NULL) searchdata->SetDescription(desc_entry->text());
-  if (!(panel1->LoadToObj())) return false;
+  if (!(search_and_filter_panel->LoadToObj())) return false;
   panel2->CoreSave();
   (searchdata->categories)->base_outputdir = dirpicker->GetPath();
   return panel3->SaveCategories();
@@ -84,7 +84,7 @@ void jfSearchGrouping::FinishConstruction() {
   top_bar->addWidget(desc_entry,3);
 
   // the notebook
-  panel_holder->addTab(panel1,"Main");
+  panel_holder->addTab(search_and_filter_panel,"Main");
   panel_holder->addTab(panel2,"Filters");
   panel_holder->addTab(panel3,"Categories");
   // top level arranging

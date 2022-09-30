@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares fanfic object data of archoveofourown.org
 Created :   August 26, 2012
 Conversion to Qt Started September 28, 2013
-Updated :  December 24, 2021 (multiple orientation related changes)
+Updated :  August 26, 2022
 ******************************************************************************/
 #ifndef AO3_FICOBJ_H_INCLUDED
 #define AO3_FICOBJ_H_INCLUDED
@@ -20,8 +20,8 @@ Updated :  December 24, 2021 (multiple orientation related changes)
   #include "../ficbase.h"
 #endif // FICBASE_H
 
-
 #include <vector>
+#include <QLocale>
 //**************************************************************************
 class jfAO3Fanfic : public jfGenericFanfic2 {
   public:
@@ -42,7 +42,8 @@ class jfAO3Fanfic : public jfGenericFanfic2 {
     size_t GetKudos() const;
     QString GetRelationships() const;
     QString GetCharacters() const;
-    QString GetExtraTags() const;
+    const QStringList& GetExtraTags() const;
+    QString GetJoinedExtraTags() const;
     bool InSeries() const;
     size_t SeriesIndex() const;
     QString SeriesName() const;
@@ -78,13 +79,15 @@ class jfAO3Fanfic : public jfGenericFanfic2 {
     virtual bool ReadRestFromFile(jfFileReader* infile);
     virtual bool AddExtraStuff(QTextStream* outfile) const;
     virtual bool ReadExtraStuff(jfFileReader* infile);
+
     // more data
     QChar rating, warn;
     QString warntags;
     QString orientations;
     int eccount;
     size_t kudcount;
-    QString relationships, characters, extratags;
+    QString relationships, characters;
+    QStringList extratags;
     // categories
     std::vector<const jfAO3_Category*> cats;
     // series
@@ -94,5 +97,6 @@ class jfAO3Fanfic : public jfGenericFanfic2 {
     // parsing
     jfStringParser* x_parser;
     QString parser_error;
+    QLocale english_locale;
 };
 //**************************************************************************

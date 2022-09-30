@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares the search interface classes, assembled from display_base.h
             and display_base1.h for the Qt version
 Created :   Originally Septmber 2009, new Qt version, November 23, 2013
-Updated :   August 1, 2016
+Updated :   June 4, 2022
 ******************************************************************************/
 #ifndef SEARCH_PANELS_H
 #define SEARCH_PANELS_H
@@ -33,16 +33,14 @@ class jfOnePanelSearch : public jfSearchGroupingCore {
     // the constructor
     jfOnePanelSearch(QWidget* parent = NULL);
     // custom  methods
-    virtual jfSearchPanelBase*  MakeFirstPanel() = 0;
+    virtual jfSearchPanelRoot*  MakeFirstPanel() = 0;
     virtual jfSearchCore*       MakeTypedSearch() const = 0;
     virtual jfResultCollection* MakeTypedCollection() const = 0;
-    virtual jfBaseItemDownloader*   MakeTypedThread() const = 0;
+    virtual jfDownloadRootItems*   MakeTypedThread() const = 0;
     // returning data
     virtual bool UpdateSearchData();
   protected:
     virtual void FinishConstruction();
-    // the main panels
-    jfSearchPanelBase*        panel1;
     // the sizer
     QVBoxLayout* top_sizer;
     // internal data
@@ -57,10 +55,10 @@ class jfSearchGrouping : public jfSearchGroupingCore {
     // the constructor
     jfSearchGrouping(const QStringList* infclist, QWidget* parent = NULL);
     // custom  methods
-    virtual jfSearchPanelBase*  MakeFirstPanel() = 0;
+    virtual jfSearchPanelRoot*  MakeFirstPanel() = 0;
     virtual jfSearchCore*       MakeTypedSearch() const = 0;
     virtual jfResultCollection* MakeTypedCollection() const = 0;
-    virtual jfBaseItemDownloader*   MakeTypedThread() const = 0;
+    virtual jfDownloadRootItems*   MakeTypedThread() const = 0;
     // returning data
     virtual bool UpdateSearchData();
     //extra methods
@@ -70,7 +68,6 @@ class jfSearchGrouping : public jfSearchGroupingCore {
   protected:
     virtual void FinishConstruction();
     // the main panels
-    jfSearchPanelBase*        panel1;
     jfFilterMapEditor*        panel2;
     jfMainCategoriesEditor*   panel3;
     // other gui elements

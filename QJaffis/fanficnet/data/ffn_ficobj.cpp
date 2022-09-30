@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net item object
 // Created:     May 25, 2010
 // Conversion to Qt Started September 25, 2013
-// Updated:     March 19, 2022 (parsing bugfixes)
+// Updated:     June 25, 2022
 /////////////////////////////////////////////////////////////////////////////
 #ifndef JFFNFICOBJ
   #include "ffn_ficobj.h"
@@ -81,60 +81,46 @@ QString jfFFNItemCore::ToText() const {
 QString jfFFNItemCore::ToDisplayHTML() const {
   const QString fname = ("jfFFNItem::ToDisplayHTML");
   QString result,buffer;
+
+  const jfDisplayHTMLHelper* helper = HTMLHelpers::ffn_item_helper;
   // we start with the table
-  result = ("<table width=99%><tr><td>");
-  // building the title line
-  result += ("<font size=+3 color=#010101><a href=\"");
-  result += primarylink + ("\">");
-  result += name + ("</a>");
-  // adding the author stuff
-  result += (" by ") + author_name;
-  result += ("</font> ");
-  // status
-  if (ustatus!=jud_NONE) {
-    result += ("<font size=+2 color=");
-    if (ustatus==jud_UPDATED) result += ("Lime><b>[Updated");
-    else if (ustatus==jud_MISSING) result += ("Red><b>[Missing");
-    else if (ustatus==jud_NEW) result += ("Aqua><b>[New");
-    else if (ustatus==jud_AUTHORNC) result += ("Yellow><b>[Author Name Change");
-    result += ("!]</b></font>");
-  }
+  result = DisplayHTMLHeader(1, helper);
   result += ("</td></tr>\n");
   // next line: link display
   result += ("<tr><td>");
-  result += ("<font color=\"green\" size=+1>");
-  result += primarylink + ("</font><br>\n");
+  result += helper->WrapText("ficlink", primarylink, true);
+
   // adding the main description
-  result += "<font color=#010101 size=+2>" + description + ("<br>\n");
+  result += "<div style=\"margin-left:10px;\">";
+  QString rdesc = (description.length() > 1000) ? (description.left(1000) + "...") : description;
+  result += helper->WrapTextNoEsc("description",rdesc,false);
+  result += "</div>";
+
   // next up.. two extra lines
-  result += ("<font color=gray size=+1>Published: ");
-  result += published.toString("MM-dd-yyyy");
+  QString mdata = "Published: " + published.toString("MM-dd-yyyy");
   if (isupdated) {
-    result += " - Updated: " + updated_date.toString("MM-dd-yyyy");
+    mdata += " - Updated: " + updated_date.toString("MM-dd-yyyy");
   }
   // the rating...
   if (rating==('+')) buffer = ("K+");
   else buffer = rating;
-  result += (" - Rating: ") + buffer;
+  mdata += (" - Rating: ") + buffer;
   // part count and word count
-  result += " - Parts: " + QString::number(part_count);
-  result += " - Words: " + QString::number(word_count);
-  result += " - Favs: " + QString::number(favs) + "</font><br>\n";
-  // final info,
-  result += ("<font color=gray size=+1>");
-  result += language;
-  if (!genres.isEmpty()) {
-    result += (" - Genres: ") + genres;
-  }
-  // character data
-  if (!genres.isEmpty()) {
-    result += " - Characters Specified: " + char_data;
-  }
+  mdata += " - Parts: " + QString::number(part_count);
+  mdata += " - Words: " + QString::number(word_count);
+  mdata += " - Favs: " + QString::number(favs);
   if (completed) {
-    result += " - Complete";
+    mdata += " - Complete";
   }
+  result += helper->WrapText("basicinfo", mdata, true);
+
+  // characters
+  result += helper->ConditionalWrapText("characters", false,"Characters: ", true, char_data, false);
+  // genres
+  result += helper->ConditionalWrapText("genres", true, "Genres: ", true, genres, true);
+
   // finishing off
-  result += ("</font></td></tr>\n</table>");
+  result += ("</td></tr>\n</table>");
   // done
   return result;
 }
@@ -176,13 +162,13 @@ void jfFFNItemCore::ProcessDescription() {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfFFNItemCore::ExtractDescription(jfStringParser &zparser, QString &parserr) {
-    // going ahed
+  // going ahed
     if (!zparser.MovePastAlt("<div class=\"z-indent z-padtop\">","<div class='z-indent z-padtop'>")) {
         return failMsg(parserr,"Could not find start of description!");
     }
     if (!zparser.GetMovePast("<div ",description)) {
         return failMsg(parserr,"Could not find end of description!");
-    }
+  }
   return true;
 }
 //-------------------------------------------------
@@ -243,8 +229,8 @@ bool jfFFNItemCore::Dates_and_Completion(jfStringParser &zparser, QString &parse
           return failMsg(parserr,"Cannot find start of Updated Date");
       }
       if (!zparser.GetMovePastAltULong("\">","'>",xoutval,xoerr)) {
-          return failMsg(parserr,"Problem with Updated Date :" + xoerr);
-      }
+      return failMsg(parserr,"Problem with Updated Date :" + xoerr);
+    }
 
     xdatetime.setTime_t((uint)(xoutval));
     updated_date = xdatetime.date();
@@ -258,7 +244,7 @@ bool jfFFNItemCore::Dates_and_Completion(jfStringParser &zparser, QString &parse
       return failMsg(parserr,"Cannot find start of Published Date");
   }
   if (!zparser.GetMovePastAltULong("\">","'>",xoutval,xoerr)) {
-      return failMsg(parserr,"Problem with Published Date :" + xoerr);
+    return failMsg(parserr,"Problem with Published Date :" + xoerr);
   }
 
   xdatetime.setTime_t((uint)(xoutval));
@@ -330,7 +316,7 @@ bool jfFFNItemCore::AddExtraStuff(QTextStream* outfile) const {
   // preparing line 4, lots of data
   xresult << language << QString(rating) << char_data;
   (*outfile) << xresult << "\n";
-  xresult.clear();
+  xresult.FullClear();
   // line 5 is more stuff
   xresult << favs << isupdated << published;
   (*outfile) << xresult << "\n";
@@ -386,11 +372,12 @@ jfFFNItem::jfFFNItem(const jfFFNItem& src) {
 }
 //------------------------------------------------------------------------
 jfFFNItem::jfFFNItem(const QString& instr, const jfFFN_CategoryCore* cat_linkin):jfFFNItemCore() {
+    const QString fname = "jfFFNItem::jfFFNItem";
   cat_link = NULL;
   QString parse_err;
   if (!SetFromString(instr, cat_linkin,parse_err)) {
-    /**/jfXLogString(parse_err);
-    validdata = false;
+      jerror::ParseLog(fname,parse_err);
+      validdata = false;
   }
   ustatus = jud_NONE;
 }
@@ -413,8 +400,7 @@ bool jfFFNItem::SetCatLink(const jfFFN_CategoryCore* cat_linkin) {
 	<div class='z-indent z-padtop'>what if Harry grows up in the Shinobi world with Naruto, and what will happen to Hogwarts when he gets their?<div class='z-padtop2' style='color:gray;'>Rated: T - English - Chapters: 1 - Words: 598 - Published: 6-6-12 - Harry P. & Naruto U.
 */
 bool jfFFNItem::SetFromString(const QString& instr, const jfFFN_CategoryCore* cat_linkin, QString& parserr) {
-    const QString fname = "jfFFNItem::SetFromString";
-    // local variables
+  // local variables
   QString buffer, oerr;
   unsigned long qval;
   jfStringParser xparser;
@@ -425,12 +411,9 @@ bool jfFFNItem::SetFromString(const QString& instr, const jfFFN_CategoryCore* ca
   if (cat_linkin==NULL) return failMsg(parserr,"Category Link is NULL");
   else cat_link = cat_linkin;
   // start parsing
-  /**/JDEBUGLOG(fname,1);
   xparser.ChangeData(instr);
   // processing fic id, title, and making the link
-  /**/JDEBUGLOGS(fname,2,parserr);
   if (!GetLinkTitle(xparser,parserr)) return false;
-  /**/JDEBUGLOG(fname,3);
   // the author id
   if (!xparser.GetDelimitedULong("<a href=\"/u/","/",qval,oerr)) {
     /* in fanfiction.net, you can sometimes comes across unreachable stories with
@@ -439,26 +422,22 @@ bool jfFFNItem::SetFromString(const QString& instr, const jfFFN_CategoryCore* ca
     included = false;
     return failMsg(parserr,oerr + " When getting author id.");
   }
-  /**/JDEBUGLOG(fname,4);
   author_id = qval;
   // the author
   if (!(xparser.GetDelimited("\">","</a>",buffer)))return failMsg(parserr,"Author not found!");
   author_name = buffer;
-  /**/JDEBUGLOGS(fname,5,buffer);
   // next, the description!
   if (!ExtractDescription(xparser,parserr)) return false;
   // next, the rating, language, genres, chapter count, and word count
   if (!Rating2Words(xparser,parserr)) return false;
-/**/JDEBUGLOG(fname,6);
+
   // we skip past the reviews
   if (!xparser.MovePast("Reviews:")) {
     // this is okay, sometimes there are no reviews
   }
-  /**/JDEBUGLOG(fname,7);
   if (!Dates_and_Completion(xparser,parserr)) return false;
   // done with all the parsing, just some finishing up...
   author_url = MakeAuthorUrl();
-  /**/JDEBUGLOG(fname,8);
   validdata = true;
   return true;
 }
@@ -549,9 +528,9 @@ bool jfFFNItem::GetLinkTitle(jfStringParser& zparser, QString& parseerr) {
   // next up is the story id
 /**/JDEBUGLOG(fname,3);
   if (!zparser.MovePast("<a class=\"stitle\" href=\"/s/")) {
-      if (!zparser.MovePastAlt("<a  class=stitle href=\"/s/", "<a class=stitle href=\"/s/")) {
-        return failMsg(parseerr,"Start of Fic ID not found!");
-      }
+  if (!zparser.MovePastAlt("<a  class=stitle href=\"/s/", "<a class=stitle href=\"/s/")) {
+    return failMsg(parseerr,"Start of Fic ID not found!");
+  }
   }
 
   /**/JDEBUGLOG(fname,4);
@@ -592,8 +571,7 @@ bool jfFFNItem::ReadMoreExtraStuff(jfFileReader* infile) {
   unsigned long oval;
   // starting with line 4
   /**/JDEBUGLOG(funcname,1);
-  assert(infile!=NULL);
-  /**/JDEBUGLOG(funcname,2);
+  jerror::AssertLog(infile!=NULL,funcname,"infile reader is NULL");
   if (!infile->ReadULong(oval,funcname)) return false;
   /**/JDEBUGLOGU(funcname,3,oval);
   ustatus = (jf_FUpdateStatus)oval;

@@ -3,27 +3,50 @@ Name    : testthread.cpp
 Basic   : Thread Download/Parse for testing (testing download and parse for sites)
 Author  : John Q Metro
 Started : March 25, 2018
-Updated : March 30, 2018
+Updated : July 7, 2022
 ******************************************************************************/
 #ifndef TESTTHREAD_H
     #include "testthread.h"
 #endif // TESTTHREAD_H
 //-----------------------------------------------
-#ifndef DOWNLOAD_H
-  #include "../fetching/download.h"
-#endif // DOWNLOAD_H
+
+#ifndef DOWNLOADROOT_H
+    #include "../fetching/loopget/downloadroot.h"
+#endif // DOWNLOADROOT_H
 #ifndef TESTPARSE_H
     #include "testparse.h"
 #endif // TESTPARSE_H
 #ifndef TESTURL_H
     #include "testurl.h"
 #endif // TESTURL_H
+#ifndef TESTFETCH_H
+    #include "testfetch.h"
+#endif // TESTFETCH_H
+
+#ifndef GLOBALSETTINGS_H
+    #include "../globalsettings.h"
+#endif // GLOBALSETTINGS_H
+
+#ifndef DEFAULTPATHS_H
+    #include "../defaultpaths.h"
+#endif // DEFAULTPATHS_H
+
+#ifndef INITEND_H_INCLUDED
+  #include "../initend.h"
+#endif // INITEND_H_INCLUDED
 //-----------------------------------------------------
 #include <assert.h>
 /*****************************************************************************/
-jfTestDownloader::jfTestDownloader(size_t in_max_threads):jfBaseDownloader(in_max_threads) {
+jfTestDownloader::jfTestDownloader():jfDownloadRoot() {
     pagecount = test::count;
     skip_on_fail = true;
+    wrap_parser = NULL;
+}
+jfTestDownloader::~jfTestDownloader() {
+    if (wrap_parser != NULL) {
+        delete wrap_parser;
+        wrap_parser = NULL;
+    }
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void jfTestDownloader::StartProcessing() {
@@ -34,10 +57,12 @@ void jfTestDownloader::StartProcessing() {
     /**/tLog(fname,1);
     started = true;
     emit SendItemCount(pagecount);
-    SetupThreads(false);
     // doing it
+    /**/tLog(fname,2);
+    SetupWorkers(false);
     /**/tLog(fname,5);
-    bool do_result = LoopGet();
+    bool do_result = xLoopGet();
+    ClearWorkers(true);
     AllDone(do_result);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -74,8 +99,18 @@ bool jfTestDownloader::advanceResultIndex() {
     return true;
 }
 //------------------------------------------------
-jfPageParserBase* jfTestDownloader::makeParser() {
-    return new jfTestWrapParser();
+jfParseFetchPackage* jfTestDownloader::MakeParserFetcher() {
+    // hardcoded fanfiction.net python fetcher
+    jglobal::jfFetchBasics fetch_type = jglobal::settings.FindFetchTypeFor(jfft_FFN, jglobal::FPT_FICPART_PAGE);
+    jfPythonPaths* ffn_path = jglobal::settings.getFetchPackageMaker()->makePathsFor(fetch_type);
+    if (ffn_path == NULL) return NULL;
+
+    // finishing
+    jfTestsFetcherWrapper* fetcher = new jfTestsFetcherWrapper(NULL,ffn_path);
+    if (wrap_parser == NULL) wrap_parser = new jfTestWrapParser();
+
+    return new jfParseFetchPackage(wrap_parser,fetcher,true);
 }
+
 /*****************************************************************************/
 

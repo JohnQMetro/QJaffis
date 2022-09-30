@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Fanfiction.net
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   June 20, 2021
+ * Updated:   June 25, 2022
  *
  **************************************************************/
 #ifndef FFNPARSER_H
@@ -23,7 +23,7 @@ jfFFN_FicPartParser::jfFFN_FicPartParser():jfStoryPartParseBase(){}
 //+++++++++++++++++++++++++++++++++++++++++++++++
 // virual methods that are implemented
 //--------------------------------------
-QString* jfFFN_FicPartParser::makeRedirectedURL(const QString& inPart) {
+QString* jfFFN_FicPartParser::makeRedirectedURL(const QString& inPart) const {
   return NULL;
 }
 //--------------------------------------
@@ -46,7 +46,6 @@ bool jfFFN_FicPartParser::testMissing(const QString *page) const {
 }
 //--------------------------------------
 bool jfFFN_FicPartParser::testIncomplete(const QString *page) const {
-  // constants and variables
   // checking
   assert(page!=NULL);
   const QString footer1 = "<div id=p_footer class=maxwidth";
@@ -80,21 +79,21 @@ bool jfFFN_FicPartParser::ParseFirstPage(const QString& indata) {
   const QString aidpfx2 = "<a class='xcontrast_txt' href='/u/";
 
   if (!xparser.MovePastAlt(aidpfx1,aidpfx2)) {
-      delete result;
+    delete result;
       /**/lpt->tLog(fname,3);
       return parsErr("Cannot find start of author id!");
   }
   if (!xparser.GetMovePastULong("/",qval,errout)) {
       delete result;
       /**/lpt->tLog(fname,4);
-      return parsErr("Problems getting author id! " + errout);
+    return parsErr("Problems getting author id! " + errout);
   }
 
   result->auth_id = qval;
   // getting the author name
   if (!xparser.GetDelimited(">","</a>",buffer)) {
     delete result;
-    /**/lpt->tLog(fname,4);
+      /**/lpt->tParseError(fname,"Problems getting author name!");
     return parsErr("Problems getting author name!");
   }
   result->author_name = buffer.trimmed();
@@ -147,36 +146,37 @@ bool jfFFN_FicPartParser::ParseOtherPage() {
   if (!xparser.GetDelimited(" id='storytext'>","</div>",partcontents)) {
       /**/lpt->tLog(fname,3);
       if (!ExtractPartContents(partcontents)) {
-         return parsErr("Cannot find contents");
-      }
+    return parsErr("Cannot find contents");
+  }
   }
   /**/lpt->tLog(fname,4);
   // just to check...
   if (!xparser.MovePastAlt(patscript_tag1,patscript_tag2)) {
     return parsErr("Cannot find separator after style and social script parts");
   }
-  /**/lpt->tLog(fname,5);
+  /**/lpt->tLog(fname,4);
   // next, we look for more info...
   if (!xparser.MovePast("<script>")) {
     return parsErr("Cannot find fic info script start");
   }
   // looking for the fic id
   if (!xparser.GetDelimitedULong("var storyid = ",";",oval,errout)) {
-    /**/lpt->tLog(fname,6);
+    /**/lpt->tLog(fname,5);
     return parsErr("Problems getting fic id! " + errout);
   }
   story_id = oval;
-  /**/lpt->tLogS(fname,7,story_id);
+  /**/lpt->tLogS(fname,6,story_id);
   if (!xparser.GetDelimitedULong("var chapter =",";",oval,errout)) {
+      /**/lpt->tParseError(fname,"Problems with chaper index : " + errout);
     return parsErr("Problems with chaper index : " + errout);
   }
 
   // setting up result info
   intfic.partindex = oval;
-  /**/lpt->tLogS(fname,8,intfic.partindex);
+  /**/lpt->tLogS(fname,7,intfic.partindex);
   fpart = new jfFicPart(intfic);
   fpart->part_contents = PartProcessing(partcontents);
-  /**/lpt->tLog(fname,9);
+  /**/lpt->tLog(fname,8);
   return true;
 }
 //---------------------------------------------------------------------------
@@ -265,8 +265,9 @@ bool jfFFN_FicPartParser::FirstProcessStart(QString& out_title) {
     return parsErr("Cannot find the title! B");
   }
   buffer = buffer.trimmed();
-  /**/lpt->tLog(fname,6,buffer);
+  /**/lpt->tLog(fname,5,buffer);
   if (buffer.isEmpty()) {
+      /**/lpt->tParseError(fname,"Title is empty");
     return parsErr("Title is Empty!");
   }
   // returning
@@ -287,13 +288,13 @@ bool jfFFN_FicPartParser::DateAndCompletion(jfFicExtract_FFN* in_result) {
   QString buffer1,xoerr;
   // looking for the updated date (or published date)
   if (!xparser.GetDelimitedULong("Updated: <span data-xutime=\"","\">",xoval,xoerr)) {
-      if (!xparser.GetDelimitedULong("Updated: <span data-xutime='","'>",xoval,xoerr)) {
+  if (!xparser.GetDelimitedULong("Updated: <span data-xutime='","'>",xoval,xoerr)) {
           if (!xparser.GetDelimitedULong("Published: <span data-xutime=\"","\">",xoval,xoerr)) {
-            if (!xparser.GetDelimitedULong("Published: <span data-xutime='","'>",xoval,xoerr)) {
-                /**/lpt->tLog(fname,1);
-                return parsErr("Problems getting date! " + xoerr);
-            }
-          }
+    if (!xparser.GetDelimitedULong("Published: <span data-xutime='","'>",xoval,xoerr)) {
+      /**/lpt->tLog(fname,1);
+      return parsErr("Problems getting date! " + xoerr);
+    }
+  }
       }
   }
   // the time in xoval is a unix time stamp

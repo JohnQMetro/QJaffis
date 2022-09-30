@@ -34,7 +34,7 @@ jfFFNItemCollection::jfFFNItemCollection(const jfFFN_CategoryCore* cat_linkin):j
   // constants
   const QString fname = "jfFFNItemCollection::jfFFNItemCollection";
   // checks
-  /**/jfAssertLog(cat_linkin!=NULL,fname,"The input category link is NULL!");
+  /**/jerror::AssertLog(cat_linkin!=NULL,fname,"The input category link is NULL!");
   first_id = 0;
   // category link
   cat_link = cat_linkin;

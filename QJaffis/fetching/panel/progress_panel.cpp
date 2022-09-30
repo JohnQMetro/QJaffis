@@ -3,7 +3,7 @@ Name    : progress_panel.cpp
 Basic   : Defines abstract panel with progress bar that shows download info
 Author  : John Q Metro
 Started : April 1, 2013
-Updated : July 10, 2016
+Updated : July 4, 2021 (wait and stop wait)
 
 ******************************************************************************/
 #ifndef PROGRESS_PANEL_H
@@ -156,10 +156,21 @@ void jfProgressPanelBase::HandleStopped(jfFETCH_AFTERMATH final_error) {
   emit SendPanelDone(final_error==jfa_DONE);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++
+// slots for waiting and stopped waiting
+//---------------
+void jfProgressPanelBase::HandleWaiting(int amount) {
+    main_status->setText("WAITING " + QString::number(amount) + "s");
+}
+//---------------
+void jfProgressPanelBase::HandleStoppedWaiting() {
+    main_status->setText("WORKING");
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++
 // slots for handling thread messages
 //--------------
 void jfProgressPanelBase::HandleStart(bool all_okay) {
-  jfXLogString("jfProgressPanelBase::HandleStart");
+    const QString fname = "jfProgressPanelBase::HandleStart";
+    /**/JDEBUGLOG(fname, 1)
   SetWorking();
   working = true;
   start_stop->setEnabled(true);
@@ -302,6 +313,8 @@ bool jfProgressPanelBase::MakePauser() {
   connect(pauser, SIGNAL(SendPaused(bool)),this, SLOT(HandlePaused(bool)));
   connect(pauser, SIGNAL(SendStopping(bool)),this, SLOT(HandleStopping(bool)));
   connect(pauser, SIGNAL(SendStopped(jfFETCH_AFTERMATH)),this, SLOT(HandleStopped(jfFETCH_AFTERMATH)));
+  connect(pauser, SIGNAL(SendWaiting(int)), this, SLOT(HandleWaiting(int)));
+  connect(pauser, SIGNAL(SendStoppedWaiting()), this, SLOT(HandleStoppedWaiting()));
   // DONE
   return true;
 }

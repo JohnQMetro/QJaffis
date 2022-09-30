@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines search object of AO3
 Created :   August 28, 2012
 Conversion to Qt Started March 29, 2014
-Updated :   January 27, 2022
+Updated :   July 19, 2022
 ******************************************************************************/
 #ifndef AO3_SEARCH_H_INCLUDED
   #include "ao3_search.h"
@@ -42,7 +42,6 @@ jfAO3Search::jfAO3Search():jfSearchCore() {
   wx_rape = true;
   orientation_parameters = NULL; // created as needed
   excludes = includes = template_replacer = "";
-  gensex = emo = other = fluff = false;
   conly = false;
   eng_only = true;
   ord_index = 1; // updated date new to old
@@ -63,7 +62,6 @@ jfAO3Search::jfAO3Search(jfGen_CatHolder* cat_datain, size_t search_indexin):jfS
   wx_rape = true;
   orientation_parameters = NULL; // created as needed
   excludes = includes = template_replacer = "";
-  gensex = emo = other = false;
   conly = false;
   eng_only = true;
   ord_index = 1; // updated date new to old
@@ -125,12 +123,11 @@ void jfAO3Search::SetTagExcludes(const QString& in_excludes, const QString& in_r
     template_replacer = in_replacer;
 }
 
-void jfAO3Search::SetPredefinedExcludes(bool in_gensex, bool in_emo, bool in_other, bool in_fluff) {
-    gensex = in_gensex;
-    emo = in_emo;
-    other = in_other;
-    fluff = in_fluff;
+void jfAO3Search::SetPredefinedExcludes(const QStringList& predefined_excludes) {
+    predef_excludes.clear();
+    if (predefined_excludes.size() > 0) predef_excludes.append(predefined_excludes);
 }
+
 void jfAO3Search::SetIncludes(const QString& in_includes) {
     includes = in_includes;
 }
@@ -188,17 +185,8 @@ QString jfAO3Search::GetExcludedTagsList() const {
 QString jfAO3Search::GetExcludeReplacer() const {
     return template_replacer;
 }
-bool jfAO3Search::IsGendSexExcluded() const {
-    return gensex;
-}
-bool jfAO3Search::IsEmoStuffExcluded() const {
-    return emo;
-}
-bool jfAO3Search::IsOtherStuffExcluded() const {
-    return other;
-}
-bool jfAO3Search::IsFluffStuffExcluded() const {
-    return fluff;
+QStringList jfAO3Search::GetPredefinedExcludes() const {
+    return predef_excludes;
 }
 QString jfAO3Search::GetIncludedTagsList() const {
     return includes;
@@ -371,7 +359,7 @@ void jfAO3Search::MakeURLMaker() {
     /**/JDEBUGLOG(fname,3)
     url_maker->setOrderingChoice(ord_index);
     /**/JDEBUGLOG(fname,4)
-    url_maker->setFullExcludeQuery(gensex, emo, other, fluff, excludes, template_replacer);
+    url_maker->setFullExcludeQuery(predef_excludes, excludes, template_replacer);
     /**/JDEBUGLOG(fname,6)
     url_maker->setWarningExcludes(wx_violence, wx_death, wx_rape, wx_underage);
     /**/JDEBUGLOG(fname,7)
@@ -410,15 +398,19 @@ bool jfAO3Search::AddMiddleToFile(QTextStream* outfile) const {
   xline << "V3" << ord_index << rindex << wx_violence << wx_death << wx_underage << wx_rape;
   xline << conly << eng_only << cross_only;
   (*outfile) << xline << "\n";
-  xline.clear();
-  // excludes: flags, then custom
-  xline << gensex << emo << other << fluff << false << excludes << template_replacer;
+  xline.FullClear();
+  // predefined excludes
+  if (!predef_excludes.isEmpty()) xline << predef_excludes;
   (*outfile) << xline << "\n";
-  xline.clear();
+  xline.FullClear();
+  // custom excludes
+  xline << 0 << excludes << template_replacer;
+  (*outfile) << xline << "\n";
+  xline.FullClear();
   // includes, words from and words to
   xline << words_from << words_to << includes;
   (*outfile) << xline << "\n";
-  xline.clear();
+  xline.FullClear();
   // orientation
   AddTagListingToFile(orientation_parameters, outfile);
   // finally, the selector
@@ -467,23 +459,20 @@ bool jfAO3Search::ReadMiddleFromFile(jfFileReader* infile) {
   }
 
   // excludes
-  if (!infile->ReadParseLine(7,fname)) return false;
-  if (!infile->lp.BoolVal(0,gensex)) {
-      return infile->BuildError("Gender/Sex excludes flag invalid.");
+  // predefined excludes
+  if (!infile->ReadParseLine(0,fname)) return false;
+  if ((infile->lp.Num()) == 0) predef_excludes.clear();
+  else {
+      QStringList* values = (infile->lp).GetRest(0);
+      predef_excludes = (*values);
+      delete values;
   }
-  if (!infile->lp.BoolVal(1,emo)) {
-      return infile->BuildError("Emotional excludes flag invalid.");
-  }
-  if (!infile->lp.BoolVal(2,other)) {
-      return infile->BuildError("Other excludes flag invalid.");
-  }
-  if (!infile->lp.BoolVal(3,fluff)) {
-      return infile->BuildError("Other excludes flag invalid.");
-  }
-  // skipping reserved
+  // other excludes
+  if (!infile->ReadParseLine(3,fname)) return false;
+
   // string exclude info
-  excludes = infile->lp.UnEscStr(5);
-  template_replacer = infile->lp.UnEscStr(6);
+  excludes = infile->lp.UnEscStr(1);
+  template_replacer = infile->lp.UnEscStr(2);
 
   // includes and word limits
   if (!infile->ReadParseLine(3,fname)) return false;

@@ -17,7 +17,7 @@ Updated :   April 9, 2014
   #include "../../interface/filters/base/sexpr_edit.h"
 #endif // SEXPR_EDIT_H_INCLUDED
 #ifndef WIDGETS1_H_INCLUDED
-  #include "../../interface/misc/widgets1.h"
+  #include "../../interface/controls/widgets1.h"
 #endif // WIDGETS1_H_INCLUDED
 /*****************************************************************************/
 // two checkbox list boxes to pick catgeories

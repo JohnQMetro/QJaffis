@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    Declares a panel for displaying search results
 Created:     July 26, 2009
 Conversion to Qt Started November 20, 2013
-Updated:     June 23, 2016
+Updated:     April 30, 2022: changing downloader class
 ******************************************************************************/
 #ifndef RESULT_PANEL_H_INCLUDED
 #define RESULT_PANEL_H_INCLUDED
@@ -28,9 +28,10 @@ Updated:     June 23, 2016
 #ifndef RESULTCOLLECT_H_INCLUDED
   #include "../../core/structs/resultcollect.h"
 #endif // RESULTCOLLECT_H_INCLUDED
-#ifndef DOWNLOAD2_H
-  #include "../../fetching/download2.h"
-#endif // DOWNLOAD2_H
+#ifndef MULTICATROOT_H
+    #include "../../fetching/loopget/multicatroot.h"
+#endif // MULTICATROOT_H
+
 //------------------------------------------------------------------------------
 #include <QThread>
 //*****************************************************************************
@@ -44,7 +45,7 @@ class jfResultDisplay: public QWidget {
     // constructor
     jfResultDisplay(rtype_enum rinval, header_enum hinval, QWidget* parent = NULL);
     // when we launch the search, some information has to be used to setup things
-    bool LaunchParameters(jfResultCollection* results, jfBaseItemDownloader* in_downloader);
+    bool LaunchParameters(jfResultCollection* results, jfDownloadRootItems* in_downloader);
     // functions to return info that has to be passed to the search thread
     jfPauseStop* GetPauser();
     // additional data to set
@@ -66,7 +67,7 @@ class jfResultDisplay: public QWidget {
     void ThreadDone();
   private:
     // helper methods for lauch parameters
-    bool SetupValues(jfResultCollection* results, jfBaseItemDownloader* in_downloader);
+    bool SetupValues(jfResultCollection* results, jfDownloadRootItems* in_downloader);
     bool ConnectSignalsAndSlots();
     // gui elements
     jfHtmlResultCollection* mainviewer;
@@ -80,8 +81,8 @@ class jfResultDisplay: public QWidget {
     // thread data and control
     jfSearchCore* search_data;
     jfResultCollection* data_collection;
-    jfMultiCatBaseDownloader* download_ptr_multi;
-    jfBaseItemDownloader* download_ptr_single;
+    jfMultiCatRootDownloader* download_ptr_multi;
+    jfDownloadRootItems* download_ptr_single;
     QThread* thread_object;
 
 };

@@ -97,7 +97,7 @@ void jfFIMPageParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
     // the item is not okay
     else {
       parseErrorMessage = perr + "\nIN :\n" + buffer;
-      /**/lpt->tLog(fname,6,parseErrorMessage);
+      /**/lpt->tParseError(fname,parseErrorMessage);
       if (!temp->included) delete temp;
       else {
         delete temp;
@@ -117,7 +117,7 @@ void* jfFIMPageParser::getResults() {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++
 // handling redirection, NULL result if faliure
-QString* jfFIMPageParser::makeRedirectedURL(const QString& inPart) {
+QString* jfFIMPageParser::makeRedirectedURL(const QString& inPart) const{
   return NULL;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++

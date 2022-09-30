@@ -3,7 +3,7 @@ Name:        ficurl_parsing.cpp
 Author  :    John Q Metro
 Purpose :    When given a fic url to download, it has to be checked
 Created :    July 8, 2016
-Updated :    October 12, 2019 (HPF changes)
+Updated :    January 23, 2022 (remove Harry Potter)
 
 ****************************************************************************/
 #ifndef FICURL_PARSING_H_INCLUDED
@@ -18,7 +18,6 @@ const QString FFN_TAG = "www.fanfiction.net";
 const QString FIM_TAG = "www.fimfiction.net";
 const QString AO3_TAG = "archiveofourown.org";
 const QString MMO_TAG = "www.mediaminer.org";
-const QString HPF_TAG = "harrypotterfanfiction.com";
 
 //================================================================================
 // constructor
@@ -50,7 +49,6 @@ bool jfFicURLParser::ParseURL(const QString& input_url) {
   else if (domain == FIM_TAG) okay = HandleFIM(slashparsed);
   else if (domain == AO3_TAG) okay = HandleAO3(slashparsed);
   else if (domain == MMO_TAG) okay = HandleMMO(slashparsed);
-  else if (domain == HPF_TAG) okay = HandleHPF(slashparsed);
   else okay = false;
 
   // finishing
@@ -181,33 +179,6 @@ bool jfFicURLParser::HandleAO3(QStringList* urlarr) {
   // building the result...
   outputURL += "/works/" + buffer2;
   outputURL += "?view_adult=true";
-  // names are not included
-  return true;
-}
-//----------------------------------------------
-bool jfFicURLParser::HandleHPF(QStringList* urlarr) {
-  // variables and constants
-  const QString vsPREFIX = "viewstory.php?psid=";
-  const QString srAFFIX = "&showRestricted";
-  QString aftdomain,buffer;
-  unsigned long tval;
-  bool showres;
-  // starting...
-  type = jfft_HPF;
-  aftdomain = urlarr->at(0);
-  if (writehttp) outputURL = "http://";
-  outputURL += HPF_TAG + "/";
-  // harry potter fanfic urls must be index pages
-  // format "viewstory.php?psid=<num>[&showRestricted]"
-  if (!aftdomain.startsWith(vsPREFIX)) return false;
-  buffer = aftdomain.mid(vsPREFIX.length());
-  showres = buffer.endsWith(srAFFIX);
-  if (showres)buffer.chop(srAFFIX.length());
-  // checking the fic id
-  if (!Str2ULong(buffer,tval)) return false;
-  // building the result...
-  outputURL += vsPREFIX + buffer;
-  if (showres) outputURL += srAFFIX;
   // names are not included
   return true;
 }

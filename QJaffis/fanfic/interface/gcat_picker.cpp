@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Category picking panel for generic section/category picking
 Created :   August 25, 2012
 Conversion to Qt Started April 6, 2014
-Updated :   December 20, 2021
+Updated :   April 3, 2022
 ******************************************************************************/
 #ifndef GCAT_PICKER_H_INCLUDED
   #include "gcat_picker.h"
@@ -21,9 +21,9 @@ jfTwinPanelGCPicker::jfTwinPanelGCPicker(jfGen_CatHolder* inmain, jfGenCat_PickD
                    size_t prop, QWidget* parent):QWidget(parent) {
   // some checks and asserts
   const QString fname = "jfTwinPanelGCPicker::jfTwinPanelGCPicker";
-  /**/jfAssertLog(inmain!=NULL,fname,"The Holder is NULL");
-  /**/jfAssertLog(inselection!=NULL,fname,"The Selection is NULL");
-  /**/jfAssertLog(prop<10,fname,"The Prop is 10 or more");
+  /**/jerror::AssertLog(inmain!=NULL,fname,"The Holder is NULL");
+  /**/jerror::AssertLog(inselection!=NULL,fname,"The Selection is NULL");
+  /**/jerror::AssertLog(prop<10,fname,"The Prop is 10 or more");
   // assigning initial values
   /**/JDEBUGLOG(fname,1);
   QStringList* snames = NULL;
@@ -485,17 +485,17 @@ bool jf_Gen_CatPicker::SaveFilters() {
 //---------------------------------------------------------
 // one of the
 void jf_Gen_CatPicker::OnCheckEvent(bool value) {
-  /**/jfXLogString("jf_Gen_CatPicker::OnCheckEvent");
   picked_display->UpdateDisplay();
 }
 //-----------------------------------------------------------------------
 void jf_Gen_CatPicker::OnSItemDeleted(QString del_value) {
+    const QString fname = "jf_Gen_CatPicker::OnSItemDeleted";
   // constants and variables
   const QChar pstr = ';';
   QStringList* pvalue;
   // we parse
   pvalue = ListToStrArr( del_value, pstr );
-  /**/jfXLogString(del_value);
+  /**/jerror::Log(fname,del_value);
   assert(pvalue!=NULL);
   section_panel->UnCheck(pvalue->at(0),pvalue->at(1));
   delete pvalue;

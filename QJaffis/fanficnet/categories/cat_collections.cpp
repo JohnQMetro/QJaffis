@@ -589,6 +589,10 @@ jfFFN_CrossoverCategory* jfFFN_CrossCatStore::AddCategoryAndSetSection(const
   }
   ccptr = const_cast<jfFFN_CrossoverCategory*>(*xi);
   // setting extra section info
+  if ((idptr == 8) || (idptr == 1955)) {
+      validdata = true;
+  }
+
   ccptr->SetSectionByID(idptr,insection);
   validdata = true;
   return ccptr;

@@ -95,5 +95,5 @@ bool fimcon::WriteTagsToFile(QString filepath) {
     return true;
 }
 //---------------------
-const QString fimcon::fimtag_path = "fimtag.dat";
+const QString fimcon::fimtag_path = "config/fimtag.dat";
 /*****************************************************************************/

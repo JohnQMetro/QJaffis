@@ -3,7 +3,7 @@
  * Purpose:   Declares dialog for updating directories
  * Author:    John Q Metro (johnqmetro@hotmail.com)
  * Created:   June 30, 2015
- * Updated:   April 21, 2018
+ * Updated:   April 3, 2022
  *
 **************************************************************/
 #ifndef DIRUPDATE_DIALOG_H_INCLUDED
@@ -65,10 +65,10 @@ void jfUpdateDirectoryPickPanel::SetLEnabled(bool enabled) {
 // gui builder methods
 //---------------------------------------------
 void jfUpdateDirectoryPickPanel::MakeWidgets() {
-  QString sdir = jglobal::settings.GetDirectory(jglobal::SourceForSync);
-  sourcedir = new jfDirPicker(NULL,false,false,"Source Directory",sdir);
-  sdir = jglobal::settings.GetDirectory(jglobal::DestinationForSync);
-  destdir = new jfDirPicker(NULL,false,false,"Target Directory",sdir);
+    QString sdir = jglobal::settings.paths.GetPathFor(jglobal::SYNC_SOURCE);
+    sourcedir = new jfDirPicker(NULL,false,false,"Source Directory",sdir);
+    sdir = jglobal::settings.paths.GetPathFor(jglobal::SYNC_TARGET);
+    destdir = new jfDirPicker(NULL,false,false,"Target Directory",sdir);
 }
 
 //=====================================================================================
@@ -109,7 +109,7 @@ jfUpdateDirectory_Dialog::jfUpdateDirectory_Dialog(QWidget* parent):QDialog(pare
 
   /* To allow an invalid default target directory (an sd card or something could be
    * inserted afterwards, before the sync is started. */
-  QString txdir = jglobal::settings.GetDirectory(jglobal::DestinationForSync);
+  QString txdir = jglobal::settings.paths.GetPathFor(jglobal::SYNC_TARGET);
   dpanel->SetValue(false,txdir);
 
   QSize xsize = QSize(705,180);
@@ -174,7 +174,7 @@ bool jfUpdateDirectory_Dialog::SetupThread() {
   sync_runner->moveToThread(thread_object);
   // connecting signals and slots
   bool testoo = mpanel->ConnectAndSetPauser(sync_runner);
-  /**/jfAssertLog(testoo,fname,"Connecting and Setting Pauser FAILED!!!!");
+  jerror::AssertLog(testoo,fname,"Connecting and Setting Pauser FAILED!!!!");
 
   // standard thread/downloader connections
   connect(thread_object, SIGNAL(started()),sync_runner ,SLOT(StartProcessing()));

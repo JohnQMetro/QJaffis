@@ -4,7 +4,7 @@
 // Purpose :    Declares functions and stuff for parsing boolean expressions
 // Created:     31.12.06
 // Conversion to QT Started April 8, 2013
-// Updated:     August 22, 2012 (removing exceptions)
+// Updated:     August 6, 2022 (adding whole string matching)
 /////////////////////////////////////////////////////////////////////////////
 //headers
 //----------------------------------------------------------------------------
@@ -28,12 +28,15 @@
  -However, a sort of 'id' at the start, followed by ';' can change this.
  -This id cannot be more than 2 characters long.
  -character it can contain: 'c' or 'i' to set case sensetivity
- -Also, 's', 'm', 't', or 'q' to set the type
+ -Also, 's', 'm', 't', 'q', or 'z' to set the type
  */
 //*****************************************************************************
+// match type
+enum jfExpMatchType:char { jfemt_SUBSTRING = 's', jfemt_TOKENIZED = 'm', jfemt_WHOLESTRING = 'z' };
+
 // because of the complication of parsing, using a class can make parts simpler
 class jfExpParserClass {
-public:
+  public:
     QString parse_error;
     // the constructor
     jfExpParserClass(const QString& insource,bool issimple,jfFilterMap* inlocalmap);
@@ -44,7 +47,7 @@ public:
     QString GetRawExp() const;
     // done
     ~jfExpParserClass();
-protected:
+  protected:
     // constants
     QString fname1;
     // used in parsing
@@ -61,7 +64,7 @@ protected:
     bool IsLiteralFilter(QString& sourcef);
     bool IsFilterReference(QString& sourcef);
     bool FilterTest(QString& sourcef, QChar delimt) const;
-    bool CheckId(const QString& idin, bool& ssout, bool& csout, bool& titout) const;
+    bool CheckId(const QString& idin, jfExpMatchType& ssout, bool& csout, bool& titout) const;
 };
 //=============================================================================
 // following function is designed to take in an element array on produce a postfix

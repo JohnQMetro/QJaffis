@@ -4,7 +4,7 @@
 // Purpose :    Defines the dialog for downloading Fanfiction.Net fics
 // Created:     July 17, 2011
 // Started Qt conversion May 25, 2013
-// Updated:     July 12, 2016
+// Updated:     March 27, 2022
 ******************************************************************************/
 #ifndef FFNDOWN_DIALOG_H_INCLUDED
   #include "ffndown_dialog.h"
@@ -31,7 +31,7 @@ jfFicDownDialog_Core::jfFicDownDialog_Core(QWidget* parent):QDialog(parent) {
   downloader = NULL;
   // creating the common widgets
   fic_display = new QLabel("",this);
-  QString xoutdir= jglobal::settings.GetDirectory(jglobal::DownloadedFics);
+  QString xoutdir = jglobal::settings.paths.GetPathFor(jglobal::SAVED_FANFIC_A);
   poutput_dir = new jfDirPicker(this,false,true,"Output Directory",xoutdir);
   sdir_label = new QLabel("Subfolder :",this);
   pick_subdir = new QComboBox(this);
@@ -160,14 +160,15 @@ void jfFicDownDialog_Core::LoadSubDirs() {
 }
 //-------------------------
 bool jfFicDownDialog_Core::MakeAndStartDownloader() {
+
   // setting up the thread and downloader
-  downloader = new jfSingleFicDownloader(3);
+  downloader = new jfSingleFicDownloader();
   downloader->SetFicParameters(fparams);
   the_thread = new QThread();
   downloader->moveToThread(the_thread);
   // connecting signals and slots
   bool testoo = progress->ConnectAndSetPauser(downloader);
-  /**/jfAssertLog(testoo,"jfFicDownDialog_Core::MakeAndStartDownloader","Connecting and Setting Pauser FAILED!!!!");
+  jerror::AssertLog(testoo,"jfFicDownDialog_Core::MakeAndStartDownloader","Connecting and Setting Pauser FAILED!!!!");
   connect(downloader,SIGNAL(sendFicExtract(jfFicExtract*)),this,SLOT(HandleNewExtract(jfFicExtract*)));
 
   // standard thread/downloader connections

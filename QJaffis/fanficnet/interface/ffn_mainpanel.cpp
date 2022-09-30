@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net search interface
 // Created:     July 1, 2010
 // conversion to Qt started July 29, 2014
-// Updated:     August 26, 2014
+// Updated:     June 11, 2022
 //**************************************************************************
 #ifndef FFN_MAINPANEL
   #include "ffn_mainpanel.h"
@@ -54,7 +54,7 @@ jfFFNSearchGrp::jfFFNSearchGrp(jfFFNSearch* searchin, jfFFNMain* tholder, QWidge
   typed_search->GetSelector()->SetCatLink(ffn_catorganizer::main_manager->GetHolder());
   // making panel 1
   /**/JDEBUGLOG(fname,3);
-  panel1 = MakeFirstPanel();
+  search_and_filter_panel = MakeFirstPanel();
   custinit = true;
   // finishing off
   FinishConstruction();
@@ -70,7 +70,8 @@ jfSearchCore*       jfFFNSearchGrp::MakeTypedSearch() const {
   temp = new jfFFNSearch();
   temp->MakeEmpty();
   temp->categories->SetUseDefault(true);
-  temp->categories->base_outputdir = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+  QString sres =jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
+  temp->categories->base_outputdir = sres;
   temp->SetData(ffn_catorganizer::main_manager->GetHolder(),sval);
   return temp;
 }
@@ -80,8 +81,8 @@ jfResultCollection* jfFFNSearchGrp::MakeTypedCollection() const {
   return new jfFFNResColl(typed_search);
 }
 //----------------------------------------------------------------------------
-jfBaseItemDownloader* jfFFNSearchGrp::MakeTypedThread() const {
-  return new jfFFNDownloader(3);
+jfDownloadRootItems* jfFFNSearchGrp::MakeTypedThread() const {
+  return new jfFFNDownloader();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 int jfFFNSearchGrp::GetSearchIndex() const {
@@ -109,7 +110,7 @@ jfFFNSearchOnePanel::jfFFNSearchOnePanel(jfFFNSearch* searchin, jfFFNMain* thold
   typed_search->GetSelector()->SetCatLink(ffn_catorganizer::main_manager->GetHolder());
     /**/JDEBUGLOG(fname,8)
   // making panel 1
-  panel1 = MakeFirstPanel();
+  search_and_filter_panel = MakeFirstPanel();
     /**/JDEBUGLOG(fname,9)
   custinit = true;
   // finishing off
@@ -128,7 +129,8 @@ jfSearchCore*       jfFFNSearchOnePanel::MakeTypedSearch() const {
   temp = new jfFFNSearch();
   temp->MakeEmpty();
   temp->categories->SetUseDefault(true);
-  temp->categories->base_outputdir = jglobal::settings.GetDirectory(jglobal::FanficSearchResults);
+  QString sres =jglobal::settings.paths.GetPathFor(jglobal::SAVED_RESULTS);
+  temp->categories->base_outputdir = sres;
   temp->SetData(ffn_catorganizer::main_manager->GetHolder(),sval);
   return temp;
 }
@@ -138,8 +140,8 @@ jfResultCollection* jfFFNSearchOnePanel::MakeTypedCollection() const {
   return new jfFFNResColl(typed_search);
 }
 //--------------------------------------
-jfBaseItemDownloader* jfFFNSearchOnePanel::MakeTypedThread() const {
-  return new jfFFNDownloader(3);
+jfDownloadRootItems* jfFFNSearchOnePanel::MakeTypedThread() const {
+  return new jfFFNDownloader();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // special methods

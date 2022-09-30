@@ -93,6 +93,7 @@ class jfFilterMap : public jfBaseCollection {
     bool AddFilter(jfBaseFilter* infilter, size_t& outindex);
     bool GetIndexByName(const QString& findname, size_t& outindex) const;
     jfBaseFilter* GetItem(const size_t& findex);
+    const jfBaseFilter* GetItemConst(const size_t& findex) const;
     bool DeleteByName(const QString& findname);
     bool ReplaceByName(QString nameold, jfBaseFilter* newfilter, size_t& outindex);
     bool ReplaceSame(jfBaseFilter* newfilter,size_t& outindex);

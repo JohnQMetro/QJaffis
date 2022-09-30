@@ -3,12 +3,15 @@ Name    : ffncatparser2.cpp
 Basic   : Fanfiction.Net category parsing, crossover versions
 Author  : John Q Metro
 Started : July 20, 2016
-Updated : December 9 2018
+Updated : September 5, 2022
 
 ******************************************************************************/
 #ifndef FFNCATPARSER2_H
   #include "ffncatparser2.h"
 #endif // FFNCATPARSER2_H
+#ifndef HTMLPARSE_H_INCLUDED
+  #include "../../core/utils/htmlparse.h"
+#endif // HTMLPARSE_H_INCLUDED
 //-----------------------------------
 #include <assert.h>
 
@@ -25,9 +28,6 @@ jfFFNCrossoverSectionParser::jfFFNCrossoverSectionParser():jfFFNCatParserBase() 
 bool jfFFNCrossoverSectionParser::ParsePageCore(size_t pageindex) {
   // constants
   const QString fname = "jfFFNCrossoverSectionParser::ParsePageCore";
-  const QString arrow_tag = "<img src='/static/fcons/arrow-switch.png'";
-  const QString arrow_tag2 = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
-  const QString arrow_tag3 = "<img src=\"//ff74.b-cdn.net/static/fcons/arrow-switch.png\"";
 
   // variables
   QString buffer,errmsg;
@@ -36,17 +36,19 @@ bool jfFFNCrossoverSectionParser::ParsePageCore(size_t pageindex) {
   jfFFN_HalfCrossover* tcat;
 
   // starting
-  if (!xparser.MovePastAlt(arrow_tag3,arrow_tag2)) {
-    if (!xparser.MovePast(arrow_tag)) return parsErr("Cannot find arrow icon!");
+  if (!xparser.MovePast(regex.arrow_tagA)) {
+      /**/lpt->tParseError(fname,"Cannot find arrow tag!");
+      /**/lpt->tParseError(fname, "BLOCK: " + xparser.GetBlock(1000));
+    return parsErr("Cannot find arrow icon!");
   }
   if (!xparser.GetDelimitedFromEnd(">","Crossovers",buffer,"<hr size=")) {
     return parsErr("Failed in extracting the Crossover Section name!");
   }
-  secname = buffer.trimmed();
+  secname = htmlparse::HTML2Text(buffer).replace("shoppingmode","");;
   // adding the plural
   if ((secname!="Misc") && (secname!="Anime/Manga")) secname += "s";
   // preparing for the list
-  if (!xparser.MovePastAlt("<div id=\"list_output\">", "<div id='list_output'>")) {
+  if (!xparser.MovePast(regex.list_output)) {
       return parsErr("Cannot find section crossover list!");
   }
   if (!xparser.ChopAfter("</td></tr></tbody></table>",true)) {
@@ -114,9 +116,7 @@ bool jfFFNCrossoverParser::SetHoldingSectionName(const QString& sname_in) {
 bool jfFFNCrossoverParser::ParsePageCore(size_t pageindex) {
   // constants
   const QString fname = "jfFFNCrossoverParser::ParsePageCore";
-  const QString arrow_tag = "<img src='/static/fcons/arrow-switch.png'";
-  const QString arrow_tag2 = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
-  const QString arrow_tag3 = "<img src=\"//ff74.b-cdn.net/static/fcons/arrow-switch.png\"";
+
   // variables
   QString buffer, oerr;
   ulong uval;
@@ -126,28 +126,28 @@ bool jfFFNCrossoverParser::ParsePageCore(size_t pageindex) {
   /**/lpt->tLog(fname,0);
   // assert(crossstore_ptr != NULL);
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePastAlt(arrow_tag3, arrow_tag2)) {
-    if (!xparser.MovePast(arrow_tag)) return parsErr("Cannot Find Arrow Switch!");
+  if (!xparser.MovePast(regex.arrow_tagA)) {
+      /**/lpt->tParseError(fname,"Cannot find arrow tag!");
+      /**/lpt->tParseError(fname, "BLOCK: " + xparser.GetBlock(1000));
+      return parsErr("Cannot Find Arrow Switch!");
   }
   // catname and name, we use FromEnd just in case a category name includes 'Crossovers'
   if (!xparser.GetDelimitedFromEnd("absmiddle\">","Crossovers",buffer,"<hr size=")) {
       if (!xparser.GetDelimitedFromEnd("absmiddle>","Crossovers",buffer,"<hr size=")) {
-        return parsErr("Failed in extracting the Crossover Category name!");
+    return parsErr("Failed in extracting the Crossover Category name!");
       }
   }
-  QString catname = buffer.trimmed();
+  QString catname = htmlparse::HTML2Text(buffer).replace("shoppingmode","");
   if (catname.isEmpty()) return parsErr("The crossover category name is Empty!");
   // getting the id
-  if (!xparser.MovePast("<a class=\"btn\" href=\"/")) {
-      if (!xparser.MovePast("<a class=btn href='/")) {
-        return parsErr("Cannot find main link!");
-      }
+  if (!xparser.MovePast(regex.btn_href)) {
+     return parsErr("Cannot find main link!");
   }
   if (!xparser.GetDelimitedULong("/","/",uval,oerr)) {
     return parsErr("Problems with getting the category ID : " + oerr);
   }
   // preparing for the list
-  if (!xparser.MovePastAlt("<div id=\"list_output\">","<div id='list_output'>")) {
+  if (!xparser.MovePast(regex.list_output)) {
       return parsErr("Cannot find crossover list!");
   }
   if (!xparser.ChopAfter("</td></tr></tbody></table>",true)) {

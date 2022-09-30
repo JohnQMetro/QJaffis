@@ -35,7 +35,7 @@ class jfFicDownParameters {
 class jfSingleFicDownloader : public jfFicDownloaderBase {
     Q_OBJECT
   public:
-    jfSingleFicDownloader(size_t in_max_threads);
+    jfSingleFicDownloader();
     bool SetFicParameters(jfFicDownParameters* in_ficparams);
   public slots:
     virtual void StartProcessing();

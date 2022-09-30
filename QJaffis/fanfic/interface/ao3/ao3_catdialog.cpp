@@ -16,6 +16,7 @@ Updated :   August 25, 2012
 #ifndef AO3_CATS_H_INCLUDED
   #include "../../data/ao3/ao3_cats.h"
 #endif // AO3_CATS_H_INCLUDED
+
 //---------------------------------------
 #include <assert.h>
 /******************************************************************************/

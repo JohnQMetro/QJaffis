@@ -3,7 +3,7 @@ Name    :   ffnitem_parser.h
 Author  :   John Q Metro
 Purpose :   Parser for Fanfiction.Net Category pages, to get lists of fanfics
 Created :   July 22, 2016
-Updated :   August 10, 2016
+Updated :   July 9, 2022
 ******************************************************************************/
 #ifndef FFNITEM_PARSER_H
 #define FFNITEM_PARSER_H
@@ -21,6 +21,8 @@ Updated :   August 10, 2016
 #ifndef UPD_TYPES_H_INCLUDED
   #include "../../ffnupdate/data/upd_types.h"
 #endif // UPD_TYPES_H_INCLUDED
+//--------------------------------------
+#include <QRegularExpression>
 /*****************************************************************************/
 class jfFFNItemParser : public jfItemsPageParserBase {
   public:
@@ -32,7 +34,7 @@ class jfFFNItemParser : public jfItemsPageParserBase {
     virtual void ParseDownloadedPage(const QString& inPage, size_t pageindex);
     virtual void* getResults();
     // handling redirection, NULL result if faliure
-    virtual QString* makeRedirectedURL(const QString& inPart);
+    virtual QString* makeRedirectedURL(const QString& inPart) const;
     // test methods
     virtual bool testMissing(const QString *page) const;
     virtual bool testIncomplete(const QString *page) const;
@@ -52,6 +54,11 @@ class jfFFNItemParser : public jfItemsPageParserBase {
     jfFicLimit* limit;
     bool limitreached;
 
+    QRegularExpression page_header;
+    QRegularExpression cross_link;
+    QRegularExpression pagehead;
+    QRegularExpression zlist_start;
+    QRegularExpression item_ico;
 };
 /*****************************************************************************/
 

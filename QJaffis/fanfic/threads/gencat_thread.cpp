@@ -3,19 +3,21 @@ Name    :   gencat_thread.cpp
 Author  :   John Q Metro
 Purpose :   Base downloader class for sections & categories
 Created :   July 13, 2016
-Updated :   September 4, 2016
+Updated :   July 7, 2022
 ******************************************************************************/
 #ifndef GENCAT_THREAD_H
   #include "gencat_thread.h"
 #endif // GENCAT_THREAD_H
 //------------------------------------
+#ifndef INITEND_H_INCLUDED
+  #include "../../initend.h"
+#endif // INITEND_H_INCLUDED
 
 /*****************************************************************************/
 // -- [ METHODS forjfGeneralCategoryDownloaderBase ] ---------------
 //+++++++++++++++++++++++++++++++++++++++++++++++++
 // base constructor
-jfGeneralCategoryDownloaderBase::jfGeneralCategoryDownloaderBase(size_t in_max_threads):
-        jfBaseDownloader(in_max_threads) {
+jfGeneralCategoryDownloaderBase::jfGeneralCategoryDownloaderBase():jfDownloadRoot() {
   result_holder =NULL;
   working_data = NULL;
   url_source = NULL;
@@ -50,15 +52,16 @@ void jfGeneralCategoryDownloaderBase::StartProcessing() {
   working_data = result_holder->StartNew();
 
   // the main tasks
-  SetupThreads(false);
+  SetupWorkers(false);
   /**/tLog(fname,3);
-  bool main_results = LoopGet();
+  bool main_results = xLoopGet();
 
   // handling the aftermath
   if (main_results) result_holder->NewDone();
   else result_holder->DiscardNew();
   working_data = NULL;
   /**/tLogB(fname,4,main_results);
+  ClearWorkers(true);
 
   // done
   AllDone(main_results);
@@ -100,5 +103,20 @@ void jfGeneralCategoryDownloaderBase::PrepareItemInfo(size_t pageIndex) {
   infoToSend.item_name = url_source->NameAtIndex(pageIndex-1);
   infoToSend.item_index = pageIndex;
   infoToSend.item_label = "Section";
+}
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jfParseFetchPackage* jfGeneralCategoryDownloaderBase::CategoryParseFetchMaker(jf_FICTYPE site, jfPageParserBase* page_parser) const {
+    if (page_parser == NULL) return NULL;
+    jfParseFetchPackageMaker* parse_fetch_maker = jglobal::settings.getFetchPackageMaker();
+    if (parse_fetch_maker == NULL) return NULL;
+    else {
+        jglobal::jfFetchBasics fetch_type = jglobal::settings.FindFetchTypeFor(site, jglobal::FPT_CATEGORY_PAGE);
+        if (fetch_type.IsValid()) {
+            return parse_fetch_maker->makeFetchPackage(fetch_type, page_parser);
+        }
+        else {
+            return parse_fetch_maker->makeGeneralFetchPackage(page_parser);
+        }
+    }
 }
 /*****************************************************************************/

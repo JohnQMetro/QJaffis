@@ -299,12 +299,12 @@ bool jfFFN_CatP_SelCat::RemoveByString(const QString& inval) {
   parser = new jfLineParse(inval);
   // special case faliures: the input is invalid
   if ((parser->Num())<2) {
-    delete parser;
-    /**/JDEBUGLOG(fname,2);
-    return false;
+      delete parser;
+      jerror::Log(fname,"string to remove 2 could not be parsed!");
+      return false;
   }
   if ((parser->Num())>3) {
-    /**/JDEBUGLOG(fname,3);
+      jerror::Log(fname,"string to remove 3 could not be parsed!");
     delete parser;
     return false;
   }

@@ -3,7 +3,7 @@ Name    :   ao3cat_thread.h
 Author  :   John Q Metro
 Purpose :   Downloader class for AO3 sections (fandom listings)
 Created :   July 15, 2016
-Updated :   July 15, 2016
+Updated :   June 11, 2022
 ******************************************************************************/
 #ifndef AO3CAT_THREAD_H
   #define AO3CAT_THREAD_H
@@ -22,6 +22,7 @@ class jfAO3CategoryDownloader : public jfGeneralCategoryDownloaderBase {
   protected:
     // virtual methods that have to be implemented by derived threads
     virtual jfPageParserBase* makeParser();
+    virtual jfParseFetchPackage* MakeParserFetcher();
 
 //    QString tlogname;
 };

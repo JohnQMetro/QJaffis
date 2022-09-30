@@ -11,7 +11,7 @@
 #endif
 //-----------------------------------------
 #ifndef WIDGETS1_H_INCLUDED
-  #include "../../interface/misc/widgets1.h"
+  #include "../../interface/controls/widgets1.h"
 #endif // WIDGETS1_H_INCLUDED
 #ifndef FFNCATPDATA
   #include "../categories/ffn_catpdata.h"

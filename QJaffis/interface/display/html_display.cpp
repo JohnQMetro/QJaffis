@@ -37,7 +37,7 @@ void HtmlDelegate::ResetWidth() {
 void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
   // variables and constants
     const QString fname = " %%%% &&&& HtmlDelegate::paint";
-    QStyleOptionViewItemV4 optionV4 = option;
+    QStyleOptionViewItem optionV4 = option;
     QString html_data;
     QTextDocument doc;
   // some initialization
@@ -53,7 +53,7 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter);
     QAbstractTextDocumentLayout::PaintContext ctx;
     QColor xcolour = modelptr->getColorAtModelIndex(index);
-    /**/JDEBUGLOGB(fname,1,xcolour.isValid());
+    /**///JDEBUGLOGB(fname,1,xcolour.isValid());
     if (xcolour.isValid()) {
         ctx.palette.setColor(QPalette::Window,xcolour);
     }
@@ -63,7 +63,7 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
       //ctx.palette.setColor(QPalette::Text, optionV4.palette.color(QPalette::Active, QPalette::HighlightedText));
       // ctx.palette.setColor(QPalette::Text,Qt::red);
     }
-    /**/JDEBUGLOG(fname,3);
+    /**///JDEBUGLOG(fname,3);
     QRect textRect = style->subElementRect(QStyle::SE_ItemViewItemText, &optionV4);
     painter->save();
     painter->translate(textRect.topLeft());

@@ -3,7 +3,7 @@
  * Purpose:   Downloaded fanfic updater thread
  * Author:    John Q Metro
  * Created:   July 25, 2016
- * Updated:   December 23, 2021
+ * Updated:   July 5, 2022
  *
  **************************************************************/
 #ifndef FICUPDATE_THREAD_H
@@ -16,6 +16,9 @@
 #ifndef FICDOWN_TBASE_H
   #include "ficdown_tbase.h"
 #endif // FICDOWN_TBASE_H
+#ifndef MAKEPARSER_H
+  #include "../parsers/makeparser.h"
+#endif // MAKEPARSER_H
 //-------------------------------------
 #include <vector>
 /**************************************************************/
@@ -45,7 +48,7 @@ Q_DECLARE_METATYPE(ficur::jfFICUR);
 class jfFicUpdateThread : public jfFicDownloaderBase {
     Q_OBJECT
   public:
-    jfFicUpdateThread(size_t in_max_threads);
+    jfFicUpdateThread();
     bool SetParams(const QString& indir, const size_t& in_sizeguide, bool in_docomplete, bool skip_ffn);
   signals:
     void sendOneActionSection(QString action,QString what);
@@ -57,7 +60,7 @@ class jfFicUpdateThread : public jfFicDownloaderBase {
     void sendNothing(bool fics);
     void sendFicCount(size_t ficcount);
   public slots:
-    virtual void StartProcessing();
+    virtual void StartProcessing() override;
   protected:
     bool InterCatCheckStop();
     // component parts (pre fic-download)
@@ -69,8 +72,12 @@ class jfFicUpdateThread : public jfFicDownloaderBase {
     bool HandleFanficResult(bool fres);
 
     // custom virtual abstract methods
-    virtual bool TestForAbort(jfFicExtract* new_extract) const;
-    virtual bool SetFileBase();
+    virtual bool TestForAbort(jfFicExtract* new_extract) const override;
+    virtual bool SetFileBase() override;
+
+    // some custom overridden methods
+    virtual jfPageParserBase* makeParser() override;
+    virtual jfParseFetchPackage* MakeParserFetcher() override;
 
     jfItemInfoMsg section_msg_data;
     size_t phase;
@@ -85,6 +92,8 @@ class jfFicUpdateThread : public jfFicDownloaderBase {
     QStringList* filelist;
     QStringList* subdirs;
     jfFicExtractArray* ficlist;
+
+    jfFanficUpdateWrapParser* update_parser;
 
 };
 

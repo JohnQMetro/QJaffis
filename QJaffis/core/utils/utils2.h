@@ -4,7 +4,7 @@ Basic   : Declares some more utility functions and things used in the other file
 Author  : John Q Metro
 Started : May 13, 2009
 Conversion to QT started : February 22, 2013
-Updated : September 14, 2016
+Updated : July 19, 2022 (added IBoundVal)
 Notes   :
 
 ******************************************************************************/
@@ -43,6 +43,7 @@ class jfLineParse {
     bool SBoundVal(size_t index, const size_t& ubound, size_t& outval, QString& oerr) const;
     bool UIntVal(size_t index, quint32& outval) const;
     bool IIntVal(size_t index, int& outval) const;
+    bool IBoundVal(size_t index, const int& lbound, const int& ubound, int& outval, QString& oerr) const;
     bool DateVal(size_t index, QDate& outval) const;
     bool CharVal(size_t index, QChar& outval, const QString& oallow="") const;
     // finding a value after a tag
@@ -68,6 +69,8 @@ overrides some of the operators already there... we use ';' as separators and es
 string input... */
 class jfOutString : public QString {
   public:
+    jfOutString();
+
     jfOutString& operator<< (const QString& toadd);
     jfOutString& operator<< (const QChar* toadd);
     jfOutString& operator<< (const bool& toadd);
@@ -75,7 +78,10 @@ class jfOutString : public QString {
     jfOutString& operator<< (const int toadd);
     jfOutString& operator<< (const QDate& toadd);
     jfOutString& operator<< (const QStringList& toadd);
+
+    void FullClear();
   protected:
+    bool item_added;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -110,6 +116,8 @@ class jfFileReader {
     bool Backup(const QString& finname = "");
     bool BuildError(QString inerr);
     bool AtEnd() const;
+    bool IsOpen() const;
+    bool IsOpenBeforeEnd() const;
     ~jfFileReader();
   protected:
     // not really reading

@@ -3,7 +3,7 @@ Name    : testurl.cpp
 Basic   : URLs and any misc stuff for the test routines
 Author  : John Q Metro
 Started : March 18, 2018
-Updated : October 11, 2019
+Updated : April 17, 2022
 ******************************************************************************/
 #ifndef TESTURL_H
     #include "testurl.h"
@@ -48,9 +48,6 @@ Updated : October 11, 2019
 #ifndef FIMGROUP_PARSER_H
   #include "../fanfic/threads/fim/fimgroup_parser.h"
 #endif // FIMGROUP_PARSER_H
-#ifndef HPFPARSER_H
-  #include "../ficdown/parsers/hpfparser.h"
-#endif // HPFPARSER_H
 #ifndef MMOPARSER_H
   #include "../ficdown/parsers/mmoparser.h"
 #endif // MMOPARSER_H
@@ -65,7 +62,7 @@ Updated : October 11, 2019
   #include "../core/utils/logging.h"
 #endif // LOGGING_H_INCLUDED
 /*****************************************************************************/
-const size_t test::count = 25;
+const size_t test::count = 23;
 const QString test::urls[test::count] = {
     /** Fanfiction.Net categories **/
     "https://www.fanfiction.net/cartoon/",
@@ -94,8 +91,6 @@ const QString test::urls[test::count] = {
     "https://www.fimfiction.net/groups?q=twilight&order=date_created",
     "https://www.fimfiction.net/group/212215/twilight-sparkles-library",
     /** Others **/
-    "https://harrypotterfanfiction.com/viewstory.php?psid=338339",
-    "https://harrypotterfanfiction.com/viewstory.php?chapterid=528599",
     "https://www.mediaminer.org/fanfic/s/tenchi-muyo-fan-fiction/the-second-chance/159822",
     "https://www.mediaminer.org/fanfic/c/tenchi-muyo-fan-fiction/the-second-chance/159822/560497"
 
@@ -109,13 +104,12 @@ const QString test::labels[test::count] = {
     "Fimfiction.Net Tag Source","Fimfiction.Net Compact Listing","Fimfiction.Net Full Listing",
     "Fimfiction.Net Fic Index","Fimfiction.Net Fic Part",
     "Fimfiction.Net Group Listing","Fimfiction.Net Group",
-    "HarryPotterFanfiction.com Fic Index","HarryPotterFanfiction.com Fic Part",
     "MediaMiner.org Fic Index","MediaMiner.org Fic Part"
 };
 // some of these indexes are not accurate, but they don't always have to be. */
 const size_t test::pageindexes[test::count] = {
     3,7,1,  1,4,1,   1,1,2,    9,1,   1,1,2,   1,1,1,
-    1,2,  1,1,  1,2,  1,2
+    1,2,  1,1,  1,2
 };
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ParserList* test::makeParsers() {
@@ -165,9 +159,6 @@ ParserList* test::makeParsers() {
 
     /* 10 */ result->push_back(ao3_parser);
 
-
-
-
     /* 11 */ result->push_back(new jfAO3_FicPartParser());
     /* 12 */ result->push_back(result->back());
     /* 13 */ result->push_back(result->back());
@@ -178,10 +169,8 @@ ParserList* test::makeParsers() {
     /* 18 */ result->push_back(result->back());
     /* 19 */ result->push_back(new jfNewFIMGroupParser());
     /* 20 */ result->push_back(new jfFIMGroupParser());
-    /* 21 */ result->push_back(new jfHPF_FicPartParser());
+    /* 21 */ result->push_back(new jfMMO_FicPartParser());
     /* 22 */ result->push_back(result->back());
-    /* 23 */ result->push_back(new jfMMO_FicPartParser());
-    /* 24 */ result->push_back(result->back());
 
     return result;
 }
@@ -204,7 +193,6 @@ bool test::FreeParsers(ParserList* plist) {
     delete (*plist)[19];
     delete (*plist)[20];
     delete (*plist)[21];
-    delete (*plist)[23];
     plist->clear();
     return true;
 }
@@ -294,36 +282,19 @@ bool test::DeleteResults(size_t index, void* resultdata) {
         item_results = static_cast<jfResultUnitVector*>(resultdata);
         delete resultdata;
     }
-    // harry potter fics are index, then separate parts, always.
-    else if (index == 21) {
-        fextract = static_cast<jfFicExtract*>(resultdata);
-        delete fextract;
-    }
-    //fimfiction.net fic part page
-    else if (index == 22) {
-        fpart = static_cast<jfFicPart*>(resultdata);
-        delete fpart;
-    }
+
     // fimfiction.net group parts
     else if (index <= 20) {
         item_results = static_cast<jfResultUnitVector*>(resultdata);
         delete resultdata;
     }
-    // harry potter fics are index, then separate parts, always.
+
+    // mediaminer.org fics are index, then separate parts, always.
     else if (index == 21) {
         fextract = static_cast<jfFicExtract*>(resultdata);
         delete fextract;
     }
     else if (index == 22) {
-        fpart = static_cast<jfFicPart*>(resultdata);
-        delete fpart;
-    }
-    // mediaminer.org fics are index, then separate parts, always.
-    else if (index == 23) {
-        fextract = static_cast<jfFicExtract*>(resultdata);
-        delete fextract;
-    }
-    else if (index == 24) {
         fpart = static_cast<jfFicPart*>(resultdata);
         delete fpart;
     }

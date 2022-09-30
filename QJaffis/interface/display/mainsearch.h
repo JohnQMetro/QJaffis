@@ -20,7 +20,7 @@ Updated :   January 12, 2016
   #include "search_panels.h"
 #endif // SEARCH_PANELS_H
 #ifndef WIDGETS2_H_INCLUDED
-  #include "../misc/widgets2.h"
+  #include "../controls/widgets2.h"
 #endif // WIDGETS2_H_INCLUDED
 /*****************************************************************************/
 class DisplayPanelCore : public QWidget {
@@ -86,7 +86,7 @@ class jfMainSearchGroup : public DisplayPanelCore {
     // internal data
     bool launched;
     jfResultCollection* results;
-    jfBaseItemDownloader* thread_holder;
+    jfDownloadRootItems* thread_holder;
     jfSearchCore* search_data;
     // save data
     bool beensaved;

@@ -4,8 +4,8 @@ Basic   : String parsing class
 Author  : John Q Metro
 Started : August 21, 2012 (spit from utils2.h)
 Conversion to QT started : March 2, 2013
-Updated : March 22, 2019
-Notes   : Added GetMovePastAltULong
+Updated : July 11, 2022
+Notes   :
 
 ******************************************************************************/
 #ifndef STRINGPARSER_H_INCLUDED
@@ -16,7 +16,7 @@ Notes   : Added GetMovePastAltULong
 #include <QtGlobal>
 #include <Qt>
 #include <QStringList>
-#include <QRegExp>
+#include <QRegularExpression>
 
 /*****************************************************************************/
 /* another class used in parsing... this one is for more complicated things than delimited
@@ -42,7 +42,7 @@ class jfStringParser {
     // parsing methods
     // looks for <find>, if found, returns true and moves the index past the substring
     bool MovePast(QString find);
-    bool MovePast(const QRegExp& find);
+    bool MovePast(const QRegularExpression& find);
     bool MovePastTwice(QString find);
     bool MovePastLimit(QString find, QString limit);
     bool MovePastTwo(QString first, QString second);
@@ -53,6 +53,7 @@ class jfStringParser {
     /* looks for <find>, if found, returns true, returns everything between the index
     and the start of <find> in outbuf, amd moves the index past the substring */
     bool GetMovePast(QString end, QString& outbuf);
+    bool GetMovePast(const QRegularExpression end, QString& outbuf);
     bool MovePastOrEnd(QString endval, QString& outbuf);
     bool GetMovePastPair(QString end1, QString end2, QString& outbuf);
     bool GetMovePastPairI(QString end1, QString end2, QString& outbuf, bool& owhich);
@@ -65,6 +66,9 @@ class jfStringParser {
     /* a combination of MovePast and GetMovePast, return the value between <start> and
     <end> (if found), and move the end past <end> */
     bool GetDelimited(QString start, QString end, QString& outbuf);
+    // regular expression extract
+    bool GetUsingRegex(const QRegularExpression& regex, bool first_capture, QString& outbuf);
+    bool GetULongUsingRegex(const QRegularExpression& regex, bool first_capture, ulong& outval, QString& outerr);
     // similar to GetDelimited, but tries to get a number
     bool GetDelimitedULong(QString start, QString end, ulong& outval, QString& outerr);
     bool GetDelimitedFloat(QString start, QString end, double& outval, QString& outerr);
@@ -100,12 +104,13 @@ class jfStringParser {
     bool GetUntilWhitespace(QString& outbuf);
   private:
     size_t CalcSkipAmount(const size_t& lpos) const;
+    bool CheckRegex(const QRegularExpression& toMatch) const;
     // internal data...
     QString rawdata;
     QString skipped_data;
     size_t oldindex, mainindex;
     bool ready;
     Qt::CaseSensitivity casesen;
-    QRegExp xendl;
+    QRegularExpression xendl;
 };
 /*****************************************************************************/
