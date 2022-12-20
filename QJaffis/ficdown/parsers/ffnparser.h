@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Fanfiction.net
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   June 25, 2022
+ * Updated:   November 4, 2022
  *
  **************************************************************/
 #ifndef FFNPARSER_H
@@ -38,6 +38,11 @@ class jfFFN_FicPartParser : public jfStoryPartParseBase {
     size_t story_id;
     bool getpartnames;
     QStringList extracted_partnames;
+
+    QRegularExpression titlehead;
+    QRegularExpression arrow_switch_icon;
+    QRegularExpression chevron_icon;
+
 };
 /**************************************************************/
 

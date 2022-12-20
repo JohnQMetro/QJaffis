@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Fanfiction.net
  * Author:    John Q Metro
  * Created:   July 4, 2016
- * Updated:   June 25, 2022
+ * Updated:   November 4, 2022
  *
  **************************************************************/
 #ifndef FFNPARSER_H
@@ -19,7 +19,13 @@
 /**************************************************************/
 // +++ [ METHODS for jfFFN_FicPartParser ] +++
 //+++++++++++++++++++++++++++++++++++++++++++++++
-jfFFN_FicPartParser::jfFFN_FicPartParser():jfStoryPartParseBase(){}
+jfFFN_FicPartParser::jfFFN_FicPartParser():jfStoryPartParseBase(){
+
+    titlehead = QRegularExpression("id=['\"]?pre_story_links['\"]?",QRegularExpression::CaseInsensitiveOption);
+    arrow_switch_icon = QRegularExpression("<img\\s+src=['\"]?(//ff7\\d\\.b-cdn\\.net)?/static/fcons/arrow-switch.png['\"]?",QRegularExpression::CaseInsensitiveOption);
+    chevron_icon = QRegularExpression("<span\\s+class=['\"]?xcontrast_txt icon-chevron-right xicon-section-arrow['\"]?>",QRegularExpression::CaseInsensitiveOption);
+
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++
 // virual methods that are implemented
 //--------------------------------------
@@ -230,26 +236,17 @@ bool jfFFN_FicPartParser::ExtractPartContents(QString& partcontents) {
 bool jfFFN_FicPartParser::FirstProcessStart(QString& out_title) {
   // constants
   const QString fname = "jfFicPart::FirstProcessStart";
-  const QString titlehead_tag = " id=pre_story_links>";
-  const QString titlehead_tag2 = "id=\"pre_story_links\">";
-  const QString icon_tag1a = "<img src=\"//ff74.b-cdn.net/static/fcons/arrow-switch.png\"";
-  const QString icon_tag2a = "<img src=\"/static/fcons/arrow-switch.png\"";
-  const QString icon_tag1b = "<img src='//ff74.b-cdn.net/static/fcons/arrow-switch.png'";
-  const QString icon_tag2b = "<img src='/static/fcons/arrow-switch.png'";
-  const QString chev_tag1 = "<span class='xcontrast_txt icon-chevron-right xicon-section-arrow'>";
-  const QString chev_tag2 = "<span class=\"xcontrast_txt icon-chevron-right xicon-section-arrow\">";
   // variables
   QString buffer;
   bool crossover;
   // we start
   /**/lpt->tLog(fname,1);
-  if (!xparser.MovePastAlt(titlehead_tag2,titlehead_tag)) {
+  if (!xparser.MovePast(titlehead)) {
     return parsErr("Missing Special DIV tag!");
   }
-  crossover = xparser.MovePastAlt(icon_tag1a,icon_tag2a);
-  if (!crossover) crossover = xparser.MovePastAlt(icon_tag1b,icon_tag2b);
+  crossover = xparser.MovePast(arrow_switch_icon);
   if (!crossover) {
-    if (!xparser.MovePastAlt(chev_tag2,chev_tag1)) {
+    if (!xparser.MovePast(chevron_icon)) {
         /**/lpt->tLog(fname,2,xparser.GetBlock(3000));
       return parsErr("Missing Icon or Chevron!");
     }
