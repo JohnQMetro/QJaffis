@@ -3,7 +3,7 @@ Name    :   ao3_lookvals.cpp
 Author  :   John Q Metro
 Purpose :   Some constants and utility functions for making AO3 searches
 Created :   June 12, 2021
-Updated :   August 27, 2022
+Updated :   February 11, 2023
 ******************************************************************************/
 #ifndef AO3_LOOKVALS_H
     #include "ao3_lookvals.h"
@@ -169,6 +169,9 @@ QStringList AO3RatingMake::GetPredefined() const {
 QString AO3RatingMake::MakeUsingPredefined(size_t index) const {
     if (index >= (size_t)choice_codes.size()) return "";
     else return MakeQuery(choice_codes.at(index));
+}
+size_t AO3RatingMake::Count() const {
+    return choice_labels.size();
 }
 AO3RatingMake::~AO3RatingMake() {
 

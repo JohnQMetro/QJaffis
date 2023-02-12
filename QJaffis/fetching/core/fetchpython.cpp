@@ -201,7 +201,7 @@ QString jfPageFetchWithPython::ScriptFetch(const QString& cookie) {
     // reading
     int waitsdone = 0;
     while (waitsdone < 30) {
-       okay = script_com->waitForReadyRead(20000); // 20 sec wait
+       okay = script_com->waitForReadyRead(30000); // 30 sec wait
        if (script_com->bytesAvailable() > 0) break;
        waitsdone++;
     }

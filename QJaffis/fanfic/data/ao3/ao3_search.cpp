@@ -109,7 +109,8 @@ void jfAO3Search::SetOrder(size_t in_oindex) {
     ord_index = in_oindex;
 }
 void jfAO3Search::SetRatingIndex(size_t in_rindex) {
-    rindex = in_rindex;
+    if (in_rindex >= ao3values::ratingMaker.Count()) rindex = 1000;
+    else rindex = in_rindex;
 }
 
 void jfAO3Search::SetWarningExcludes(bool in_violence, bool in_death, bool in_rape, bool in_underage) {
@@ -395,7 +396,7 @@ bool jfAO3Search::AddMiddleToFile(QTextStream* outfile) const {
 
   // ordering, rating combo index, exclude violence/death/underage/rape,
   // completed only, english only, crossover only
-  xline << "V3" << ord_index << rindex << wx_violence << wx_death << wx_underage << wx_rape;
+  xline << QString("V3") << ord_index << rindex << wx_violence << wx_death << wx_underage << wx_rape;
   xline << conly << eng_only << cross_only;
   (*outfile) << xline << "\n";
   xline.FullClear();
@@ -432,6 +433,7 @@ bool jfAO3Search::ReadMiddleFromFile(jfFileReader* infile) {
   if (!infile->lp.SIntVal(2, rindex)) {
       return infile->BuildError("Rating combo index invalid.");
   }
+  if (rindex >= ao3values::ratingMaker.Count()) rindex = 1000;
   // exclude flags
   if (!infile->lp.BoolVal(3, wx_violence)) {
       return infile->BuildError("Excl Violence flag invalid.");

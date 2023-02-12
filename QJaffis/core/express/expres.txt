@@ -18,6 +18,7 @@ Token Types:
 -Tokens To match            m
 -Search Title substring     t
 -Match Tokenized title      q
+-Match entire string	    z
 
 Pseudo operands
 ---------------

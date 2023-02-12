@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    HTML listbox for showing results
 Created:     April 26, 2011
 Conversion Started : August 27, 2013
-Updated:     July 31, 2016
+Updated:     February 11, 2023
 ******************************************************************************/
 #ifndef HTML_DISPLAY_H_INCLUDED
   #include "html_display.h"
@@ -38,7 +38,6 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
   // variables and constants
     const QString fname = " %%%% &&&& HtmlDelegate::paint";
     QStyleOptionViewItem optionV4 = option;
-    QString html_data;
     QTextDocument doc;
   // some initialization
     initStyleOption(&optionV4, index);
@@ -46,9 +45,9 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
     // setting the html document
     doc.setHtml(optionV4.text);
     int xwidth = optionV4.rect.width();
-    if (basewidth == xwidth) basewidth = xwidth;
+    if (basewidth != xwidth) basewidth = xwidth;
     doc.setTextWidth(xwidth);
-    /// Painting item without text
+    // Painting item without text
     optionV4.text = QString();
     style->drawControl(QStyle::CE_ItemViewItem, &optionV4, painter);
     QAbstractTextDocumentLayout::PaintContext ctx;
@@ -74,6 +73,7 @@ void HtmlDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, 
 //-----------------------------------------------------------------------------
 QSize HtmlDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
   const QString fname = " ^^^^ &&&& HtmlDelegate::sizeHint";
+
   // checking the width, option.rec.width is unreliable, but it might be all that we have
   int defwidth = (basewidth != 0)?(basewidth):(option.rect.width());
   // initial size cache check
@@ -83,8 +83,9 @@ QSize HtmlDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInd
     tpr->widd4 = 999999999;
     sc_ptr->insert(index.row(),tpr);
   }
-  // check to see if things are okay to use cache
-  if ((tpr->widd4) != defwidth) {
+  int cachewidth = tpr->widd4;
+  // check to see if the cache holds a proper entry
+  if (cachewidth != defwidth) {
     QStyleOptionViewItemV4 optionV4 = option;
     initStyleOption(&optionV4, index);
     QTextDocument doc;
@@ -256,7 +257,7 @@ jfHtmlListView::jfHtmlListView(QWidget * parent, size_t resindex):QListView(pare
   palettex.setColor(QPalette::Highlight,QColor::fromRgb(245,245,255));
   setPalette(palettex);
 
-  size_cache = new jfQSizeCache(1000);
+  size_cache = new jfQSizeCache(2000);
   htmlshow = new HtmlDelegate(size_cache,datastore);
   setItemDelegate(htmlshow);
   setContextMenuPolicy(Qt::CustomContextMenu);

@@ -3,7 +3,7 @@ Name    :   ao3_lookvals.h
 Author  :   John Q Metro
 Purpose :   Some constants and utility functions for making AO3 searches
 Created :   June 12, 2021
-Updated :   August 27, 2022
+Updated :   February 11, 2023
 ******************************************************************************/
 #ifndef AO3_LOOKVALS_H
     #define AO3_LOOKVALS_H
@@ -75,6 +75,7 @@ Updated :   August 27, 2022
         QString MakeQuery(const QString& specialCodes) const;
         QStringList GetPredefined() const;
         QString MakeUsingPredefined(size_t index) const;
+        size_t Count() const;
         virtual ~AO3RatingMake();
       protected:
         QMap<QChar,QString> code_lookup;

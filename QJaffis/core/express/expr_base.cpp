@@ -363,7 +363,7 @@ QString jfStrElem::String() const {
 //===========================================================================
 // the substring matching element
 // the constructor is below
-jfSubstringElem::jfSubstringElem(const QString& newpattern, bool newcs,bool istitle) {
+jfSubstringElem::jfSubstringElem(const QString& newpattern, bool newcs,bool istitle):jfStrElem() {
 	// loading the basics
   pattern = newpattern.trimmed();
   assert(!(pattern.isEmpty()));

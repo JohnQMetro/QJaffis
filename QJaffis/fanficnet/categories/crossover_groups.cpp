@@ -605,6 +605,12 @@ bool jfFFN_CrossoverSection::InsertGroupAtIndex(jfFFN_CrossoverGroup* in_group) 
     delete (index->second).grouplink;
     index->second.grouplink = NULL;
   }
+  // checking
+  size_t half_id = ((index->second).catlink)->GetID();
+  size_t new_id = (in_group->GetID());
+    if (half_id != new_id) {
+        /**/jfLogString("Arrgh!");
+    }
   // inserting
   (index->second).grouplink = in_group;
   return true;
@@ -1104,6 +1110,8 @@ bool jfFFN_CrossoverSection::ReadRestFromFile(jfFileReader* infile) {
       xres = cgroup->GetFromFile(infile);
       if (!xres) return false;
       // cheking if the names match (just in case)
+      /**/JDEBUGLOGS(funcname,tidx,ridx->first)
+      /**/JDEBUGLOGS(funcname,tidx,cgroup->GetCatName())
       if ((ridx->first)!=(cgroup->GetCatName())) {
         rname = "The names " + ridx->first + " and " + cgroup->GetCatName();
         rname += " are supposed to match!";
