@@ -3,7 +3,7 @@
  * Purpose:   a single function to make a fic parser
  * Author:    John Q Metro
  * Created:   July 10, 2016
- * Updated:   July 4, 2002
+ * Updated:   February 12, 2023
  *
  **************************************************************/
 #ifndef MAKEPARSER_H
@@ -134,11 +134,14 @@ QString jfFanficUpdateWrapParser::getCookie() const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfFanficUpdateWrapParser::SetFicType(jf_FICTYPE fictype) {
-    if (IsValidFictype(fictype) && (fictype != current_type)) {
-        current_type = fictype;
-        setupParserFor(fictype);
-        has_current_type = true;
-        return true;
+    if (IsValidFictype(fictype)) {
+        if ((has_current_type == false) || (fictype != current_type)) {
+            current_type = fictype;
+            setupParserFor(fictype);
+            has_current_type = true;
+            return true;
+        }
+        else return false;
     }
     else return false;
 }
