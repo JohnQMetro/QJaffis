@@ -4,7 +4,7 @@
 // Purpose :    Misc types and untils helpful in fanfiction.net updating
 // Created:     January 18, 2011
 // Conversion to Qt Started September 25, 2013
-// Updated:     August 8, 2016
+// Updated:     February 25, 2023
 /////////////////////////////////////////////////////////////////////////////
 #ifndef UPD_TYPES_H_INCLUDED
   #include "upd_types.h"
@@ -147,12 +147,12 @@ bool jfFFNItemAuthor::GetLinkTitle(jfStringParser& xparser, QString& outerr) {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // io methods. compatability only
 //-------------------------------------------
-bool jfFFNItemAuthor::AddMoreExtraStuff(QTextStream* outfile) const {
+bool jfFFNItemAuthor::AddCodaStuff(QTextStream* outfile) const {
   assert(false);
   return false;
 }
 //-------------------------------------------
-bool jfFFNItemAuthor::ReadMoreExtraStuff(jfFileReader* infile) {
+bool jfFFNItemAuthor::ReadCodaStuff(jfFileReader* infile) {
   assert(false);
   return false;
 }

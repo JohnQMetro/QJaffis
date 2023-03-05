@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net search, first panel
 // Created:     June 25, 2010
 // conversion to Qt started July 27, 2014
-// Updated:     February 8, 2018 (exclude genre built-in Fanfiction.Net filter)
+// Updated:     March 3, 2023 (new character list filter)
 //**************************************************************************
 #ifndef FFN_PANEL1
   #include "ffn_panel1.h"
@@ -27,6 +27,8 @@
 #ifndef MOREFILTERS1_H_INCLUDED
   #include "../../core/filters/extended/morefilters1.h"
 #endif
+
+#include "../../core/filters/extended/list_sexp.h"
 //-----------------------------
 #include <assert.h>
 //**************************************************************************
@@ -54,7 +56,7 @@ jfFFN_DFE::jfFFN_DFE(jfFFNSearch* inobj, QWidget* parent):jfDefaultFilterEditorB
   auth_fillabel = new QLabel("Author Filter :");
   char_fillabel = new QLabel("Character Filter :");
   auth_filedit = new jfSimpleExprEdit(false);
-  char_filedit = new jfSimpleExprEdit(false);
+  char_filedit = new jfListExprEdit(false);
   lsizer1 = new QGridLayout();
   lsizer1->addWidget(auth_fillabel,0,0,Qt::AlignRight);
   lsizer1->addWidget(auth_filedit,0,1);
@@ -104,7 +106,7 @@ bool jfFFN_DFE::SaveFiltersExtended() {
   jfSimpleExpr* exprval;
   jfFFNGenresFilter* tag_filter;
   jfAuthExprFilter* author_filter;
-  jfCharExprFilter* char_filter;
+  jfCharListExprFilter* char_filter;
   jfWordCountFilter* wc_filter;
   jfCompletedFilter* cm_filter;
   jfLanguageExprFilter* lang_filter;
@@ -124,12 +126,15 @@ bool jfFFN_DFE::SaveFiltersExtended() {
   author_filter = new jfAuthExprFilter(exprval);
   author_filter->SetName(DEF_ffnauthor_name);
   embedded_filters->ReplaceSame(author_filter,oindex);
+
   // the character filter
   exprval = char_filedit->CheckFilter(omsg);
   assert(exprval!=NULL);
-  char_filter = new jfCharExprFilter(exprval);
+  jfListMatchMode match_mode = char_filedit->GetMatchMode();
+  char_filter = new jfCharListExprFilter(match_mode,exprval);
   char_filter->SetName(DEF_ffnchars_name);
   embedded_filters->ReplaceSame(char_filter,oindex);
+
   // the word count filter
   wmin = wc_picker->GetMin();
   wmax = wc_picker->GetMax();
@@ -166,7 +171,7 @@ bool jfFFN_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   jfTagListing* listing;
   jfFFNGenresFilter* tag_filter;
   jfAuthExprFilter* author_filter;
-  jfCharExprFilter* char_filter;
+  jfCharListExprFilter* char_filter;
   jfWordCountFilter* wc_filter;
   jfCompletedFilter* cm_filter;
   jfLanguageExprFilter* lang_filter;
@@ -197,10 +202,11 @@ bool jfFFN_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   }
   /**/JDEBUGLOG(fname,5)
   // then, the character expression filter
-  char_filter = dynamic_cast<jfCharExprFilter*>(embedded_filters->GetItem(DEF_ffnchars_name));
+  char_filter = dynamic_cast<jfCharListExprFilter*>(embedded_filters->GetItem(DEF_ffnchars_name));
   if (char_filter!=NULL) {
-    atest = char_filedit->SetData(char_filter->ToString(),omsg);
+    atest = char_filedit->SetData(char_filter->GetExpression(),omsg);
     assert(atest);
+    char_filedit->SetMatchMode(char_filter->GetMatchMode());
   }
   /**/JDEBUGLOG(fname,6)
   // the word count filter

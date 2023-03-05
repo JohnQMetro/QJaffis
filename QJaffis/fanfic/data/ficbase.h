@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares fanfic objects that hold fanfic info
 Created :   April 2, 2012
 // Conversion to QT started : April 20, 2013
-Updated :   August 9, 2022
+Updated :   February 25, 2023
 // Renamed from ficobj2.h
 ******************************************************************************/
 #ifndef FICBASE_H
@@ -21,10 +21,14 @@ Updated :   August 9, 2022
   #include "../../ficdown/data/ficextract.h"
 #endif // FICEXTRACT_H_INCLUDED
 
+#include "../../core/filters/base/structpair.h"
+#include <QVector>
+
 #ifndef DISPLAYHTMLSPEC_H
     #include "displayhtmlspec.h"
 #endif // DISPLAYHTMLSPEC_
 //****************************************************************************
+/* A common base class for Fanfic Items (description) */
 class jfGenericFanfic : public jfBasePD {
   public:
     // default constructor
@@ -69,6 +73,7 @@ class jfGenericFanfic : public jfBasePD {
     QDate updated_date;
 };
 //==================================================================
+/* A base class for fanfic items that have some extras like characters, word counts, and completed state. */
 class jfGenericFanfic2 : public jfGenericFanfic {
   public:
     // default constructor
@@ -77,14 +82,38 @@ class jfGenericFanfic2 : public jfGenericFanfic {
     // getting values
     size_t GetWordcount() const;
     bool IsComplete() const;
+    const QStringList& GetCharacterList() const;
   protected:
     // extra methods
     void LoadMoreValues2(jfSkeletonParser* inparser) const;
+    void StoreToCopy2(jfGenericFanfic2* destination) const;
+    // file i/o output
+    virtual bool AddRestToFile(QTextStream* outfile) const;
+    virtual bool ReadRestFromFile(jfFileReader* infile);
+    virtual bool AddExtraStuff(QTextStream* outfile) const = 0;
+    virtual bool ReadExtraStuff(jfFileReader* infile) = 0;
     // internal data
     size_t word_count;
     bool completed;
+    QStringList characters;
 };
+// ================================================================
+// a mixin class for fanfic items that have pairing info
+class jfFanficPairsMixin {
+  public:
+    int RelationshipCount() const;
+    const QVector<const jfPairingStruct*>& GetRelationships() const;
+    QString RelationshipsAsDisplayString(bool rom_pipe) const;
+  protected:
+    QString RelationshipsAsStorageString() const;
+    void ClearPairingVector(QVector<const jfPairingStruct*>& target) const;
+    void RelationshipCopy(const jfFanficPairsMixin& source);
+    void LoadRelationships(jfSkeletonParser* inparser, bool rom_pipe) const;
+    bool SetRelationshipsFromString(const QString& source, bool display);
+    bool ParseAndAddPair(const QString& source, bool display);
 
+    QVector<const jfPairingStruct*> char_pairs;
+};
 //==================================================================
 class jfGenericFanfic3 : public jfGenericFanfic2 {
   public:
@@ -96,11 +125,14 @@ class jfGenericFanfic3 : public jfGenericFanfic2 {
     size_t GetAuthorID() const;
     void ChangeAuthorID(size_t newid);
   protected:
+    // extra methods
+    void LoadMoreValues3(jfSkeletonParser* inparser) const;
+    void StoreToCopy3(jfGenericFanfic3* destination) const;
     // file i/o output
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
-    virtual bool AddExtraStuff(QTextStream* outfile) const = 0;
-    virtual bool ReadExtraStuff(jfFileReader* infile) = 0;
+    virtual bool AddExtraStuff(QTextStream* outfile) const;
+    virtual bool ReadExtraStuff(jfFileReader* infile);
+    virtual bool AddMoreExtraStuff(QTextStream* outfile) const = 0;
+    virtual bool ReadMoreExtraStuff(jfFileReader* infile) = 0;
     // more data
     size_t author_id;
     QString genres;

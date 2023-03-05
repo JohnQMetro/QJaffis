@@ -259,6 +259,7 @@ jfDisplayHTMLHelper* HTMLHelpers::makeFFNItemHelper(int in_relative_modifier) {
     ffn_helper->MakeAndSetFont("description", "#010101", 1);
     ffn_helper->MakeAndSetFont("basicinfo", "gray", 1);
     ffn_helper->MakeAndSetFont("characters", "darkblue", 1);
+    ffn_helper->MakeAndSetFont("pairings", "olive", 0);
     ffn_helper->MakeAndSetFont("genres", "teal", 1);
 
     return ffn_helper;

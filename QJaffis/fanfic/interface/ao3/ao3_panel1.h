@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     July 17, 2022
+// Updated:     March 4, 2023
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
 #define AO3_PANEL1_H_INCLUDED
@@ -39,6 +39,8 @@
 #ifndef AO3_SPECIAL3_H
   #include "../../../interface/filters/ao3/ao3_special3.h"
 #endif // AO3_SPECIAL3_H
+
+#include "../../../interface/filters/extended/listexpr_edit.h"
 //**************************************************************************
 // default Archiveofourown.org filter names
 const QString DEF_ao3author_name = "Default Archiveofourown.org Author Filter";
@@ -62,7 +64,7 @@ class jfAO3_DFE : public jfDefaultFilterEditorBase {
     QLabel* auth_fillabel;
     QLabel* char_fillabel;
     jfSimpleExprEdit* auth_filedit;
-    jfSimpleExprEdit* char_filedit;
+    jfListExprEdit* char_filedit;
     jfZeroToMaxEditor* kc_picker;
     QLabel* taglabel;
     jfSimpleExprEdit* tag_filedit;

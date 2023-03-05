@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   A filter editor creator, and anything else that comes to mind
 Created :   December 27, 2010
 Conversion to Qt Started Oct 24, 2013
-Updated :   July 24, 2022
+Updated :   March 3, 2023
 ******************************************************************************/
 #ifndef FILTER_UTILS_H_INCLUDED
   #include "filter_utils.h"
@@ -26,6 +26,8 @@ Updated :   July 24, 2022
 #ifndef BFILT_EDIT_H_INCLUDED
   #include "bfilt_edit.h"
 #endif // BFILT_EDIT_H_INCLUDED
+
+#include "../../core/filters/base/structpair.h"
 
 #ifndef FILTERS_EDIT1_H_INCLUDED
   #include "extended/filters_edit1.h"
@@ -77,6 +79,8 @@ Updated :   July 24, 2022
   #include "../../core/filters/ffn/ffn_special1.h"
 #endif // FFN_SPECIAL1_H
 
+#include "../../core/filters/extended/list_sexp.h"
+
 
 #ifndef FIM2_FILEDIT_H
     #include "fim/fim2_filedit.h"
@@ -91,6 +95,9 @@ Updated :   July 24, 2022
 #ifndef AO3_LIST_PERCENT_FILTER_EDITOR_H
     #include "ao3/ao3_list_percent_filter_editor.h"
 #endif // AO3_LIST_PERCENT_FILTER_EDITOR_H
+
+#include "base/relpair_edit.h"
+#include "extended/listexpr_edit.h"
 
 //---------------------------------------------------
 #include <assert.h>
@@ -113,7 +120,7 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
   jfExpressionFilter*   a02;
 
   jfAuthExprFilter*     a03;
-  jfCharExprFilter*     a04;
+  jfCharListExprFilter*     a04;
   jfFFN_CategoryExprFilter* a05;
   jfWordCountFilter*    a06;
 
@@ -137,7 +144,7 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
   jfAO3FandomFilter*  a21;
   jfAO3RatingFilter*      a22;
   jfAO3OrientationFilter* a23;
-  jfAO3PairFilter*        a24;
+  jfStructuredPairFilter* a24;
   jfAO3WarnFilter*        a25;
   jfAO3KudoFilter*        a26;
   jfFFNFavsFilter*        a27;
@@ -169,9 +176,9 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
     a03 = dynamic_cast<jfAuthExprFilter*>(input_filter);
     result = new jfAuthorFilterEditor(containing_map,a03,parent);
   }
-  else if (in_typeid=="CharacterFilter") {
-    a04 = dynamic_cast<jfCharExprFilter*>(input_filter);
-    result = new jfCharFilterEditor(containing_map,a04,parent);
+  else if (in_typeid=="CharacterListFilter") {
+    a04 = dynamic_cast<jfCharListExprFilter*>(input_filter);
+    result = new jfCharacterListExprFilterEditor(containing_map,a04,parent);
   }
   else if (in_typeid=="CategoryFilter") {
     a05 = dynamic_cast<jfFFN_CategoryExprFilter*>(input_filter);
@@ -258,9 +265,9 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
     result = new jfAO3_OrientFilterEditor(containing_map,a23,parent);
       /**/JDEBUGLOG(fname,5)
   }
-  else if (in_typeid=="AO3PairFilter") {
-    a24 = dynamic_cast<jfAO3PairFilter*>(input_filter);
-    result = new jfAO3_PairingFilterEditor(a24,containing_map,parent);
+  else if (in_typeid=="StructuredPairFilter") {
+    a24 = dynamic_cast<jfStructuredPairFilter*>(input_filter);
+    result = new jfStr_PairingFilterEditor(a24,containing_map,parent);
   }
   else if (in_typeid=="AO3WarnFilter") {
     a25 = dynamic_cast<jfAO3WarnFilter*>(input_filter);

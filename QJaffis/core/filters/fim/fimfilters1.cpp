@@ -252,7 +252,7 @@ bool jfFIMCharacterFilter::CoreMatch(const jfBasePD* testelem) const {
   // we start
   assert(testelem!=NULL);
   rvalue = dynamic_cast<const jfFIM_Fanfic*>(testelem);
-  return MatchVsData(rvalue->GetCharacters());
+  return MatchVsData(rvalue->GetCharacterList().join(","));
 }
 //------------------------------------------------------
 bool jfFIMCharacterFilter::ModifyList(QStringList* templist) const {

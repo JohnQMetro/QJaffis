@@ -10,9 +10,6 @@ QT       += core gui network widgets concurrent
 TARGET = QJaffis
 TEMPLATE = app
 
-QMAKE_CXXFLAGS += -Wno-deprecated-copy
-
-
 SOURCES += main.cpp\
     core/filters/ao3/ao3_percent_tags_filter.cpp \
     core/tagfilter/base_tagfilters.cpp \

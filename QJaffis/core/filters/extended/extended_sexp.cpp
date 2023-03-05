@@ -4,7 +4,7 @@
 // Purpose :    Specializations of string expressions for particular strings
 // Created:     November 30, 2010
 // Conversion to Qt Started September 26, 2013
-// Updated:     July 8, 2016 (taken from sexp_filters.cpp)
+// Updated:     March 3, 2023 (removed character filter)
 //***************************************************************************
 #ifndef EXTENDED_SEXP_FILTER_H
   #include "extended_sexp.h"
@@ -59,56 +59,6 @@ bool jfAuthExprFilter::CoreMatch(const jfBasePD* testelem) const {
   assert(testelem!=NULL);
   typed_item = dynamic_cast<const jfGenericFanfic*>(testelem);
   datainfo = typed_item->GetAuthor();
-  return InternalMatch(datainfo);
-}
-
-//===========================================================================================
-// constructors
-//----------------------------------------------------------
-jfCharExprFilter::jfCharExprFilter():jfSimpleExpFilterCore() {}
-//----------------------------------------------------------
-jfCharExprFilter::jfCharExprFilter(const jfCharExprFilter& source) {
-  CoreCopy(source);
-}
-//----------------------------------------------------------
-jfCharExprFilter::jfCharExprFilter(jfSimpleExpr* in_source):jfSimpleExpFilterCore(in_source) {}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfCharExprFilter::GetTypeDescription() const {
-  return "The Character Expression Filter matches the character list against a boolean \
-expression, the elements of which are themselves to be matched. These elements \
-are either strings or substrings.";
-}
-//------------------------------------------------------------
-jfCharExprFilter* jfCharExprFilter::Copy() const {
-  return new jfCharExprFilter(*this);
-}
-//------------------------------------------------------------
-jfBaseFilter* jfCharExprFilter::GenCopy() const {
-  return Copy();
-}
-//------------------------------------------------------------
-QString jfCharExprFilter::GetTypeID() const {
-  return "CharacterFilter";
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// the core matching method
-bool jfCharExprFilter::CoreMatch(const jfBasePD* testelem) const {
-  QString datatype,datainfo;
-  const jfFFNItem* typed_item1;
-  const jfAO3Fanfic* typed_item2;
-  // checks and starts
-  assert(testelem!=NULL);
-  // two types
-  datatype = testelem->GetTypeID();
-  if (datatype=="FFNItem") {
-    typed_item1 = dynamic_cast<const jfFFNItem*>(testelem);
-    datainfo = typed_item1->GetCharacter();
-  }
-  else if (datatype=="AO3Fanfic") {
-    typed_item2 = dynamic_cast<const jfAO3Fanfic*>(testelem);
-    datainfo = typed_item2->GetCharacters();
-  }
-  else assert(false);
   return InternalMatch(datainfo);
 }
 

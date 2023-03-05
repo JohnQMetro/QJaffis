@@ -3,11 +3,14 @@ Name    :   ao3cat_parser.cpp
 Author  :   John Q Metro
 Purpose :   Parser for AO3 section pages to lists of categories/fandoms
 Created :   June 21, 2016
-Updated :   June 22, 2016
+Updated :   February 11, 2023
 ******************************************************************************/
 #ifndef AO3CAT_PARSER_H
   #include "ao3cat_parser.h"
 #endif // AO3CAT_PARSER_H
+#ifndef UTILS3_H_INCLUDED
+  #include "../../../core/utils/utils3.h"
+#endif
 //-----------------------------------
 #include <assert.h>
 /*****************************************************************************/
@@ -74,8 +77,8 @@ void* jfAO3CatParser::getResults() {
   return catsection;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString* jfAO3CatParser::makeRedirectedURL(const QString& inPart) const{
-  return NULL;
+QString* jfAO3CatParser::makeRedirectedURL(const QString& inPart) const {
+    return NULL;
 }
 //---------------------------
 QString jfAO3CatParser::getCookie() const { return ""; }

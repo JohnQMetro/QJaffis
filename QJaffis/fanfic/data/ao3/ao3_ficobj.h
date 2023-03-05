@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares fanfic object data of archoveofourown.org
 Created :   August 26, 2012
 Conversion to Qt Started September 28, 2013
-Updated :  August 26, 2022
+Updated :  February 21, 2023
 ******************************************************************************/
 #ifndef AO3_FICOBJ_H_INCLUDED
 #define AO3_FICOBJ_H_INCLUDED
@@ -23,7 +23,7 @@ Updated :  August 26, 2022
 #include <vector>
 #include <QLocale>
 //**************************************************************************
-class jfAO3Fanfic : public jfGenericFanfic2 {
+class jfAO3Fanfic : public jfGenericFanfic2, public jfFanficPairsMixin {
   public:
     // default constructors
     jfAO3Fanfic();
@@ -40,8 +40,6 @@ class jfAO3Fanfic : public jfGenericFanfic2 {
     bool TestWarntag(QChar inval) const;
     int GetEstPCount() const;
     size_t GetKudos() const;
-    QString GetRelationships() const;
-    QString GetCharacters() const;
     const QStringList& GetExtraTags() const;
     QString GetJoinedExtraTags() const;
     bool InSeries() const;
@@ -61,6 +59,7 @@ class jfAO3Fanfic : public jfGenericFanfic2 {
     // added stuff
     virtual bool LoadValues(jfSkeletonParser* inparser) const;
     virtual void ProcessDescription();
+    virtual ~jfAO3Fanfic();
   protected:
     // internal to string helper methods
     QString RatingToString() const;
@@ -75,10 +74,10 @@ class jfAO3Fanfic : public jfGenericFanfic2 {
     virtual jfFicExtract* MakeExtract() const;
     virtual void LoadIntoExtract(jfFicExtract* into) const;
     // file i/o output
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
     virtual bool AddExtraStuff(QTextStream* outfile) const;
     virtual bool ReadExtraStuff(jfFileReader* infile);
+    bool AddMoreExtraStuff(QTextStream* outfile) const;
+    bool ReadMoreExtraStuff(jfFileReader* infile);
 
     // more data
     QChar rating, warn;
@@ -86,7 +85,6 @@ class jfAO3Fanfic : public jfGenericFanfic2 {
     QString orientations;
     int eccount;
     size_t kudcount;
-    QString relationships, characters;
     QStringList extratags;
     // categories
     std::vector<const jfAO3_Category*> cats;

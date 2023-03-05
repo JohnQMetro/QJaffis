@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines fanfic object data of archoveofourown.org
 Created :   August 26, 2012
 Conversion to Qt Started September 28, 2013
-Updated :   August 31, 2022
+Updated :   February 25, 2023
 ******************************************************************************/
 #ifndef AO3_FICOBJ_H_INCLUDED
   #include "ao3_ficobj.h"
@@ -51,8 +51,6 @@ jfAO3Fanfic::jfAO3Fanfic(const jfAO3Fanfic& src):jfGenericFanfic2(src) {
   eccount = src.eccount;
   kudcount = src.kudcount;
   warntags = src.warntags;
-  relationships = src.relationships;
-  characters = src.characters;
   extratags = src.extratags;
   // categories and series
   series_index = src.series_index;
@@ -60,6 +58,7 @@ jfAO3Fanfic::jfAO3Fanfic(const jfAO3Fanfic& src):jfGenericFanfic2(src) {
   series_url = src.series_url;
   cats.assign(src.cats.begin(),src.cats.end());
   x_parser = NULL;
+  RelationshipCopy(src);
   english_locale = QLocale(QLocale::English, QLocale::UnitedStates);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -87,7 +86,10 @@ bool jfAO3Fanfic::SetFromString(QString inval, const jfAO3_Category* incat, QStr
     parse_err = parser_error;
     JDEBUGLOGS(fxname,1, parse_err)
   }
-  else delete x_parser;
+  else {
+      delete x_parser;
+      x_parser = NULL;
+  }
   validdata = success;
   return success;
 }
@@ -114,10 +116,6 @@ bool jfAO3Fanfic::TestWarntag(QChar inval) const {
 int jfAO3Fanfic::GetEstPCount() const { return eccount; }
 //----------------------------
 size_t jfAO3Fanfic::GetKudos() const { return kudcount; }
-//----------------------------
-QString jfAO3Fanfic::GetRelationships() const { return relationships; }
-//----------------------------
-QString jfAO3Fanfic::GetCharacters() const { return characters; }
 //----------------------------
 const QStringList& jfAO3Fanfic::GetExtraTags() const { return extratags; }
 //----------------------------
@@ -189,11 +187,11 @@ QString jfAO3Fanfic::ToText() const {
   // final info,
   result += "Warnings: " + WarnToString();
   if (!characters.isEmpty()) {
-    result += " - Characters: " + characters + "\n";
+    result += " - Characters: " + characters.join(", ") + "\n";
   }
   // character data
-  if (!relationships.isEmpty()) {
-    result += "Pairings: " + relationships;
+  if (RelationshipCount() > 0) {
+    result += "Pairings: " + RelationshipsAsDisplayString(false);
   }
   // tags
   if (!extratags.isEmpty()) {
@@ -249,8 +247,8 @@ QString jfAO3Fanfic::ToDisplayHTML() const {
 
   // final info
   optline = helper->ConditionalWrapText("warnings",false,"Warnings: ", true, WarnToString());
-  optline += helper->ConditionalWrapText("characters", !optline.isEmpty(), "Characters: ", true, characters);
-  optline += helper->ConditionalWrapText("pairings", !optline.isEmpty(), "Pairings: ", true, relationships);
+  optline += helper->ConditionalWrapText("characters", !optline.isEmpty(), "Characters: ", true, characters.join(", "));
+  optline += helper->ConditionalWrapText("pairings", !optline.isEmpty(), "Pairings: ", true, RelationshipsAsDisplayString(false));
   if (!optline.isEmpty()) result += optline + "<br>\n";
 
   // extra tags
@@ -271,6 +269,7 @@ bool jfAO3Fanfic::LoadValues(jfSkeletonParser* inparser) const {
   LoadCoreValues(inparser);
   LoadMoreValues1(inparser);
   LoadMoreValues2(inparser);
+  LoadRelationships(inparser, false);
   // rating
   inparser->AddText("ITEMF_RATING",RatingToString());
   // orientation
@@ -280,8 +279,6 @@ bool jfAO3Fanfic::LoadValues(jfSkeletonParser* inparser) const {
   // kudos
   inparser->AddUInt("ITEMF_KUDOS",kudcount);
   // the strings
-  inparser->AddText("ITEMF_CHARACTERS",characters);
-  inparser->AddText("ITEMF_RELATIONSHIPS",relationships);
   inparser->AddText("ITEMF_EXTRATAGS",GetJoinedExtraTags());
   inparser->AddText("ITEMF_FANDOMS",GetFandoms());
   // series stuff
@@ -307,6 +304,12 @@ void jfAO3Fanfic::ProcessDescription() {
 
     description = description.simplified();
   }
+}
+// ---------------------------------------------
+jfAO3Fanfic::~jfAO3Fanfic() {
+    ClearPairingVector(char_pairs);
+    if (x_parser != NULL) delete x_parser;
+    cats.clear();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // internal to string helper methods
@@ -507,21 +510,18 @@ bool jfAO3Fanfic::ParseTags() {
       else extrawarn = buffer2.trimmed();
     }
     else if (buffer1=="characters") {
-      if (!characters.isEmpty()) characters += ", ";
-      characters += buffer2;
+        characters.append(buffer2);
     }
     else if (buffer1=="relationships") {
-      if (!relationships.isEmpty()) relationships += ", ";
-      relationships += buffer2;
-
+        if (! ParseAndAddPair(buffer2, true)) {
+            // TODO: log
+        }
     }
     else if (buffer1=="freeforms") {
         extratags.append(buffer2.trimmed());
     }
     else return parseError("Unrecognized Tag Type! (" + buffer1 + ")");
   }
-  characters = characters.trimmed();
-  relationships = relationships.trimmed();
   if (!extrawarn.isEmpty()) {
     if (!extratags.isEmpty()) extratags += ", ";
     extratags += extrawarn;
@@ -626,62 +626,48 @@ void jfAO3Fanfic::LoadIntoExtract(jfFicExtract* into) const {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // file i/o output
 //----------------------------
-bool jfAO3Fanfic::AddRestToFile(QTextStream* outfile) const {
+bool jfAO3Fanfic::AddExtraStuff(QTextStream* outfile) const {
   // local variables
   jfOutString xresult;
   QStringList* cfinders;
   size_t chloop;
   // checking and special conditions
   if (outfile==NULL) return false;
-  // preparing line 4
-  xresult << author_name << author_url;
-  (*outfile) << xresult << "\n";
-  xresult.FullClear();
-  // doing line 5
-  xresult << part_count << updated_date << word_count << completed;
-  (*outfile) << xresult << "\n";
-  xresult.FullClear();
-  // long line 6
+
+  // long line 7
   xresult << series_index << series_name << series_url;
   (*outfile) << xresult << "\n";
   xresult.FullClear();
-  // chapter finders (line 7)
+
+  // chapter finders (line 8)
   cfinders = new QStringList();
   for (chloop=0;chloop<cats.size();chloop++) {
     cfinders->append(cats[chloop]->GetCombo());
   }
   xresult << StrArrToList(cfinders,',');
   (*outfile) << xresult << "\n";
+
   // done
   return AddExtraStuff(outfile);
 }
 //----------------------------
-bool jfAO3Fanfic::ReadRestFromFile(jfFileReader* infile) {
+bool jfAO3Fanfic::ReadExtraStuff(jfFileReader* infile) {
   // constants and variables
   const QString funcname = "jfAO3Fanfic::ReadRestFromFile";
   QString buffer;
   QStringList* clist;
   size_t cloop;
   const jfGeneralCategory* temp;
-  // the line with characters
+
   assert(infile!=NULL);
-  // reading line 4
-  if (!infile->ReadParseLine(2,funcname)) return false;
-  author_name = infile->lp.UnEscStr(0);
-  author_url = infile->lp.UnEscStr(1);
-  if (author_url.isEmpty()) infile->BuildError("The author link is empty!");
-  // reading line 5
-  if (!infile->ReadParseLine(4,funcname)) return false;
-  if (!infile->lp.SIntVal(0,part_count)) return infile->BuildError("The part count is invalid!");
-  if (!infile->lp.DateVal(1,updated_date)) return infile->BuildError("Unable to convert the Updated Date field properly!");
-  if (!infile->lp.SIntVal(2,word_count)) return infile->BuildError("The word count is not valid!");
-  if (!infile->lp.BoolVal(3,completed)) return infile->BuildError("The completed flag is not a boolean!");
-  // reading line 6
+
+  // reading line 7
   if (!infile->ReadParseLine(3,funcname)) return false;
   if (!infile->lp.SIntVal(0,series_index)) return infile->BuildError("The series index is wrong!");
   series_name = infile->lp.UnEscStr(1);
   series_url = infile->lp.UnEscStr(2);
-  // getting chapters
+
+  // getting chapters (line 8)
   if (!infile->ReadUnEsc(buffer,funcname)) return infile->BuildError("Category list not found!");
   clist = ListToStrArr(buffer,',');
   // first error handling
@@ -699,25 +685,20 @@ bool jfAO3Fanfic::ReadRestFromFile(jfFileReader* infile) {
   // cheking the results
   delete clist;
   if (temp==NULL) return infile->BuildError("Unknown category!");
+
   // finally
   return ReadExtraStuff(infile);
 }
 //----------------------------
-bool jfAO3Fanfic::AddExtraStuff(QTextStream* outfile) const {
+bool jfAO3Fanfic::AddMoreExtraStuff(QTextStream* outfile) const {
   // local variables
   jfOutString xresult;
   // checking and special conditions
   if (outfile==NULL) return false;
-  // preparing line 8
+  // line 9 will be relationships
+  (*outfile) << RelationshipsAsStorageString() << "\n";
+  // preparing line 10
   xresult << rating << orientations << warn << warntags << eccount << kudcount;
-  (*outfile) << xresult << "\n";
-  xresult.FullClear();
-  // doing line 9
-  xresult << characters;
-  (*outfile) << xresult << "\n";
-  xresult.FullClear();
-  // doing line 10
-  xresult << relationships;
   (*outfile) << xresult << "\n";
   xresult.FullClear();
   // doing line 11
@@ -728,14 +709,19 @@ bool jfAO3Fanfic::AddExtraStuff(QTextStream* outfile) const {
   return true;
 }
 //----------------------------
-bool jfAO3Fanfic::ReadExtraStuff(jfFileReader* infile) {
+bool jfAO3Fanfic::ReadMoreExtraStuff(jfFileReader* infile) {
     // constants and variables
   const QString funcname = "jfAO3Fanfic::ReadExtraStuff";
   QString buffer;
   QRegExp qcheck = QRegExp("[^" + ao3con::warn2_ac + "]");
   // the line with characters
   assert(infile!=NULL);
-  // reading line 8
+
+  // line 9 is relationships
+  if (!infile->ReadLine(buffer, funcname)) return false;
+  if (!SetRelationshipsFromString(buffer, false)) return infile->BuildError("Could not parse relationships!");
+
+  // reading line 10
   if (!infile->ReadParseLine(6,funcname)) return false;
   // testing special chars
   if (!infile->lp.CharVal(0,rating,ao3con::rating_ac)) return infile->BuildError("Rating is invalid!");
@@ -747,9 +733,8 @@ bool jfAO3Fanfic::ReadExtraStuff(jfFileReader* infile) {
   }
   if (!infile->lp.IIntVal(4,eccount)) return infile->BuildError("Estimated chaper count is not a number!");
   if (!infile->lp.SIntVal(5,kudcount)) return infile->BuildError("The amount of kudos is invalid!");
-  // lines 9, 10, 11
-  if (!infile->ReadUnEsc(characters)) return infile->BuildError("Could not get characters!");
-  if (!infile->ReadUnEsc(relationships)) return infile->BuildError("Could not get pairings!");
+
+  // line 11
   QString joined_extra_tags;
   if (!infile->ReadUnEsc(joined_extra_tags)) return infile->BuildError("Could not get tags!");
   extratags = joined_extra_tags.split(',');

@@ -4,7 +4,7 @@ Basic   : Defines some utility functions and things used in the other files
 Author  : John Q Metro
 Started : March 17, 2009
 Conversion to QT started : February 21, 2013
-Updated : August 17, 2014
+Updated : February 18, 2023
 Notes   :
 
 ******************************************************************************/
@@ -274,6 +274,45 @@ QStringList *ListToStrArr(const QString& source, QChar ichar, bool trims) {
   }
   return result;
 }
+// =========================================================================
+QStringList SplitTrim(const QString& source, const QString& delimiter) {
+    QStringList res1 = source.split(delimiter);
+    QStringList res2 = QStringList();
+    for (QString part : res1) {
+        QString part2 = part.trimmed();
+        if (part2.isEmpty() == false) res2.append(part2);
+    }
+    return res2;
+}
+// ----------------------------------------------
+QStringList SplitTrim(const QString& source, const QChar& delimiter) {
+    QStringList res1 = source.split(delimiter);
+    QStringList res2 = QStringList();
+    for (QString part : res1) {
+        QString part2 = part.trimmed();
+        if (part2.isEmpty() == false) res2.append(part2);
+    }
+    return res2;
+}
+// ---------------------------------------------
+QRegularExpression makeNewlineExpression() {
+    // flexible regexp for newlines. Please note that due to compiler limitations,
+    // Unicode literals cannot be used
+    QString xo = "\\n|\\r\\n|\\r|\\n\\r|";
+    xo += QString(QChar(0x2028)) + "|" + QChar(0x2029) + "|" + QChar(0x0085);
+    return std::move(QRegularExpression(xo));
+}
+// ----------------------------------------------
+QStringList SplitTrimNL(const QString& source) {
+    QStringList res1 = source.split(makeNewlineExpression());
+    QStringList res2 = QStringList();
+    for (QString part : res1) {
+        QString part2 = part.trimmed();
+        if (part2.isEmpty() == false) res2.append(part2);
+    }
+    return res2;
+}
+
 //===========================================================================
 // splits a string at the location, not including that location
 bool SplitString(const QString& input, size_t point, QString& out1, QString& out2) {

@@ -28,20 +28,12 @@ jfStringParser::jfStringParser() {
   mainindex = 0;
   oldindex = 0;
   casesen = Qt::CaseInsensitive;
-  // flexible regexp for newlines. Please note that due to compiler limitations,
-  // Unicode literals cannot be used
-  QString xo = "\\n|\\r\\n|\\r|\\n\\r|";
-  xo += QString(QChar(0x2028)) + "|" + QChar(0x2029) + "|" + QChar(0x0085);
-  xendl = QRegularExpression(xo);
+  xendl = makeNewlineExpression();
 }
 //--------------------------------------------------------------------------
 jfStringParser::jfStringParser(QString indata, bool incasesen) {
   ChangeData(indata,incasesen);
-  // flexible regexp for newlines. Please note that due to compiler limitations,
-  // Unicode literals cannot be used
-  QString xo = "\\n|\\r\\n|\\r|\\n\\r|";
-  xo += QString(QChar(0x2028)) + "|" + QChar(0x2029) + "|" + QChar(0x0085);
-  xendl = QRegularExpression(xo);
+  xendl = makeNewlineExpression();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // change indata

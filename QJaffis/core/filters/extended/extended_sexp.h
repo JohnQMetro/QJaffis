@@ -4,7 +4,7 @@
 // Purpose :    Specializations of string expressions for particular strings
 // Created:     November 30, 2010
 // Conversion to Qt Started September 26, 2013
-// Updated:     July 8, 2016 (taken from sexp_filters.h)
+// Updated:     March 3, 2023 (removed character filter)
 //***************************************************************************
 #ifndef EXTENDED_SEXP_FILTER_H
   #define EXTENDED_SEXP_FILTER_H
@@ -23,22 +23,6 @@ class jfAuthExprFilter : public jfSimpleExpFilterCore {
     jfAuthExprFilter(jfSimpleExpr* in_source);
     virtual QString GetTypeDescription() const;
     virtual jfAuthExprFilter* Copy() const;
-    virtual jfBaseFilter* GenCopy() const;
-    virtual QString GetTypeID() const;
-  protected:
-    // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
-};
-
-//===========================================================================
-// a simple expression filter that matches against author data
-class jfCharExprFilter : public jfSimpleExpFilterCore {
-  public:
-    jfCharExprFilter();
-    jfCharExprFilter(const jfCharExprFilter& source);
-    jfCharExprFilter(jfSimpleExpr* in_source);
-    virtual QString GetTypeDescription() const;
-    virtual jfCharExprFilter* Copy() const;
     virtual jfBaseFilter* GenCopy() const;
     virtual QString GetTypeID() const;
   protected:

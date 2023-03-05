@@ -43,11 +43,21 @@ bool jfFFN_FicPartParser::testMissing(const QString *page) const {
   // checking
   assert(page!=NULL);
   bool rval = page->contains(mstring_pfx);
-  if (!rval) return true;
-  if (page->contains(mstring1)) return false;
-  if (page->contains(mstring2)) return false;
-  if (page->contains(mstring3)) return false;
-  if (page->contains(mstring4)) return false;
+  if (!rval) {
+      return true;
+  }
+  if (page->contains(mstring1)) {
+      return false;
+  }
+  if (page->contains(mstring2)){
+      return false;
+  }
+  if (page->contains(mstring3)) {
+      return false;
+  }
+  if (page->contains(mstring4)) {
+      return false;
+  }
   return true;
 }
 //--------------------------------------

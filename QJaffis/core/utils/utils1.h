@@ -4,7 +4,7 @@ Basic   : Defclares some utility functions and things used in the other files
 Author  : John Q Metro
 Started : March 17, 2009
 Conversion to QT started : February 21, 2013
-Updated : July 11, 2016
+Updated : February 25, 2023
 Notes   : mostly taken from the earlier jaffis_utils.h and jaffis_utils2.h
 
 ******************************************************************************/
@@ -15,6 +15,7 @@ Notes   : mostly taken from the earlier jaffis_utils.h and jaffis_utils2.h
 #include <QString>
 #include <QtGlobal>
 #include <QStringList>
+#include <QRegularExpression>
 //*****************************************************************************
 // constants
 extern const QString EXPR_DELIMS;
@@ -62,6 +63,12 @@ QString StrArrToList(QStringList *source, QChar ichar);
 //------------------------------------------------------------------------
 // converts a delimited list into a QStringList
 QStringList *ListToStrArr(const QString& source, QChar ichar, bool trims = true);
+// -----------------------------------------------------------------------
+// splits the string, trims the parts, and discards empty parts
+QStringList SplitTrim(const QString& source, const QString& delimiter);
+QStringList SplitTrim(const QString& source, const QChar& delimiter);
+QRegularExpression makeNewlineExpression();
+QStringList SplitTrimNL(const QString& source);
 //------------------------------------------------------------------------
 // splits a string at the location, not including that location
 bool SplitString(const QString& input, size_t point, QString& out1, QString& out2);

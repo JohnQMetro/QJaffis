@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares some interface panels for some AO3 Filters
 Created :   October 6, 2012
 Conversion to Qt Started October 19, 2013
-Updated :   September 9, 2020
+Updated :   February 25, 2023
 ******************************************************************************/
 #ifndef AO3_SPECIAL2_H_INCLUDED
 #define AO3_SPECIAL2_H_INCLUDED
@@ -23,47 +23,6 @@ Updated :   September 9, 2020
   #include "../../controls/charo_editor.h"
 #endif // CHARO_EDITOR_H_INCLUDED
 /*****************************************************************************/
-class jfAO3PairingPanel : public QWidget {
-  public:
-    // constructor
-    jfAO3PairingPanel(bool orient, QWidget* parent = NULL);
-    // i/o
-    bool SetFromString(const QString& inval);
-    void SetAlternateCheck(bool cval);
-    void SetReaderCheck(bool cval);
-    void SetOriginalCheck(bool cval);
-    QString GetStringValue() const;
-    bool GetAlternateCheck() const;
-    bool GetReaderCheck() const;
-    bool GetOriginalCheck() const;
-    // filter based i/o
-    jfAO3PairFilter* GetFilter() const;
-    bool StoreToFilter(jfAO3PairFilter* outval);
-    bool LoadFromFilter(const jfAO3PairFilter* inval);
-  protected:
-    // GUI data
-    QCheckBox* altbox;
-    QCheckBox* readerbox;
-    QCheckBox* originalbox;
-    jfLabeledEdit* pairlistbox;
-    QVBoxLayout* bsizer;
-    // non gui data
-    size_t omode;
-};
-//=============================================================
-// ao3 ratings filter editor
-class jfAO3_PairingFilterEditor : public jfBaseFilterEditor {
-  public:
-    // the default constructor
-    jfAO3_PairingFilterEditor(const jfBaseFilter* infilt, const jfFilterMap* infmap, QWidget* parent = NULL);
-    // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    virtual bool GeneralCheck() const;
-  protected:
-    jfAO3PairingPanel* insert_panel;
-};
-//====================================================================
 // ao3 ratings filter editor
 class jfAO3_WarnFilterEditor : public jfBaseFilterEditor {
   public:

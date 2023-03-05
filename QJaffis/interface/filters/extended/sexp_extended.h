@@ -3,7 +3,7 @@ Name    :   sexp_extended.h
 Author  :   John Q Metro
 Purpose :   Extended simple expression filter editors
 Created :   July 8, 2016 (split from sfilt_edit.h)
-Updated :   July 8, 2016
+Updated :   March 3, 2023
 ******************************************************************************/
 #ifndef SEXP_EXTENDED_H_INCLUDED
 #define SEXP_EXTENDED_H_INCLUDED
@@ -21,16 +21,6 @@ class jfAuthorFilterEditor : public jfSimpleSFilterEditor {
   public:
     // the default constructor
     jfAuthorFilterEditor(const jfFilterMap* infmap, const jfAuthExprFilter* infilt, QWidget* parent = NULL);
-  protected:
-    // internal methods
-    virtual jfSimpleExpFilterCore* MakeTypedFilter(jfSimpleExpr* inpval);
-};
-//================================================================================
-/* a wrapper for jfSimpleExprEdit that is for an character filter */
-class jfCharFilterEditor : public jfSimpleSFilterEditor {
-  public:
-    // the default constructor
-    jfCharFilterEditor(const jfFilterMap* infmap, const jfCharExprFilter* infilt, QWidget* parent = NULL);
   protected:
     // internal methods
     virtual jfSimpleExpFilterCore* MakeTypedFilter(jfSimpleExpr* inpval);

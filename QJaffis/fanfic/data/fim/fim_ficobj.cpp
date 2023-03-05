@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Fanfic object for fimfiction.net
 Created :   May 8, 2012
 Conversion to QT started : April 20, 2013
-Updated :   September 7, 2022
+Updated :   February 22, 2023
 ******************************************************************************/
 #ifndef FIM_FICOBJ_H_INCLUDED
   #include "fim_ficobj.h"
@@ -34,7 +34,7 @@ jfFIM_Fanfic::jfFIM_Fanfic():jfGenericFanfic3() {
 }
 //----------------------------------------------
 jfFIM_Fanfic::jfFIM_Fanfic(const jfFIM_Fanfic& src):jfGenericFanfic3(src) {
-  characters = src.characters;
+
   thumbsup = src.thumbsup;
   thumbsdown = src.thumbsdown;
   rating = src.rating;
@@ -340,9 +340,6 @@ void jfFIM_Fanfic::SetCompactSummary(const QString& insum) {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // getting data
-QString jfFIM_Fanfic::GetCharacters() const {
-  return characters;
-}
 //-----------------------------------------------------------------------
 QString jfFIM_Fanfic::GetContentTypes() const {
     return content_types;
@@ -415,7 +412,7 @@ QString jfFIM_Fanfic::ToText() const {
   if (hasChar || completed) result += "\n";
   // character data
   if (hasChar) {
-    result += "Characters Specified: " + characters;
+    result += "Characters Specified: " + characters.join(", ");
   }
   if (completed) {
       if (hasChar) result += " - ";
@@ -474,7 +471,7 @@ QString jfFIM_Fanfic::ToDisplayHTML() const {
 
   result += "<br>\n";
   // characters
-  result += helper->ConditionalWrapText("characters", false, "Characters: ", true, characters, false);
+  result += helper->ConditionalWrapText("characters", false, "Characters: ", true, characters.join(", "), false);
 
   // finishing off
   result += "</div></td></tr>\n</table>";
@@ -488,11 +485,9 @@ bool jfFIM_Fanfic::LoadValues(jfSkeletonParser* inparser) const {
   LoadCoreValues(inparser);
   LoadMoreValues1(inparser);
   LoadMoreValues2(inparser);
-  inparser->AddText("ITEMF_GENRES",genres);
-  inparser->AddText("ITEMF_CHARDATA",characters);
+  LoadMoreValues3(inparser);
   inparser->AddText("ITEMF_CONTENTTYPES",content_types);
   inparser->AddText("ITEMF_WARNINGS",warnings);
-  inparser->AddUInt("ITEMF_AUTHORID",author_id);
   inparser->AddText("ITEMF_RATING",rating);
   inparser->AddBool("THUMBS_DISABLED",(thumbsup < 0));
   inparser->AddUInt("THUMBSUP",(thumbsup< 0)?0:thumbsup);
@@ -599,16 +594,14 @@ jfFicExtract_FIM* jfFIM_Fanfic::ExtractError(QString& perror,const QString& mess
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // file i/o output
 //--------------------------------
-bool jfFIM_Fanfic::AddExtraStuff(QTextStream* outfile) const {
+bool jfFIM_Fanfic::AddMoreExtraStuff(QTextStream* outfile) const {
   // local variables
   QString result;
   jfOutString xresult;
   // checking and special conditions
   if (outfile==NULL) return false;
-  // preparing next line, characters
-  xresult << characters;
-  (*outfile) << xresult << "\n";
-  xresult.FullClear();
+
+  // next line (line 8)
   // content type and warnings
   xresult << content_types << warnings;
   (*outfile) << xresult << "\n";
@@ -624,12 +617,9 @@ bool jfFIM_Fanfic::AddExtraStuff(QTextStream* outfile) const {
   return true;
 }
 //--------------------------------
-bool jfFIM_Fanfic::ReadExtraStuff(jfFileReader* infile) {
+bool jfFIM_Fanfic::ReadMoreExtraStuff(jfFileReader* infile) {
   const QString funcname = "jfFIM_Fanfic::ReadExtraStuff";
-  // the line with characters
-  assert(infile!=NULL);
-  if (!infile->ReadUnEsc(characters,funcname)) return false;
-  // content type and warnings
+  // content type and warnings (line 8)
   if (!infile->ReadParseLine(2,funcname)) return false;
   content_types = (infile->lp).UnEscStr(0);
   warnings = (infile->lp).UnEscStr(1);

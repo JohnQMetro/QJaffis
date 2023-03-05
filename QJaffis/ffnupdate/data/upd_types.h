@@ -4,7 +4,7 @@
 // Purpose :    Misc types and untils helpful in fanfiction.net updating
 // Created:     January 18, 2011
 // Conversion to Qt Started September 25, 2013
-// Updated:     August 8, 2016
+// Updated:     February 25, 2023
 /////////////////////////////////////////////////////////////////////////////
 #ifndef UPD_TYPES_H_INCLUDED
 #define UPD_TYPES_H_INCLUDED
@@ -45,8 +45,8 @@ class jfFFNItemAuthor : public jfFFNItemCore {
   protected:
     virtual bool GetLinkTitle(jfStringParser& xparser, QString& outerr);
     // io methods
-    virtual bool AddMoreExtraStuff(QTextStream* outfile) const;
-    virtual bool ReadMoreExtraStuff(jfFileReader* infile);
+    virtual bool AddCodaStuff(QTextStream* outfile) const;
+    virtual bool ReadCodaStuff(jfFileReader* infile);
     // since we do not use category links, we do check the category name
     QString catname;
 };

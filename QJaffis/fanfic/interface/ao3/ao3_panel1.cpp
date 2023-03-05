@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     July 16, 2022
+// Updated:     March 4, 2023
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
   #include "ao3_panel1.h"
@@ -49,7 +49,7 @@ jfAO3_DFE::jfAO3_DFE(jfAO3Search* inobj, QWidget* parent):jfDefaultFilterEditorB
     auth_fillabel = new QLabel("Author Filter :");
     char_fillabel = new QLabel("Character Filter :");
     auth_filedit = new jfSimpleExprEdit(false);
-    char_filedit = new jfSimpleExprEdit(false);
+    char_filedit = new jfListExprEdit(false);
 
     lsizer3->addSpacing(8);
     lsizer3->addWidget(auth_fillabel,0,Qt::AlignLeft);
@@ -94,7 +94,7 @@ bool jfAO3_DFE::SaveFiltersExtended() {
   QString omsg;
   jfSimpleExpr* exprval;
   jfAuthExprFilter* author_filter;
-  jfCharExprFilter* char_filter;
+  jfCharListExprFilter* char_filter;
   jfExtraTagFilter* et_filter;
   jfAO3KudoFilter* kc_filter;
   size_t wmin, wmax;
@@ -104,10 +104,12 @@ bool jfAO3_DFE::SaveFiltersExtended() {
   author_filter = new jfAuthExprFilter(exprval);
   author_filter->SetName(DEF_ao3author_name);
   embedded_filters->ReplaceSame(author_filter,oindex);
+
   // the character filter
   exprval = char_filedit->CheckFilter(omsg);
   assert(exprval!=NULL);
-  char_filter = new jfCharExprFilter(exprval);
+  jfListMatchMode match_mode = char_filedit->GetMatchMode();
+  char_filter = new jfCharListExprFilter(match_mode, exprval);
   char_filter->SetName(DEF_ao3chars_name);
   embedded_filters->ReplaceSame(char_filter,oindex);
 
@@ -133,7 +135,7 @@ bool jfAO3_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   // local variables
   QString omsg;
   jfAuthExprFilter* author_filter;
-  jfCharExprFilter* char_filter;
+  jfCharListExprFilter* char_filter;
 
   jfExtraTagFilter* et_filter;
   jfAO3KudoFilter* kc_filter;
@@ -147,10 +149,12 @@ bool jfAO3_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
     assert(atest);
   }
   // then, the character expression filter
-  char_filter = dynamic_cast<jfCharExprFilter*>(embedded_filters->GetItem(DEF_ao3chars_name));
+  char_filter = dynamic_cast<jfCharListExprFilter*>(embedded_filters->GetItem(DEF_ao3chars_name));
   if (char_filter!=NULL) {
-    atest = char_filedit->SetData(char_filter->ToString(),omsg);
+    jfListMatchMode match_mode = char_filter->GetMatchMode();
+    atest = char_filedit->SetData(char_filter->GetExpression(),omsg);
     assert(atest);
+    char_filedit->SetMatchMode(match_mode);
   }
 
   // the kudo count filter

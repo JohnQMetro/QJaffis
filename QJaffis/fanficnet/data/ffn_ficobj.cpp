@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net item object
 // Created:     May 25, 2010
 // Conversion to Qt Started September 25, 2013
-// Updated:     June 25, 2022
+// Updated:     February 25, 2023
 /////////////////////////////////////////////////////////////////////////////
 #ifndef JFFNFICOBJ
   #include "ffn_ficobj.h"
@@ -21,6 +21,9 @@
 #ifndef LOGGING_H_INCLUDED
   #include "../../core/utils/logging.h"
 #endif // LOGGING_H_INCLUDED
+#ifndef HTMLPARSE_H_INCLUDED
+  #include "../../core/utils/htmlparse.h"
+#endif // HTMLPARSE_H_INCLUDED
 /*
 #ifndef UPD_TYPES_H_INCLUDED
   #include "../../ffnupdate/data/upd_types.h"
@@ -34,6 +37,15 @@
 jfFFNItemCore::jfFFNItemCore():jfGenericFanfic3() {
   favs = 0;
   isupdated = false;
+}
+// ----------------------------
+jfFFNItemCore::jfFFNItemCore(const jfFFNItemCore& src):jfGenericFanfic3(src) {
+    language = src.language;
+    isupdated = src.isupdated;
+    published = src.published;
+    rating = src.rating;
+    favs = src.favs;
+    RelationshipCopy(src);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
@@ -67,8 +79,13 @@ QString jfFFNItemCore::ToText() const {
   }
   // character data
   if (!genres.isEmpty()) {
-    result += " - Characters Specified: " + char_data;
+    result += " - Characters Specified: " + characters.join(", ");
   }
+  // pairings
+  if (RelationshipCount() > 0) {
+      result += " - Pairings: " + RelationshipsAsDisplayString(true);
+  }
+
   if (completed) {
     result += " - Complete";
   }
@@ -115,7 +132,9 @@ QString jfFFNItemCore::ToDisplayHTML() const {
   result += helper->WrapText("basicinfo", mdata, true);
 
   // characters
-  result += helper->ConditionalWrapText("characters", false,"Characters: ", true, char_data, false);
+  result += helper->ConditionalWrapText("characters", false,"Characters: ", true, characters.join(","), false);
+  // relationships
+  result += helper->ConditionalWrapText("pairings", true,"Pairings: ", true, RelationshipsAsDisplayString(true), false);
   // genres
   result += helper->ConditionalWrapText("genres", true, "Genres: ", true, genres, true);
 
@@ -132,10 +151,6 @@ QString jfFFNItemCore::MakeAuthorUrl() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // data getting methods
-//---------------------------------------
-QString jfFFNItemCore::GetCharacter() const {
-  return char_data;
-}
 //-------------------------------------------------
 QDate jfFFNItemCore::GetPublished() const {
   return published;
@@ -159,6 +174,22 @@ size_t jfFFNItemCore::GetFavs() const {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void jfFFNItemCore::ProcessDescription() {
   // fanfiction.net does not put anything wierd in the descriptions
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jfFFNItemCore::~jfFFNItemCore() {
+    ClearPairingVector(char_pairs);
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfFFNItemCore::UpdateFromSource(const jfFFNItemCore* source) {
+    if (source == NULL) return false;
+    source->StoreToCopy3(this);
+    RelationshipCopy(*source);
+    language = source->GetLanguage();
+    isupdated = source->IsUpdated();
+    published = source->GetPublished();
+    rating = source->GetRating();
+    favs = source->GetFavs();
+    return true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfFFNItemCore::ExtractDescription(jfStringParser &zparser, QString &parserr) {
@@ -213,6 +244,106 @@ bool jfFFNItemCore::Rating2Words(jfStringParser &zparser, QString &parserr) {
   else favs = qval;
   return true;
 }
+// -------------------------------------------------------------------------
+// I find that to properly handle that character list, I need to split and keep the delimiters
+QStringList jfFFNItemCore::SplitCharacters(const QString& source) const {
+    const QChar comm = QChar(',');
+    const QChar opbr = QChar('[');
+    const QChar clbr = QChar(']');
+    QStringList result;
+    result.reserve(10);
+    QString charbuf;
+    charbuf.reserve(25);
+
+    // we now go over the string character by character
+    for (int ind = 0; ind < source.size(); ind++) {
+        QChar curr = source.at(ind);
+        if ((curr == comm) || (curr == opbr) || (curr == clbr)) {
+            charbuf = charbuf.trimmed();
+            if (charbuf.size() > 0) result.append(charbuf);
+            charbuf = "";
+            result.append(QString(curr));
+        }
+        else charbuf += curr;
+    }
+    if (charbuf.size() > 0) {
+        charbuf = charbuf.trimmed();
+        if (charbuf.size() > 0) result.append(charbuf);
+    }
+    return result;
+}
+// --------------------------------------------------------------------------
+bool jfFFNItemCore::Characters_Pairs_and_Completion(jfStringParser &zparser, QString &parserr) {
+    QString buffer, buffer2;
+    QString raw_characters;
+
+    // If we do have fields, the split is always at the last dash, using a custom method...
+    if (zparser.GetAfterLast("-",buffer)) {
+        // buffer 2 is character data
+        buffer2 = zparser.GetSkipped();
+        buffer2 = buffer2.trimmed();
+        // buffer is probably completion
+        buffer = buffer.trimmed();
+        if (buffer=="Complete") completed = true;
+        // but maybe not, if the name has a dash...
+        else buffer2 = buffer2 + "-" + buffer;
+        raw_characters = buffer2;
+    }
+    // below, there must be only 1 field
+    else {
+      bool moref = zparser.GetToEnd(buffer);
+      if (! moref) {
+        return failMsg(parserr,"Strange error after dates!");
+      }
+      buffer = buffer.trimmed();
+      // What is the field? I will assume there is no character known as 'Complete'
+      if (buffer=="Complete") completed = true;
+      else raw_characters = buffer;
+    }
+
+    // processing characters
+    if (! raw_characters.isEmpty()) {
+        QStringList char_parts = SplitCharacters(raw_characters);
+        bool inpair = false;
+        QStringList pair_members;
+
+        // the list contains both characters and separators
+        for (QString char_part : char_parts) {
+            if (char_part == "[") {
+                // pairing start
+                inpair = true;
+            }
+            else if (char_part == ",") {
+                // merely a divider
+            }
+            else if (char_part == "]") {
+                if (inpair) {
+                    // the pairing has come to an end, save the data
+                    inpair = false;
+                    if (pair_members.size() > 0) {
+                        char_pairs.append(new jfPairingStruct(pair_members, false));
+                        pair_members.clear();
+                    }
+                }
+            }
+            else {
+                // character processing
+                QString parsed_character = htmlparse::ConvertEntities(char_part,false);
+                characters.append(parsed_character);
+                if (inpair) pair_members.append(parsed_character);
+
+            }
+        }
+        // to avoid discarding data if we end somehow still inside a pair...
+        if (inpair) {
+            if (pair_members.size() > 0) {
+                char_pairs.append(new jfPairingStruct(pair_members, false));
+                pair_members.clear();
+            }
+        }
+    }
+    return true;
+}
 //----------------------------------------------------------------------------
 bool jfFFNItemCore::Dates_and_Completion(jfStringParser &zparser, QString &parserr) {
   // varibales
@@ -254,35 +385,10 @@ bool jfFFNItemCore::Dates_and_Completion(jfStringParser &zparser, QString &parse
   /* The next 2 fields are for character data, and completion status. Both of
   them are optional, so parsing is tricky */
   // first, there is always a dash if at least 1 field is there
-  // x_parser->GetToEnd(buffer);
   if (zparser.MovePast("-")) {
-    zparser.GetToEnd(buffer);
-    // If we do have fields, the split is always at the last dash, using a custom method...
-    if (zparser.GetAfterLast("-",buffer)) {
-      // buffer 2 is character data
-      buffer2 = zparser.GetSkipped();
-      buffer2 = buffer2.trimmed();
-      // buffer is probably completion
-      buffer = buffer.trimmed();
-      if (buffer=="Complete") completed = true;
-      // but maybe not, if the name has a dash...
-      else buffer2 = buffer2 + "-" + buffer;
-      char_data = buffer2;
-    }
-    // below, there must be only 1 field
-    else {
-      moref = zparser.GetToEnd(buffer);
-      if (!moref) {
-        return failMsg(parserr,"Strange error after dates!");
-      }
-      buffer = buffer.trimmed();
-      // What is the field? I will assume there is no character known as 'Complete'
-      if (buffer=="Complete") completed = true;
-      else char_data = buffer;
-    }
+    return Characters_Pairs_and_Completion(zparser, parserr);
   }
-  // done
-  return true;
+  else return true;
 }
 //-----------------------------
 bool jfFFNItemCore::failMsg(QString &pto, const QString message) const {
@@ -308,46 +414,42 @@ void jfFFNItemCore::LoadIntoExtract(jfFicExtract* into) const {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // file i/o output
 //---------------------------------------
-bool jfFFNItemCore::AddExtraStuff(QTextStream* outfile) const {
+bool jfFFNItemCore::AddMoreExtraStuff(QTextStream* outfile) const {
   // local variables
   jfOutString xresult;
   // checking and special conditions
   if (outfile==NULL) return false;
-  // preparing line 4, lots of data
-  xresult << language << QString(rating) << char_data;
-  (*outfile) << xresult << "\n";
-  xresult.FullClear();
-  // line 5 is more stuff
-  xresult << favs << isupdated << published;
-  (*outfile) << xresult << "\n";
+    // relationships (line 8)
+    (*outfile) << RelationshipsAsStorageString() << "\n";
+    // line 9, more info
+    xresult << language << QString(rating) << favs << isupdated << published;
+    (*outfile) << xresult << "\n";
   // done
-  return AddMoreExtraStuff(outfile);
+  return AddCodaStuff(outfile);
 }
 //---------------------------------------
-bool jfFFNItemCore::ReadExtraStuff(jfFileReader* infile) {
-  const QString funcname = ("jfFFNItemCore::ReadRestFromFile");
+bool jfFFNItemCore::ReadMoreExtraStuff(jfFileReader* infile) {
+  const QString funcname = ("jfFFNItemCore::ReadMoreExtraStuff");
   // local variables
   QString buffer;
-  // starting with line 4
   assert(infile!=NULL);
   /**/JDEBUGLOG(funcname,1);
-  if (!infile->ReadParseLine(3,funcname)) return false;
+  // line 8 is relationships
+  if (!infile->ReadLine(buffer,funcname)) return false;
+  if (!SetRelationshipsFromString(buffer, false)) return infile->BuildError("Could not parse relationships!");
+
+  // line 9, more stuff
+  if (!infile->ReadParseLine(5, funcname)) return false;
   language = (infile->lp).UnEscStr(0);
   buffer = (infile->lp).UnEscStr(1);
   rating = buffer[0];
-  char_data = (infile->lp).UnEscStr(2);
-
-  // line 5, reading more data
-  /**/JDEBUGLOG(funcname,2);
-  if (!infile->ReadParseLine(3,funcname)) return false;
-  if (!infile->lp.SIntVal(0,favs)) return infile->BuildError("The favorites count is not a number!");
-  if (!infile->lp.BoolVal(1,isupdated)) return infile->BuildError("The updated flag is not valid!");
-  // the next two values of line 5 are a bit more complicated because they are dates
-  if (!infile->lp.DateVal(2,published)) return infile->BuildError("Unable to convert the Published field properly");
+  if (!infile->lp.SIntVal(2,favs)) return infile->BuildError("The favorites count is not a number!");
+  if (!infile->lp.BoolVal(3,isupdated)) return infile->BuildError("The updated flag is not valid!");
+  if (!infile->lp.DateVal(4,published)) return infile->BuildError("Unable to convert the Published field properly");
 
   // done with the lines
   /**/JDEBUGLOG(funcname,3);
-  return ReadMoreExtraStuff(infile);
+  return ReadCodaStuff(infile);
 }
 //================================================================================
 jfFFNItem::jfFFNItem():jfFFNItemCore() {
@@ -356,30 +458,20 @@ jfFFNItem::jfFFNItem():jfFFNItemCore() {
 }
 //-------------------------------------------------------------------
 // copy constructor
-jfFFNItem::jfFFNItem(const jfFFNItem& src) {
-  // stuff from jfGenericFanfic
-  src.StoreToCopy(this);
-  // new stuff for FFN Fic objects
-  language = src.language;
-  genres = src.genres;
-  word_count = src.word_count;
-  completed = src.completed;
-  isupdated = src.isupdated;
-  published = src.published;
-  rating = src.rating;
-  char_data = src.char_data;
-  author_id = src.author_id;
+jfFFNItem::jfFFNItem(const jfFFNItem& src):jfFFNItemCore(src) {
+    ustatus = jud_NONE;
+    cat_link = src.cat_link;
 }
 //------------------------------------------------------------------------
 jfFFNItem::jfFFNItem(const QString& instr, const jfFFN_CategoryCore* cat_linkin):jfFFNItemCore() {
     const QString fname = "jfFFNItem::jfFFNItem";
-  cat_link = NULL;
-  QString parse_err;
-  if (!SetFromString(instr, cat_linkin,parse_err)) {
-      jerror::ParseLog(fname,parse_err);
-      validdata = false;
-  }
-  ustatus = jud_NONE;
+    cat_link = NULL;
+    QString parse_err;
+    if (!SetFromString(instr, cat_linkin,parse_err)) {
+        jerror::ParseLog(fname,parse_err);
+        validdata = false;
+    }
+    ustatus = jud_NONE;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // data setting methods
@@ -447,23 +539,14 @@ bool jfFFNItem::UpdateFromObj(const jfFFNItemCore* src) {
   // invalid cases
   if (src==NULL) return false;
   if (num_id!=(src->GetID())) return false;
+
+  // copying over the fields
+  UpdateFromSource(src);
+
   // we set the new update status
   ustatus = jud_UPDATED;
-  // copying over stuff
-  name = src->GetName();
-  description = src->GetDescription();
-  primarylink = src->GetUrl();
-  rank = src->GetRank();
-  genres = src->GetGenres();
-  word_count = src->GetWordcount();
-  part_count = src->GetChapterCount();
-  completed = src->IsComplete();
   isupdated = true;
-  updated_date = src->GetUpdates();
-  char_data = src->GetCharacter();
-  rating = src->GetRating();
-  author_name = src->GetAuthor();
-  // I will assume, for now, that author and language cannot change
+
   return true;
 }
 //-----------------------------------------------------------------
@@ -487,10 +570,9 @@ bool jfFFNItem::LoadValues(jfSkeletonParser* inparser) const {
   LoadCoreValues(inparser);
   LoadMoreValues1(inparser);
   LoadMoreValues2(inparser);
+  LoadMoreValues3(inparser);
+  LoadRelationships(inparser, true);
   inparser->AddText("ITEMF_LANGUAGE",language);
-  inparser->AddText("ITEMF_GENRES",genres);
-  inparser->AddText("ITEMF_CHARDATA",char_data);
-  inparser->AddUInt("ITEMF_AUTHORID",author_id);
   if (rating==('+')) rbuffer = ("K+");
   else rbuffer = rating;
   inparser->AddText("ITEMF_RATING",rbuffer);
@@ -504,14 +586,7 @@ bool jfFFNItem::LoadValues(jfSkeletonParser* inparser) const {
 QString jfFFNItem::GetCatString() const {
   return cat_link->GetName();
 }
-//----------------------------------------------------
-/*
-jfAuthorInfo* jfFFNItem::GetAuthorInfo() const {
-  jfAuthorInfo* result;
-  result = new jfAuthorInfo(author_id,author_name);
-  return result;
-}
-*/
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // parsing helper methods
 bool jfFFNItem::GetLinkTitle(jfStringParser& zparser, QString& parseerr) {
@@ -556,7 +631,7 @@ bool jfFFNItem::GetLinkTitle(jfStringParser& zparser, QString& parseerr) {
   return true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool jfFFNItem::AddMoreExtraStuff(QTextStream* outfile) const  {
+bool jfFFNItem::AddCodaStuff(QTextStream* outfile) const  {
   QString xline;
   size_t xval;
   xval = (size_t)(jud_NONE);
@@ -565,8 +640,8 @@ bool jfFFNItem::AddMoreExtraStuff(QTextStream* outfile) const  {
   return true;
 }
 //-------------------------------------------------------------
-bool jfFFNItem::ReadMoreExtraStuff(jfFileReader* infile) {
-  const QString funcname = ("jfFFNItem::ReadExtraStuff");
+bool jfFFNItem::ReadCodaStuff(jfFileReader* infile) {
+  const QString funcname = ("jfFFNItem::ReadCodaStuff");
   // local variables
   unsigned long oval;
   // starting with line 4

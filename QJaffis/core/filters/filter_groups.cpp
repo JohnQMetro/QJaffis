@@ -4,7 +4,7 @@
 // Purpose :    Defines global filter map groupings and associated stuff
 // Created:     01.08.06
 // Started conversion to Qt June 23, 2013
-// Updated:     July 24, 2022
+// Updated:     March 3, 2023
 /////////////////////////////////////////////////////////////////////////////
 // headers
 // ----------------------------------------------------------------------------
@@ -67,6 +67,9 @@
     #include "ao3/ao3_percent_tags_filter.h"
 #endif // AO3_PERCENT_TAGS_FILTER_H
 
+#include "base/structpair.h"
+#include "extended/list_sexp.h"
+
 
 //-----------------------------------------
 
@@ -97,7 +100,7 @@ jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname) {
     result = itag_result;
   }
   else if (typestring=="AuthorFilter") result = new jfAuthExprFilter();
-  else if (typestring=="CharacterFilter") result = new jfCharExprFilter();
+  else if (typestring=="CharacterListFilter") result = new jfCharListExprFilter();
   else if (typestring=="CategoryFilter") result = new jfFFN_CategoryExprFilter();
   else if (typestring=="PairFilterSingle") result = new jfPairFilterSingle();
   else if (typestring=="PairFilterList") result = new jfPairFilterList();
@@ -137,7 +140,7 @@ jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname) {
       otag_result->SetToEmpty();
       result = otag_result;
   }
-  else if (typestring=="AO3PairFilter") result = new jfAO3PairFilter();
+  else if (typestring=="StructuredPairFilter") result = new jfStructuredPairFilter();
   else if (typestring=="AO3WarnFilter") result = new jfAO3WarnFilter();
   else if (typestring=="AO3KudoCountFilter") result = new jfAO3KudoFilter();
   else if (typestring=="AO3ExtraTagsPercentFilter") result = new jfAO3ExtraTagsPercentFilter();

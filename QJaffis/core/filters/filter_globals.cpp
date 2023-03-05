@@ -4,7 +4,7 @@
 // Purpose :    Defines global filter constants & stuff
 // Created:     30.07.06
 // Conversion to QT Started April 11, 2013
-// Updated:     July 24, 2022
+// Updated:     March 3, 2023
 /////////////////////////////////////////////////////////////////////////////
 // headers
 // ----------------------------------------------------------------------------
@@ -26,7 +26,7 @@ namespace filterstrd {
         QString("FimRatingFilter,FimThumbPercentFilter,FIMShortDescFilter,") +
           "FIMDualDescFilter,FIMContentTypeFilter,FIMWarningFilter";
   const QString newao3fils = QString("ExtraTagFilter,AO3FandomFilter,AO3RatingFilter,") +
-        "AO3OrientationFilter,AO3PairFilter,AO3WarnFilter,AO3KudoCountFilter,AO3ExtraTagsPercentFilter";
+        "AO3OrientationFilter,AO3WarnFilter,AO3KudoCountFilter,AO3ExtraTagsPercentFilter";
   const QString fimgfils = "FIMGroupSCFilter,FIMGroupMCFilter";
   // filters compatible with jfBasePD
   const QString basepd_fc = "ExprFilter";
@@ -37,13 +37,19 @@ namespace filterstrd {
       ",PairFilterSingle,PairFilterList,PairFilterMultiple";
   // filters compatible with jfGenericFanfic2
   const QString genfic2_fc = genfic_fc + "," + "WordCountFilter,CompletedFilter";
+
   // filters compatible with jfFFNItem
-  const QString ffnfic_fc = genfic2_fc + "," + "CharacterFilter,CategoryFilter," +
-    "FFNTagFilter,LanguageFilter,FFNRatingFilter,PublishedDateFilter,FFNFavsFilter";
+  const QString ffnfic_fc = genfic2_fc + "," + "CharacterListFilter,CategoryFilter," +
+    "FFNTagFilter,LanguageFilter,FFNRatingFilter,PublishedDateFilter,FFNFavsFilter," +
+    "StructuredPairFilter";
+
   // filters compatible with jfFIM_Fanfic
-  const QString fimfic_fc = genfic2_fc + "," + newfimfils;
+  const QString fimfic_fc = genfic2_fc + "," + "CharacterListFilter" + "," + newfimfils;
+
   // filters compatible with jfAO3_Fanfic
-  const QString ao3fic_fc = genfic2_fc + "," + "CharacterFilter" + ","  + newao3fils;
+  const QString ao3fic_fc = genfic2_fc + "," + "CharacterListFilter" + ","  + newao3fils + "," +
+          "StructuredPairFilter";
+
   // filters compatible with jfFIMGroup
   const QString fimgroup_fc = basepd_fc + "," + fimgfils;
   // all filters

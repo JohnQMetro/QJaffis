@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Fanfic object for fimfiction.net
 Created :   May 7, 2012
 // Conversion to QT started : April 20, 2013
-Updated :   June 30, 2022
+Updated :   February 21, 2023
 ******************************************************************************/
 #ifndef FIM_FICOBJ_H_INCLUDED
 #define FIM_FICOBJ_H_INCLUDED
@@ -36,7 +36,6 @@ class jfFIM_Fanfic : public jfGenericFanfic3 {
     jfFicExtract_FIM* ExtractFromString(QString inval, QString& parse_err);
     void SetCompactSummary(const QString& insum);
     // getting data
-    QString GetCharacters() const;
     QString GetContentTypes() const;
     QString GetWarnings() const;
     int GetThumbs(bool down) const;
@@ -59,10 +58,10 @@ class jfFIM_Fanfic : public jfGenericFanfic3 {
     bool ParseError(QString& perror,const QString& message);
     jfFicExtract_FIM* ExtractError(QString& perror,const QString& message);
     // file i/o output
-    virtual bool AddExtraStuff(QTextStream* outfile) const;
-    virtual bool ReadExtraStuff(jfFileReader* infile);
+    virtual bool AddMoreExtraStuff(QTextStream* outfile) const;
+    virtual bool ReadMoreExtraStuff(jfFileReader* infile);
     // data
-    QString characters,content_types,warnings;
+    QString content_types,warnings;
     int thumbsup, thumbsdown;
     QString rating;
     QDate pubdate;
