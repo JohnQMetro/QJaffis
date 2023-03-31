@@ -50,7 +50,7 @@ jfBaseFilter* jfFIMContentTypeFilter::GenCopy() const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFIMContentTypeFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFIMContentTypeFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfFIM_Fanfic* rvalue;
   // we start
   assert(testelem!=NULL);
@@ -104,7 +104,7 @@ jfBaseFilter* jfFIMWarningsFilter::GenCopy() const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFIMWarningsFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFIMWarningsFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfFIM_Fanfic* rvalue;
   // we start
   assert(testelem!=NULL);

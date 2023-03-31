@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Fimfiction.net parser for full item pages
             search results.
 Created :   June 29, 2016
-Updated :   June 30, 2016
+Updated :   March 20, 2023
 ******************************************************************************/
 #ifndef FIMPARSE_ITEMS_H
 #define FIMPARSE_ITEMS_H

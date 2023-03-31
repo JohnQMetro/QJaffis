@@ -47,6 +47,14 @@ void jfStringParser::ChangeData(QString indata, bool incasesen) {
   if (incasesen)casesen = Qt::CaseSensitive;
   else casesen = Qt::CaseInsensitive;
 }
+// ----------------------------------------------------
+void jfStringParser::Clear() {
+    ready = false;
+    mainindex = 0;
+    oldindex = 0;
+    rawdata.clear();
+    skipped_data.clear();
+}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // getting basic info
 //--------------------------------------------------------------------------
@@ -121,7 +129,7 @@ bool jfStringParser::MovePast(const QRegularExpression& find) {
             int startpos = match.capturedStart();
             int matchlen = match.capturedLength();
             skipped_data = rawdata.mid(mainindex,startpos-mainindex);
-            SetIndex(startpos + match.capturedLength());
+            SetIndex(startpos + matchlen);
             return true;
         }
         else return false;

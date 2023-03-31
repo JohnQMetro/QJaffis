@@ -3,7 +3,7 @@ Name    : baseparse.cpp
 Basic   : Defines a base class that handles page parsing (and redirection)
 Author  : John Q Metro
 Started : June 13, 2016
-Updated : August 6, 2022: Filtering using QtConcurrent
+Updated : March 20, 2023
 
 ******************************************************************************/
 #ifndef BASEPARSE_H
@@ -70,11 +70,16 @@ jfPageParserBase::~jfPageParserBase() { }
 //--------------------------------------------
 // default does nothing
 bool jfPageParserBase::setPageIndex(const size_t& page_index) { return true; }
+
 //============================================================================
+//============================================================================
+
 jfItemsPageParserBase::jfItemsPageParserBase():jfPageParserBase() {
   page_results = NULL;
   start_itemcount = 0;
   search_ptr = NULL;
+  item_parser = NULL;
+  item_outputter = NULL;
 }
 //-----------------------------------
 bool jfItemsPageParserBase::setSearchPointer(jfSearchCore* in_sptr) {
@@ -86,20 +91,26 @@ bool jfItemsPageParserBase::setSearchPointer(jfSearchCore* in_sptr) {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // helper methods
 jfResultUnitVector* jfItemsPageParserBase::MakeResults() {
-  if (page_results == NULL) return NULL;
-  // local variables
-  jfResultUnitVector* result = new jfResultUnitVector();
-  jfResultUnit* tresult;
-  size_t pr_size = page_results->size();
-  // we start
-  if (pr_size>0) {
-    for (size_t pr_index=0;pr_index<pr_size;pr_index++) {
-      tresult = (*page_results)[pr_index]->makeResultUnit();
-      result->push_back(tresult);
+    assert(item_outputter != NULL);
+    if (page_results == NULL) return NULL;
+    // local variables
+    jfResultUnitVector* result = new jfResultUnitVector();
+    jfResultUnit* tresult;
+    size_t pr_size = page_results->size();
+    // we start
+    if (pr_size>0) {
+        for (size_t pr_index=0;pr_index<pr_size;pr_index++) {
+
+            const jfSearchResultItem* item = page_results->at(pr_index).item;
+            jfItemMetaFlags* flags =  page_results->at(pr_index).flags;
+            item_outputter->SetItemSource(item, flags);
+
+            tresult = new jfResultUnit(item, flags,item_outputter->ToDisplayHTML());
+            result->push_back(tresult);
+        }
     }
-  }
-  result->stotal = start_itemcount;
-  return result;
+    result->stotal = start_itemcount;
+    return result;
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -107,8 +118,9 @@ jfResultUnitVector* jfItemsPageParserBase::MakeResults() {
 struct FilterApplyer {
     FilterApplyer(const jfFilterMap* filters_to_use):filters(filters_to_use) {}
 
-    void operator()(jfBasePD* &item) {
-        item->included = filters->MatchAll(item);
+    void operator()(jfItemFlagGroup &item) {
+        if (item.flags == NULL) item.flags = new jfItemMetaFlags();
+        item.flags->included = filters->MatchAll(item.item);
     }
 
     const jfFilterMap* filters;
@@ -118,34 +130,34 @@ struct FilterApplyer {
 // -------------------------------------------------------
 // filtering and removing from the current page
 size_t jfItemsPageParserBase::FilterByList() const {
-  // constants
-  const QString fname = "jfItemsPageParserBase::FilterByList";
-  // variables and checks
-  size_t fsize,rcount;
-  /**/lpt->tAssert(page_results!=NULL,fname,"Page Results are NULL");
-  /**/lpt->tAssert(search_ptr->Check(),fname,"Search check failed");
-  /**/lpt->tLog(fname,1);
-  jfBasePD* tvector;
-  QStringList* scheck;
-  // the constructor of the items should have them be included by default
-  /**/lpt->tLog(fname,2);
+    // constants
+    const QString fname = "jfItemsPageParserBase::FilterByList";
+    // variables and checks
+    size_t fsize,rcount;
+    /**/lpt->tAssert(page_results!=NULL,fname,"Page Results are NULL");
+    /**/lpt->tAssert(search_ptr->Check(),fname,"Search check failed");
+    /**/lpt->tLog(fname,1);
+
+    QStringList* scheck;
+    // the constructor of the items should have them be included by default
+    /**/lpt->tLog(fname,2);
 
 
-  // we use a special cases first
-  if ((search_ptr->def_filtermap)==NULL) return start_itemcount;
-  fsize = (search_ptr->def_filtermap)->GetCount();
-  if (fsize==0) return start_itemcount;
-  /**/lpt->tLogS(fname,3,fsize);
-  rcount = 0;
-  scheck = search_ptr->def_filtermap->GetNameList();
-  delete scheck;
-  /**/lpt->tLog(fname,6);
-  FilterApplyer applyer = FilterApplyer(search_ptr->def_filtermap);
+    // we use a special cases first
+    if ((search_ptr->def_filtermap)==NULL) return start_itemcount;
+    fsize = (search_ptr->def_filtermap)->GetCount();
+    if (fsize==0) return start_itemcount;
+    /**/lpt->tLogS(fname,3,fsize);
+    rcount = 0;
+    scheck = search_ptr->def_filtermap->GetNameList();
+    delete scheck;
+    /**/lpt->tLog(fname,6);
+    FilterApplyer applyer = FilterApplyer(search_ptr->def_filtermap);
 
-  QtConcurrent::blockingMap(*page_results, applyer);
+    QtConcurrent::blockingMap(*page_results, applyer);
 
 
-  // we assume pr_size is correct
+    // we assume pr_size is correct
     /*
   for (size_t pr_index = 0 ; pr_index < start_itemcount ; pr_index++) {
     // and then we test against the filter list
@@ -158,52 +170,49 @@ size_t jfItemsPageParserBase::FilterByList() const {
   }
   */
 
-  for (size_t pr_index = 0; pr_index < start_itemcount; pr_index++) {
-      tvector = (*page_results)[pr_index];
-      if (tvector->included) rcount++;
-  }
+    for (size_t pr_index = 0; pr_index < start_itemcount; pr_index++) {
+        const jfItemMetaFlags* flags  = page_results->at(pr_index).flags;
+        if ((flags == NULL) || (flags->included)) rcount++;
+    }
 
-  return rcount;
+    return rcount;
 }
 //-----------------------------------------
 size_t jfItemsPageParserBase::CategorySort() {
-  jfBasePD* tvector;
-  size_t rcount;
-  assert(search_ptr->Check());
-  // the main checksing loop
-  rcount = start_itemcount;
-  for (size_t pr_index = 0 ; pr_index < start_itemcount ; pr_index++) {
-    // and then we test against the filter list
-    tvector = (*page_results)[pr_index];
-    (search_ptr->categories)->Sort(tvector);
-    if (search_ptr->NoCatTest(tvector)) tvector->included = false;
-    if (!(tvector->included)) rcount--;
-  }
-  return rcount;
+    size_t rcount;
+    assert(search_ptr->Check());
+    // the main checksing loop
+    rcount = start_itemcount;
+    for (size_t pr_index = 0 ; pr_index < start_itemcount ; pr_index++) {
+        // and then we test against the filter list
+        jfItemFlagGroup testee = page_results->at(pr_index);
+        (search_ptr->categories)->Sort(&testee);
+        if (search_ptr->NoCatTest(testee.flags)) testee.flags->included = false;
+        if (!(testee.flags->included)) rcount--;
+    }
+    return rcount;
 }
 
 //-----------------------------------------
 size_t jfItemsPageParserBase::Condense() {
-  // the result list
-  jfPDVector* newlist;
-  jfBasePD* tvector;
-  // we start
-  newlist = new jfPDVector();
-  // the loop
-  for (size_t pr_index = 0 ; pr_index < start_itemcount ;pr_index++) {
-    // and then we check
-    tvector = (*page_results)[pr_index];
-    if (tvector->included) newlist->push_back(tvector);
-    else {
-      delete tvector;
-      (*page_results)[pr_index] = NULL;
+    // the result list
+    std::vector<jfItemFlagGroup>* newlist;
+    newlist = new std::vector<jfItemFlagGroup>();
+    newlist->reserve(start_itemcount);
+
+    // the loop
+    for (size_t pr_index = 0 ; pr_index < start_itemcount ;pr_index++) {
+        jfItemFlagGroup testee = page_results->at(pr_index);
+        // and then we check
+        if (testee.flags->included) newlist->push_back(testee);
+        else testee.Dispose();
     }
-  }
-  // at the end of the loop, we get rid of the old
-  delete page_results;
-  // and usher in the new
-  page_results = newlist;
-  return newlist->size();
+    // at the end of the loop, we get rid of the old
+    page_results->clear();
+    delete page_results;
+    // and usher in the new
+    page_results = newlist;
+    return newlist->size();
 }
 //-----------------------------------------
 void jfItemsPageParserBase::PostPageProcessing() {
@@ -211,7 +220,7 @@ void jfItemsPageParserBase::PostPageProcessing() {
   assert(page_results != NULL);
   // if the search is null (only during download and parse tests) we skip.
   if (search_ptr == NULL) return;
-  jfBasePD* worki;
+
   // filtering and sorting
   lpt->tLog(fname,1);
   start_itemcount = page_results->size();
@@ -222,14 +231,6 @@ void jfItemsPageParserBase::PostPageProcessing() {
   lpt->tLog(fname,4);
   Condense();
   lpt->tLog(fname,5);
-  // processing the summary (removing bad tags, etc)
-  if ((page_results!=NULL) && (start_itemcount>0)) {
-    for (size_t loopc=0 ; loopc<(page_results->size()) ; loopc++) {
-      worki = (*page_results)[loopc];
-      worki->ProcessDescription();
-    }
-  }
-  lpt->tLog(fname,6);
   // done
 }
 

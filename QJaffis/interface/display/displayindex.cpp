@@ -3,7 +3,7 @@ Name:        displayindex.cpp
 Author :     John Q Metro
 Purpose :    Organizing the indexes of results for the viewing listboxes
 Created:     September 1, 2013
-Updated:     April 30, 2014
+Updated:     March 25, 2012
 ******************************************************************************/
 #ifndef DISPLAYINDEX_H
   #include "displayindex.h"
@@ -61,10 +61,10 @@ size_t jfResultIndexes_Category::AddResults(jfResultUnitVector* inresults) {
     wval = inresults->at(inr_idx);
     // incrementing the counts
     for (rc_idx=0;rc_idx<rcat_count;rc_idx++) {
-      if (wval->Marked(rc_idx)) num_results[rc_idx]++;
+      if (wval->InCategory(rc_idx)) num_results[rc_idx]++;
     }
     if (use_default) {
-      if (!(wval->HasMark())) num_results[32]++;
+      if (!(wval->HasCategory())) num_results[32]++;
     }
     // appending the value
     results.push_back(wval);

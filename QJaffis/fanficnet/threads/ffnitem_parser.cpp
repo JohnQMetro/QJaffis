@@ -3,7 +3,7 @@ Name    :   ffnitem_parser.cpp
 Author  :   John Q Metro
 Purpose :   Parser for Fanfiction.Net Category pages, to get lists of fanfics
 Created :   July 22, 2016
-Updated :   Sreptember 28, 2022
+Updated :   March 26, 2023
 ******************************************************************************/
 #ifndef FFNITEM_PARSER_H
   #include "ffnitem_parser.h"
@@ -12,6 +12,8 @@ Updated :   Sreptember 28, 2022
 #ifndef HTMLPARSE_H_INCLUDED
   #include "../../core/utils/htmlparse.h"
 #endif // HTMLPARSE_H_INCLUDED
+
+#include "../data/ffn_ficutils.h"
 
 #include <assert.h>
 #include <math.h>
@@ -30,6 +32,9 @@ jfFFNItemParser::jfFFNItemParser():jfItemsPageParserBase() {
   pagehead = QRegularExpression("<center\\s+style=['\"]?margin-top:5px;margin-bottom:5px;?['\"]?>",QRegularExpression::CaseInsensitiveOption);
   zlist_start = QRegularExpression("<div\\s+class=['\"]?z-list\\s",QRegularExpression::CaseInsensitiveOption);
   item_ico = QRegularExpression("/static/fi?cons/");
+
+  item_outputter = new jfFFNItemOutputter();
+  item_parser = new jfFFNFanficParse();
 }
 //------------------------------------------------------
 bool jfFFNItemParser::SetCategory(const jfFFN_CategoryCore* in_category){
@@ -48,92 +53,105 @@ bool jfFFNItemParser::setLimit(jfFicLimit* in_limit) {
 // custom parse methods
 //----------------------------------
 void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageindex) {
-  const QString fname = "jfFFNItemParser::ParseDownloadedPage";
-  // variables
-  size_t newcount;
-  jfFFNItem* temp;
-  QString buffer,outerr;
-  // starting...
-  /**/lpt->tLog(fname,1);
-  NewData(inPage);
-  limitreached = false;
-  // skipping past header gunk
-  if (!xparser.MovePastAlt("</form>","</FORM>")) {
-      /**/lpt->tLog(fname,2,xparser.GetBlock(2000));
-      parseErrorMessage = "Could not find end of form";
-      return;
-  }
-  // we check names first
-  if (!CheckNames()) {
-      /**/lpt->tParseError(fname,"Could not get names!");
-    parseErrorMessage = "Could not get names!";
-    return;
-  }
-  /**/lpt->tLog(fname,3);
-  // next, we check the item count and thus get the page count
-  if (!PageAndItemCount(newcount)) {
-    size_t pindex = xparser.GetIndex();
-    /**/lpt->tParseError(fname,"Failed to get page and item count: " + QString::number(pindex));
-    return;
-  }
-  /**/lpt->tLog(fname,5);
-  // initializing the list of results
-  page_results = new jfPDVector();
+    const QString fname = "jfFFNItemParser::ParseDownloadedPage";
 
-  /**/lpt->tLog(fname,6);
-  // next up is parsing the items
-  //
+    // starting...
+    /**/lpt->tLog(fname,1);
+    NewData(inPage);
+    limitreached = false;
 
-  while (xparser.MovePast(zlist_start)) {
-      if (!xparser.GetMovePast("</div></div></div>", buffer)) {
-          parseErrorMessage = "Failed to find end of fic info";
-          lpt->tLog(fname,7,parseErrorMessage);
-          delete page_results;
-          page_results =NULL;
-          return;
-      }
-    temp = new jfFFNItem();
-    temp->SetFromString(buffer,this_category,outerr);
-    /**/lpt->tLog(fname,8);
-    // the item is okay
-    if (temp->IsValid()) {
-      // checking the date limit
-      if (ExitCheck(temp)) {
-        limitreached = true;
-        break;
-      }
-      // adding
-      page_results->push_back(temp);
-      if (newfic) temp->SetNew(true);
-    }
-    // the item is not okay
-    else {
-      parseErrorMessage = "Parsing Error : " + outerr + " : IN\n" + buffer;
-      /**/lpt->tParseError(fname,parseErrorMessage);
-      if (!(temp->included)) delete temp;
-      else {
-        delete temp;
-        delete page_results;
-        page_results =NULL;
+    // skipping past header gunk
+    if (!xparser.MovePastAlt("</form>","</FORM>")) {
+        /**/lpt->tLog(fname,2,xparser.GetBlock(2000));
+        parseErrorMessage = "Could not find end of form";
         return;
-      }
     }
-  }
-  /**/lpt->tLog(fname,8);
-  // done with the items
-  if (!(page_results->empty())) {
-      /**/lpt->tLog(fname,9);
-    firstid = (*page_results)[0]->GetID();
-    // post page processing and getting the result
-    /**/lpt->tLog(fname,10);
-    PostPageProcessing();
-    /**/lpt->tLog(fname,11);
-  }
-  else {
-      firstid = 0;
-  }
-  page_parsed = true;
-  /**/lpt->tLog(fname,12);
+    // we check names first
+    if (!CheckNames()) {
+        /**/lpt->tParseError(fname,"Could not get names!");
+        parseErrorMessage = "Could not get names!";
+        return;
+    }
+    /**/lpt->tLog(fname,3);
+    // next, we check the item count and thus get the page count
+    size_t newcount;
+    if (!PageAndItemCount(newcount)) {
+        size_t pindex = xparser.GetIndex();
+        /**/lpt->tParseError(fname,"Failed to get page and item count: " + QString::number(pindex));
+        return;
+    }
+    /**/lpt->tLog(fname,5);
+
+    // initializing the list of results
+    page_results = new std::vector<jfItemFlagGroup>();
+
+    /**/lpt->tLog(fname,6);
+    // next up is parsing the items
+    jfFFNFanficParse* parser = dynamic_cast<jfFFNFanficParse*>(item_parser);
+    parser->SetCategory(this_category);
+    QString buffer;
+
+    while (xparser.MovePast(zlist_start)) {
+
+        if (!xparser.GetMovePast("</div></div></div>", buffer)) {
+            parseErrorMessage = "Failed to find end of fic info";
+            lpt->tLog(fname,7,parseErrorMessage);
+            delete page_results;
+            page_results =NULL;
+            return;
+        }
+
+        jfItemParseResultState parse_result = parser->ParseFromSource(buffer);
+        // success
+        if (parse_result == jfItemParseResultState::SUCCEESS) {
+            jfItemFlagGroup temp;
+            const jfFFNItem* temp_fic = parser->getFanfic();
+            // checking the date limit
+            if (ExitCheck(temp_fic)) {
+                limitreached = true;
+                break;
+            }
+            temp.item = temp_fic;
+            temp.flags = new jfItemMetaFlags();
+            page_results->push_back(temp);
+            // adding
+            page_results->push_back(temp);
+            if (newfic) temp.flags->ustatus = jfUpdateStatus::NEW;
+            parser->Clear();
+        }
+        // the fic source was bad
+        else if (parse_result == jfItemParseResultState::DEFECTIVE) {
+            parser->Clear();
+        }
+        // failed to parse, assume the code is at fault
+        else {
+            QString outerr = parser->LastError();
+            parseErrorMessage = "Parsing Error : " + outerr + " : IN\n" + buffer;
+            /**/lpt->tParseError(fname,parseErrorMessage);
+            parser->Clear();
+            parser->ClearCategory();
+
+            delete page_results;
+            page_results =NULL;
+            return;
+        }
+    }
+
+    /**/lpt->tLog(fname,8);
+    // done with the items
+    if (!(page_results->empty())) {
+        /**/lpt->tLog(fname,9);
+        firstid = page_results->at(0).item->GetId();
+        // post page processing and getting the result
+        /**/lpt->tLog(fname,10);
+        PostPageProcessing();
+        /**/lpt->tLog(fname,11);
+    }
+    else {
+        firstid = 0;
+    }
+    page_parsed = true;
+    /**/lpt->tLog(fname,12);
 }
 
 //----------------------------------
@@ -311,7 +329,7 @@ bool jfFFNItemParser::PageAndItemCount(size_t& itemcount) {
   return true;
 }
 //---------------------------------------------
-bool jfFFNItemParser::ExitCheck(jfFFNItem* tocheck) const {
+bool jfFFNItemParser::ExitCheck(const jfFFNItem* tocheck) const {
   if (limit==NULL) return false;
   assert(tocheck!=NULL);
   return !(limit->IsLater(tocheck));

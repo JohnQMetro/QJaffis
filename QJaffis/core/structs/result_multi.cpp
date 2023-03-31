@@ -3,7 +3,7 @@ Name:        result_multi.cpp
 Author :     John Q Metro
 Purpose :    A derivation of jfResultCollection for multi-category results
 Created:     July 16, 2016
-Updated:     September 7, 2016
+Updated:     March 25, 2023
 ******************************************************************************/
 #ifndef RESULT_MULTI_H
   #include "result_multi.h"
@@ -53,19 +53,19 @@ bool jfResultMultiCollection::NoResults() const {
   return (itemcount == 0);
 }
 //---------------------------------
-jfUrlItemCollection* jfResultMultiCollection::AppendNewCollection() {
-  jfUrlItemCollection* temp = MakeEmptyCollection();
-  if (idstore != NULL) temp->SetIDFiltering(idstore);
-  AddItem(temp);
-  return temp;
+jfSearchResultItemCollectionBase* jfResultMultiCollection::AppendNewCollection() {
+    jfSearchResultItemCollectionBase* temp = MakeEmptyCollection();
+    if (idstore != NULL) temp->SetIDFiltering(idstore);
+    AddItem(temp);
+    return temp;
 }
 //---------------------------------
-jfUrlItemCollection* jfResultMultiCollection::AppendNewCollection(const QString& cname, const size_t& cid) {
-  jfUrlItemCollection* temp = MakeEmptyCollection();
-  temp->SetName(cname);
-  temp->SetID(cid);
-  if (idstore != NULL) temp->SetIDFiltering(idstore);
-  AddItem(temp);
-  return temp;
+
+jfSearchResultItemCollectionBase* jfResultMultiCollection::AppendNewCollection(const QString& cname, const size_t& cid) {
+    jfSearchResultItemCollectionBase* temp = MakeEmptyCollection(cname, cid);
+    if (idstore != NULL) temp->SetIDFiltering(idstore);
+    AddItem(temp);
+    return temp;
 }
+
 /*****************************************************************************/

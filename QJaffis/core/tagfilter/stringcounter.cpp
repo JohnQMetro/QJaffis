@@ -40,18 +40,12 @@ jfStringCounter::jfStringCounter(bool is_case_sensitive, bool do_record_pairs) {
 //++++++++++++++++++++++++++++++++++++++++
 // recording
 bool jfStringCounter::RecordItem(const QString& item) {
-    if (item.isNull()) return false;
-    QString rkey = (case_sensitive) ? item.trimmed() : item.toLower().trimmed();
-    if (rkey.isEmpty()) return false;
-    InnerRecordItem(rkey, string_count);
-    if (record_pairs) {
-        RecordPair(item);
-        last_recorded = rkey;
-    }
-    return true;
+    QMutexLocker mlock(&mutex);
+    return RecordItemZ(item);
 }
 // -------------------------------
 bool jfStringCounter::ClearPairPrevious() {
+    QMutexLocker mlock(&mutex);
     if (record_pairs) return false;
     else {
         last_recorded.clear();
@@ -60,19 +54,23 @@ bool jfStringCounter::ClearPairPrevious() {
 }
 // -------------------------------
 bool jfStringCounter::RecordList(const QStringList& items, bool pair_clear) {
+    QMutexLocker mlock(&mutex);
     if (items.isEmpty()) return false;
     int recorded_count = 0;
     for (int item_dex = 0; item_dex < items.size(); item_dex++) {
-        if (RecordItem(items.at(item_dex))) recorded_count++;
+        if (RecordItemZ(items.at(item_dex))) recorded_count++;
     }
     if (pair_clear) last_recorded.clear();
     return (recorded_count > 0);
 }
 //++++++++++++++++++++++++++++++++++++++++
 int jfStringCounter::DifferentItemCount() const {
+    QMutexLocker mlock(&mutex);
     return string_count.size();
 }
+// --------------------------------------
 int jfStringCounter::DifferentPairCount() const {
+    QMutexLocker mlock(&mutex);
     return (pair_count == NULL) ? 0 : pair_count->size();
 }
 //++++++++++++++++++++++++++++++++++++++++
@@ -126,6 +124,19 @@ bool jfStringCounter::RecordPair(const QString second_item) {
         return true;
     }
 }
+//--------------------------------------
+// full record, but without a mutex
+bool jfStringCounter::RecordItemZ(const QString& item) {
+    if (item.isNull()) return false;
+    QString rkey = (case_sensitive) ? item.trimmed() : item.toLower().trimmed();
+    if (rkey.isEmpty()) return false;
+    InnerRecordItem(rkey, string_count);
+    if (record_pairs) {
+        RecordPair(item);
+        last_recorded = rkey;
+    }
+    return true;
+}
 // -------------------------------------
 QList<QPair<QString,size_t>>* jfStringCounter::GetAllPairs(const QHash<QString, size_t>& target) const {
     QList<QPair<QString,size_t>>* result = new QList<QPair<QString,size_t>>();
@@ -148,7 +159,7 @@ bool jfStringCounter::SaveSortedList(const QString& filename, const QList<QPair<
         (*output_file) << outline << endl;
     }
     bool closed_okay = CloseFileStream(output_file, true);
-    return true;
+    return closed_okay;
 }
 
 /*****************************************************************************/

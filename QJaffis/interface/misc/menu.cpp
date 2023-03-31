@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    Defines custom popup menu classes
 Created:     January 5, 2010
 Conversion to Qt Started February 22, 2013
-Updated:     July 12, 2017
+Updated:     March 25, 2023
 ******************************************************************************/
 #ifndef MENU_H_INCLUDED
   #include "menu.h"
@@ -68,7 +68,7 @@ void jfPopupMenu::OnLoadURL() {
 void jfPopupMenu::OnAppendToExpressionFilter() {
   QString desc;
   if (xNN()) {
-    desc = GetSource()->GetDescription();
+    desc = GetSource()->SourceLink()->GetSummary();
     emit sendDescription(desc);
   }
 }
@@ -79,32 +79,10 @@ bool jfPopupMenu::xNN() const {
     else return true;
 }
 //--------------------------------------------
-const jfBasePD* jfPopupMenu::GetSource() {
+jfResultUnit* jfPopupMenu::GetSource() const {
     if (sdata==NULL) return NULL;
-    else if ((sdata->item_clicked)  == NULL) return NULL;
-    else return (sdata->item_clicked)->Sourcelink();
+    else return sdata->item_clicked;
 }
-
-//===========================================================================
-/*
-jfGooxPopupMenu::jfGooxPopupMenu(wxWindow* destination):jfPopupMenu(destination) {
-  miExcludeUrl = new wxMenuItem(this,jfID_RMENU_EXLURL,"Add the url to the exclude list..."),wxT("Edit the url to add to the url filter",wxITEM_NORMAL);
-  Append(miExcludeUrl);
-  Connect(jfID_RMENU_EXLURL,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&jfGooxPopupMenu::OnExcludeUrl);
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfGooxPopupMenu::OnExcludeUrl(wxCommandEvent& event) {
-    // local variables
-  wxPoint* outpair;
-  // creating the out-event
-  wxCommandEvent outevent(jf_RMENU_EXLUDEURL_EVENT,-1);
-  // setting up the index information
-  outpair = new wxPoint(coll_index,item_index);
-  outevent.SetClientData(outpair);
-  // posting
-  wxPostEvent(dtarget,outevent);
-}
-*/
 //===================================================================
 jfItemPopupMenuBase::jfItemPopupMenuBase():jfPopupMenu() {
     ignore_toggle = addAction("Ignore Item",this,SLOT(OnToggleIgnore()));
@@ -114,28 +92,35 @@ jfItemPopupMenuBase::jfItemPopupMenuBase():jfPopupMenu() {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void jfItemPopupMenuBase::OnToggleIgnore() {
     const QString fname = "jfItemPopupMenuBase::OnToggleIgnore";
-    jfBasePD* group_pointer;
-    if (xNN()) {
+    jfResultUnit* group_pointer = GetSource();
+    if (xNN() && group_pointer->HasFlags() ) {
         /**/JDEBUGLOG(fname,1)
-        bool xtest;
-        group_pointer = const_cast<jfBasePD*>(GetSource());
-        group_pointer->ignore = !(group_pointer->ignore);
-         /**/JDEBUGLOGB(fname,2,group_pointer->ignore)
-        /**/JDEBUGLOGB(fname,3,defcolour::ignored.isValid());
-        if (group_pointer->ignore) sdata->item_clicked->bgcolor = defcolour::ignored;
-        else sdata->item_clicked->bgcolor = defcolour::base;
+        group_pointer = GetSource();
+        jfItemMetaFlags* mflags = group_pointer->Flags();
+
+        /**/JDEBUGLOGB(fname, 2, mflags->ignore)
+        /**/JDEBUGLOGB(fname, 3, defcolour::ignored.isValid());
+
+        if (mflags->ignore) mflags->background_color = defcolour::ignored;
+        else mflags->background_color = defcolour::base;
         // updating the display...
-        xtest = (sdata->model_pointer)->SignalRowChanged(sdata->row_index);
-         /**/JDEBUGLOGB(fname,4,xtest)
+        bool xtest = (sdata->model_pointer)->SignalRowChanged(sdata->row_index);
+        /**/JDEBUGLOGB(fname,4,xtest)
     }
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void jfItemPopupMenuBase::EnableDisable() {
     if (xNN()) {
-        ignore_toggle->setEnabled(true);
         ignore_toggle->blockSignals(true);
-        if (GetSource()->ignore) ignore_toggle->setChecked(true);
-        else ignore_toggle->setChecked(false);
+        if (GetSource()->HasFlags()) {
+            ignore_toggle->setEnabled(true);
+            bool is_ignored = GetSource()->Flags()->ignore;
+            ignore_toggle->setChecked(is_ignored);
+        }
+        else {
+            ignore_toggle->setChecked(false);
+            ignore_toggle->setEnabled(false);
+        }
         ignore_toggle->blockSignals(false);
     }
     else ignore_toggle->setEnabled(false);

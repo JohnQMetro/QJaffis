@@ -44,7 +44,7 @@ QString jfExtraTagFilter::GetTypeID() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfExtraTagFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfExtraTagFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   QString datainfo;
   const jfAO3Fanfic* typed_item;
   // checks and starts

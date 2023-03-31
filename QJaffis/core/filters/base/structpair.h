@@ -3,7 +3,7 @@ Name    :   structpair.h
 Author  :   John Q Metro
 Purpose :   'Structured Pair' filters
 Created :   February 16, 2023
-Updated :   February 25, 2023
+Updated :   March 10, 2023
 ******************************************************************************/
 #pragma once
 
@@ -14,6 +14,8 @@ Updated :   February 25, 2023
 #ifndef JFBASEFILTER
   #include "../base/filterbase.h"
 #endif
+
+#include "../../objs/baseitem.h"
 
 #include <QVector>
 /*****************************************************************************/
@@ -89,18 +91,18 @@ class jfStructuredPairFilter : public jfBaseFilter {
     jfStructuredPairFilter();
     jfStructuredPairFilter(const jfStructuredPairFilter& source);
     // match against the filter
-    virtual bool isEmpty() const;
+    virtual bool isEmpty() const override;
     // loading from a string representation
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
+    virtual bool FromString(const QString& sourcedata) override;
+    virtual QString ToString() const override;
     bool SetNamesData(const QString& sourcedata, bool nl_split);
     QString GetNamesData(bool nl_split) const;
     // gets a description
-    virtual QString GetTypeDescription() const;
+    virtual QString GetTypeDescription() const override;
     // copy
-    virtual jfBaseFilter* GenCopy() const;
+    virtual jfBaseFilter* GenCopy() const override;
     // special meta-information
-    virtual QString GetTypeID() const;
+    virtual QString GetTypeID() const override;
     // other methods
     void SetMatchAll(bool inval);
     bool GetMatchAll() const;
@@ -113,18 +115,18 @@ class jfStructuredPairFilter : public jfBaseFilter {
   protected:
     static void EmptyPairList(QVector<const jfPairFilterPair*>& plist);
     bool DoesPairingMatch(const jfPairingStruct& target) const;
-    const jfFanficPairsMixin* CheckCastElement(const jfBasePD* testelem) const;
+    const jfFanficPairsMixin* CheckCastElement(const jfSearchResultItem* testelem) const;
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
     bool ParsePairs(const QString& inval, bool nl, QVector<const jfPairFilterPair*>& target) const;
     // file i/o
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
+    virtual bool AddRestToFile(QTextStream* outfile) const override;
+    virtual bool ReadRestFromFile(jfFileReader* infile) override;
 
     /* since different types are stored together, the text file reprentation
     may have objects of varying length */
 
-    virtual size_t ExtraLines() const;
+    virtual size_t ExtraLines() const override;
     // internal data
     QVector<const jfPairFilterPair*> filter_pairs;
     bool match_all;

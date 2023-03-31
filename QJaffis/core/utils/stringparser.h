@@ -4,7 +4,7 @@ Basic   : String parsing class
 Author  : John Q Metro
 Started : August 21, 2012 (spit from utils2.h)
 Conversion to QT started : March 2, 2013
-Updated : July 11, 2022
+Updated : March 12, 2023
 Notes   :
 
 ******************************************************************************/
@@ -28,6 +28,7 @@ class jfStringParser {
     jfStringParser(QString indata, bool incasesen=false);
     // change indata
     void ChangeData(QString indata, bool incasesen=false);
+    void Clear();
     // getting basic info
     bool IsReady() const;
     bool IsCaseSensetive() const;

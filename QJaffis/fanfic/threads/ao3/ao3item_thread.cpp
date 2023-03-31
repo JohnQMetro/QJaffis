@@ -3,7 +3,7 @@ Name    :   ao3item_thread.cpp
 Author  :   John Q Metro
 Purpose :   Downloader class for AO3 fic listings
 Created :   July 17, 2016
-Updated :   July 30, 2022
+Updated :   March 25, 2023
 ******************************************************************************/
 #ifndef AO3ITEM_THREAD_H
   #include "ao3item_thread.h"
@@ -26,10 +26,11 @@ bool jfAO3FandomItemDownloader::NextCategory() {
   if (!ao3_search->NextIndex()) return false;
   current_category = ao3_search->GetCurrCat();
   ao3_search->DispatchCategory();
-  jfAO3_FicList* newcoll = dynamic_cast<jfAO3_FicList*>(multi_maindata->AppendNewCollection());
+  QString cname = (ao3_search->GetCatName())+" Result Fics";
+  size_t cid = current_category->GetID();
+
+  jfAO3_FicList* newcoll = dynamic_cast<jfAO3_FicList*>(multi_maindata->AppendNewCollection(cname, cid));
   newcoll->ReplaceCat(current_category);
-  newcoll->SetName((ao3_search->GetCatName())+" Result Fics");
-  newcoll->SetID(current_category->GetID());
   current_collection = newcoll;
   ao3_parser->SetCategory(current_category);
   return true;

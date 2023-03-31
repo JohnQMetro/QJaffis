@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    vector declarations
 Created:     April 29, 2009
 Conversion to QT started : April 18, 2013
-Updated:     June 4 (result unit vector change due to downloader changes)
+Updated:     March 11, 2023
 ******************************************************************************/
 #ifndef VECTORS_H_INCLUDED
 #define VECTORS_H_INCLUDED
@@ -17,6 +17,8 @@ Updated:     June 4 (result unit vector change due to downloader changes)
 #include <QMetaType>
 #include <set>
 #include <map>
+
+#include "../objs/baseitem.h"
 /******************************************************************************/
 // forward declarations
 class jfResultUnit;
@@ -40,7 +42,6 @@ class jfResultUnitVector : public std::vector<jfResultUnit*> {
     // used by display to tell downloader it is done
     jfDownloadRootItems* source_new;
 
-
 };
 
 Q_DECLARE_METATYPE(jfResultUnitVector);
@@ -51,10 +52,7 @@ class jfIndexVector : public std::vector<size_t> {
     QString ToDelimString(QChar dval) const;
     bool SetFromString(QString inval, QChar dval);
 };
-//===========================================================================
-class jfBasePD;
-// a vector of jfBasePD items
-class jfPDVector : public std::vector<jfBasePD*> {};
+
 //===========================================================================
 class jfBaseObj;
 
@@ -64,7 +62,8 @@ class jfIDStore : public std::set<size_t> {
     /* DiscardTest returns true if the input is in the set, otherwise it
     adds the input to the set and returns false */
     bool DiscardTest(size_t testval);
-    bool DiscardTest(jfBaseObj* testobj);
+    bool DiscardTest(const jfBaseObj* testobj);
+    bool DiscardTest(const jfSearchResultItem* testitem);
 };
 //======================================================================
 typedef struct xjfBSPair {

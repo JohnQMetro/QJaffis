@@ -365,7 +365,7 @@ bool caseInsensitiveLessThan(const QString &s1, const QString &s2) {
 void SortStringList(QStringList* tosort, bool casesen) {
   if (tosort!=NULL){
     if (casesen) tosort->sort();
-    else qSort(tosort->begin(),tosort->end(),caseInsensitiveLessThan);
+    else std::sort(tosort->begin(),tosort->end(),caseInsensitiveLessThan);
   }
 }
 

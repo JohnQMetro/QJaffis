@@ -30,7 +30,7 @@ class jfFIMContentTypeFilter : public jfTagFilterCore {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     virtual bool ModifyList(QStringList* templist) const;
     // check the tags against a list of pre-approved tags
     virtual bool DoVerify();
@@ -50,7 +50,7 @@ class jfFIMWarningsFilter : public jfTagFilterCore {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     virtual bool ModifyList(QStringList* templist) const;
     // check the tags against a list of pre-approved tags
     virtual bool DoVerify();

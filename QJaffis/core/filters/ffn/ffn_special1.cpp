@@ -67,7 +67,7 @@ bool jfFFNGenresFilter::ModifyList(QStringList* templist) const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFFNGenresFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFFNGenresFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfFFNItem* rvalue;
   // we start
   assert(testelem!=NULL);
@@ -135,7 +135,7 @@ bool jfFFNRatingFilter::Includes(QChar test) const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFFNRatingFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFFNRatingFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfFFNItem* rvalue;
   QChar cvalue;
   assert(testelem!=NULL);
@@ -198,7 +198,7 @@ jfBaseFilter* jfFFNFavsFilter::GenCopy() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFFNFavsFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFFNFavsFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   // variables
   const jfFFNItemCore* rvalue;
   size_t cvalue;
@@ -240,7 +240,7 @@ QString jfFFN_CategoryExprFilter::GetTypeID() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFFN_CategoryExprFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFFN_CategoryExprFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   QString datainfo;
   const jfFFNItem* typed_item;
   // checks and starts

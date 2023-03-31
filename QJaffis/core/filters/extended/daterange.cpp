@@ -44,7 +44,7 @@ bool jfDateRangeFilter::FromString(const QString& sourcedata) {
   // variables
   const QString npointer;
   QDate testdate;
-  int divider, leng;
+  int divider;
   QString p1, p2;
   // special case to start
   /**/JDEBUGLOGS(fname,1,sourcedata)
@@ -60,7 +60,6 @@ bool jfDateRangeFilter::FromString(const QString& sourcedata) {
   if (divider<0) return false;
   /**/JDEBUGLOG(fname,3)
   p1 = sourcedata.mid(0,divider);
-  leng = sourcedata.length();
   p2 = sourcedata.mid(divider+2);
   p1 = p1.trimmed();
   p2 = p2.trimmed();
@@ -131,8 +130,8 @@ QDate jfDateRangeFilter::DayPlus(QDate inval, bool decrement) const {
   // special case
   if (!inval.isValid()) return inval;
   // other cases
-  if (decrement) inval.addDays(-1);
-  else inval.addDays(1);
+  if (decrement) inval = inval.addDays(-1);
+  else inval = inval.addDays(1);
   return inval;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -206,7 +205,7 @@ jfBaseFilter* jfUpdatedDateFilter::GenCopy() const {
 QString jfUpdatedDateFilter::GetTypeID() const { return "UpdatedDateFilter";}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfUpdatedDateFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfUpdatedDateFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   // variables
   const jfGenericFanfic* rvalue;
   QDate gdate;
@@ -243,7 +242,7 @@ jfBaseFilter* jfPublishedDateFilter::GenCopy() const {
 QString jfPublishedDateFilter::GetTypeID() const { return "PublishedDateFilter";}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfPublishedDateFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfPublishedDateFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   // variables
   const jfFFNItem* rvalue;
   QDate gdate;

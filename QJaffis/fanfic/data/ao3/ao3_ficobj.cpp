@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines fanfic object data of archoveofourown.org
 Created :   August 26, 2012
 Conversion to Qt Started September 28, 2013
-Updated :   February 25, 2023
+Updated :   March 18, 2023
 ******************************************************************************/
 #ifndef AO3_FICOBJ_H_INCLUDED
   #include "ao3_ficobj.h"
@@ -19,9 +19,7 @@ Updated :   February 25, 2023
 #ifndef AO3_CONSTS_H_INCLUDED
   #include "ao3_consts.h"
 #endif // AO3_CONSTS_H_INCLUDED
-#ifndef HTMLPARSE_H_INCLUDED
-  #include "../../../core/utils/htmlparse.h"
-#endif // HTMLPARSE_H_INCLUDED
+
 
 #ifndef DISPLAYHTMLSPEC_H
     #include "../displayhtmlspec.h"
@@ -31,89 +29,69 @@ Updated :   February 25, 2023
 #include <QRegExp>
 #include <QRegularExpression>
 //**************************************************************************
-const QRegularExpression breaks = QRegularExpression("<br/?>[\\s\\-*]*<br/?>([\\s\\-*]*<br/?>)*",QRegularExpression::CaseInsensitiveOption);
 
+const QString jfAO3Fanfic::AO3_FANFIC_TYPE_ID = QString("AO3Fanfic");
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // default constructors
 //----------------------------
 jfAO3Fanfic::jfAO3Fanfic():jfGenericFanfic2() {
-  rating = warn = ao3con::unchar;
-  eccount = -1;
-  kudcount = 0;
-  series_index = 0;
-  x_parser = NULL;
-  english_locale = QLocale(QLocale::English, QLocale::UnitedStates);
+    type_labels.append(FANFIC_PAIRS_TYPE_ID);
+    type_labels.append(AO3_FANFIC_TYPE_ID);
+
+    rating = warn = ao3con::unchar;
+    eccount = -1;
+    kudcount = 0;
+    series_index = 0;
+}
+// --------------------------
+jfAO3Fanfic::jfAO3Fanfic(const jfSearchResultItemData& init_data):jfGenericFanfic2(init_data) {
+    type_labels.append(FANFIC_PAIRS_TYPE_ID);
+    type_labels.append(AO3_FANFIC_TYPE_ID);
+
+    rating = warn = ao3con::unchar;
+    eccount = -1;
+    kudcount = 0;
+    series_index = 0;
 }
 //----------------------------
 jfAO3Fanfic::jfAO3Fanfic(const jfAO3Fanfic& src):jfGenericFanfic2(src) {
-  rating = src.rating;
-  orientations = src.orientations;
-  warn = src.warn;
-  eccount = src.eccount;
-  kudcount = src.kudcount;
-  warntags = src.warntags;
-  extratags = src.extratags;
-  // categories and series
-  series_index = src.series_index;
-  series_name = src.series_name;
-  series_url = src.series_url;
-  cats.assign(src.cats.begin(),src.cats.end());
-  x_parser = NULL;
-  RelationshipCopy(src);
-  english_locale = QLocale(QLocale::English, QLocale::UnitedStates);
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// other methods
-bool jfAO3Fanfic::SetFromString(QString inval, const jfAO3_Category* incat, QString& parse_err) {
-  const QString fxname = "jfAO3Fanfic::SetFromString";
-  // preparing
-  bool success = false;
-  validdata = false;
-  // category stuff
-  assert(incat!=NULL);
-  cats.clear();
-  cats.push_back(incat);
-  // setting up the parser
-  x_parser = new jfStringParser(inval);
-  // calling
-  if (ParseStart()) {
-    if (ParseMiddle()) {
-      if (ParseTags()) {
-        if (ParseEnd()) success = true;
-      }
-    }
-  }
-  if (!success) {
-    parse_err = parser_error;
-    JDEBUGLOGS(fxname,1, parse_err)
-  }
-  else {
-      delete x_parser;
-      x_parser = NULL;
-  }
-  validdata = success;
-  return success;
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// special meta-information
-QString jfAO3Fanfic::GetTypeID() const {
-  return "AO3Fanfic";
+    type_labels.append(FANFIC_PAIRS_TYPE_ID);
+    type_labels.append(AO3_FANFIC_TYPE_ID);
+
+    rating = src.rating;
+    orientations = src.orientations;
+    warn = src.warn;
+    eccount = src.eccount;
+    kudcount = src.kudcount;
+    warntags = src.warntags;
+    extratags = src.extratags;
+    // categories and series
+    series_index = src.series_index;
+    series_name = src.series_name;
+    series_url = src.series_url;
+    cats.assign(src.cats.begin(),src.cats.end());
+    RelationshipCopy(src);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // getting info
 //----------------------------
 QChar jfAO3Fanfic::GetRating() const { return rating; }
 //----------------------------
-QString jfAO3Fanfic::GetOrientations() const { return orientations; }
+bool jfAO3Fanfic::MultipleOrientations() const {
+    return orientations.contains(",");
+}
+//----------------------------
+const QString& jfAO3Fanfic::GetOrientations() const { return orientations; }
 //----------------------------
 QChar jfAO3Fanfic::GetWarnflag() const { return warn; }
 //----------------------------
-QString jfAO3Fanfic::GetWarntag() const { return warntags;}
+const QString& jfAO3Fanfic::GetWarntag() const { return warntags;}
 //----------------------------
 bool jfAO3Fanfic::TestWarntag(QChar inval) const {
   return warntags.contains(inval);
 }
 //----------------------------
-int jfAO3Fanfic::GetEstPCount() const { return eccount; }
+int jfAO3Fanfic::GetEstPartCount() const { return eccount; }
 //----------------------------
 size_t jfAO3Fanfic::GetKudos() const { return kudcount; }
 //----------------------------
@@ -122,7 +100,7 @@ const QStringList& jfAO3Fanfic::GetExtraTags() const { return extratags; }
 QString jfAO3Fanfic::GetJoinedExtraTags() const {
     return extratags.join(',');
 }
-//----------------------------
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfAO3Fanfic::InSeries() const { return (series_index!=0); }
 //----------------------------
 size_t jfAO3Fanfic::SeriesIndex() const { return series_index; }
@@ -130,7 +108,7 @@ size_t jfAO3Fanfic::SeriesIndex() const { return series_index; }
 QString jfAO3Fanfic::SeriesName() const { return series_name; }
 //----------------------------
 QString jfAO3Fanfic::SeriesUrl() const { return series_url; }
-//---------------------------------
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++
 QString jfAO3Fanfic::GetFandoms() const {
   QString resval;
   for (size_t xl = 0;xl<cats.size();xl++) {
@@ -155,458 +133,77 @@ size_t jfAO3Fanfic::FandomCount() const {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // special url construction
 QString jfAO3Fanfic::MakeAuthorUrl() const { return  author_url; }
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// to string functions
-//----------------------------
-QString jfAO3Fanfic::ToText() const {
-  QString result,buffer;
-  // building the title and author line
-  result += name + " by " + author_name + "\n";
-  // next line: link display
-  result += primarylink + "\n";
-  // adding the main description
-  result += description + "\n";
-  if (InSeries()) {
-    result += "Part " + QString::number(series_index) + " of the " + series_name;
-    result += " Series.\n";
-  }
-  // next up.. two extra lines
-  result += "Updated: " + updated_date.toString("MM-dd-yyyy");
-
-  // the rating... and orientation
-  result += " - Rating: " + RatingToString();
-  result += " - Orientation";
-  result += (orientations.contains(","))?"s: ":": ";
-  result += orientations;
-
-  // part count and word count
-  result += " - Parts: " + QString::number(part_count);
-  result += " - Words: " + QString::number(word_count);
-  if (kudcount!=0) result += " - Kudos: " + QString::number(kudcount);
-  result+= "\n";
-  // final info,
-  result += "Warnings: " + WarnToString();
-  if (!characters.isEmpty()) {
-    result += " - Characters: " + characters.join(", ") + "\n";
-  }
-  // character data
-  if (RelationshipCount() > 0) {
-    result += "Pairings: " + RelationshipsAsDisplayString(false);
-  }
-  // tags
-  if (!extratags.isEmpty()) {
-    result += " - Tags: " + GetJoinedExtraTags();
-  }
-  if (completed) {
-    result += " - Complete";
-  }
-  // finishing off
-  result += "\n";
-  // done
-  return result;
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfAO3Fanfic::LoadMoreValues2(jfSkeletonParser* inparser) const {
+    // checking
+    assert(inparser!=NULL);
+    QString rtval;
+    // starting
+    LoadRelationships(inparser, false);
+    // rating
+    inparser->AddText("ITEMF_RATING",RatingToString());
+    // orientation
+    inparser->AddText("ITEMF_ORIENT",GetOrientations());
+    // warnings
+    inparser->AddText("ITEMF_WARNING",WarnToString());
+    // kudos
+    inparser->AddUInt("ITEMF_KUDOS",kudcount);
+    // the strings
+    inparser->AddText("ITEMF_EXTRATAGS",GetJoinedExtraTags());
+    inparser->AddText("ITEMF_FANDOMS",GetFandoms());
+    // series stuff
+    inparser->AddBool("ITEMF_INSERIES",InSeries());
+    inparser->AddUInt("ITEMF_SERIESINDEX",series_index);
+    inparser->AddText("ITEMF_SERIESNAME",series_name);
+    inparser->AddText("ITEMF_SERIESURL",series_url);
+    // done
+    return true;
 }
-//----------------------------
-QString jfAO3Fanfic::ToDisplayHTML() const {
-  const QString fname = "jfAO3Fanfic::ToDisplayHTML";
-  QString result,buffer,optline;
-
-  const jfDisplayHTMLHelper* helper = HTMLHelpers::ao3_item_helper;
-  // we start with the table
-  result = DisplayHTMLHeader(1, helper);
-  // fandom display
-  result += "<br>\n" + helper->WrapText("fandoms", GetFandoms());
-  result += "</td></tr>\n";
-  // next line: link display
-  result += "<tr><td>";
-  result += helper->WrapText("ficlink", primarylink, false);
-
-  // adding the main description
-  result += "<div style=\"margin-left:10px;\">";
-  QString rdesc = (description.length() > 1000) ? (description.left(1000) + "...") : description;
-  result += helper->WrapTextNoEsc("description",rdesc,false);
-  result += "</div>";
-
-  // series
-  if (InSeries()) {
-      QString series = "Part " + QString::number(series_index) + " of the " + series_name + " Series";
-      result += helper->WrapText("series", series, true);
-  }
-  // standard metadata
-  QString mdata = "Updated: " + updated_date.toString("MM-dd-yyyy") + " - Rating: " + RatingToString();
-  mdata += " - Orientation";
-  mdata += ((orientations.contains(","))?"s: ":": ") + orientations;
-  // part count and word count
-  mdata += " - Parts: " + QString::number(part_count);
-  mdata += " - Words: " + QString::number(word_count);
-  // kudos
-  mdata += " - Kudos: " + QString::number(kudcount);
-  if (completed) {
-    mdata += " - Complete";
-  }
-  result += helper->WrapText("basicinfo", mdata, true);
-
-  // final info
-  optline = helper->ConditionalWrapText("warnings",false,"Warnings: ", true, WarnToString());
-  optline += helper->ConditionalWrapText("characters", !optline.isEmpty(), "Characters: ", true, characters.join(", "));
-  optline += helper->ConditionalWrapText("pairings", !optline.isEmpty(), "Pairings: ", true, RelationshipsAsDisplayString(false));
-  if (!optline.isEmpty()) result += optline + "<br>\n";
-
-  // extra tags
-  result += helper->ConditionalWrapText("tags", false, "", false, GetJoinedExtraTags());
-
-  // finishing off
-  result += "</td></tr>\n</table>";
-  // done
-  return result;
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// added stuff
-bool jfAO3Fanfic::LoadValues(jfSkeletonParser* inparser) const {
-  // checking
-  assert(inparser!=NULL);
-  QString rtval;
-  // starting
-  LoadCoreValues(inparser);
-  LoadMoreValues1(inparser);
-  LoadMoreValues2(inparser);
-  LoadRelationships(inparser, false);
-  // rating
-  inparser->AddText("ITEMF_RATING",RatingToString());
-  // orientation
-  inparser->AddText("ITEMF_ORIENT",GetOrientations());
-  // warnings
-  inparser->AddText("ITEMF_WARNING",WarnToString());
-  // kudos
-  inparser->AddUInt("ITEMF_KUDOS",kudcount);
-  // the strings
-  inparser->AddText("ITEMF_EXTRATAGS",GetJoinedExtraTags());
-  inparser->AddText("ITEMF_FANDOMS",GetFandoms());
-  // series stuff
-  inparser->AddBool("ITEMF_INSERIES",InSeries());
-  inparser->AddUInt("ITEMF_SERIESINDEX",series_index);
-  inparser->AddText("ITEMF_SERIESNAME",series_name);
-  inparser->AddText("ITEMF_SERIESURL",series_url);
-  // done
-  return true;
-}
-//------------------------------------------------------------------
-void jfAO3Fanfic::ProcessDescription() {
-  if (!description.isEmpty()) {
-    description = description.trimmed();
-    description = description.mid(3,description.length()-7);
-    // post processing
-    description.replace("</p><p><hr></p>","<br>\n",Qt::CaseInsensitive);
-    description.replace("<hr />","<br>\n",Qt::CaseInsensitive);
-    description.replace("</p><p>","<br>\n",Qt::CaseInsensitive);
-    description.replace("</p>","<br>\n",Qt::CaseInsensitive);
-    description.replace("<p>"," ",Qt::CaseInsensitive);
-    description.replace(breaks,"<br>\n");
-
-    description = description.simplified();
-  }
-}
-// ---------------------------------------------
-jfAO3Fanfic::~jfAO3Fanfic() {
-    ClearPairingVector(char_pairs);
-    if (x_parser != NULL) delete x_parser;
-    cats.clear();
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // internal to string helper methods
 //----------------------------
 QString jfAO3Fanfic::RatingToString() const {
-  if (rating=='G') return "General";
-  else if (rating=='T') return "Teen";
-  else if (rating=='M') return "Mature";
-  else if (rating=='E') return "Explicit";
-  else if (rating=='_') return "Unspecified";
-  else assert(false);
-  return "";
+    if (rating=='G') return "General";
+    else if (rating=='T') return "Teen";
+    else if (rating=='M') return "Mature";
+    else if (rating=='E') return "Explicit";
+    else if (rating=='_') return "Unspecified";
+    else assert(false);
+    return "";
 }
-//----------------------------
-QString jfAO3Fanfic::WarnToString() const {
-  // variables
-  QString resval;
-  // testing
-  if (warn=='N') return "Creator Chose Not To Use Archive Warnings";
-  else if (warn=='_') return "No Archive Warnings Apply";
-  else if (warn=='E') return "External Site";
-  else if (warn=='W') {
-    if (TestWarntag('V')) resval = "Violence";
-    if (TestWarntag('D')) {
-      if (!resval.isEmpty()) resval+= ", ";
-      resval += "Character Death";
-    }
-    if (TestWarntag('R')) {
-      if (!resval.isEmpty()) resval+= ", ";
-      resval += "Rape";
-    }
-    if (TestWarntag('P')) {
-      if (!resval.isEmpty()) resval+= ", ";
-      resval += "Underage Sex";
-    }
-    // done
-    return resval;
-  }
-  else assert(false);
-  return "";
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jfAO3Fanfic::~jfAO3Fanfic() {
+    ClearPairingVector(char_pairs);
+    cats.clear();
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// internal parsing methods
-//-------------------------------------------
-// handles fic name, id, author name and id, and category info
-bool jfAO3Fanfic::ParseStart() {
-  // constants
-  // variables
-  unsigned long tval;
-  QString errpass,buffer;
-  jfStringParser* tparser;
-  QString curl;
-  const jfGeneralCategory* temp;
-  size_t aloc, bloc;
-  // starting...
-  assert(x_parser!=NULL);
-  // the fic id first
-  if (!x_parser->GetDelimitedULong("<a href=\"/works/","\">",tval,errpass)) {
-    return parseError("Error in getting fic id : " + errpass);
-  }
-  num_id = tval;
-  primarylink = "https://archiveofourown.org/works/" + QString::number(num_id);
-  primarylink += "?view_adult=true";
-  // title
-  if (!x_parser->GetMovePast("</a>",name)) return parseError("Could not extract title!");
-  name = htmlparse::ConvertEntities(name, false);
-  // can be rather complicated because we can have anonymous stories with no link
-  if (!x_parser->Find1stPair("<a rel=\"author\"","Anonymous",aloc,bloc)) {
-    return parseError("Could not get author!");
-  }
-  if (aloc==1) {
-    // author link
-    if (!x_parser->MovePast("<a rel=\"author\"")) {
-      return parseError("Error in getting start of author link!");
-    }
-    if (!x_parser->GetDelimited("href=\"","\"",buffer)) {
-      return parseError("Error in getting author link!");
-    }
-    author_url = "https://archiveofourown.org" + buffer;
-    // author name
-    if (!x_parser->GetDelimited(">","</a>",author_name)) {
-      return parseError("Error in getting author name!");
-    }
-    author_name = htmlparse::ConvertEntities(author_name, false);
-  }
-  else {
-    author_name = "Anonymous";
-  }
-  // fandoms
-  if (!x_parser->GetDelimited("<h5 class=\"fandoms","</h5>",buffer)) {
-    return parseError("Cannot find fandoms!");
-  }
-  tparser = new jfStringParser(buffer);
-  while (tparser->MovePast("<a class=\"tag\"")) {
-    if (!tparser->GetDelimited("href=\"","\"",curl)) break;
-    curl = "https://archiveofourown.org" + curl;
-    if (curl==cats[0]->GetUrl()) continue;
-    temp = ao3_catdata::ao3_catmanager->GetData()->FindByUrl(curl);
-    /* note that I've decided to ignore unfound fandoms after my first first
-    test revealed multiple names/urls for the same fandon. Too difficult to track
-    all of them. */
-    if (temp!=NULL) cats.push_back(dynamic_cast<const jfAO3_Category*>(temp));
-  }
-  delete tparser;
-  if (cats.size()==0) return parseError("No fandoms!");
-  else return true;
-}
-//-------------------------------------------
-// special flags and date
-bool jfAO3Fanfic::ParseMiddle() {
-  // constants
 
-  // variables
-  QString buffer;
-  QString whatwarn = "";
-  // starting...
-  assert(x_parser!=NULL);
-  // rating
-  if (!x_parser->GetDelimited("<span class=\"rating-","\"",buffer)) {
-    return parseError("Cannot find rating!");
-  }
-  if (buffer=="teen rating") rating = 'T';
-  else if (buffer=="explicit rating") rating = 'E';
-  else if (buffer=="general-audience rating") rating = 'G';
-  else if (buffer=="mature rating") rating = 'M';
-  else if (buffer=="notrated rating") rating = '_';
-  else return parseError("Rating unrecognized!");
-
-  // warning flag
-  if (!x_parser->GetDelimited("<span class=\"warning-","\"",buffer)) {
-    return parseError("Cannot find warning flag!");
-  }
-  if (buffer=="yes warnings") warn = 'W';
-  else if (buffer=="no warnings") warn = '_';
-  else if (buffer=="choosenotto warnings") warn = 'N';
-  else if (buffer=="mature rating") warn = 'E';
-  else return parseError("Warning Flags unrecognized!");
-  // we try to get the actual warning
-  if (warn == 'W') {
-      if (x_parser->GetDelimited("title=\"","\">",buffer)) {
-          whatwarn = buffer.trimmed().replace("\\'","'");;
-      }
-  }
-
-  // orientation
-  if (!x_parser->MovePastTwo("<span class=\"category-","\"")) {
-      return parseError("Cannot start of find orientation!");
-  }
-  if (!x_parser->GetDelimited("title=\"","\"",buffer)) {
-      return parseError("Cannot find orientation!");
-  }
-  if (buffer == "No category") orientations = "";
-  else {
-      orientations = buffer.trimmed();
-  }
-
-  // completed flag
-  if (!x_parser->GetDelimited("<span class=\"complete-","\"",buffer)) {
-    return parseError("Cannot find completion status!");
-  }
-  completed = (buffer=="yes iswip");
-  // getting the date
-  if (!x_parser->GetDelimited("<p class=\"datetime\">","</p>",buffer)) {
-    return parseError("Cannot find date!");
-  }
-  // converting the date
-  buffer = buffer.trimmed();
-  updated_date = english_locale.toDate(buffer,"d MMM yyyy");
-  // updated_date = QDate::fromString(buffer,"d MMM yyyy");
-  if (!updated_date.isValid()) return parseError("Date Conversion failed! " + buffer);
-  return true;
-}
-//-------------------------------------------
-bool jfAO3Fanfic::ParseTags() {
-  // constants
-  // variables
-  QString buffer1,buffer2;
-  QString extrawarn;
-  // the tag loop
-  while(x_parser->GetDelimited("<li class='","'>",buffer1)) {
-    if (!x_parser->MovePast("<a class=\"tag\"")) {
-        return parseError("Cannot find middle part of tag!");
-    }
-    if (!x_parser->GetDelimited("\">","</a>",buffer2)) {
-      return parseError("Cannot find final part of tag!");
-    }
-    buffer2 = htmlparse::ConvertEntities(buffer2, false);
-    // here, we've got the tag strings, just sort them!
-    if (buffer1=="warnings") {
-      if (buffer2=="Underage") warntags += 'P';
-      else if (buffer2=="Graphic Depictions Of Violence") warntags += 'V';
-      else if (buffer2=="Major Character Death") warntags += 'D';
-      else if (buffer2=="Rape/Non-Con") warntags += 'R';
-      else if (buffer2=="Creator Chose Not To Use Archive Warnings") ;
-      else if (buffer2=="No Archive Warnings Apply") ;
-      /* annoyingly, AO3 has just come up with a bunch of additional warnings which
-       * seem to be not standardized or filterable. so, I'll stick them in extratags */
-      else extrawarn = buffer2.trimmed();
-    }
-    else if (buffer1=="characters") {
-        characters.append(buffer2);
-    }
-    else if (buffer1=="relationships") {
-        if (! ParseAndAddPair(buffer2, true)) {
-            // TODO: log
+QString jfAO3Fanfic::WarnToString() const {
+    // variables
+    QString resval;
+    // testing
+    if (warn=='N') return "Creator Chose Not To Use Archive Warnings";
+    else if (warn=='_') return "No Archive Warnings Apply";
+    else if (warn=='E') return "External Site";
+    else if (warn=='W') {
+        if (TestWarntag('V')) resval = "Violence";
+        if (TestWarntag('D')) {
+            if (!resval.isEmpty()) resval+= ", ";
+            resval += "Character Death";
         }
+        if (TestWarntag('R')) {
+            if (!resval.isEmpty()) resval+= ", ";
+            resval += "Rape";
+        }
+        if (TestWarntag('P')) {
+            if (!resval.isEmpty()) resval+= ", ";
+            resval += "Underage Sex";
+        }
+        // done
+        return resval;
     }
-    else if (buffer1=="freeforms") {
-        extratags.append(buffer2.trimmed());
-    }
-    else return parseError("Unrecognized Tag Type! (" + buffer1 + ")");
-  }
-  if (!extrawarn.isEmpty()) {
-    if (!extratags.isEmpty()) extratags += ", ";
-    extratags += extrawarn;
-  }
-  // done
-  return true;
-}
-//-------------------------------------------
-bool jfAO3Fanfic::ParseEnd() {
-  // constants
-  const QString sum_string = "<blockquote class=\"userstuff summary\">";
-  // variables
-  QString buffer1,buffer2;
-  QString errout;
-  unsigned long tval;
-  // getting the summary
-  if (!x_parser->GetDelimited(sum_string,"</blockquote>",buffer1)) {
-    // sometimes there is no summary
-    description = "";
-  }
-  else description = buffer1.trimmed();
-
-  // series (optional)
-  if (x_parser->MovePast("<h6 class=\"landmark heading\">Series</h6>")) {
-    if (!x_parser->GetDelimitedULong("Part <strong>","</strong>",tval,errout)) {
-      return parseError("Series index is wrong! " + errout);
-    }
-    series_index = tval;
-    if (!x_parser->GetDelimited("<a href=\"","\">",buffer2)) {
-      return parseError("Problems getting series url!");
-    }
-    series_url = "https://archiveofourown.org" + buffer2;
-    if (!x_parser->GetMovePast("</a>",buffer1)) {
-      return parseError("Problems getting series name!");
-    }
-    series_name = htmlparse::ConvertEntities(buffer1, false);
-  }
-  else series_index = 0;
-  // words
-  if (!x_parser->MovePast("<dt class=\"words\">Words:</dt>")) return parseError("Cannot find wordcount!");
-  if (!x_parser->GetDelimitedULong("<dd class=\"words\">","</dd>",tval,errout)) {
-    included = false;
-    return parseError("Cannot extract wordcount! " + errout);
-  }
-  word_count = tval;
-  // part count
-  if (!x_parser->MovePast("<dt class=\"chapters\">Chapters:</dt>"))return parseError("Cannot find part count!");
-  if (!x_parser->MovePast("<dd class=\"chapters\">")) {
-      return parseError("Cannot find start of chapter counts!");
-  }
-  // try the 'not embedded in a link' first
-  if (!x_parser->GetMovePastULong("/",tval,errout)) {
-      // if that fails, assume we are embedded in a link
-      if (!x_parser->GetDelimitedULong("\">","</a>",tval,errout)) {
-          return parseError("Cannot extract part count! " + errout);
-      }
-      x_parser->MovePast("/");
-  }
-  part_count = tval;
-  // estimated part count
-  if (!x_parser->GetMovePast("</dd>",buffer1)) {
-    return parseError("Cannot find estimated part count!");
-  }
-  // checking..
-  if (buffer1=="?") eccount = -1;
-  else if (Str2ULong(buffer1,tval,false)) eccount = tval;
-  else return parseError("Estimated part count is not a number!");
-  // kudos
-  if (x_parser->MovePast("<dt class=\"kudos\">Kudos:</dt>")) {
-    if (!x_parser->MovePast("<dd class=\"kudos\">")) return parseError("Missing Kudos!");
-    if (!x_parser->GetDelimitedULong("\">","</a>",tval,errout)) {
-      return parseError("Kudos is not a number!");
-    }
-    kudcount = tval;
-  }
-  else kudcount = 0;
-  // done
-  return true;
-}
-//----------------------------
-bool jfAO3Fanfic::parseError(const QString in_msg) {
-  if (x_parser != NULL) delete x_parser;
-  x_parser =NULL;
-  parser_error = "PARSE ERROR: "+ in_msg;
-  return false;
+    else assert(false);
+    return "";
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // special methods
@@ -656,8 +253,6 @@ bool jfAO3Fanfic::ReadExtraStuff(jfFileReader* infile) {
   const QString funcname = "jfAO3Fanfic::ReadRestFromFile";
   QString buffer;
   QStringList* clist;
-  size_t cloop;
-  const jfGeneralCategory* temp;
 
   assert(infile!=NULL);
 
@@ -677,7 +272,9 @@ bool jfAO3Fanfic::ReadExtraStuff(jfFileReader* infile) {
     return infile->BuildError("The categories are empty!");
   }
   // chapter finders
-  for (cloop=0;cloop<(clist->count());cloop++) {
+  const jfGeneralCategory* temp = NULL;
+
+  for (int cloop = 0; cloop < (clist->count()) ; cloop++) {
     temp = ao3_catdata::ao3_catmanager->GetData()->FindCatFromFinder(clist->at(cloop));
     if (temp==NULL) break;
     cats.push_back(dynamic_cast<const jfAO3_Category*>(temp));

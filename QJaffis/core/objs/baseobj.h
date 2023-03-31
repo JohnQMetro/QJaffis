@@ -91,6 +91,7 @@ class jfUrlBase : public jfBaseObj {
 };
 
 //============================================================================
+/*
 // a forward declaration
 class jfResultUnit;
 // a very basal data class for searched items such as fics and pages
@@ -128,9 +129,11 @@ class jfBasePD : public jfUrlBase {
     // special stuff used in tokenized matching
     mutable QStringList *toksummary;
 };
+*/
 //============================================================================
 /* The following class is basically a compact extract of jfBasePD used in
 displaying results */
+/*
 class jfResultUnit {
   friend class jfBasePD;
   public:
@@ -155,6 +158,6 @@ class jfResultUnit {
 };
 
 Q_DECLARE_METATYPE(jfResultUnit*);
-
+*/
 
 //*****************************************************************************

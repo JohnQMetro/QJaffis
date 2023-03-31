@@ -4,7 +4,7 @@
 // Purpose :    Holder for multiple-category search results from Fanfiction.Net
 // Created:     June 17, 2010
 // Conversion to Qt Started July 11, 2014
-// Updated:     August 22, 2012
+// Updated:     March 27, 2023
 //*******************************************************************************
 #ifndef FFN_MULTICOLL
   #include "ffn_mulcoll.h"
@@ -103,7 +103,7 @@ bool jfFFNResColl::WriteToHTML(size_t result_category) {
   // body
   for (ccloop=0; ccloop<itemcount; ccloop++) {
     temp = dynamic_cast<jfFFNItemCollection*>((*collections)[ccloop]);
-    numres = temp->CountRCategory(output->GetResCat());
+    numres = temp->CountResultCategory(output->GetResCat());
     if (numres>0) temp->WriteToHTML(output,false);
   }
   // finishing off
@@ -125,67 +125,69 @@ jfFicExtract* jfFFNResColl::GetFicExtract(size_t c_index, size_t i_index) const 
   (*cprotect)[c_index]->lock();
   typox = dynamic_cast<jfFFNItemCollection*>((*collections)[c_index]);
   // getting the data
-  jfFicExtract* xres = typox->FicExt_AtIndex(i_index);
+  jfFicExtract* xres = typox->FicExtractAtIndex(i_index);
   (*cprotect)[c_index]->unlock();
   // done
   return xres;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void jfFFNResColl::WriteHtmlHeader(jfHtmlParams* indata) {
-  // constants
-  const QString fname = "jfFFNResColl::WriteHtmlHeader";
-  // local variables
-  QString buffer;
-  size_t ccloop;
-  size_t numres;
-  bool firstdone;
-  bool lvres;
-  QString skeldata;
-  jfFFNItemCollection* temp;
-  // the usual checks
-  jerror::AssertLog(indata!=NULL,fname,"The input data is NULL!");
-  jerror::AssertLog(indata->CheckOk(),fname,"The input data failed checks!");
-  // loading values
-  // the start of the header
-  /**/JDEBUGLOG(fname,1)
-  buffer = indata->MakeResult(indata->base->header_skel);
-  (*(indata->outfile)) << buffer << "\n";
-  firstdone = false;
-  /**/JDEBUGLOG(fname,2)
-  // category links
-  for (ccloop=0; ccloop<itemcount; ccloop++) {
-    /**/JDEBUGLOGST(fname,3,ccloop)
-    // getting the collection and loading the values...
-    temp = dynamic_cast<jfFFNItemCollection*>((*collections)[ccloop]);
-    /**/JDEBUGLOGS(fname,4,temp->GetCatName())
-    lvres = temp->LoadValues(indata->parse,indata->GetResCat());
-      jerror::AssertLog(lvres,fname,"Item Collection load values failed! " + QString::number(ccloop));
-    numres = temp->CountRCategory(indata->GetResCat());
-    /**/JDEBUGLOGST(fname,5,numres)
-    // the cat link
-    if (numres>0) {
-      // the cat separator
-      if (firstdone) {
-        skeldata = indata->Multiple()->catlink_separator;
-        buffer = indata->MakeResult(skeldata);
-        buffer += " ";
-      }
-      /**/JDEBUGLOG(fname,8)
-      skeldata = indata->Multiple()->catlink;
-      if (firstdone) buffer += indata->MakeResult(skeldata);
-      else buffer = indata->MakeResult(skeldata);
-      /**/JDEBUGLOG(fname,9);
-      // writing the result
-      (*(indata->outfile)) << buffer << "\n";
-      firstdone = true;
+    // constants
+    const QString fname = "jfFFNResColl::WriteHtmlHeader";
+    // local variables
+    QString buffer;
+    size_t ccloop;
+    size_t numres;
+    bool firstdone;
+    bool lvres;
+    QString skeldata;
+    jfFFNItemCollection* temp;
+    // the usual checks
+    jerror::AssertLog(indata!=NULL,fname,"The input data is NULL!");
+    jerror::AssertLog(indata->CheckOk(),fname,"The input data failed checks!");
+
+    // loading values
+    // the start of the header
+    /**/JDEBUGLOG(fname,1)
+    buffer = indata->MakeResult(indata->base->header_skel);
+    (*(indata->outfile)) << buffer << "\n";
+    firstdone = false;
+    /**/JDEBUGLOG(fname,2)
+
+    // category links
+    for (ccloop=0; ccloop<itemcount; ccloop++) {
+        /**/JDEBUGLOGST(fname,3,ccloop)
+        // getting the collection and loading the values...
+        temp = dynamic_cast<jfFFNItemCollection*>((*collections)[ccloop]);
+        /**/JDEBUGLOGS(fname,4,temp->GetCatName())
+        lvres = temp->LoadValues(indata->parse,indata->GetResCat());
+        jerror::AssertLog(lvres,fname,"Item Collection load values failed! " + QString::number(ccloop));
+        numres = temp->CountResultCategory(indata->GetResCat());
+        /**/JDEBUGLOGST(fname,5,numres)
+        // the cat link
+        if (numres>0) {
+            // the cat separator
+            if (firstdone) {
+                skeldata = indata->Multiple()->catlink_separator;
+                buffer = indata->MakeResult(skeldata);
+                buffer += " ";
+            }
+            /**/JDEBUGLOG(fname,8)
+            skeldata = indata->Multiple()->catlink;
+            if (firstdone) buffer += indata->MakeResult(skeldata);
+            else buffer = indata->MakeResult(skeldata);
+            /**/JDEBUGLOG(fname,9);
+            // writing the result
+            (*(indata->outfile)) << buffer << "\n";
+            firstdone = true;
+        }
+        /**/JDEBUGLOG(fname,10);
     }
-    /**/JDEBUGLOG(fname,10);
-  }
-  // then we have a footer below...
-  skeldata = indata->Multiple()->top_footer;
-  buffer = indata->MakeResult(skeldata);
-  /**/JDEBUGLOG(fname,11);
-  (*(indata->outfile)) << buffer << "\n";
+    // then we have a footer below...
+    skeldata = indata->Multiple()->top_footer;
+    buffer = indata->MakeResult(skeldata);
+    /**/JDEBUGLOG(fname,11);
+    (*(indata->outfile)) << buffer << "\n";
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // i/o methods
@@ -196,50 +198,56 @@ bool jfFFNResColl::AddRestToFile(QTextStream* outfile) const {
 }
 //----------------------------
 // we create an empty Fanfiction.Net Collection
-jfUrlItemCollection* jfFFNResColl::MakeEmptyCollection() const {
+jfSearchResultItemCollectionBase* jfFFNResColl::MakeEmptyCollection() const {
   return new jfFFNItemCollection();
+}
+//----------------------------
+jfSearchResultItemCollectionBase* jfFFNResColl::MakeEmptyCollection(const QString& name, size_t cid) const {
+    return new jfFFNItemCollection(name, cid);
 }
 //----------------------------
 /* although no new items are to be loaded, we need to link each collection
 with its appropriate category */
 bool jfFFNResColl::ReadRestFromFile(jfFileReader* infile) {
-  // constants
-  const QString fname = "jfFFNResColl::ReadRestFromFile";
-  // variables
-  jfFFNItemCollection* temp;
-  const jfFFN_CategoryCore* cresult;
-  size_t ccloop;
-  QString cfindstr;
-  bool dres;
-  // a check
-  /**/JDEBUGLOG(fname,1);
-  assert(cat_links!=NULL);
-  /**/JDEBUGLOG(fname,2);
-  // we loop over each collection
-  for (ccloop=0;ccloop<itemcount;ccloop++) {
-    // getting the collection
-    /**/JDEBUGLOGST(fname,3,ccloop);
-    temp = dynamic_cast<jfFFNItemCollection*>((*collections)[ccloop]);
-    // looking for the cat link
-    cfindstr = temp->GetFinder();
-    cresult = cat_links->FindCatFromFinder(cfindstr);
-    // a null result is badd
-    if (cresult==NULL) {
-      /**/JDEBUGLOGS(fname,4,cfindstr);
-      // so therefore we delete the entire category
-      dres = DeleteAtIndex(ccloop);
-      assert(dres);
-      ccloop--;
+    // constants
+    const QString fname = "jfFFNResColl::ReadRestFromFile";
+    // variables
+    jfFFNItemCollection* temp;
+    const jfFFN_CategoryCore* cresult;
+    size_t ccloop;
+    QString cfindstr;
+    bool dres;
+
+    // a check
+    /**/JDEBUGLOG(fname,1);
+    assert(cat_links!=NULL);
+    /**/JDEBUGLOG(fname,2);
+    // we loop over each collection
+    for (ccloop=0;ccloop<itemcount;ccloop++) {
+
+        // getting the collection
+        /**/JDEBUGLOGST(fname,3,ccloop);
+        temp = dynamic_cast<jfFFNItemCollection*>((*collections)[ccloop]);
+        // looking for the cat link
+        cfindstr = temp->GetFinder();
+        cresult = cat_links->FindCatFromFinder(cfindstr);
+        // a null result is bad
+        if (cresult==NULL) {
+            /**/JDEBUGLOGS(fname,4,cfindstr);
+            // so therefore we delete the entire category
+            dres = DeleteAtIndex(ccloop);
+            assert(dres);
+            ccloop--;
+        }
+        else {
+            // if not null, we call the function thats set the cat
+            temp->ReplaceCat(cresult);
+        }
+        /**/JDEBUGLOG(fname,5);
     }
-    else {
-      // if not null, we call the function thats set the cat
-      temp->ReplaceCat(cresult);
-    }
-    /**/JDEBUGLOG(fname,5);
-  }
-  /**/JDEBUGLOG(fname,6);
-  // done okay!
-  return true;
+    /**/JDEBUGLOG(fname,6);
+    // done okay!
+    return true;
 }
 //*******************************************************************************
 

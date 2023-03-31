@@ -97,6 +97,7 @@ jfMultiMatchSource* jfMultiMatchEditor::getMatchData() const {
     jfMultiMatchSource* result = new jfMultiMatchSource;
     result->extraExpression = result_expression;
     result->listNamesToUse = GetPickedNames();
+    result->miss_counter = NULL;
 
     if (miss_report_allowed) {
         QString filename = miss_name_input->text().trimmed();
@@ -105,7 +106,6 @@ jfMultiMatchSource* jfMultiMatchEditor::getMatchData() const {
             result->miss_counter = miss_counter;
         }
     }
-    else result->miss_counter = NULL;
 
     return result;
 }
@@ -137,7 +137,7 @@ bool jfMultiMatchEditor::CheckExpr(const QString& inexpr,bool& outempty,QString&
     }
 }
 // +++++++++++++++++++++++++++++++++++++++++
-void jfMultiMatchEditor::HandleMissReport(bool checked) {
+void jfMultiMatchEditor::HandleMissReport() {
     if (miss_report_allowed && (miss_counter != NULL)) {
         QString filename = miss_name_input->text().trimmed();
         if (!filename.isEmpty()) miss_counter->SaveRecordedCounts(filename,4);

@@ -44,6 +44,6 @@ class jfAO3WarnFilter : public jfSpecialsFilter {
     virtual bool IsFull() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 /*****************************************************************************/

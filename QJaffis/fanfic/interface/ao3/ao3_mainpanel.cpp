@@ -142,7 +142,7 @@ int jfAO3OnePanelSearch::GetSearchIndex() const {
 }
 /*****************************************************************************/
 jfAO3Main::jfAO3Main(jfSearchCore* searchin, bool notebook, QWidget* parent):
-        jfMainSearchGroup(searchin, rtype_MCNU, notebook, true,  parent ) {
+                           jfMainSearchGroup(searchin, notebook,  parent ) {
   // the usual constant
   const QString fname = "jfAO3Main::jfAO3Main";
   // preparing notebook and results display

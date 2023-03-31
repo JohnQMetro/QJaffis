@@ -218,39 +218,39 @@ jfExprToker::jfExprToker(const QString& sourceexpr) {
 //-------------------------------------------------------------------------
 // gets the next token
 QString jfExprToker::GetToken() {
-  QString result;
-	// the basic check
-	assert(!pastend);
-	// looking for the next delimiter
-  int nextdelim = FindNonEscaped(source,expr_scitems,index);
-	// checking...
-	if (nextdelim == 0) {
+    QString result;
+    // the basic check
+    assert(!pastend);
+    // looking for the next delimiter
+    int nextdelim = FindNonEscaped(source,expr_scitems,index);
+    // checking...
+    if (nextdelim == 0) {
         result = source[(uint)index];
-		lindex = lindex;
-		index++;
-		pastend = (index==sleng);
-	}
-	// extract up to the next delimiter
-  else if (nextdelim>=0) {
-		// producing the result
-    result = source.mid(index,nextdelim-index);
-    result = result.trimmed();
-		UnEscape(result,expr_scitems);
-		// setting thingd
-		lindex = index;
-		index = nextdelim;
-	}
-	// we have not found any delimiter, we return everything left
-	else {
-		// extracting..
-    result = source.mid(index);
-    result = result.trimmed();
-		lindex = index;
-		index = sleng;
-		pastend = true;
-	}
-	// done
-	return result;
+        lindex = index;
+        index++;
+        pastend = (index==sleng);
+    }
+    // extract up to the next delimiter
+    else if (nextdelim>=0) {
+        // producing the result
+        result = source.mid(index,nextdelim-index);
+        result = result.trimmed();
+        UnEscape(result,expr_scitems);
+        // setting thingd
+        lindex = index;
+        index = nextdelim;
+    }
+    // we have not found any delimiter, we return everything left
+    else {
+        // extracting..
+        result = source.mid(index);
+        result = result.trimmed();
+        lindex = index;
+        index = sleng;
+        pastend = true;
+    }
+    // done
+    return result;
 }
 //-------------------------------------------------------------------------
 // returns the next character, iff AtOp is true

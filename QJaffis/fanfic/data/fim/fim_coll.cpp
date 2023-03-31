@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Collections for fimfiction.net data
 Created :   May 22, 2012
 Conversion to Qt started November 9, 2013
-Updated :   July 30, 2016
+Updated :   March 19, 2023
 ******************************************************************************/
 #ifndef FIM_COLL_H_INCLUDED
   #include "fim_coll.h"
@@ -21,12 +21,17 @@ Updated :   July 30, 2016
 //---------------------------------------------------------------
 //*****************************************************************************
 // alternate constructor for use when loading data from file
-jfFIMItemCollection::jfFIMItemCollection():jfTypedCollection<jfFIM_Fanfic>() {
+jfFIMItemCollection::jfFIMItemCollection(QString&& in_name, size_t in_num_id):jfSearchResultsCollection<jfFIM_Fanfic>(in_name, in_num_id) {
+
 }
+jfFIMItemCollection::jfFIMItemCollection(const QString& in_name, size_t in_num_id):jfSearchResultsCollection<jfFIM_Fanfic>(in_name, in_num_id) {
+
+}
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented page methods
 //-----------------------------------------------------
-QString jfFIMItemCollection::GetTypeID() const {
+QString jfFIMItemCollection::TypeId() const {
   return "FIMItemCollection";
 }
 //-----------------------------------------------------
@@ -37,11 +42,26 @@ bool jfFIMItemCollection::LoadValues(jfSkeletonParser* inparser,size_t which) co
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // getting more information
 jfFicExtract_FIM* jfFIMItemCollection::FicExt_AtIndex(size_t i_index) const {
-  if (i_index>=item_count) return NULL;
-  else return dynamic_cast<jfFicExtract_FIM*>((mainlist[i_index])->GetExtract());
+  if (i_index >= mainlist.size()) return NULL;
+  else {
+      const jfFIM_Fanfic* fanfic = dynamic_cast<const jfFIM_Fanfic*>(mainlist.at(i_index).item);
+      return dynamic_cast<jfFicExtract_FIM*>(fanfic->GetExtract());
+  }
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // some more virtual i/o methods
+//-----------------------------------------------------
+bool jfFIMItemCollection::ReadItemFromFile(jfFileReader* infile, jfItemFlagGroup& target_group) const {
+    jfFIM_Fanfic* fanfic = new jfFIM_Fanfic();
+    if (fanfic->GetFromFile(infile)) {
+        target_group.item = fanfic;
+        return true;
+    }
+    else {
+        delete fanfic;
+        return false;
+    }
+}
 //-----------------------------------------------------
 bool jfFIMItemCollection::AddDelta(QTextStream* outfile) const {
   return true;
@@ -55,9 +75,7 @@ bool jfFIMItemCollection::ReadDelta(jfFileReader* infile) {
 // constructor
 jfFIMResColl::jfFIMResColl(jfFIMSearch* xsearch_in):jfResultCollection(xsearch_in, false) {
   typed_search = xsearch_in;
-  jfUrlItemCollection* xc = MakeEmptyCollection();
-  xc->SetID(1);
-  xc->SetName("The Only FIM Collection!");
+  jfSearchResultItemCollectionBase* xc = MakeEmptyCollection();
   AddItem(xc);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -122,9 +140,9 @@ bool jfFIMResColl::AddRestToFile(QTextStream* outfile) const {
   return true;
 }
 //--------------------------------------
-jfUrlItemCollection* jfFIMResColl::MakeEmptyCollection() const {
+jfSearchResultItemCollectionBase* jfFIMResColl::MakeEmptyCollection() const {
   jfFIMItemCollection* result;
-  result = new jfFIMItemCollection();
+  result = new jfFIMItemCollection("FIM Item List",1);
   return result;
 }
 //--------------------------------------

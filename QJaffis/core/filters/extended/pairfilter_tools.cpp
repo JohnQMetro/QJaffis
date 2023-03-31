@@ -281,7 +281,7 @@ jfPairStats::jfPairStats(QString inchars) {
   // the first item in charfcount is reserved for nothing at all
   charfcount.push_back(0);
   // next, we initialize the other charfcount slots
-  for(size_t cloop=0;cloop<inchars.length();cloop++) charfcount.push_back(0);
+  for(int cloop=0; cloop < inchars.length(); cloop++) charfcount.push_back(0);
   // other stuff
   maxname_length = 0;
   maxspec_length = 0;
@@ -302,13 +302,15 @@ bool jfPairStats::LogFind(QString name1, QString name2, QChar inchar) {
   }
   // next up, we log the name combo in the map
   logname = name1 + " / " + name2;
-  if (logname.length()>maxname_length) maxname_length = logname.length();
+  size_t loglen = (size_t)(logname.length());
+  if (loglen >maxname_length) maxname_length = loglen;
   return maindata.AddOrIncrement(logname);
 }
 //------------------------------------------------------------------
 bool jfPairStats::LogSpecial(QString identifier) {
   assert(!identifier.isEmpty());
-  if (identifier.length()>maxspec_length) maxspec_length = identifier.length();
+  size_t id_len = (size_t)(identifier.length());
+  if (id_len > maxspec_length) maxspec_length = id_len;
   return specials.AddOrIncrement(identifier);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -366,7 +368,7 @@ void jfPairStats::WriteResults() const {
 // helper methods
 //----------------------------------------------
 QString jfPairStats::MakeCharResult(size_t index) const {
-  assert(index<=sepchars.length());
+  assert(index <= ((size_t)sepchars.length()));
   QString result;
   // we build the label part first
   if (index==0) result = " null : ";
@@ -386,10 +388,8 @@ QString jfPairStats::MakeNameResult(const jfPaircount::const_iterator& inval, si
   // result
   QString result;
   QString cval;
-  size_t cvlen;
   // we will assume here that inval is valid and correct
   cval = inval->first;
-  cvlen = cval.length();
   // padding
   cval = cval.rightJustified(padlength);
   // building the label

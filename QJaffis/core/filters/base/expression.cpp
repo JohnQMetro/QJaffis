@@ -215,7 +215,7 @@ jfExpressionFilter::~jfExpressionFilter() {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //----------------------------------------------------------------------
 // basic matching
-bool jfExpressionFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfExpressionFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   return FullItemExprMatch(testelem,parsedinfo);
 }
 //-----------------------------------------------------------------------

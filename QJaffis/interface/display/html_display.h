@@ -149,7 +149,7 @@ class jfHtmlResultCollection : public QWidget {
     void SetPopupMenu(jfPopupMenu* inmenu);
     bool SetupViewers(jfCategories* input);
     bool ClearViewers();
-    bool CheckRCounts(bool uses_default,size_t ch_rcats) const;
+    bool CheckRCounts(bool in_uses_default,size_t ch_rcats) const;
     int SelectedIndex() const;
   public slots:
     virtual void HandleNewResults(jfResultUnitVector* inresults) = 0;

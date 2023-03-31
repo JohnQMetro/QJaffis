@@ -61,7 +61,7 @@ class jfWordCountFilter : public jfMinMaxUFilter {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 
 /******************************************************************************/

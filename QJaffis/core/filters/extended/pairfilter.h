@@ -51,7 +51,7 @@ class jfPairFilterCore : public jfBaseFilter {
     ~jfPairFilterCore();
   protected:
     // virtual method
-    virtual bool CoreMatch(const jfBasePD* testelem) const = 0;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
     // internal helper matching methods
     bool DoMatchString(QString inbase, size_t ninindex1, size_t ninindex2) const;
     bool DoMatchToken(const QStringList* inbase, size_t ninindex1, size_t ninindex2) const;
@@ -59,7 +59,7 @@ class jfPairFilterCore : public jfBaseFilter {
     bool MatchSpecialsToken(const QStringList* inbase) const;
     bool MatchMultipleString(QString inbase, size_t startat) const;
     bool MatchMultipleToken(const QStringList* inbase, size_t startat) const;
-    bool MainMatch(const jfBasePD* intest) const;
+    bool MainMatch(const jfSearchResultItem* intest) const;
     // file i/o
     virtual size_t ExtraLines() const;
     virtual bool AddRestToFile(QTextStream* outfile) const;
@@ -89,7 +89,7 @@ class jfPairFilterSingle : public jfPairFilterCore {
     jfPairFilterSingle* Copy() const;
   protected:
     // virtual method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 //===========================================================================
 // pairing filter: one pairset paired with a list of others
@@ -107,7 +107,7 @@ class jfPairFilterList : public jfPairFilterCore {
     jfPairFilterList* Copy() const;
   protected:
     // virtual method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 //===========================================================================
 // pairing filter: every nameset matched against the other
@@ -125,7 +125,7 @@ class jfPairFilterMultiple : public jfPairFilterCore {
     jfPairFilterMultiple* Copy() const;
   protected:
     // virtual method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 
 //***************************************************************************

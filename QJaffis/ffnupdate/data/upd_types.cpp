@@ -4,7 +4,7 @@
 // Purpose :    Misc types and untils helpful in fanfiction.net updating
 // Created:     January 18, 2011
 // Conversion to Qt Started September 25, 2013
-// Updated:     February 25, 2023
+// Updated:     March 26, 2023
 /////////////////////////////////////////////////////////////////////////////
 #ifndef UPD_TYPES_H_INCLUDED
   #include "upd_types.h"
@@ -52,97 +52,26 @@ QString jfAuthorInfo::GetUrl() const {
   return result;
 }
 //****************************************************************************
+const QString jfFFNItemAuthor::FFN_AUTHORITEM_TYPE_ID = QString("FFNItemAuthor");
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++
 // constructors
 //-------------------------------------------
-jfFFNItemAuthor::jfFFNItemAuthor():jfFFNItemCore() {}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// setting data
-bool jfFFNItemAuthor::SetFromString(const QString& indata, QString& outerr) {
-  // local variables
-  QString buffer;
- jfStringParser xparser;
-  // we start
-  xparser.ChangeData(indata);
-  // processing fic id, title, and making the link
-  if (!GetLinkTitle(xparser,outerr)) return false;
-  // get we the descrtption
-  if (!ExtractDescription(xparser,outerr)) return false;
-  // getting the category name
-  if (!xparser.MovePastAlt("class='gray z-padtop2'>","class='z-padtop2 xgray'>")) {
-    outerr = "Category Name not found! A";
-    return false;
-  }
-  if (!xparser.GetUpto("- Rated:",buffer)) {
-    outerr = "Category Name not found! B";
-    return false;
-  }
-  catname = buffer.trimmed();
-  // the rest is just like jfFFNItem
-  // next, the rating, language, genres, chapter count, and word count
-   if (!Rating2Words(xparser, outerr)) return false;
-  // we skip past the reviews
-  if (!xparser.MovePast("Reviews:")) {
-    // this is okay, sometimes there are no reviews
-  }
-  if (!Dates_and_Completion(xparser,outerr)) return false;
-  // done with all the parsing, just some finishing up...
-  validdata = true;
-  return true;
+jfFFNItemAuthor::jfFFNItemAuthor():jfFFNItemCore() {
+    type_labels.append(FFN_AUTHORITEM_TYPE_ID);
+}
+//-------------------------------------------
+jfFFNItemAuthor::jfFFNItemAuthor(const jfSearchResultItemData& init_data):jfFFNItemCore(init_data) {
+    type_labels.append(FFN_AUTHORITEM_TYPE_ID);
+}
+//-------------------------------------------
+jfFFNItemAuthor::jfFFNItemAuthor(const jfFFNItemAuthor& src):jfFFNItemCore(src) {
+    type_labels.append(FFN_AUTHORITEM_TYPE_ID);
+    catname = src.catname;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // getting data
-QString jfFFNItemAuthor::GetCatname() const {
+const QString& jfFFNItemAuthor::GetCatname() const {
   return catname;
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// implemented virtual methods
-//-------------------------------------------
-QString jfFFNItemAuthor::GetTypeID() const {
-  return "FFNItemAuthor";
-}
-//-------------------------------------------
-// since we do not actually display the author derived items, this is here for compatabilty
-bool jfFFNItemAuthor::LoadValues(jfSkeletonParser* inparser) const {
-  assert(false);
-  return true;
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// parsing helper methods
-bool jfFFNItemAuthor::GetLinkTitle(jfStringParser& xparser, QString& outerr) {
-  // variables
-  unsigned long qval;
-  QString buffer, oerr;
-  // starting
-  rank = 0;
-  // next up is the story id
-  if (!xparser.MovePastAlt("<a  class=stitle href=\"/s/", "<a class=stitle href=\"/s/")) {
-    outerr = "Start of Fic ID not found!";
-    return false;
-  }
-  if (!xparser.GetMovePastULong("/",qval,oerr)) {
-    outerr = oerr + " When getting fic id.";
-    return false;
-  }
-  num_id = qval;
-  // we get the rest of the url
-  if (!xparser.GetMovePast("\">",buffer)) {
-    outerr = "End of fic link not found!";
-    return false;
-  }
-  // we then build the url...
-  primarylink = "https://www.fanfiction.net/s/" + QString::number(num_id);
-  primarylink += (QString("/") + buffer);
-  // next up is the title
-  if (!xparser.MovePast("<img class='lazy cimage")) {
-    outerr = "Problems finding image in author link!";
-    return false;
-  }
-  if (!xparser.GetDelimited(">","</a>",buffer)) {
-    outerr = "End of title field not found!";
-    return false;
-  }
-  name = buffer.trimmed();
-  return true;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // io methods. compatability only
@@ -179,7 +108,7 @@ size_t jfFicLimit::IdLimit() const {
 // testing...
 bool jfFicLimit::IsLater(const jfFFNItemCore* test) const {
   assert(test!=NULL);
-  if ((test->GetID())<id_limit) return false;
+  if ((test->GetId())<id_limit) return false;
   if (nodate) return true;
   if ((test->GetPublished())<fpublished) return false;
   return true;

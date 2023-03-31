@@ -4,7 +4,7 @@
 // Purpose :    Defines functions that use the expression matches
 // Created:     April 1, 2010
 // Conversion to QT Started April 8, 2013
-// Updated:     August 6, 2022 (added while string matching)
+// Updated:     March 10, 2023
 /////////////////////////////////////////////////////////////////////////////
 #ifndef JFEXPRMATCH
 	#include "expr_match.h"
@@ -16,7 +16,7 @@
 #include <assert.h>
 //**************************************************************************
 // a matching function that uses everything: title, embedded filters, the works
-bool FullItemExprMatch(const jfBasePD* testelem, const jfElemArray* parsedinfo) {
+bool FullItemExprMatch(const jfSearchResultItem* testelem, const jfElemArray* parsedinfo) {
   // constants
   const QString fname = "FullItemExprMatch";
 	// the default checks
@@ -49,10 +49,10 @@ bool FullItemExprMatch(const jfBasePD* testelem, const jfElemArray* parsedinfo) 
         if ((theop=='s') || (theop=='t') ) {
           t_string = dynamic_cast<jfSubstringElem*>(topnd);
           if (t_string->GetTitle()) {
-            tresult = t_string->Match(testelem->GetName());
+            tresult = t_string->Match(testelem->GetTitle());
           }
           else {
-            tresult = t_string->Match(testelem->GetDescription());
+            tresult = t_string->Match(testelem->GetSummary());
           }
 
         }
@@ -69,7 +69,7 @@ bool FullItemExprMatch(const jfBasePD* testelem, const jfElemArray* parsedinfo) 
         // whole string evaluation
         else if (theop=='z') {
             t_wholestring = dynamic_cast<jfWholeStringElem*>(topnd);
-            tresult = t_wholestring->Match(testelem->GetDescription());
+            tresult = t_wholestring->Match(testelem->GetSummary());
         }
         else assert(false);
 
@@ -100,7 +100,6 @@ bool FullItemExprMatch(const jfBasePD* testelem, const jfElemArray* parsedinfo) 
   assert(tstack->One());
   fresult = tstack->top();
   delete tstack;
-  testelem->ClearTok();
   // done
   return fresult;
 }

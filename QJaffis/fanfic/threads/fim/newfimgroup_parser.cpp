@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Now that there is a group search interface at Fimfiction.Net, the
 old direct parser can be mostly replaced by a more typical item parser.
 Created :   January 6, 2018
-Updated :   January 6, 2018
+Updated :   March 26, 2023
 ******************************************************************************/
 #ifndef NEWFIMGROUP_PARSER_H
     #include "newfimgroup_parser.h"
@@ -13,10 +13,13 @@ Updated :   January 6, 2018
 #ifndef FIM_GROUPOBJ_H_INCLUDED
   #include "../../data/fim/fim_groupobj.h"
 #endif // FIM_GROUPOBJ_H_INCLUDED
+
 /*****************************************************************************/
 // constructor
 jfNewFIMGroupParser::jfNewFIMGroupParser():jfItemsPageParserBase() {
     pagecount = 0;
+    item_outputter = new jfFIMGroupOutputter();
+    item_parser = new jfFIMGroupItemParser();
 }
 //------------------------------------------------------------
 // custom parse method
@@ -24,19 +27,16 @@ void jfNewFIMGroupParser::ParseDownloadedPage(const QString& inPage, size_t page
     // constants
     const QString func = "jfNewFIMGroupParser::ParseDownloadedPage";
     // variables
-    jfFIMGroup* temp;
-    size_t pit_index;
-    QString buffer;
-    QString perror_out;
-    ulong tval;
+
     // starting...
     page_parsed = false;
     NewData(inPage);
     // maximum 36 groups per page
     /**/lpt->tLog(func,1);
-    page_results = new jfPDVector();
-    pit_index = (pageindex-1)*36;
+    page_results = new std::vector<jfItemFlagGroup>();
+    size_t pit_index = (pageindex-1)*36;
     /**/lpt->tLogS(func,2,pit_index);
+
     if (!xparser.MovePast("<ul class=\"group-card-list\">")) {
         parseErrorMessage = "ParseError: Missing 'card-list' contents!";
         delete page_results;
@@ -44,22 +44,35 @@ void jfNewFIMGroupParser::ParseDownloadedPage(const QString& inPage, size_t page
         /**/lpt->tParseError(func,parseErrorMessage);
     }
     else {
+        // preparing for the loop
+        jfFIMGroupItemParser* parser = dynamic_cast<jfFIMGroupItemParser*>(item_parser);
+        jfItemFlagGroup temp;
+        QString buffer;
+
         while (xparser.GetDelimited("<li>","</div> </div>",buffer)) {
             pit_index++;
-            temp = new jfFIMGroup();
             /**/lpt->tLog(func,4);
-            temp->SetFromCardString(buffer,perror_out);
+            jfItemParseResultState result = parser->ParseFromCardSource(buffer);
+
             // the item is okay
-            if (temp->IsValid()) {
+            if (result == jfItemParseResultState::SUCCEESS) {
                 /**/lpt->tLog(func,5);
+                temp.item = parser->GetGroupItem();
+                temp.flags = new jfItemMetaFlags();
                 page_results->push_back(temp);
+                parser->Clear();
+
             }
-            // the item is not okay
-            else {
+            else if (result == jfItemParseResultState::DEFECTIVE) {
                 /**/lpt->tLog(func,6);
-                parseErrorMessage = "ParseError: " + perror_out + " in :\n";
+                parser->Clear();
+            }
+            else {
+                /**/lpt->tLog(func,7);
+                parseErrorMessage = "ParseError: " + parser->LastError() + " in :\n";
                 parseErrorMessage += buffer;
                 /**/lpt->tParseError(func,parseErrorMessage);
+                parser->Clear();
                 delete page_results;
                 page_results = NULL;
                 break;
@@ -71,6 +84,7 @@ void jfNewFIMGroupParser::ParseDownloadedPage(const QString& inPage, size_t page
             if (xparser.MovePast("<div class=\"page_list\">")) {
                 xparser.ChopAfter("</ul>",true);
                 // the last link label that can be converted to an integer is the page count!
+                ulong tval = 1; QString perror_out;
                 while(xparser.MovePast("<a href=\"")) {
                     xparser.GetDelimitedULong("\">","</a>",tval,perror_out);
                 }

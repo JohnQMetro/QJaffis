@@ -3,7 +3,7 @@
  * Purpose:   Fic parsers: base abstract class and fim
  * Author:    John Q Metro
  * Created:   July 3, 2016
- * Updated:   June 7, 2017 (Fimfiction 4 parsing fixes)
+ * Updated:   March 24, 2023
  *
  **************************************************************/
 #ifndef BASEFIM_H
@@ -54,11 +54,15 @@ void* jfStoryPartParseBase::getResults() {
   else if (extract !=NULL) return extract;
   else return fpart;
 }
+//++++++++++++++++++++++++++++++++++++++++++++
+jfStoryPartParseBase::~jfStoryPartParseBase() {}
 //==========================================================
 // +++ [ METHODS for jfFIM_FicPartParser ]+++
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the constructor
-jfFIM_FicPartParser::jfFIM_FicPartParser():jfStoryPartParseBase() {}
+jfFIM_FicPartParser::jfFIM_FicPartParser():jfStoryPartParseBase() {
+    extract_parser = new jfFIMExtractParser();
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // virual methods that are implemented
 //------------------------------------
@@ -87,6 +91,11 @@ bool jfFIM_FicPartParser::testIncomplete(const QString *page) const {
 QString jfFIM_FicPartParser::getCookie() const {
   return "view_mature=true";
 }
+//++++++++++++++++++++++++++++++++++++++++++++
+jfFIM_FicPartParser::~jfFIM_FicPartParser() {
+    delete extract_parser;
+    extract_parser = NULL;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // custom virtual methods that are implemented
 //------------------------------------
@@ -94,30 +103,31 @@ QString jfFIM_FicPartParser::getCookie() const {
 bool jfFIM_FicPartParser::ParseFirstPage(const QString& indata) {
   const QString fname= "jfFIM_FicPartParser::ParseFirstPage";
   // variables
-  jfFicExtract_FIM* result;
-  jfFIM_Fanfic* fres;
-  QString outerr;
-  /* The stuff in the index page is almost identical to what gets fetched
-   * in FIM Search results, so I've overloaded the class for parsing and
-   * and holding those, to also get the fic extract for the FIM fic index
-   * page.*/
+  const jfFicExtract_FIM* result;
+
+  /* Using the special extract parser. */
   /**/lpt->tLog(fname,1);
-  fres = new jfFIM_Fanfic();
-  result = fres->ExtractFromString(indata,outerr);
-  /**/lpt->tLog(fname,2,outerr);
-  delete fres;
-  // checking the result
-  if (result == NULL) {
-    parseErrorMessage = outerr;
-    return false;
+
+  jfItemParseResultState parse_res = extract_parser->ParseFromSource(indata);
+  /**/lpt->tLog(fname,2);
+
+  // things went fine
+  if (parse_res == jfItemParseResultState::SUCCEESS) {
+      /**/lpt->tLog(fname,3);
+      result = extract_parser->GetFIMExtract();
+      partcount = result->pcount;
+      pagecount = partcount + 1;
+      /**/lpt->tLog(fname,4);
+      extract = const_cast<jfFicExtract_FIM*>(result);
+      return true;
   }
+  // things failed
   else {
-    partcount = result->pcount;
-    pagecount = partcount + 1;
-    /**/lpt->tLog(fname,3);
-    extract = result;
-    return true;
+      parseErrorMessage = extract_parser->LastError();
+      /**/lpt->tLog(fname,5,parseErrorMessage);
+      return false;
   }
+
 }
 //------------------------------------
 // getting the pic parts

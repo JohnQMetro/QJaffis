@@ -4,7 +4,7 @@
 // Purpose :    Misc types and untils helpful in fanfiction.net updating
 // Created:     January 18, 2011
 // Conversion to Qt Started September 25, 2013
-// Updated:     February 25, 2023
+// Updated:     March 26, 2023
 /////////////////////////////////////////////////////////////////////////////
 #ifndef UPD_TYPES_H_INCLUDED
 #define UPD_TYPES_H_INCLUDED
@@ -32,21 +32,20 @@ class jfAuthorInfo {
 //=========================================================================
 // the fic object class when extracted from an author's page
 class jfFFNItemAuthor : public jfFFNItemCore {
+    friend class jfFFNAuthorFanficParser;
   public:
+    static const QString FFN_AUTHORITEM_TYPE_ID;
+
     // constructors
     jfFFNItemAuthor();
-    // setting data
-    bool SetFromString(const QString& indata, QString& outerr);
+    jfFFNItemAuthor(const jfSearchResultItemData& init_data);
+    jfFFNItemAuthor(const jfFFNItemAuthor& src);
     // getting data
-    QString GetCatname() const;
-    // implemented virtual methods
-    virtual QString GetTypeID() const;
-    virtual bool LoadValues(jfSkeletonParser* inparser) const;
+    const QString& GetCatname() const;
   protected:
-    virtual bool GetLinkTitle(jfStringParser& xparser, QString& outerr);
     // io methods
-    virtual bool AddCodaStuff(QTextStream* outfile) const;
-    virtual bool ReadCodaStuff(jfFileReader* infile);
+    virtual bool AddCodaStuff(QTextStream* outfile) const override;
+    virtual bool ReadCodaStuff(jfFileReader* infile) override;
     // since we do not use category links, we do check the category name
     QString catname;
 };

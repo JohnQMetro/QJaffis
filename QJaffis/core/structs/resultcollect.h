@@ -21,7 +21,7 @@ Updated:     June 20, 2016
 #include <vector>
 //*******************************************************************************
 // some vector classes
-class jfItemVector : public std::vector<jfUrlItemCollection*> {};
+class jfItemVector : public std::vector<jfSearchResultItemCollectionBase*> {};
 class jfMutexVector : public std::vector<QMutex*> {};
 //-------------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ class jfResultCollection : public jfBaseObj {
     // wrapper to access the collection at the current index
     size_t PageIndex() const;
     size_t ItemCount() const;
-    jfUrlItemCollection* GetCurrPointer();
+    jfSearchResultItemCollectionBase* GetCurrPointer();
     // extracting information from a particular item
     QString GetItemDescription(size_t c_index, size_t i_index) const;
     QString GetItemUrl(size_t c_index, size_t i_index) const;
@@ -47,8 +47,8 @@ class jfResultCollection : public jfBaseObj {
     // internal helper methods
     bool CheckIndex(size_t index) const;
     bool DestroyAll();
-    bool AddItem(jfUrlItemCollection* newitem);
-    bool InsertItem(jfUrlItemCollection* newitem);
+    bool AddItem(jfSearchResultItemCollectionBase* newitem);
+    bool InsertItem(jfSearchResultItemCollectionBase* newitem);
     bool DeleteAtIndex(size_t dindex);
     // internal file i/o methods
     jfHtmlParams* OpenHTMLOutfile(size_t index);
@@ -59,7 +59,7 @@ class jfResultCollection : public jfBaseObj {
     virtual bool AddMiddleToFile(QTextStream* outfile) const;
     virtual bool AddRestToFile(QTextStream* outfile) const =0;
     // file i/o input
-    virtual jfUrlItemCollection* MakeEmptyCollection() const = 0;
+    virtual jfSearchResultItemCollectionBase* MakeEmptyCollection() const = 0;
     virtual bool ReadMiddleFromFile(jfFileReader* infile);
     virtual bool ReadRestFromFile(jfFileReader* infile) =0;
     // internal data

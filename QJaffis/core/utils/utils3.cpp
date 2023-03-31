@@ -279,7 +279,7 @@ bool GetDirectoryTreeList(const QString indir, bool native, QStringList& outdata
   report_dir.setFilter(QDir::Dirs|QDir::Files|QDir::NoSymLinks|QDir::NoDotAndDotDot);
   report_dir.setSorting(QDir::Name);
   QFileInfoList dlist = report_dir.entryInfoList();
-  for (size_t dindex = 0 ; dindex < dlist.size() ; dindex++) {
+  for (int dindex = 0 ; dindex < dlist.size() ; dindex++) {
     curf = dlist.at(dindex);
     result = curf.canonicalFilePath();
     if (curf.isDir()) result += "/";

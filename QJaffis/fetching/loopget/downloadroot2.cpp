@@ -3,7 +3,7 @@ Name    : downloadroot2.cpp
 Basic   :
 Author  : John Q Metro
 Started : July 17, 2021
-Updated : July 6, 2022
+Updated : March 10, 2023
 ******************************************************************************/
 #ifndef DOWNLOADROOT2_H
     #include "downloadroot2.h"
@@ -19,6 +19,8 @@ Updated : July 6, 2022
 #ifndef INITEND_H_INCLUDED
   #include "../../initend.h"
 #endif // INITEND_H_INCLUDED
+
+#include "../../core/objs/baseitem.h"
 
 //-------------------------
 #include <QCoreApplication>
@@ -202,64 +204,62 @@ void jfDownloadRootItems::WaitAfterSend() {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 bool jfDownloadRootItems::ProcessResults(void* resultdata) {
-  const QString fname = "jfDownloadRootItems::ProcessResults";
-  assert(resultdata!=NULL);
-  jfResultUnitVector* res_vector = static_cast<jfResultUnitVector*>(resultdata);
-  // insering the results in the collection
-  // we still might have to filter for duplicates
-  if ((current_collection->hasIDFiltering()) && ((res_vector->size())>0)) {
-    size_t filtered_out = current_collection->IDFilterMarkResults(res_vector);
-    if (filtered_out>0) {
-      jfResultUnitVector* new_vector = new jfResultUnitVector();
-      new_vector->stotal = res_vector->stotal;
-      jfBasePD* curr_item = NULL;
-      // looping through the results, transferring those we keep
-      for (size_t old_index = 0; old_index < res_vector->size() ; old_index++) {
-        curr_item = const_cast<jfBasePD*>((*res_vector)[old_index]->Sourcelink());
-        if (curr_item->included) {
-          new_vector->push_back((*res_vector)[old_index]);
+    const QString fname = "jfDownloadRootItems::ProcessResults";
+    assert(resultdata!=NULL);
+    jfResultUnitVector* res_vector = static_cast<jfResultUnitVector*>(resultdata);
+
+    // insering the results in the collection
+    // we still might have to filter for duplicates
+    if ((current_collection->HasIDFiltering()) && ((res_vector->size())>0)) {
+        size_t filtered_out = current_collection->IDFilterMarkResults(res_vector);
+        if (filtered_out>0) {
+            jfResultUnitVector* new_vector = new jfResultUnitVector();
+            new_vector->stotal = res_vector->stotal;
+
+            // looping through the results, transferring those we keep
+            for (size_t old_index = 0; old_index < res_vector->size() ; old_index++) {
+                if ((*res_vector)[old_index]->IsIncluded()) {
+                    new_vector->push_back((*res_vector)[old_index]);
+                }
+                else {
+                    (*res_vector)[old_index]->Dispose();
+                    delete ((*res_vector)[old_index]);
+                    (*res_vector)[old_index] = NULL;
+                }
+            }
+            // done with the deletions and loop, nopw we clean and tranfer
+            res_vector->clear();
+            delete res_vector;
+            res_vector = new_vector;
         }
-        else {
-          delete curr_item;
-          delete ((*res_vector)[old_index]);
-          (*res_vector)[old_index] = NULL;
-        }
-      }
-      // done with the deletions and loop, nopw we clean and tranfer
-      res_vector->clear();
-      delete res_vector;
-      res_vector = new_vector;
     }
-  }
-  // finishing
-  if (!SendResults(res_vector)) {
-    delete res_vector;
-  }
-  else WaitAfterSend();
-  // done
-  return true;
+    // finishing
+    if (!SendResults(res_vector)) {
+        delete res_vector;
+    }
+    else WaitAfterSend();
+    // done
+    return true;
 }
 
 //------------------------------------
 void jfDownloadRootItems::DisposeResults(void* resultdata) {
-  const QString fname = "jfDownloadRootItems::DisposeResults";
-  jfResultUnitVector* data_to_delete = static_cast<jfResultUnitVector*>(resultdata);
-  jfBasePD* item;
-  // looping over each item
-  /**/tLog(fname,1);
-  for (size_t item_index = 0; item_index < data_to_delete->size() ; item_index++) {
-    /**/tLogL(fname,2,item_index);
-    item = const_cast<jfBasePD*>((*data_to_delete)[item_index]->Sourcelink());
-    /**/tLog(fname,3);
-    delete item;
-    delete ((*data_to_delete)[item_index]);
-    /**/tLog(fname,4);
-    (*data_to_delete)[item_index] = NULL;
-  }
-  // finishing off
-  data_to_delete->clear();
-  /**/tLog(fname,5);
-  delete data_to_delete;
+    const QString fname = "jfDownloadRootItems::DisposeResults";
+    jfResultUnitVector* data_to_delete = static_cast<jfResultUnitVector*>(resultdata);
+    // looping over each item
+    /**/tLog(fname,1);
+    for (size_t item_index = 0; item_index < data_to_delete->size() ; item_index++) {
+        /**/tLogL(fname,2,item_index);
+        (*data_to_delete)[item_index]->Dispose();
+        /**/tLog(fname,3);
+        delete ((*data_to_delete)[item_index]);
+        /**/tLog(fname,4);
+        (*data_to_delete)[item_index] = NULL;
+    }
+    // finishing off
+    data_to_delete->clear();
+    /**/tLog(fname,5);
+    delete data_to_delete;
 }
 
 //------------------------------------

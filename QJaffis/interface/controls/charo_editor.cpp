@@ -19,7 +19,7 @@ jfCharCheckBoxGroup::jfCharCheckBoxGroup(QString inname, size_t icount, const QS
   // we check...
   assert(icount>0);
   assert(incols<=icount);
-  assert(inchars.length()==icount);
+  assert(((size_t)inchars.length()) == icount);
   // we don't check this
   cbcount = icount;
   mainlabel = inname;
@@ -49,7 +49,7 @@ bool jfCharCheckBoxGroup::SetFromString(const QString& inval) {
     }
     else cboxes[loopval]->setChecked(false);
   }
-  return (rescount==inval.length());
+  return (rescount == ((size_t)inval.length()));
 }
 //----------------------------------------------------
 QString jfCharCheckBoxGroup::GetStringValue() const {
@@ -99,28 +99,28 @@ void jfCharCheckBoxGroup::SetupSizers(size_t tcount, size_t colcount) {
 }
 //----------------------------------------------------------------------------
 void jfCharCheckBoxGroup::PopulateBoxes(size_t tcount, size_t colcount) {
-  // setup variables
-  int rowin; float rowest;
-  size_t cloop, rloop, tloop;
-  // adding for non grid
-  if (!usegrid) {
-    for (cloop = 0; cloop<tcount; cloop++) {
-      tsizer->addWidget(cboxes[cloop],0);
-     }
-  }
-  // adding for grid
-  else {
-    tloop = 0;
-    rowest = (float)(tcount) / (float)(colcount);
-    rowin = ceil(rowest);
-    for (rloop = 0; rloop<rowin; rloop++) {
-      for (cloop = 0; cloop<colcount; cloop++) {
-        fsizer->addWidget(cboxes[tloop],rloop,cloop);
-        tloop++;
-        if (tloop==tcount) break;
-      }
+    // setup variables
+    size_t rowin; float rowest;
+    size_t cloop, rloop, tloop;
+    // adding for non grid
+    if (!usegrid) {
+        for (cloop = 0; cloop<tcount; cloop++) {
+            tsizer->addWidget(cboxes[cloop],0);
+        }
     }
-  }
+    // adding for grid
+    else {
+        tloop = 0;
+        rowest = (float)(tcount) / (float)(colcount);
+        rowin = ceil(rowest);
+        for (rloop = 0; rloop < rowin; rloop++) {
+            for (cloop = 0; cloop<colcount; cloop++) {
+                fsizer->addWidget(cboxes[tloop],rloop,cloop);
+                tloop++;
+                if (tloop==tcount) break;
+            }
+        }
+    }
 }
 
 /*****************************************************************************/

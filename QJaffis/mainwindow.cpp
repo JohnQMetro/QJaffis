@@ -163,7 +163,14 @@ void jfMainWindow::saveSearch() {
   if (GetJSSFilename(xfilen,true)) {
     qval = dynamic_cast<jfMainSearchGroup*>(main_display->currentWidget());
     rvres = qval->SaveToFile(xfilen);
-    assert(rvres);
+
+    if (!rvres) {
+        QMessageBox message;
+        message.setIcon(QMessageBox::Critical);
+        message.setWindowTitle("Failed to Save");
+        message.setText("Failed to save the search, because an expression or something else inside it is invalid.");
+        message.exec();
+    }
   }
 }
 //------------------------------------------------------
@@ -400,12 +407,11 @@ bool jfMainWindow::GetJSSFilename(QString& outname, bool save) {
   // variables
   QString result,xfilen,savestring;
   jfMainSearchGroup* qsearch;
-  int sresult;
   // options
   if (save) {
     qsearch = dynamic_cast<jfMainSearchGroup*>(main_display->currentWidget());
     xfilen = qsearch->GetDisplayName() + ".jss";
-    sresult = main_display->currentIndex();
+    // int sresult = main_display->currentIndex();
     savestring = jglobal::settings.paths.GetPathFor(jglobal::SAVED_SEARCHES);
     savestring += QDir::separator() + xfilen;
     result = QFileDialog::getSaveFileName(this,savemsg,savestring,wildstr);

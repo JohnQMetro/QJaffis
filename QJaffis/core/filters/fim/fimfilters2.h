@@ -32,7 +32,7 @@ class jfFIM_ShortDesc_ExprFilter : public jfSimpleExpFilterCore {
     virtual QString GetTypeID() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 
 //=============================================================================
@@ -50,7 +50,7 @@ class jfFIM_DualDesc_ExprFilter : public jfSimpleExpFilterCore {
     virtual QString GetTypeID() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 //=============================================================================
 // story count filter for FIM Group Search
@@ -65,7 +65,7 @@ class jfFIMGroupSCFilter : public jfMinMaxUFilter {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 //-----------------------------------------------------------------------
 // member count filter for FIM Group Search
@@ -80,6 +80,6 @@ class jfFIMGroupMCFilter : public jfMinMaxUFilter {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 /*****************************************************************************/

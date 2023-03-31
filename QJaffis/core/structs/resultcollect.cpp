@@ -59,7 +59,7 @@ size_t jfResultCollection::ItemCount() const {
   return (*collections)[cindex]->GetCount();
 }
 //----------------------------------------------------------------------
-jfUrlItemCollection* jfResultCollection::GetCurrPointer() {
+jfSearchResultItemCollectionBase* jfResultCollection::GetCurrPointer() {
   // checks
   if (itemcount==0) return NULL;
   assert(cindex<itemcount);
@@ -73,7 +73,7 @@ QString jfResultCollection::GetItemDescription(size_t c_index, size_t i_index) c
   assert(c_index<itemcount);
   (*cprotect)[c_index]->lock();
   // getting the string
-  QString xres = (*collections)[c_index]->DescriptionAtIndex(i_index);
+  QString xres = (*collections)[c_index]->SummaryAtIndex(i_index);
   (*cprotect)[c_index]->unlock();
   // done
   return xres;
@@ -132,7 +132,7 @@ bool jfResultCollection::DestroyAll() {
   return true;
 }
 //-------------------------------------------------------------------------------
-bool jfResultCollection::AddItem(jfUrlItemCollection* newitem) {
+bool jfResultCollection::AddItem(jfSearchResultItemCollectionBase* newitem) {
   const QString fname = "jfResultCollection::AddItem";
   assert (newitem!=NULL);
   // if we are empty, we add the vectors
@@ -149,7 +149,7 @@ bool jfResultCollection::AddItem(jfUrlItemCollection* newitem) {
 }
 //------------------------------------------------------------------------------
 // inserts an item at the current pointer
-bool jfResultCollection::InsertItem(jfUrlItemCollection* newitem) {
+bool jfResultCollection::InsertItem(jfSearchResultItemCollectionBase* newitem) {
   // checks for special conditions
   if (newitem==NULL) return false;
   // variables
@@ -262,7 +262,7 @@ bool jfResultCollection::ReadMiddleFromFile(jfFileReader* infile) {
   // constants
   const QString fname = "jfResultCollection::ReadMiddleFromFile";
   // local variables
-  jfUrlItemCollection* tcoll;
+  jfSearchResultItemCollectionBase* tcoll;
   unsigned long oval;
   size_t iloop;
   // starting

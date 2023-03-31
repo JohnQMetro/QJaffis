@@ -77,7 +77,7 @@ size_t jfTagRowView::getButtonSize() const {
   return button_size;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfTagRowView::handleIncludeClicked(bool checked) {
+void jfTagRowView::handleIncludeClicked(bool value) {
   const QString fname ="jfTagRowView::handleIncludeClicked";
   /**/JDEBUGLOG(fname,1);
   if (tstatus == jfts_INCLUDE) {
@@ -93,7 +93,7 @@ void jfTagRowView::handleIncludeClicked(bool checked) {
   emit statusChange();
 }
 //------------------------------------
-void jfTagRowView::handleExcludeClicked(bool checked) {
+void jfTagRowView::handleExcludeClicked(bool value) {
   if (tstatus == jfts_EXCLUDE) {
     exclude_btn->setPalette(*unpicked);
     tstatus = jfts_NONE;
@@ -107,7 +107,7 @@ void jfTagRowView::handleExcludeClicked(bool checked) {
   emit statusChange();
 }
 //------------------------------------
-void jfTagRowView::handleAlternateClicked(bool checked) {
+void jfTagRowView::handleAlternateClicked(bool value) {
   if (tstatus == jfts_ALTERNATE) {
     alternate_btn->setPalette(*unpicked);
     tstatus = jfts_NONE;
@@ -238,7 +238,7 @@ bool jfTagStatusPicker::SetOrChangeTags(jfTagListing* in_tags) {
     /**/JDEBUGLOG(fname,1)
     if (in_tags == NULL) return false;
     /**/JDEBUGLOG(fname,2)
-    if ((in_tags->size()) != (main_list->count())) {
+    if ((in_tags->size()) != ListSize()) {
         /**/JDEBUGLOG(fname,3)
         return SetTagList(in_tags);
     }
@@ -287,6 +287,11 @@ void jfTagStatusPicker::handleStatusChange() {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++
 // helper methods
 //----------------------------------------
+// this is just to reduce signed-unsigned comparison warnings
+size_t jfTagStatusPicker::ListSize() const {
+    return (size_t)(main_list->count());
+}
+//------------------------------------------
 bool jfTagStatusPicker::SetListFromTags() {
   if (tag_data ==NULL) return false;
   const QString fname = "jfTagStatusPicker::SetListFromTags";
@@ -326,7 +331,7 @@ bool jfTagStatusPicker::SetListFromTags() {
 //----------------------------------------
 bool jfTagStatusPicker::LoadStatusesToList() {
   if (tag_data == NULL) return false;
-  if ((tag_data->size())!=(main_list->count())) return false;
+  if ((tag_data->size()) != ListSize()) return false;
   // we do not check the actual tags
   jfTagListing::const_iterator tagdex = tag_data->begin();
   size_t lindex = 0;
@@ -345,7 +350,7 @@ bool jfTagStatusPicker::LoadStatusesToList() {
 //----------------------------------------
 bool jfTagStatusPicker::SaveStatusesFromList() {
   if (tag_data == NULL) return false;
-  if ((tag_data->size())!=(main_list->count())) return false;
+  if ((tag_data->size()) != ListSize()) return false;
   // variables
   QString curr_tag;  jfTAG_STATUS curr_status;
   // the loop

@@ -73,13 +73,13 @@ class jfCharListExprFilter : public jfListExprFilterBase {
     jfCharListExprFilter();
     jfCharListExprFilter(const jfCharListExprFilter& source);
     jfCharListExprFilter(jfListMatchMode in_match_mode, jfSimpleExpr* in_source);
-    virtual QString GetTypeDescription() const;
+    virtual QString GetTypeDescription() const override;
     virtual jfCharListExprFilter* Copy() const;
-    virtual jfBaseFilter* GenCopy() const;
-    virtual QString GetTypeID() const;
+    virtual jfBaseFilter* GenCopy() const override;
+    virtual QString GetTypeID() const override;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
 };
 
 //***************************************************************************

@@ -562,7 +562,7 @@ jfLiteralFilterElem::jfLiteralFilterElem(const jfLiteralFilterElem& fsource) {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // public methods
-bool jfLiteralFilterElem::Match(const jfBasePD* testelem) const {
+bool jfLiteralFilterElem::Match(const jfSearchResultItem* testelem) const {
 	// basic checks
 	assert(valid);
 	assert(testelem!=NULL);
@@ -595,7 +595,7 @@ jfLiteralFilterElem::~jfLiteralFilterElem() {
 bool jfFilterElem::IsString() const { return false; }
 //---------------------------------------------------------------
 // does the matching
-bool jfFilterElem::Match(const jfBasePD* testelem) const {
+bool jfFilterElem::Match(const jfSearchResultItem* testelem) const {
 	// basic checks
 	assert(valid);
 	assert(testelem!=NULL);

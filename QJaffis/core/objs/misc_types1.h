@@ -45,11 +45,6 @@ class jfTagListing : public std::map<QString,jfTAG_STATUS> {
 };
 
 //=======================================================
-// a fic update status enum
-enum jf_FUpdateStatus {jud_NONE, jud_UPDATED, jud_MISSING, jud_NEW, jud_AUTHORNC};
-// enum to string method
-QString UpdateStatus2String(const jf_FUpdateStatus& inval);
-//=======================================================
 // pair of integers
 typedef struct IntPair {
   int A;

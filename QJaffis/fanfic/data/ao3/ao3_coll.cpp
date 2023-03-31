@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines category results collection for AO3
 Created :   September 1, 2012
 Conversion to Qt Started March 29, 2014
-Updated :   April 3, 2022
+Updated :   March 25, 2023
 ******************************************************************************/
 #ifndef AO3_COLL_H_INCLUDED
   #include "ao3_coll.h"
@@ -16,18 +16,18 @@ Updated :   April 3, 2022
 #include <math.h>
 //-----------------------------------
 // alternate constructor for use when loading data from file
-jfAO3_FicList::jfAO3_FicList():jfTypedCollection<jfAO3Fanfic>() {
+jfAO3_FicList::jfAO3_FicList():jfSearchResultsCollection<jfAO3Fanfic>("AO3 Fic List", 1) {
   cat_link = NULL;
 
 }
 //-------------------------------------------------------------------------------
-jfAO3_FicList::jfAO3_FicList(size_t src_id, const QString& nname):jfTypedCollection<jfAO3Fanfic>(src_id,nname) {
+jfAO3_FicList::jfAO3_FicList(size_t src_id, const QString& nname):jfSearchResultsCollection<jfAO3Fanfic>(nname, src_id) {
   cat_link = NULL;
 }
 
 //-------------------------------------------------------------------------------
 // the usual constructor
-jfAO3_FicList::jfAO3_FicList(const jfAO3_Category* cat_linkin):jfTypedCollection<jfAO3Fanfic>() {
+jfAO3_FicList::jfAO3_FicList(const jfAO3_Category* cat_linkin):jfSearchResultsCollection<jfAO3Fanfic>(cat_linkin->GetName() + " Fandom Fic Listing", 1) {
   // constants
   const QString fname = "jfAO3_FicList::jfAO3_FicList";
   // checks
@@ -37,19 +37,18 @@ jfAO3_FicList::jfAO3_FicList(const jfAO3_Category* cat_linkin):jfTypedCollection
   cat_link = cat_linkin;
   caturl = cat_link->GetUrl();
   cfinder = cat_link->GetCombo();
-  SetName(cat_link->GetName() + " Fandom Fic Listing");
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented page methods
 //-----------------------------------------------------
-QString jfAO3_FicList::GetTypeID() const {
+QString jfAO3_FicList::TypeId() const {
   return "AO3_Ficlist";
 }
 //-----------------------------------------------------
 bool jfAO3_FicList::LoadValues(jfSkeletonParser* inparser,size_t which) const {
   LoadCoreValues(inparser,which);
   inparser->AddText("CATF_MAINLINK",cat_link->GetUrl());
-  inparser->AddText("CATF_PERCENT",PercRCategory(which));
+  inparser->AddText("CATF_PERCENT",PercentResultCategory(which));
   return true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -87,12 +86,27 @@ bool jfAO3_FicList::ReplaceCat(const jfAO3_Category* cat_linkin) {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // getting more information
 jfFicExtract* jfAO3_FicList::FicExt_AtIndex(size_t i_index) const {
-  if (i_index>=item_count) return NULL;
-  else return dynamic_cast<jfAO3Fanfic*>(mainlist[i_index])->GetExtract();
+    if (i_index >= mainlist.size()) return NULL;
+    else {
+       const jfAO3Fanfic* fanfic = dynamic_cast<const jfAO3Fanfic*>(mainlist[i_index].item);
+       return fanfic->GetExtract();
+    }
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // some more virtual i/o methods
 //-----------------------------------------------------
+bool jfAO3_FicList::ReadItemFromFile(jfFileReader* infile, jfItemFlagGroup& target_group) const {
+    jfAO3Fanfic* result = new jfAO3Fanfic();
+    if (result->GetFromFile(infile)) {
+        target_group.item = result;
+        return true;
+    }
+    else {
+        delete result;
+        return false;
+    }
+}
+//---------------------------------------------------
 bool jfAO3_FicList::AddDelta(QTextStream* outfile) const {
   // variables
   QString hiid_str;
@@ -142,35 +156,35 @@ const jfAO3_Category* jfAO3ResColl::GetCat(size_t zindex) const {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // i/o
 bool jfAO3ResColl::WriteToHTML(size_t result_category) {
-  // constants
-  const QString fname = "jfAO3ResColl::WriteToHTML";
-  // local variables
-  jfHtmlParams *output;
-  jfAO3_FicList* temp;
-  size_t ccloop;
-  size_t numres;
-  // checks
-  assert(result_category<33);
-  // starting
-  output = OpenHTMLOutfile(result_category);
-  // we prepare the skeletop
-  output->base = search->GetLocalSkeleton();
-  if ((output->base)==NULL) {
-    output->base = mainskelc->AtIndexM(4);
-  }
-  // we load up with values first
-  search->LoadValues(output->parse,output->GetResCat());
-  // header
-  WriteHtmlHeader(output);
-  // body
-  for (ccloop=0; ccloop<itemcount; ccloop++) {
-    temp = dynamic_cast<jfAO3_FicList*>((*collections)[ccloop]);
-    numres = temp->CountRCategory(output->GetResCat());
-    if (numres>0) temp->WriteToHTML(output,false);
-  }
-  // finishing off
-  WriteFooterClose(output);
-  return true;
+    // constants
+    const QString fname = "jfAO3ResColl::WriteToHTML";
+    // local variables
+    jfHtmlParams *output;
+    jfAO3_FicList* temp;
+    size_t ccloop;
+    size_t numres;
+    // checks
+    assert(result_category<33);
+    // starting
+    output = OpenHTMLOutfile(result_category);
+    // we prepare the skeletop
+    output->base = search->GetLocalSkeleton();
+    if ((output->base)==NULL) {
+        output->base = mainskelc->AtIndexM(4);
+    }
+    // we load up with values first
+    search->LoadValues(output->parse,output->GetResCat());
+    // header
+    WriteHtmlHeader(output);
+    // body
+    for (ccloop=0; ccloop<itemcount; ccloop++) {
+        temp = dynamic_cast<jfAO3_FicList*>((*collections)[ccloop]);
+        numres = temp->CountResultCategory(output->GetResCat());
+        if (numres>0) temp->WriteToHTML(output,false);
+    }
+    // finishing off
+    WriteFooterClose(output);
+    return true;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // gets the fic extract (an abstract of the fic data used for fic downloading)
@@ -217,7 +231,7 @@ void jfAO3ResColl::WriteHtmlHeader(jfHtmlParams* indata) {
     temp = dynamic_cast<jfAO3_FicList*>((*collections)[ccloop]);
     lvres = temp->LoadValues(indata->parse,indata->GetResCat());
     assert(lvres);
-    numres = temp->CountRCategory(indata->GetResCat());
+    numres = temp->CountResultCategory(indata->GetResCat());
     // the cat link
     if (numres>0) {
       // the cat separator
@@ -248,8 +262,12 @@ bool jfAO3ResColl::AddRestToFile(QTextStream* outfile) const {
 }
 //----------------------------
 // we create an empty Fanfiction.Net Collection
-jfUrlItemCollection* jfAO3ResColl::MakeEmptyCollection() const {
+jfSearchResultItemCollectionBase* jfAO3ResColl::MakeEmptyCollection() const {
   return new jfAO3_FicList();
+}
+//----------------------------
+jfSearchResultItemCollectionBase* jfAO3ResColl::MakeEmptyCollection(const QString& name, size_t cid) const {
+    return new jfAO3_FicList(cid, name);
 }
 //----------------------------
 /* although no new items are to be loaded, we need to link each collection

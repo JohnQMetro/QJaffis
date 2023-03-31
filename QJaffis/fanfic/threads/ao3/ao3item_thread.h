@@ -34,14 +34,14 @@ class jfAO3FandomItemDownloader : public jfMultiCatRootDownloader {
 
   protected:
     // virtual category related methods
-    virtual bool NextCategory();
-    virtual void LoadCatInfo();
-    virtual size_t EstCatPagecount() const;
-    virtual bool InitialSetup();
+    virtual bool NextCategory() override;
+    virtual void LoadCatInfo() override;
+    virtual size_t EstCatPagecount() const override;
+    virtual bool InitialSetup() override;
     // virtual methods that have to be implemented by derived threads
-    virtual jfItemsPageParserBase* makeItemParser();
-    virtual jfParseFetchPackage* MakeParserFetcher();
-    virtual QString* makeURLforPage(size_t index) const;
+    virtual jfItemsPageParserBase* makeItemParser() override;
+    virtual jfParseFetchPackage* MakeParserFetcher() override;
+    virtual QString* makeURLforPage(size_t index) const override;
 
     virtual void ClearWorkers(bool delete_parser) override;
 

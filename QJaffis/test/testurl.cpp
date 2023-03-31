@@ -219,7 +219,7 @@ bool test::DeleteResults(size_t index, void* resultdata) {
     // index listings
     else if (index <= 6) {
         item_results = static_cast<jfResultUnitVector*>(resultdata);
-        delete resultdata;
+        delete item_results;
     }
     // Fanfiction.Net first page results
     else if (index == 7) {
@@ -240,7 +240,7 @@ bool test::DeleteResults(size_t index, void* resultdata) {
     // index listings
     else if (index == 10) {
         item_results = static_cast<jfResultUnitVector*>(resultdata);
-        delete resultdata;
+        delete item_results;
     }
     // ArchiveOfOurOwn.org first page results
     else if (index <= 12) {
@@ -265,7 +265,7 @@ bool test::DeleteResults(size_t index, void* resultdata) {
     // index listings
     else if (index == 16) {
         item_results = static_cast<jfResultUnitVector*>(resultdata);
-        delete resultdata;
+        delete item_results;
     }
     // fimfiction.net index page
     else if (index == 17) {
@@ -280,13 +280,13 @@ bool test::DeleteResults(size_t index, void* resultdata) {
     // fim group data
     else if (index <= 20) {
         item_results = static_cast<jfResultUnitVector*>(resultdata);
-        delete resultdata;
+        delete item_results;
     }
 
     // fimfiction.net group parts
     else if (index <= 20) {
         item_results = static_cast<jfResultUnitVector*>(resultdata);
-        delete resultdata;
+        delete item_results;
     }
 
     // mediaminer.org fics are index, then separate parts, always.
@@ -299,6 +299,7 @@ bool test::DeleteResults(size_t index, void* resultdata) {
         delete fpart;
     }
     else return false;
+    resultdata = NULL;
     // done
     return true;
 }

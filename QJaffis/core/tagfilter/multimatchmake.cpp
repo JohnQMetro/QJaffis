@@ -132,6 +132,7 @@ bool jfMatchFilterCore::SetFromRawParts(const QString& listnames, const QString&
     jfMultiMatchSource* new_source = new jfMultiMatchSource();
     new_source->extraExpression = new_exp;
     new_source->listNamesToUse = listnames.split(',');
+    new_source->miss_counter = NULL;
     return SetFromSource(new_source, lists);
 }
 //+++++++++++++++++++++++++++++++

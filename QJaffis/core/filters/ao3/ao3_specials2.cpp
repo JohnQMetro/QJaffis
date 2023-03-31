@@ -76,7 +76,7 @@ bool jfAO3WarnFilter::IsFull() const {
 }
 //---------------------------
 // the core matching method
-bool jfAO3WarnFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfAO3WarnFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const QString fname = "jfAO3WarnFilter::CoreMatch";
   QRegExp qpval = QRegExp("["+value+"]");
   // starting

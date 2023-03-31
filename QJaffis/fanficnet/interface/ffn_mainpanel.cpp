@@ -150,7 +150,7 @@ int jfFFNSearchOnePanel::GetSearchIndex() const {
 }
 /*****************************************************************************/
 jfFFNMain::jfFFNMain(jfSearchCore* searchin, bool notebook, QWidget* parent):
-    jfMainSearchGroup( searchin , rtype_MCNU , notebook , true , parent ) {
+                            jfMainSearchGroup( searchin , notebook , parent ) {
   // the usual constant
 	const QString fname = "jfFFNMain::jfFFNMain";
   // preparing notebook and results display

@@ -39,7 +39,7 @@ class jfFimThumbsFilter : public jfBaseFilter {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     // file i/o
     virtual bool AddRestToFile(QTextStream* outfile) const;
     virtual bool ReadRestFromFile(jfFileReader* infile);
@@ -64,7 +64,7 @@ class jfFIMGenreFilter : public jfTagFilterCore {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     virtual bool ModifyList(QStringList* templist) const;
     // check the tags against a list of pre-approved tags
     virtual bool DoVerify();
@@ -86,7 +86,7 @@ class jfFIMCharacterFilter : public jfTagFilterCore {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     virtual bool ModifyList(QStringList* templist) const;
     // check the tags against a list of pre-approved tags
     virtual bool DoVerify();
@@ -112,7 +112,7 @@ class jfFimRatingFilter : public jfBaseFilter {
     bool Includes(QString test) const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     // file i/o
     virtual bool AddRestToFile(QTextStream* outfile) const;
     virtual bool ReadRestFromFile(jfFileReader* infile);
@@ -145,7 +145,7 @@ class jfFimThumbPercentFilter : public jfBaseFilter {
     virtual QString GetTypeID() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     // file i/o
     virtual bool AddRestToFile(QTextStream* outfile) const;
     virtual bool ReadRestFromFile(jfFileReader* infile);

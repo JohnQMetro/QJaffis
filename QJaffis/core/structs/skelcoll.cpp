@@ -45,7 +45,7 @@ jfSkelCollection::jfSkelCollection():jfBaseCollection() {
 //-------------------------------------------------------------------
 bool jfSkelCollection::NextIndex() {
   if ((item_count==0) || (item_index==-2)) return false;
-  if (item_index==(item_count-1)) {
+  if (item_index==(((int)item_count)-1)) {
     curr_item = NULL;
     item_index = -2;
     return false;
@@ -77,7 +77,7 @@ void jfSkelCollection::ResetIndex() {
 //-------------------------------------------------------------------
 bool jfSkelCollection::ToIndex(const int& newindex) {
   if (newindex<-2) return false;
-  if (newindex>=item_count) return false;
+  if (newindex >= ((int)item_count)) return false;
   if (newindex<0) curr_item = NULL;
   else curr_item = (*datalist)[newindex];
   item_index = newindex;

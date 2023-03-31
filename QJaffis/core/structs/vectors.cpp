@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    vector declarations
 Created:     April 29, 2009
 Conversion to QT started : April 18, 2013
-Updated:     June 4, 2022
+Updated:     March 11, 2023
 ******************************************************************************/
 #ifndef VECTORS_H_INCLUDED
   #include "vectors.h"
@@ -102,7 +102,7 @@ bool jfIDStore::DiscardTest(size_t testval) {
   }
 }
 //--------------------------------------------
-bool jfIDStore::DiscardTest(jfBaseObj* testobj) {
+bool jfIDStore::DiscardTest(const jfBaseObj* testobj) {
   assert(testobj!=NULL);
   size_t testval = testobj->GetID();
   // special case
@@ -118,6 +118,24 @@ bool jfIDStore::DiscardTest(jfBaseObj* testobj) {
     }
     else return true;
   }
+}
+// ----------------------------------------------
+bool jfIDStore::DiscardTest(const jfSearchResultItem* testitem) {
+    assert(testitem!=NULL);
+    size_t testval = testitem->GetId();
+    // special case
+    if (empty()) {
+        insert(testval);
+        return false;
+    }
+    // general
+    else {
+        if (find(testval)==end()) {
+            insert(testval);
+            return false;
+        }
+        else return true;
+    }
 }
 //===============================================================
 void jfStrBoolList::AddItem(const QString& inname, bool indis) {

@@ -130,7 +130,7 @@ bool jfGetPage::WaitToRetry(int full_wait) {
     int sleep_left = full_wait;
     while(sleep_left > 0) {
         pauser->SignalWaiting(sleep_left);
-        if (sleep_left >= rtimes.retry_step_time) {
+        if (sleep_left >=((int)rtimes.retry_step_time)) {
             jfSleepThread::msleep(full_sleep);
         }
         else {

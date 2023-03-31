@@ -112,7 +112,7 @@ bool jfAO3RatingFilter::IsFull() const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfAO3RatingFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfAO3RatingFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfAO3Fanfic* testval = dynamic_cast<const jfAO3Fanfic*>(testelem);
   return value.contains(testval->GetRating());
 }
@@ -150,7 +150,7 @@ jfBaseFilter* jfAO3OrientationFilter::GenCopy() const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfAO3OrientationFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfAO3OrientationFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfAO3Fanfic* rvalue;
   // we start
   assert(testelem!=NULL);

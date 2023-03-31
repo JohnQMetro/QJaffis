@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    Declares custom popup menu classes
 Created:     January 5, 2010
 Conversion to Qt started February 22, 2014
-Updated:     July 12, 2017
+Updated:     March 25, 2023
 ******************************************************************************/
 #ifndef MENU_H_INCLUDED
 #define MENU_H_INCLUDED
@@ -12,9 +12,8 @@ Updated:     July 12, 2017
 //------------------
 #include <QMenu>
 //---------------------
-#ifndef BASEOBJ_H_INCLUDED
-    #include "../../core/objs/baseobj.h"
-#endif // BASEOBJ_H_INCLUDED
+
+#include "../../core/objs/baseitem.h"
 /*****************************************************************************/
 // a forward declaration
 class jfMainSearchGroup;
@@ -36,7 +35,7 @@ class jfPopupMenu : public QMenu {
   protected:
     virtual void EnableDisable() = 0;
     bool xNN() const;
-    const jfBasePD* GetSource();
+    jfResultUnit* GetSource() const;
     // internal data
     jfRClickData* sdata;
     // action pointers
@@ -44,18 +43,7 @@ class jfPopupMenu : public QMenu {
     QAction* append_action;
 
 };
-//-----------------------------------------------------------------
-/*
-class jfGooxPopupMenu : public jfPopupMenu {
-  public:
-    jfGooxPopupMenu(wxWindow* destination);
-  protected:
-    // menu handlers
-    void OnExcludeUrl(wxCommandEvent& event);
-    // internal data
-    wxMenuItem* miExcludeUrl;
-};
-*/
+
 //------------------------------------------------------------------
 // base class for Fanfic and Fim Group menus
 class jfItemPopupMenuBase : public jfPopupMenu {

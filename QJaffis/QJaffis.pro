@@ -12,17 +12,25 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     core/filters/ao3/ao3_percent_tags_filter.cpp \
+    core/filters/base/structpair.cpp \
+    core/filters/extended/list_sexp.cpp \
+    core/objs/baseitem.cpp \
+    core/objs/itemutils.cpp \
     core/tagfilter/base_tagfilters.cpp \
     core/tagfilter/multimatchmake.cpp \
     core/tagfilter/stringcounter.cpp \
     core/tagfilter/taglist.cpp \
     core/tagfilter/tagmatch.cpp \
     defaultpaths.cpp \
+    fanfic/data/ao3/ao3_ficutils.cpp \
     fanfic/data/ao3/ao3_lookvals.cpp \
     fanfic/data/ao3/ao3_urlmake.cpp \
     fanfic/data/displayhtmlspec.cpp \
+    fanfic/data/ficitemutils.cpp \
+    fanfic/data/fim/fim_ficutils.cpp \
     fanfic/interface/ao3/ao3_searchfilter_panel.cpp \
     fanfic/interface/ao3/ao3_tagparams.cpp \
+    fanficnet/data/ffn_ficutils.cpp \
     fanficnet/threads/ffncatparser_exp1.cpp \
     fetching/core/fetchbase.cpp \
     fetching/core/fetchpython.cpp \
@@ -38,6 +46,7 @@ SOURCES += main.cpp\
     fetching/loopget/getpage.cpp \
     fetching/loopget/multicatroot.cpp \
     fetchparse/parsefetch_packagemaker.cpp \
+    ffnupdate/data/upd_utils.cpp \
     ficdown/threads/update_fetcher.cpp \
     globalsettings.cpp \
     interface/controls/charo_editor.cpp \
@@ -48,6 +57,8 @@ SOURCES += main.cpp\
     interface/controls/widgets3.cpp \
     interface/controls/widgets4.cpp \
     interface/filters/ao3/ao3_list_percent_filter_editor.cpp \
+    interface/filters/base/relpair_edit.cpp \
+    interface/filters/extended/listexpr_edit.cpp \
     interface/filters/tagfilter/filter_match.cpp \
     interface/filters/tagfilter/multimatch.cpp \
     interface/filters/tagfilter/tag_match_filter_edits.cpp \
@@ -228,16 +239,24 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     core/filters/ao3/ao3_percent_tags_filter.h \
+    core/filters/base/structpair.h \
+    core/filters/extended/list_sexp.h \
+    core/objs/baseitem.h \
+    core/objs/itemutils.h \
     core/tagfilter/base_tagfilters.h \
     core/tagfilter/multimatchmake.h \
     core/tagfilter/stringcounter.h \
     core/tagfilter/taglist.h \
     core/tagfilter/tagmatch.h \
     defaultpaths.h \
+    fanfic/data/ao3/ao3_ficutils.h \
     fanfic/data/ao3/ao3_lookvals.h \
     fanfic/data/displayhtmlspec.h \
+    fanfic/data/ficitemutils.h \
+    fanfic/data/fim/fim_ficutils.h \
     fanfic/interface/ao3/ao3_searchfilter_panel.h \
     fanfic/interface/ao3/ao3_tagparams.h \
+    fanficnet/data/ffn_ficutils.h \
     fanficnet/threads/ffncatparser_exp1.h \
     fetching/core/fetchbase.h \
     fetching/core/fetchpython.h \
@@ -253,6 +272,7 @@ HEADERS  += mainwindow.h \
     fetching/loopget/getpage.h \
     fetching/loopget/multicatroot.h \
     fetchparse/parsefetch_packagemaker.h \
+    ffnupdate/data/upd_utils.h \
     ficdown/threads/update_fetcher.h \
     globalsettings.h \
     initend.h \
@@ -362,6 +382,7 @@ HEADERS  += mainwindow.h \
     interface/filters/ao3/ao3_special2.h \
     interface/filters/ao3/ao3_special1.h \
     interface/filters/ao3/ao3_sexpeditors.h \
+    interface/filters/base/relpair_edit.h \
     interface/filters/base/urlfilter_editor.h \
     interface/filters/base/sfilt_edit.h \
     interface/filters/base/sexpr_edit.h \
@@ -369,6 +390,7 @@ HEADERS  += mainwindow.h \
     interface/filters/base/bfilt_edit.h \
     interface/filters/category/category_listedit.h \
     interface/filters/category/category_editor.h \
+    interface/filters/extended/listexpr_edit.h \
     interface/filters/extended/sexp_extended.h \
     interface/filters/extended/pairs_edit.h \
     interface/filters/extended/pairf_editor.h \
@@ -448,6 +470,3 @@ RC_FILE = qjaffis.rc
 
 OTHER_FILES += \
     todo.txt
-
-DISTFILES += \
-    interface/filters/tagfilter/ydhjdty.txt

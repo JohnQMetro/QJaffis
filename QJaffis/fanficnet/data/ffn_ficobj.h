@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net item object
 // Created:     May 25, 2010
 // Conversion to Qt Started September 25, 2013
-// Updated:     February 25, 2023
+// Updated:     March 24, 2023
 /////////////////////////////////////////////////////////////////////////////
 #ifndef BASEOBJ_H_INCLUDED
     #include "../../core/objs/baseobj.h"
@@ -22,42 +22,38 @@
 /* */
 //------------------------------------------------------------------------
 class jfFFNItemCore : public jfGenericFanfic3, public jfFanficPairsMixin {
+    friend class jfFFNFanficParseBase;
   public:
+    static const QString FFN_CORE_TYPE_ID;
+
     // constructors
     jfFFNItemCore();
+    jfFFNItemCore(const jfSearchResultItemData& init_data);
     jfFFNItemCore(const jfFFNItemCore& src);
-    // implemented virtual methods
-    virtual QString ToText() const;
-    virtual QString ToDisplayHTML() const;
     // virtual QString GetURLforPart(size_t partindex) const;
-    virtual QString MakeAuthorUrl() const;
+    virtual QString MakeAuthorUrl() const override;
     // data getting methods
     bool IsUpdated() const;
     QDate GetPublished() const;
     QChar GetRating() const;
-    QString GetLanguage() const;
+    const QString& GetLanguage() const;
     size_t GetFavs() const;
     // special
-    virtual void ProcessDescription();
     virtual ~jfFFNItemCore();
   protected:
+    void StoreToCopyFFNCore(jfFFNItemCore* destination) const;
     bool UpdateFromSource(const jfFFNItemCore* source);
-    // parsing helper methods
-    virtual bool GetLinkTitle(jfStringParser& zparser, QString& parseerr) = 0;
-    bool ExtractDescription(jfStringParser &zparser, QString &parserr);
-    bool Rating2Words(jfStringParser &zparser, QString &parserr);
-    QStringList SplitCharacters(const QString& source) const;
-    bool Characters_Pairs_and_Completion(jfStringParser &zparser, QString &parserr);
-    bool Dates_and_Completion(jfStringParser &zparser, QString &parserr);
-    bool failMsg(QString &pto, const QString message)const;
+
     // implemented virtual methods
-    virtual jfFicExtract* MakeExtract() const;
-    virtual void LoadIntoExtract(jfFicExtract* into) const;
+    virtual bool LoadValuesContinued(jfSkeletonParser* inparser) const override;
+    virtual jfFicExtract* MakeExtract() const override;
+    virtual void LoadIntoExtract(jfFicExtract* into) const override;
     // file i/o output
-    virtual bool AddMoreExtraStuff(QTextStream* outfile) const;
-    virtual bool ReadMoreExtraStuff(jfFileReader* infile);
+    virtual bool AddMoreExtraStuff(QTextStream* outfile) const override;
+    virtual bool ReadMoreExtraStuff(jfFileReader* infile) override;
     virtual bool AddCodaStuff(QTextStream* outfile) const = 0;
     virtual bool ReadCodaStuff(jfFileReader* infile) = 0;
+
     // new internal data
     QString language;
     bool isupdated;
@@ -68,23 +64,23 @@ class jfFFNItemCore : public jfGenericFanfic3, public jfFanficPairsMixin {
 //========================================================================
 
 class jfFFNItem : public jfFFNItemCore {
+    friend class jfFFNFanficParse;
   public:
+    static const QString FFN_ITEM_TYPE_ID;
+
     // constructors
     jfFFNItem();
+    jfFFNItem(const jfSearchResultItemData& init_data);
     jfFFNItem(const jfFFNItem& src);
-    jfFFNItem(const QString& instr, const jfFFN_CategoryCore* cat_linkin);
+
     // data setting methods
     bool SetCatLink(const jfFFN_CategoryCore* cat_linkin);
-    bool SetFromString(const QString& instr, const jfFFN_CategoryCore* cat_linkin, QString& parserr);
     bool UpdateFromObj(const jfFFNItemCore* src);
     bool UpdateWordcount(const jfFFNItemCore* src);
-    // implemented virtual methods
-    virtual QString GetTypeID() const;
-    virtual bool LoadValues(jfSkeletonParser* inparser) const;
     // getting info
     QString GetCatString() const;
   protected:
-    virtual bool GetLinkTitle(jfStringParser& zparser, QString& parseerr);
+
     // io methods
     virtual bool AddCodaStuff(QTextStream* outfile) const ;
     virtual bool ReadCodaStuff(jfFileReader* infile);

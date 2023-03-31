@@ -4,12 +4,15 @@
 // Purpose :    Declares the most basic filtering classes
 // Created:     20.02.06
 // Conversion to QT Started April 8, 2013
-// Updated:     August 21, 2012
+// Updated:     March 10, 2023
 /////////////////////////////////////////////////////////////////////////////
 // ----------------------------------------------------------------------------
 #ifndef BASEOBJ_H_INCLUDED
     #include "../../objs/baseobj.h"
 #endif // BASEOBJ_H_INCLUDED
+
+#include "../../objs/baseitem.h"
+
 #define JFBASEFILTER
 //****************************************************************************
 class jfBasePD;
@@ -21,7 +24,7 @@ class jfBaseFilter : public jfBaseObj {
     bool MatchTypeid(const QString& tomatch) const;
     // match against the filter
     virtual bool isEmpty() const = 0;
-    bool Match(const jfBasePD* testelem) const;
+    bool Match(const jfSearchResultItem* testelem) const;
     // loading from a string representation
     virtual bool FromString(const QString& sourcedata) = 0;
     virtual QString ToString() const = 0;
@@ -33,7 +36,7 @@ class jfBaseFilter : public jfBaseObj {
     virtual size_t GetFilType() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const = 0;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
     // subitem copying method, so we do not have to replicate for each child class
     void CopyOver(jfBaseFilter* core) const;
     /* since different types are stored together, the text file reprentation
@@ -55,10 +58,10 @@ class jfUrlFilter : public jfBaseFilter {
     jfUrlFilter();
     jfUrlFilter(const jfUrlFilter& source);
     // info methods
-    virtual bool isEmpty() const;
+    virtual bool isEmpty() const override;
     // redefined virtual functions
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
+    virtual bool FromString(const QString& sourcedata) override;
+    virtual QString ToString() const override;
     // manipulating internal data
     size_t SetAlternates(QStringList* mmatch, bool replace = true);
     size_t AppendToAlternates(QString url2add);
@@ -68,18 +71,18 @@ class jfUrlFilter : public jfBaseFilter {
     QStringList* GetExcludes() const;
     QStringList* GetExcludes2();
     // basic constants
-    virtual QString GetTypeID() const;
-    virtual QString GetTypeDescription() const;
+    virtual QString GetTypeID() const override;
+    virtual QString GetTypeDescription() const override;
     // copying
     jfUrlFilter* Copy() const;
-    jfBaseFilter* GenCopy() const;
+    jfBaseFilter* GenCopy() const override;
   protected:
     // private methods
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
     virtual void SetValid();
-    virtual size_t ExtraLines() const;
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
+    virtual size_t ExtraLines() const override;
+    virtual bool AddRestToFile(QTextStream* outfile) const override;
+    virtual bool ReadRestFromFile(jfFileReader* infile) override;
     // private data
     QStringList *alternates;
     bool excludeonly;

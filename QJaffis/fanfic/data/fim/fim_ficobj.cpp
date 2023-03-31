@@ -4,17 +4,13 @@ Author  :   John Q Metro
 Purpose :   Fanfic object for fimfiction.net
 Created :   May 8, 2012
 Conversion to QT started : April 20, 2013
-Updated :   February 22, 2023
+Updated :   March 18, 2023
 ******************************************************************************/
 #ifndef FIM_FICOBJ_H_INCLUDED
   #include "fim_ficobj.h"
 #endif // FIM_FICOBJ_H_INCLUDED
-#ifndef FIM_CONSTANTS_H
-  #include "fim_constants.h"
-#endif // FIM_CONSTANTS_H
-#ifndef HTMLPARSE_H_INCLUDED
-  #include "../../../core/utils/htmlparse.h"
-#endif // HTMLPARSE_H_INCLUDED
+
+
 #ifndef STRINGPARSER_H_INCLUDED
   #include "../../../core/utils/stringparser.h"
 #endif // STRINGPARSER_H_INCLUDED
@@ -26,326 +22,42 @@ Updated :   February 22, 2023
 #include <QDateTime>
 
 /*****************************************************************************/
-
-//=============================================================================
+const QString jfFIM_Fanfic::FIM_FANFIC_TYPE_ID = QString("FIM_Fanfic");
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 jfFIM_Fanfic::jfFIM_Fanfic():jfGenericFanfic3() {
-  xparser = NULL;
-  english_locale = QLocale(QLocale::English, QLocale::UnitedStates);
+    type_labels.append(FIM_FANFIC_TYPE_ID);
+    thumbsup = 0;
+    thumbsdown = 0;
+}
+// -------------------------------------
+jfFIM_Fanfic::jfFIM_Fanfic(const jfSearchResultItemData& init_data):jfGenericFanfic3(init_data) {
+    type_labels.append(FIM_FANFIC_TYPE_ID);
+    thumbsup = 0;
+    thumbsdown = 0;
 }
 //----------------------------------------------
 jfFIM_Fanfic::jfFIM_Fanfic(const jfFIM_Fanfic& src):jfGenericFanfic3(src) {
-
-  thumbsup = src.thumbsup;
-  thumbsdown = src.thumbsdown;
-  rating = src.rating;
-  pubdate = src.pubdate;
-  compact_summary = src.compact_summary;
-  warnings = src.warnings;
-  content_types = src.content_types;
-
-  xparser = NULL;
-  english_locale = QLocale(QLocale::English, QLocale::UnitedStates);
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// special meta-information
-QString jfFIM_Fanfic::GetTypeID() const {
-  return "FIM_Fanfic";
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// other methods
-bool jfFIM_Fanfic::SetFromString(const QString& inval, QString& parse_err, bool checkavatar) {
-  // constants
-  const QString fname = "jfFIM_Fanfic::SetFromString";
-  const QString avatartag = "<img src=\"//www.fimfiction-static.net/images/avatars/";
-  const QString startdesc = "<span class=\"description-text bbcode\">";
-  const QString enddesc = "</section>";
-  const QString datestart = "<span class=\"date\"><b>&#xb7;</b>";
-  // variables
-  unsigned long qval;
-  QString tfrag, oerr;
-  QString buffer,buffer2;
-  size_t findwhich;
-  bool haspubdate;
-  QString ratstring;
-  QDate latedate,currdate;
-  int lpos;
-  // starting
-  validdata = false;
-  xparser = new jfStringParser(inval);
-  // avatar author id checking...
-  if (checkavatar) {
-    if (!xparser->GetDelimitedULong(avatartag,"_64.jpg\"",qval,buffer2)) author_id = 0;
-    else author_id = qval;
-  }
-  // rating
-  if (!xparser->MovePast(" data-controller=\"rate-story\">")) {
-      return ParseError(parse_err,"Cannot find likes! A");
-  }
-  // looking for likes
-  if (xparser->GetDelimited("<span class=\"likes\">","</span>",buffer)) {
-      if (buffer=="") thumbsup = 0;
-      else if (Str2ULongC(buffer,qval)) thumbsup = qval;
-      else return ParseError(parse_err,"Likes value is not a number!");
-
-      if (!xparser->GetDelimited("<span class=\"dislikes\">","</span>",buffer)) {
-        return ParseError(parse_err,"Cannot find dislikes!");
-      }
-      if (buffer=="") thumbsdown = 0;
-      else if (Str2ULongC(buffer,qval)) thumbsdown = qval;
-      else return ParseError(parse_err,"Dislikes value is not a number!");
-  }
-  // failing that, we look for 'Ratings Disabled'
-  else if (xparser->MovePastLimit("Ratings Disabled","<div class=\"divider\">")) {
-      thumbsup = -1;
-      thumbsdown = 0;
-  }
-  else return ParseError(parse_err,"Cannot find likes! B");
-
-  // getting the fic id
-  if (!xparser->GetDelimitedULong("id=\"story_","\"",qval,oerr)) {
-    return ParseError(parse_err,oerr +=" While getting story id.");
-  }
-  num_id = qval;
-  // next, the rating
-  if (!xparser->MovePast("<a href=\"/stories?content_rating=")) {
-    return ParseError(parse_err,"Could not find rating!");
-  }
-  if (!xparser->GetDelimited(">","</a>",ratstring)) return ParseError(parse_err,"Could not extract rating!");
-  rating = fimcon::RatLookup((ratstring.trimmed())[0]);
-  // building the primary link
-  tfrag = "<a class=\"story_name\" href=\"/story/";
-  if (!xparser->MovePast(tfrag)) return ParseError(parse_err,"Cannot find primary link info!");
-  if (!xparser->GetDelimited("/","\"",buffer)) {
-    return ParseError(parse_err,"Cannot find end of primary link!");
-  }
-  primarylink = "https://www.fimfiction.net/story/" + QString::number(num_id) + "/" + buffer;
-  // the title
-  if (!xparser->GetDelimited(">","</a>",buffer)) return ParseError(parse_err,"Cannot find title!");
-  name = htmlparse::HTML2Text(buffer);
-  // the author name
-  // if checkavatar is false, the name is not here (the page is for the individual story)
-  if (checkavatar) {
-      if (!xparser->MovePast("<a href=\"/user/")) {
-          return ParseError(parse_err,"Cannot find start of author id name!");
-      }
-      // getting the author ID and link-name
-      if (!xparser->GetMovePastULong("/",qval,buffer2)) {
-          return ParseError(parse_err,"Could not get Author ID : " + buffer2);
-      }
-      if (author_id = 0) author_id = qval;
-      if (!xparser->GetMovePast("\">",buffer)) {
-          return ParseError(parse_err,"Could find end of Author link!");
-      }
-      // setting the author link
-      author_url = "https://www.fimfiction.net/user/" + QString::number(author_id);
-      author_url += "/" + buffer;
-      // getting the author name
-      if (!xparser->GetMovePast("</a>",buffer)) {
-          return ParseError(parse_err,"Cannot find author name!");
-      }
-      author_name = buffer;
-  }
-  // moving to the 'categories' (aka genres)
-  if (!xparser->MovePast("<ul class=\"story-tags\">")) return ParseError(parse_err,"Story-Tags box not found!");
-  // Tag checking loop
-  while (xparser->MovePast("class=\"tag-")) {
-      // getting the tag
-      if (!xparser->GetMovePast("\"",buffer)) return ParseError(parse_err,"Could not get tag type!");
-      if (!xparser->GetDelimited(">","</a>",buffer2)) return ParseError(parse_err,"missing genre link");
-      // converting it to the internal format...
-      if (buffer=="character") {
-          if (!characters.isEmpty()) characters += ", ";
-          characters += buffer2.trimmed();
-      }
-      else if (buffer=="content") {
-          if (!content_types.isEmpty()) content_types += ", ";
-          content_types += buffer2.trimmed();
-      }
-      else if (buffer=="warning") {
-          if (!warnings.isEmpty()) warnings += ", ";
-          warnings += buffer2.trimmed();
-      }
-      // series will be treated as a genre for now
-      else {
-        if (!genres.isEmpty()) genres += ", ";
-        genres += buffer2.trimmed();
-      }
-
-  }
-  // getting the description
-  if (!xparser->GetDelimited(startdesc,enddesc,buffer)) {
-    return ParseError(parse_err,"Description missing!");
-  }
-  lpos = buffer.lastIndexOf("</span>",-1,Qt::CaseInsensitive);
-  if (lpos != -1) buffer.truncate(lpos+7);
-  description = buffer.trimmed();
-  /* Chapter links. Due to a lack of updated dates in fimfiction 4, we collect the dates for
-   * each chapter to determine the updated date. */
-  findwhich = 0;
-  latedate = QDate(1900,1,1);
-  while (xparser->MovePast("<li data-published class=\"")) {
-    findwhich++;
-    if (!xparser->GetDelimitedEndPair(datestart,"<span ","</span>",buffer)) {
-        return ParseError(parse_err,"Unable to extract updated date for chapter!");
-    }
-    buffer = buffer.trimmed();
-    if (!ParseFIMDate(buffer,currdate)) {
-        return ParseError(parse_err,"Unable to parse chapter date!");
-    }
-    if (currdate > latedate) latedate = currdate;
-  }
-  if (findwhich==0) {
-      included = false; // this actually happens, so not really a parsing error
-      return ParseError(parse_err,"No chapters found!");
-  }
-  else part_count = findwhich;
-  /**/JDEBUGLOG(fname,1)
-  // status
-  if (!xparser->MovePast("<span class=\"completed-status")) {
-    return ParseError(parse_err,"No status span found!");
-  }
-  if (!xparser->GetDelimited(">","</span>",buffer)) return ParseError(parse_err,"Status not found!");
-  buffer = buffer.trimmed();
-  completed = (buffer=="Complete");
-  /**/JDEBUGLOG(fname,2)
-  // published date
-  tfrag = "<span class=\"desktop\"><b>Published:</b> </span><";
-  // this is more complicated than it used to be
-  if (!xparser->MovePast(tfrag)) {
-      /**/JDEBUGLOG(fname,3)
-      /* since I've come cross a case of a story with no pubdate, I have to deal with
-      it, instead of assuming a parsing error */
-      haspubdate = false;
-  }
-  else {
-      /**/JDEBUGLOG(fname,4)
-      if (!xparser->GetDelimitedULong("data-time=\"","\"",qval,buffer)) {
-          /**/JDEBUGLOG(fname,5)
-        haspubdate = false;
-      }
-      else haspubdate = true;
-  }
-  /**/JDEBUGLOG(fname,6)
-  if (haspubdate) {
-    // the extracted date is in Unix TimeStamp format
-    QDateTime temppubdate;
-    temppubdate.setTime_t(qval);
-    if (!temppubdate.isValid()) return ParseError(parse_err,"Could not parse published date!");
-    pubdate = temppubdate.date();
-    /**/JDEBUGLOG(fname,7)
-    // annoyingly, with fimfiction 4 there is no modified/updated date anymore!
-    // so I use a date built while scanning the list of chapters
-    if (latedate > pubdate) updated_date = latedate;
-    else updated_date = pubdate;
-  }
-  else updated_date = latedate;
-  // word count
-  if (!xparser->MovePast("<div class=\"word_count\">")) return ParseError(parse_err,"Missing wordcount");
-  if (!xparser->GetDelimitedULong("<b>","</b>",qval,oerr)) {
-    return ParseError(parse_err,"Could not parse wordcount! : " + oerr);
-  }
-  word_count = qval;
-
-  // finishing touches
-  validdata = true;
-  ustatus = jud_NONE;
-  delete xparser;
-  xparser = NULL;
-  return true;
+    type_labels.append(FIM_FANFIC_TYPE_ID);
+    thumbsup = src.thumbsup;
+    thumbsdown = src.thumbsdown;
+    rating = src.rating;
+    pubdate = src.pubdate;
+    compact_summary = src.compact_summary;
+    warnings = src.warnings;
+    content_types = src.content_types;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-jfFicExtract_FIM* jfFIM_Fanfic::ExtractFromString(QString inval, QString& parse_err) {
-  // constants
-  const QString fname = "jfFIM_Fanfic::ExtractFromString";
-  const QString dstr1 = "<a href=\"/user/";
-  const QString partstart = "<article class=\"story_container\"";
-  const QString partend = "</article>";
-  // variables
-  jfFicExtract_FIM* result;
-  QString buffer, errval;
-  QString rec_authname, rec_authlink;
-  size_t rec_authid;
-  unsigned long qval;
-  // starting
-  /**/JDEBUGLOG(fname,1);
-  xparser = new jfStringParser(inval);
-  if (!xparser->MovePast("<div class=\"user-page-header\"")) {
-    return ExtractError(parse_err,"Missing User Page Header");
-  }
-  // getting author id and name
-  if (!xparser->GetDelimitedULong(dstr1,"/",qval,errval)) {
-    return ExtractError(parse_err,errval);
-  }
-  rec_authid = qval;
-  if (!xparser->GetMovePast("\"",buffer)) {
-      return ExtractError(parse_err,"Error while getting Author Link!");
-  }
-  if (!xparser->GetDelimited(">","</a>",rec_authname)) {
-     return ExtractError(parse_err,"Error while getting Author Name!");
-  }
-  rec_authname = rec_authname.trimmed();
-  // building the author link
-  rec_authlink = "https://www.fimfiction.net/user/" + QString::number(rec_authid) + "/";
-  rec_authlink += buffer.trimmed();
-
-  // skipping past more crud and unecessary stuff
-  /**/JDEBUGLOG(fname,3);
-  // extracting the main contents
-  if (!xparser->GetDelimited(partstart,partend,buffer)) {
-    buffer = xparser->GetBlock(2000);
-    return ExtractError(parse_err,"could not get main contents\n"+buffer);
-  }
-  delete xparser;
-  xparser = NULL;
-  // calling set from string
-  if (!SetFromString(buffer,errval,false)) {
-    return ExtractError(parse_err,"Parsing details failed:\n"+errval);
-  }
-  // additional parsing to get part names
-  QStringList extracted_names;
-  QString namebuf;
-  /**/JDEBUGLOG(fname,7);
-  xparser = new jfStringParser(buffer);
-  if (xparser->MovePast("<!--Chapters-->")) {
-    xparser->ChopAfter("<div class=\"chapters-footer\">",true);
-    while(xparser->MovePast("<a class=\"chapter-title\" href=\"/story/")) {
-      if (!xparser->GetDelimited("\">","</a>",namebuf)) {
-        return ExtractError(parse_err,"Problems in extracting part names");
-      }
-      extracted_names.append(htmlparse::ConvertEntities(namebuf.trimmed(),false));
-    }
-  }
-  /**/JDEBUGLOG(fname,11);
-  if (part_count != extracted_names.size()) {
-    return ExtractError(parse_err,"Number of part names does not match part count!");
-  }
-  // finishing
-  result = new jfFicExtract_FIM();
-  author_id = rec_authid;
-  author_name = rec_authname;
-  author_url = rec_authlink;
-  /**/JDEBUGLOG(fname,12);
-  LoadIntoExtract(result);
-  result->auth_id = rec_authid;
-  result->partnames = extracted_names;
-  delete xparser;
-  xparser = NULL;
-  /**/JDEBUGLOG(fname,14);
-  // done
-  return result;
-}
-//-----------------------------------------------------------
 void jfFIM_Fanfic::SetCompactSummary(const QString& insum) {
   compact_summary = insum;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // getting data
 //-----------------------------------------------------------------------
-QString jfFIM_Fanfic::GetContentTypes() const {
+const QString& jfFIM_Fanfic::GetContentTypes() const {
     return content_types;
 }
 //-----------------------------------------------------------------------
-QString jfFIM_Fanfic::GetWarnings() const {
+const QString& jfFIM_Fanfic::GetWarnings() const {
     return warnings;
 }
 //-----------------------------------------------------------------------
@@ -362,8 +74,12 @@ QString jfFIM_Fanfic::GetRating() const {
   return rating;
 }
 //------------------------------------------------------------------------
-QString jfFIM_Fanfic::GetCompactSummary() const {
+const QString& jfFIM_Fanfic::GetCompactSummary() const {
   return compact_summary;
+}
+// ------------------------------------------------------
+QDate jfFIM_Fanfic::GetPublishedDate() const {
+    return pubdate;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // special url construction
@@ -373,190 +89,36 @@ QString jfFIM_Fanfic::MakeAuthorUrl() const {
   result += author_name;
   return result;
 }
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// to string functions
-//----------------------------------------------
-QString jfFIM_Fanfic::ToText() const {
-  QString result,buffer;
-  // building the title and author line
-  result += name + " by " + author_name + "\n";
-  // next line: link display
-  result += primarylink + "\n";
-  // adding the main description
-  result += GetDescExtract(6,750) + "\n";;
-  // next up.. two extra lines
-  result += "Published: " + pubdate.toString("M-d-yyyy");
-  result += " - Updated: " + updated_date.toString("M-d-yyyy");
-  // the rating...
-  result += " - Rating: " + rating;
-  // part count and word count
-  result += " - Parts: " + QString::number(part_count);
-  result += " - Words: " + QString::number(word_count) + "\n";
-  // first of 2 possible lines
-  bool hasGenre = !genres.isEmpty();
-  bool hasCT = !content_types.isEmpty();
-  bool hasWarn = !warnings.isEmpty();
-  if (hasGenre) {
-    result += "Genres: " + genres;
-  }
-  if (hasCT) {
-      if (hasGenre) result += " - ";
-      result += "Types: " + content_types;
-  }
-  if (hasWarn) {
-      if (hasGenre || hasCT) result += " - ";
-      result += "Warnings: " + warnings;
-  }
-  // second of 2 possible lines
-  bool hasChar = !characters.isEmpty();
-  if (hasChar || completed) result += "\n";
-  // character data
-  if (hasChar) {
-    result += "Characters Specified: " + characters.join(", ");
-  }
-  if (completed) {
-      if (hasChar) result += " - ";
-      result += "Complete";
-  }
-  // finishing off
-  result += "\n";
-  // done
-  return result;
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfFIM_Fanfic::LoadValuesContinued(jfSkeletonParser* inparser) const {
+    inparser->AddText("ITEMF_CONTENTTYPES",content_types);
+    inparser->AddText("ITEMF_WARNINGS",warnings);
+    inparser->AddText("ITEMF_RATING",rating);
+    inparser->AddBool("THUMBS_DISABLED",(thumbsup < 0));
+    inparser->AddUInt("THUMBSUP",(thumbsup< 0)?0:thumbsup);
+    inparser->AddUInt("THUMBSDOWN",thumbsdown);
+    inparser->AddUInt("THUMBSDOWN",thumbsdown);
+    inparser->AddText("ITEMF_PUBDATE",pubdate.toString("MM-dd-yyyy"));
+    return true;
 }
-//----------------------------------------------
-QString jfFIM_Fanfic::ToDisplayHTML() const {
-  const QString fname = "jfFFNItem::ToDisplayHTML";
-
-  QString result,buffer;
-
-  const jfDisplayHTMLHelper* helper = HTMLHelpers::fim_item_helper;
-  // we start with the table
-  result = DisplayHTMLHeader(1, helper);
-  result += "</td></tr>\n";
-  // next line: link display
-  result += "<tr><td>";
-  // next line: link display
-  result += helper->WrapText("ficlink", primarylink, true);
-
-  // adding the main description
-  result += "<div style=\"margin-left:10px;\">";
-  QString rdesc = GetDescExtract(6,1000);
-  result += helper->WrapTextNoEsc("description",rdesc,false);
-  result += "</div>\n";
-
-  // next up.. metadata
-  QString mdata = "Published: " + pubdate.toString("MM-dd-yyyy");
-  mdata += " - Updated: " + updated_date.toString("MM-dd-yyyy");
-  mdata += " - Rating: " + rating;
-  // part count and word count
-  mdata += " - Parts: " + QString::number(part_count);
-  mdata += " - Words: " + QString::number(word_count);
-  // thumbs up and down
-  if (thumbsup < 0) mdata += " - Rating Disabled";
-  else {
-    mdata += " - Thumbs Up: " + QString::number(thumbsup);
-    mdata += " - Thumbs Down: " + QString::number(thumbsdown);
-  }
-  result += "<div>";
-  result += helper->WrapText("basicinfo", mdata, false);
-  if (completed) {
-      result += helper->WrapTextNoEsc("basicinfo"," - <b>Complete</b>",false);
-  }
-  result += "<br>\n";
-
-  // genres and content type...
-  result += helper->ConditionalWrapText("genres", false, "Genres: ", true, genres, false);
-  result += helper->ConditionalWrapText("basicinfo", true, "Types: ", true, content_types, false);
-  result += helper->ConditionalWrapText("warnings", true, "Warnings: ", true, warnings, false);
-
-  result += "<br>\n";
-  // characters
-  result += helper->ConditionalWrapText("characters", false, "Characters: ", true, characters.join(", "), false);
-
-  // finishing off
-  result += "</div></td></tr>\n</table>";
-  // done
-  return result;
+//--------------------------------------------------
+void jfFIM_Fanfic::StoreToCopyFIMFanfic(jfFIM_Fanfic* destination) const {
+    assert(destination!=NULL);
+    StoreToCopyGenericFanfic3(destination);
+    destination->content_types = content_types;
+    destination->warnings = warnings;
+    destination->thumbsup = thumbsup;
+    destination->thumbsdown = thumbsdown;
+    destination->rating = rating;
+    destination->pubdate = pubdate;
+    destination->compact_summary = compact_summary;
 }
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// added stuff
-bool jfFIM_Fanfic::LoadValues(jfSkeletonParser* inparser) const {
-  QString rbuffer;
-  LoadCoreValues(inparser);
-  LoadMoreValues1(inparser);
-  LoadMoreValues2(inparser);
-  LoadMoreValues3(inparser);
-  inparser->AddText("ITEMF_CONTENTTYPES",content_types);
-  inparser->AddText("ITEMF_WARNINGS",warnings);
-  inparser->AddText("ITEMF_RATING",rating);
-  inparser->AddBool("THUMBS_DISABLED",(thumbsup < 0));
-  inparser->AddUInt("THUMBSUP",(thumbsup< 0)?0:thumbsup);
-  inparser->AddUInt("THUMBSDOWN",thumbsdown);
-  inparser->AddUInt("THUMBSDOWN",thumbsdown);
-  inparser->AddText("ITEMF_PUBDATE",pubdate.toString("MM-dd-yyyy"));
-  return true;
-}
-//----------------------------------------------------------------------------
-void jfFIM_Fanfic::ProcessDescription() {
-  jfStringParser* vparse;
-  QString bufx, nrerep;
-  bool imgrep, qres;
-  // skipping the images
-  imgrep = false;
-  vparse = new jfStringParser(description);
-  while(vparse->GetMovePast("<img",bufx)) {
-    imgrep = true;
-    nrerep += bufx;
-    qres = vparse->MovePast(">");
-    if (!qres) break;
-  }
-  if (imgrep) {
-    if (qres) {
-      vparse->GetToEnd(bufx);
-      nrerep += bufx;
-    }
-    delete vparse;
-    description = nrerep;
-  }
-  // post processing
-  description.replace("</p><br /><p><p class=\"double\"><hr>","<br><br>\n",Qt::CaseInsensitive);
-  description.replace("</p><p class=\"double\"><hr></p>","<br><br>\n",Qt::CaseInsensitive);
-  description.replace("</p><p><hr></p>","<br><br>\n",Qt::CaseInsensitive);
-  description.replace("<hr />","<br><br>\n",Qt::CaseInsensitive);
-  description.replace("</p><p class=\"double\">","<br><br>\n",Qt::CaseInsensitive);
-  description.replace("</p>","<br>\n",Qt::CaseInsensitive);
-  description.replace("<br><br>\n<br>\n","<br><br>\n",Qt::CaseInsensitive);
-  description.replace("<p>"," ",Qt::CaseInsensitive);
-  description = description.simplified();
-  description += "</center>";
-}
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // special methods
 //----------------------------------------------
-// fimfiction.net now has dates... which cannot be converted by standard functions
-bool jfFIM_Fanfic::ParseFIMDate(QString insrc, QDate& out) {
-    const QString fname = "jfFIM_Fanfic::ParseFIMDate";
-  // variables
-  QString split1,split2;
-  int spos;
-  // splitting the string
-  insrc = insrc.trimmed();
-  spos = insrc.indexOf(' ');
-  if (spos<0) return false;
-  split1 = insrc.left(spos);
-  split2 = insrc.mid(spos+1).trimmed();
-  // checking and truncating the first part (to get rid of the 'st', 'nd', 'rd', 'th' )
-  if (split1.length()<3) return false;
-  split1.chop(2);
-  // rebuilding, after which we can use QDate::ParseFormat
-  insrc = split1 + " " + split2;
-  out = english_locale.toDate(insrc,"d MMM yyyy");
-  // out = QDate::fromString(insrc,"d MMM yyyy");
-  // returning the success
-  return (out.isValid());
-}
-//----------------------------------------------
+
 jfFicExtract* jfFIM_Fanfic::MakeExtract() const {
   jfFicExtract_FIM* result;
   result = new jfFicExtract_FIM();
@@ -574,22 +136,6 @@ void jfFIM_Fanfic::LoadIntoExtract(jfFicExtract* into) const {
   // fim specific stuff
   jfFicExtract_FIM* typed_ext = dynamic_cast<jfFicExtract_FIM*>(into);
   typed_ext->wordcount = word_count;
-}
-//----------------------------------------------
-bool jfFIM_Fanfic::ParseError(QString& perror,const QString& message) {
-  if (xparser != NULL) delete xparser;
-  xparser = NULL;
-  perror = "PARSE ERROR: " + message;
-  return false;
-}
-//----------------------------------------------
-jfFicExtract_FIM* jfFIM_Fanfic::ExtractError(QString& perror,const QString& message) {
-    const QString fname = "jfFIM_Fanfic::ExtractError";
-  if (xparser != NULL) delete xparser;
-  xparser = NULL;
-  perror = "PARSE ERROR: " + message;
-  jerror::ParseLog(fname,perror);
-  return NULL;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // file i/o output

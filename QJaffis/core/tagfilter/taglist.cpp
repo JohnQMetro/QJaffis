@@ -69,6 +69,7 @@ bool jfGeneralTagList::SetFromString(const QString& source) {
             set = true;
             return true;
         }
+        else return false;
     }
     else return false;
 }
@@ -259,10 +260,12 @@ int jfGeneralTagListsGroup::LoadFromFile(jfFileReader* sourceReader) {
         if (!okay) return -1;
         // then read the lines
         int read_count = 0;
-        for (unsigned long rdex = 0; rdex < list_count; rdex++) {
+
+        while (read_count < list_count) {
             QString cline;
             okay = sourceReader->ReadLine(cline, fname);
             if (!okay) return false;
+            if (cline.isEmpty() || cline.startsWith("#")) continue;
             okay = MakeAndAdd(cline);
             if (!okay) {
                 sourceReader->BuildError("The line '" + cline + "' could not be parsed.");

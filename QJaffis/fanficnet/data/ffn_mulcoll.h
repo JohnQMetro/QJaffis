@@ -28,22 +28,23 @@ class jfFFNResColl : public jfResultMultiCollection {
     jfFFNResColl(jfFFNSearch* xsearch_in);
     bool SetCatLinks(const jfFFN_Categories* inlinks);
     // other stuff
-    virtual QString GetTypeID() const;
+    virtual QString GetTypeID() const override;
     const jfFFN_CategoryCore* GetCat(size_t zindex) const;
     size_t FirstIDAtIndex(size_t index_in) const;
     // methods for integrating updates
     bool InsertNewCollection(jfFFNItemCollection* new_coll_src);
     bool InsertFromNewCollection(jfFFNItemCollection* new_coll_src);
     // i/o
-    bool WriteToHTML(size_t result_category);
+    bool WriteToHTML(size_t result_category) override;
     // extracting information from a particular item
     jfFicExtract* GetFicExtract(size_t c_index, size_t i_index) const;
   protected:
-    void WriteHtmlHeader(jfHtmlParams* indata);
+    void WriteHtmlHeader(jfHtmlParams* indata) override;
     // i/o methods
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual jfUrlItemCollection* MakeEmptyCollection() const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
+    virtual bool AddRestToFile(QTextStream* outfile) const override;
+    virtual jfSearchResultItemCollectionBase* MakeEmptyCollection() const override;
+    virtual jfSearchResultItemCollectionBase* MakeEmptyCollection(const QString& name, size_t cid) const override;
+    virtual bool ReadRestFromFile(jfFileReader* infile) override;
     // typed search item
     jfFFNSearch* typed_search;
     // other data

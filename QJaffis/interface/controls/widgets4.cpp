@@ -3,7 +3,7 @@ Name    :   widgets4.cpp
 Author  :   John Q Metro
 Purpose :   Some misc user interface stuff
 Created :   February 12, 2018
-Updated :   February 12, 2018
+Updated :   March 27, 2023
 ******************************************************************************/
 #ifndef WIDGETS4_H
     #include "widgets4.h"
@@ -110,7 +110,7 @@ bool jfExprEditBase::SetData(const QString& inexpr,QString& outmessage) {
   return chkres;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfExprEditBase::PressCheckFilter(bool checked) {
+void jfExprEditBase::PressCheckFilter(bool value) {
   // local variables
   const QString rvalid = "Expression Valid";
   const QString nvalid = "Expression Not Valid";
@@ -144,7 +144,8 @@ void jfExprEditBase::PressCheckFilter(bool checked) {
 void jfExprEditBase::TextChanged() {
     SetStatus(1);
 }
-void jfExprEditBase::TextChanged2(const QString& newtext) {
+//--------------------------------------
+void jfExprEditBase::TextChanged2(QString value) {
     SetStatus(1);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

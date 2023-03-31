@@ -243,32 +243,32 @@ bool jfTagFilterCore::VerifyTags(size_t NUMTAGIN, const QString intags[], QStrin
 }
 //----------------------------------
 bool jfTagFilterCore::VerifyTags(const QStringList* sourcelist, QStringList* replist) {
-  // variables
-  size_t tcount, tfoundc, tnfound, tloop;
-  QString ctag;
-  bool tfound;
-  // checks
-  assert(sourcelist != NULL);
-  if (thedata==NULL) return false;
-  // we start
-  tcount = thedata->size();
-  tfoundc = 0;
-  tnfound = 0;
-  // the replacement list
-  if (replist!=NULL) {
-      thedata->ReplaceTags(replist);
-  }
-  // the loop
-  for (tloop=0 ; tloop<(sourcelist->size()) ; tloop++) {
-    ctag = sourcelist->at(tloop);
-    tfound = ((thedata->end())!=(thedata->find(ctag)));
-    if (tfound) tfoundc++;
-    else {
-      tnfound++;
-      (*thedata)[ctag] = jfts_NONE;
+    // variables
+    size_t tcount, tfoundc, tnfound;
+    QString ctag;
+    bool tfound;
+    // checks
+    assert(sourcelist != NULL);
+    if (thedata==NULL) return false;
+    // we start
+    tcount = thedata->size();
+    tfoundc = 0;
+    tnfound = 0;
+    // the replacement list
+    if (replist!=NULL) {
+        thedata->ReplaceTags(replist);
     }
-  }
-  return (tcount == tfoundc);
+    // the loop
+    for (int tloop=0 ; tloop<(sourcelist->size()) ; tloop++) {
+        ctag = sourcelist->at(tloop);
+        tfound = ((thedata->end())!=(thedata->find(ctag)));
+        if (tfound) tfoundc++;
+        else {
+            tnfound++;
+            (*thedata)[ctag] = jfts_NONE;
+        }
+    }
+    return (tcount == tfoundc);
 }
 
 //-----------------------------------
@@ -292,14 +292,13 @@ void jfTagFilterCore::SetEmpty(size_t NUMTAGIN, const QString intags[]) {
 //------------------------------------------------------------
 void jfTagFilterCore::SetEmpty(const QStringList* sourcelist) {
   // variables
-  size_t loopc;
   QString tag;
   // starting checks
   assert(sourcelist!=NULL);
   if (thedata == NULL) thedata = new jfTagListing();
   else thedata->clear();
   // loop to add items
-  for ( loopc = 0 ; loopc < sourcelist->size() ; loopc++ ) {
+  for ( int loopc = 0 ; loopc < sourcelist->size() ; loopc++ ) {
     tag = QString(sourcelist->at(loopc));
     (*thedata)[tag] = jfts_NONE;
   }
@@ -415,7 +414,7 @@ QString jfCompletedFilter::GetTypeID() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfCompletedFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfCompletedFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfGenericFanfic2* rvalue;
   bool cvalue;
   assert(testelem!=NULL);

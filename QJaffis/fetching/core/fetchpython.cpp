@@ -64,10 +64,12 @@ jfFETCH_ERROR jfPageFetchWithPython::Download(const QString& inurl, const QStrin
     // the page has been successfully downloaded
     if (signal_result == "Y") {
         bool okay = LoadSavedPage();
+        if (!okay) jerror::Log(fname, "Failed to load python-fetched page.");
     }
     // the page has failed to download
     else if (signal_result == "N") {
         bool eload = LoadErrors();
+        if (!eload) jerror::Log(fname, "Failed to load python-script errors.");
     }
     // error happened inside ScriptFetch
     else if (signal_result == "") {
@@ -189,7 +191,7 @@ QString jfPageFetchWithPython::ScriptFetch(const QString& cookie) {
     if (!cookie.isEmpty()) tosend += " ||| " + cookie.toLatin1() + "\n";
     else tosend += "\n";
     // sending
-    qint64 writeres = script_com->write(tosend);
+    /* qint64 writeres =*/ script_com->write(tosend);
 
     bool okay = script_com->waitForBytesWritten(3000);
     if (!okay) {

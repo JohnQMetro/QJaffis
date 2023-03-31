@@ -45,7 +45,7 @@ class jfDateRangeFilter : public jfBaseFilter {
     // special methdos
     QDate DayPlus(QDate inval, bool decrement) const;
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const = 0;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
     bool RealMatchCore(const QDate intest) const;
     // file i/o
     virtual bool AddRestToFile(QTextStream* outfile) const;
@@ -70,7 +70,7 @@ class jfUpdatedDateFilter : public jfDateRangeFilter {
     virtual QString GetTypeID() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 //============================================================================
 class jfPublishedDateFilter : public jfDateRangeFilter {
@@ -86,7 +86,7 @@ class jfPublishedDateFilter : public jfDateRangeFilter {
     virtual QString GetTypeID() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 
 /*****************************************************************************/

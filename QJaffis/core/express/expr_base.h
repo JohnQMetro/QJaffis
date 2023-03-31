@@ -172,7 +172,7 @@ public:
     jfLiteralFilterElem(const QString& ftype, const QString& rawdata);
     jfLiteralFilterElem(const jfLiteralFilterElem& fsource);
     // public methods
-    bool Match(const jfBasePD* testelem) const;
+    bool Match(const jfSearchResultItem* testelem) const;
     // virtual methods that need to be defined
     virtual QString String() const;
     virtual bool IsString() const;
@@ -191,7 +191,7 @@ protected:
 class jfFilterElem : public jfOperandElem {
 public:
     virtual bool IsString() const;
-    bool Match(const jfBasePD* testelem) const;
+    bool Match(const jfSearchResultItem* testelem) const;
     virtual bool IsExpr() const = 0;
     virtual bool VerfyNames(jfNameVerif* nameobj) = 0;
     virtual bool CopyLoad() = 0;

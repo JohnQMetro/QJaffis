@@ -3,7 +3,7 @@ Name    :   fimgroup_parser.cpp
 Author  :   John Q Metro
 Purpose :   Group object for fimfiction.net
 Created :   June 21, 2016
-Updated :   June 29, 2016
+Updated :   March 20, 2023
 ******************************************************************************/
 #ifndef FIMGROUP_PARSER_H
   #include "fimgroup_parser.h"
@@ -16,58 +16,66 @@ Updated :   June 29, 2016
 // constructor
 jfFIMGroupParser::jfFIMGroupParser():jfItemsPageParserBase() {
   pagecount = 0;
+  item_outputter = new jfFIMGroupOutputter();
+  item_parser = new jfFIMGroupItemParser();
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // custom parse method
 void jfFIMGroupParser::ParseDownloadedPage(const QString& inPage, size_t pageindex) {
-  // constants
-  const QString func = "jfFIMGroupCollection::ProcessPage";
-  // variables
-  jfFIMGroup* temp;
-  size_t pit_index;
-  QString buffer;
-  QString perror_out;
-  // starting...
-  page_parsed = false;
-  NewData(inPage);
-  // only 1 group per page...
-  /**/lpt->tLog(func,1);
-  page_results = new jfPDVector();
-  pit_index = (pageindex-1);
-  /**/lpt->tLogS(func,2,pit_index);
-  // next up is parsing the items
- if (xparser.GetDelimited("<!--Content-->","<!--Footer-->",buffer)) {
-    pit_index++;
-    temp = new jfFIMGroup();
-    /**/lpt->tLog(func,3);
-    temp->SetFromString(buffer,perror_out);
-    // the item is okay
-    if (temp->IsValid()) {
-      /**/lpt->tLog(func,4);
-      page_results->push_back(temp);
-      page_parsed = true;
+    // constants
+    const QString func = "jfFIMGroupParser::ParseDownloadedPage";
+    // variables
+    jfFIMGroupItemParser* parser = dynamic_cast<jfFIMGroupItemParser*>(item_parser);
+
+    // starting...
+    page_parsed = false;
+    NewData(inPage);
+    // only 1 group per page...
+    /**/lpt->tLog(func,1);
+    page_results = new std::vector<jfItemFlagGroup>();
+    size_t pit_index = (pageindex-1);
+    /**/lpt->tLogS(func,2,pit_index);
+
+    jfItemFlagGroup temp;
+
+    // next up is parsing the items
+    QString buffer;
+    if (xparser.GetDelimited("<!--Content-->","<!--Footer-->",buffer)) {
+        jfItemParseResultState result = parser->ParseFromSource(buffer);
+        // the item is okay
+        if (result == jfItemParseResultState::SUCCEESS) {
+            /**/lpt->tLog(func,4);
+            temp.item = parser->GetGroupItem();
+            temp.flags = new jfItemMetaFlags();
+            page_results->push_back(temp);
+            page_parsed = true;
+        }
+        // ignore (unlikely)
+        else if (result == jfItemParseResultState::DEFECTIVE) {
+
+        }
+        // parse error
+        else {
+            /**/lpt->tLog(func,5);
+            parseErrorMessage = "ParseError: " + parser->LastError() + " in :\n";
+            parseErrorMessage += buffer;
+            /**/lpt->tParseError(func,parseErrorMessage);
+            delete page_results;
+            page_results = NULL;
+        }
+        parser->Clear();
     }
-    // the item is not okay
     else {
-      /**/lpt->tLog(func,5);
-      parseErrorMessage = "ParseError: " + perror_out + " in :\n";
-      parseErrorMessage += buffer;
-      /**/lpt->tParseError(func,parseErrorMessage);
-      delete page_results;
-      page_results = NULL;
+        parseErrorMessage = "ParseError: Missing contents!";
+        delete page_results;
+        page_results = NULL;
+        /**/lpt->tParseError(func,parseErrorMessage);
     }
-  }
-  else {
-    parseErrorMessage = "ParseError: Missing contents!";
-    delete page_results;
-    page_results = NULL;
-    /**/lpt->tParseError(func,parseErrorMessage);
-  }
-   // done with the items
-  /**/lpt->tLog(func,8);
-  // post page processing and getting the result
-  PostPageProcessing();
-  /**/lpt->tLog(func,9);
+    // done with the items
+    /**/lpt->tLog(func,8);
+    // post page processing and getting the result
+    PostPageProcessing();
+    /**/lpt->tLog(func,9);
 }
 
 //-------------------------------------

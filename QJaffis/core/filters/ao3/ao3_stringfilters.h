@@ -20,13 +20,13 @@ class jfExtraTagFilter : public jfSimpleExpFilterCore {
     jfExtraTagFilter();
     jfExtraTagFilter(const jfExtraTagFilter& source);
     jfExtraTagFilter(jfSimpleExpr* in_source);
-    virtual QString GetTypeDescription() const;
+    virtual QString GetTypeDescription() const override;
     virtual jfExtraTagFilter* Copy() const;
-    virtual jfBaseFilter* GenCopy() const;
-    virtual QString GetTypeID() const;
+    virtual jfBaseFilter* GenCopy() const override;
+    virtual QString GetTypeID() const override;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
 };
 
 //***************************************************************************

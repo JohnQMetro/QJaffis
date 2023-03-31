@@ -79,7 +79,7 @@ class jfDownloadRootItems : public jfDownloadRootFirstPage {
     virtual void DisposeResults(void* resultdata);
     virtual jfPageParserBase* makeParser();
     // current collection
-    jfUrlItemCollection* current_collection;
+    jfSearchResultItemCollectionBase* current_collection;
     jfResultCollection* maindata;
     jfSearchCore* search_object;
     bool doprocess;

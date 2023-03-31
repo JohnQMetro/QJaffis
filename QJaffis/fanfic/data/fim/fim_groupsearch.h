@@ -58,7 +58,7 @@ class jfFIMGroupResColl : public jfResultCollection {
     bool WriteToHTML(size_t result_category);
   protected:
     void WriteHtmlHeader(jfHtmlParams* indata);
-    virtual jfUrlItemCollection* MakeEmptyCollection() const;
+    virtual jfSearchResultItemCollectionBase* MakeEmptyCollection() const;
     // implemented private i/o methods
     virtual bool AddRestToFile(QTextStream* outfile) const;
     virtual bool ReadRestFromFile(jfFileReader* infile);

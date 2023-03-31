@@ -33,7 +33,7 @@ class jfFFNGenresFilter : public jfTagFilterCore {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     virtual bool ModifyList(QStringList* templist) const;
     // check the tags against a list of pre-approved tags
     virtual bool DoVerify();
@@ -61,7 +61,7 @@ class jfFFNRatingFilter : public jfBaseFilter {
     bool Includes(QChar test) const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     // file i/o
     virtual bool AddRestToFile(QTextStream* outfile) const;
     virtual bool ReadRestFromFile(jfFileReader* infile);
@@ -83,7 +83,7 @@ class jfFFNFavsFilter : public jfMinMaxUFilter {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 //===========================================================================
 // a simple expression filter that matches against the category name
@@ -98,6 +98,6 @@ class jfFFN_CategoryExprFilter : public jfSimpleExpFilterCore {
     virtual QString GetTypeID() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 /*****************************************************************************/

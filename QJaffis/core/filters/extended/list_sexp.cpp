@@ -283,13 +283,12 @@ QString jfCharListExprFilter::GetTypeID() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfCharListExprFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfCharListExprFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfGenericFanfic2* fanfic_item = NULL;
   // checks and starts
   assert(testelem!=NULL);
-  // two types
-  QString datatype = testelem->GetTypeID();
-  if ((datatype == "FFNItem") || (datatype=="AO3Fanfic") || (datatype=="FIM_Fanfic")) {
+  // type checking
+  if (testelem->GetTypeLabels().contains(jfGenericFanfic2::GENERIC_FANFIC_2_TYPE_ID)) {
       fanfic_item = dynamic_cast<const jfGenericFanfic2*>(testelem);
       return InternalMatch(fanfic_item->GetCharacterList());
   }

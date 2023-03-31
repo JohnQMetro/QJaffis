@@ -12,13 +12,13 @@
 #ifndef JFEXPRSTRUCTS
 #include "expr_structs.h"
 #endif
-#ifndef BASEOBJ_H_INCLUDED
-#include "../objs/baseobj.h"
-#endif // BASEOBJ_H_INCLUDED
+
+#include "../objs/baseitem.h"
+
 //***************************************************************************
 
 // a matching function that uses everything: title, embedded filters, the works
-bool FullItemExprMatch(const jfBasePD* testelem, const jfElemArray* parsedinfo);
+bool FullItemExprMatch(const jfSearchResultItem* testelem, const jfElemArray* parsedinfo);
 
 // a more limited matching function that works on strings only
 bool StringExprMatch(const QString& teststr, const jfElemArray* parsedinfo);

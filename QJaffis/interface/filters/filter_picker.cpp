@@ -136,8 +136,8 @@ QString jfFilterPickerBase::NameAt(size_t nindex) const {
 void jfFilterPickerBase::SetColWidth(size_t prop1, size_t prop2, size_t prop3) {
   // variables
   size_t propsum;
-  double dprop1, dprop2,dprop3;
-  int cwidth, ssize1, ssize2, ssize3;
+  double dprop1, dprop2;
+  int cwidth, ssize1, ssize2;
   QSize controlsize;
   // getting the control width
   controlsize = size();
@@ -147,13 +147,15 @@ void jfFilterPickerBase::SetColWidth(size_t prop1, size_t prop2, size_t prop3) {
   if (three_columns) propsum += prop3;
   dprop1 = (double)prop1 / (double)propsum;
   dprop2 = (double)prop2 / (double)propsum;
+  /*
   if (three_columns) {
     dprop3 = (double)prop3 / (double)propsum;
   }
+  */
   // getting the new integer width
   ssize1 = floor(dprop1*cwidth);
   ssize2 = floor(dprop2*cwidth);
-  if (three_columns) ssize3 = floor(dprop3*cwidth);
+  // if (three_columns) ssize3 = floor(dprop3*cwidth);
   // applying the widths
   setColumnWidth(0,ssize1);
   if (three_columns) setColumnWidth(1,ssize2);

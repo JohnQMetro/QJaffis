@@ -62,8 +62,8 @@ bool jfFIM_DFE::SaveFiltersExtended() {
   jfSimpleExpr* testval;
   jfFIM_DualDesc_ExprFilter* dualexpr_filter;
   size_t oindex;
-  int gvalue;
   QString test_msg;
+
   // saving general thumbs data
   thumbs_filter = tud_filedit->GetNewFilter();
   thumbs_filter->SetName(DEF_fimthumbs_name);
@@ -89,7 +89,7 @@ bool jfFIM_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   jfFimThumbPercentFilter* thumb_perfilter;
   jfFIM_DualDesc_ExprFilter* qvalue;
   QString exp_value, err_msg;
-  bool atest;  size_t pvalue;
+  bool atest;
   // thumbs filter
   /**/JDEBUGLOG(fname,1)
   thumbs_filter = dynamic_cast<jfFimThumbsFilter*>(embedded_filters->GetItem(DEF_fimthumbs_name));

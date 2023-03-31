@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines the top level base class for the Seacrh+Results interface
 Created :   August 23, 2009 (orginal version)
 Conversion to Qt Started January 25, 2014 (and renamed from display_base2.cpp)
-Updated :   May 1, 2014
+Updated :   March 30, 2023
 ******************************************************************************/
 #ifndef MAINSEARCH_H
   #include "mainsearch.h"
@@ -26,8 +26,7 @@ DisplayPanelCore::DisplayPanelCore(QWidget* parent):QWidget(parent) {
 }
 /*****************************************************************************/
 // the defult constructor
-jfMainSearchGroup::jfMainSearchGroup(jfSearchCore* searchin, rtype_enum rinval, bool notebook,
-               bool multiple, QWidget* parent):DisplayPanelCore(parent) {
+jfMainSearchGroup::jfMainSearchGroup(jfSearchCore* searchin, bool notebook, QWidget* parent):DisplayPanelCore(parent) {
   // starting preps
   p_search = NULL;
   noteb = notebook;
@@ -99,10 +98,12 @@ bool jfMainSearchGroup::SaveToFile(QString fname) {
   xname = nedit->TryGetName();
   search_data->SetName(xname);
   usd_res = p_search->UpdateSearchData();
-  assert(usd_res);
-  if (threepanel) {
+  if (usd_res && threepanel) {
     usd_res = panel_two->UpdateSearchData();
-    assert(usd_res);
+  }
+  if (!usd_res) {
+      QApplication::restoreOverrideCursor();
+      return false;
   }
   // file opening
   outfile = GetOpenFile(fname,true);
@@ -184,7 +185,7 @@ void jfMainSearchGroup::HandleNameChange(QString newname) {
 after the calling of (their implemented version of) MakeSearchGroup */
 void jfMainSearchGroup::TopArranger() {
   const QString fname = "jfMainSearchGroup::TopArranger";
-  QSize topsize;
+
   top_sizer = new QHBoxLayout();
   if (noteb) {
     if (threepanel) {

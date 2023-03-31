@@ -4,16 +4,15 @@ Author  :   John Q Metro
 Purpose :   Declares fanfic objects that hold fanfic info
 Created :   April 2, 2012
 // Conversion to QT started : April 20, 2013
-Updated :   February 25, 2023
+Updated :   March 26, 2023
 // Renamed from ficobj2.h
 ******************************************************************************/
 #ifndef FICBASE_H
   #define FICBASE_H
 #endif // FICBASE_H
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#ifndef BASEOBJ_H_INCLUDED
-    #include "../../core/objs/baseobj.h"
-#endif // BASEOBJ_H_INCLUDED
+#include "../../core/objs/baseitem.h"
+
 #ifndef JFMISCTYPES1
   #include "../../core/objs/misc_types1.h"
 #endif
@@ -24,51 +23,42 @@ Updated :   February 25, 2023
 #include "../../core/filters/base/structpair.h"
 #include <QVector>
 
-#ifndef DISPLAYHTMLSPEC_H
-    #include "displayhtmlspec.h"
-#endif // DISPLAYHTMLSPEC_
+
 //****************************************************************************
 /* A common base class for Fanfic Items (description) */
-class jfGenericFanfic : public jfBasePD {
+class jfGenericFanfic : public jfSearchResultItem {
   public:
+    static const QString GENERIC_FANFIC_TYPE_ID;
     // default constructor
     jfGenericFanfic();
+    jfGenericFanfic(const jfSearchResultItemData& init_data);
     jfGenericFanfic(const jfGenericFanfic& src);
     // getting values
-    QString GetAuthor() const;
-    QString GetAuthorUrl() const;
+    const QString& GetAuthor() const;
+    const QString& GetAuthorUrl() const;
     size_t GetChapterCount() const;
     QDate GetUpdates() const;
-    QString GetPDesc(size_t elen) const;
+    // special
+    void ChangeAuthorName(const QString& new_author_name);
     // getting the extract
     jfFicExtract* GetExtract() const;
-    // data setting methods
-    void SetMissing();
-    void SetNew(bool ival);
-    bool ChangeAuthorname(QString newname);
     // special url construction
-    // virtual QString GetURLforPart(size_t partindex) const = 0;
     virtual QString MakeAuthorUrl() const = 0;
 
   protected:
     // extra methods
-    void LoadMoreValues1(jfSkeletonParser* inparser) const;
-    void StoreToCopy(jfGenericFanfic* destination) const;
-    QString MakeUStatus() const;
-    QString DisplayHTMLHeader(size_t mindex) const;
-    QString DisplayHTMLHeader(size_t mindex, const jfDisplayHTMLHelper* helper ) const;
+    virtual bool LoadMoreValues(jfSkeletonParser* inparser) const override;
+    virtual bool LoadExtraValues(jfSkeletonParser* inparser) const = 0;
+    void StoreToCopyGenericFanfic(jfGenericFanfic* destination) const;
+
     // special methods
     virtual jfFicExtract* MakeExtract() const = 0;
-    virtual void LoadIntoExtract(jfFicExtract* into) const = 0;
-    // core extract methods
     void LoadIntoExtractCore(jfFicExtract* into) const;
-    // fic mark methods
-    bool IsMarked(size_t mindex) const;
-    QString GetMarkColor(size_t mindex) const;
+    virtual void LoadIntoExtract(jfFicExtract* into) const = 0;
+
     // internal data
     QString author_name;
     size_t part_count;
-    jf_FUpdateStatus ustatus;
     QString author_url;
     QDate updated_date;
 };
@@ -76,8 +66,11 @@ class jfGenericFanfic : public jfBasePD {
 /* A base class for fanfic items that have some extras like characters, word counts, and completed state. */
 class jfGenericFanfic2 : public jfGenericFanfic {
   public:
+    static const QString GENERIC_FANFIC_2_TYPE_ID;
+
     // default constructor
     jfGenericFanfic2();
+    jfGenericFanfic2(const jfSearchResultItemData& init_data);
     jfGenericFanfic2(const jfGenericFanfic2& src);
     // getting values
     size_t GetWordcount() const;
@@ -85,11 +78,12 @@ class jfGenericFanfic2 : public jfGenericFanfic {
     const QStringList& GetCharacterList() const;
   protected:
     // extra methods
-    void LoadMoreValues2(jfSkeletonParser* inparser) const;
-    void StoreToCopy2(jfGenericFanfic2* destination) const;
+    virtual bool LoadExtraValues(jfSkeletonParser* inparser) const override;
+    virtual bool LoadMoreValues2(jfSkeletonParser* inparser) const = 0;
+    void StoreToCopyGenericFanfic2(jfGenericFanfic2* destination) const;
     // file i/o output
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
+    virtual bool AddRestToFile(QTextStream* outfile) const override;
+    virtual bool ReadRestFromFile(jfFileReader* infile) override;
     virtual bool AddExtraStuff(QTextStream* outfile) const = 0;
     virtual bool ReadExtraStuff(jfFileReader* infile) = 0;
     // internal data
@@ -101,6 +95,8 @@ class jfGenericFanfic2 : public jfGenericFanfic {
 // a mixin class for fanfic items that have pairing info
 class jfFanficPairsMixin {
   public:
+    static const QString FANFIC_PAIRS_TYPE_ID;
+
     int RelationshipCount() const;
     const QVector<const jfPairingStruct*>& GetRelationships() const;
     QString RelationshipsAsDisplayString(bool rom_pipe) const;
@@ -117,20 +113,24 @@ class jfFanficPairsMixin {
 //==================================================================
 class jfGenericFanfic3 : public jfGenericFanfic2 {
   public:
+    static const QString GENERIC_FANFIC_3_TYPE_ID;
+
     // default constructors
     jfGenericFanfic3();
+    jfGenericFanfic3(const jfSearchResultItemData& init_data);
     jfGenericFanfic3(const jfGenericFanfic3& src);
     // data getting methods
-    QString GetGenres() const;
+    const QString& GetGenres() const;
     size_t GetAuthorID() const;
     void ChangeAuthorID(size_t newid);
   protected:
     // extra methods
-    void LoadMoreValues3(jfSkeletonParser* inparser) const;
-    void StoreToCopy3(jfGenericFanfic3* destination) const;
+    virtual bool LoadMoreValues2(jfSkeletonParser* inparser) const override;
+    virtual bool LoadValuesContinued(jfSkeletonParser* inparser) const = 0;
+    void StoreToCopyGenericFanfic3(jfGenericFanfic3* destination) const;
     // file i/o output
-    virtual bool AddExtraStuff(QTextStream* outfile) const;
-    virtual bool ReadExtraStuff(jfFileReader* infile);
+    virtual bool AddExtraStuff(QTextStream* outfile) const override;
+    virtual bool ReadExtraStuff(jfFileReader* infile) override;
     virtual bool AddMoreExtraStuff(QTextStream* outfile) const = 0;
     virtual bool ReadMoreExtraStuff(jfFileReader* infile) = 0;
     // more data

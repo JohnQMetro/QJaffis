@@ -202,7 +202,7 @@ jfOperandElem* jfExpParserClass::MakeOperand(const QString& source) {
     QString xsrc = source;
     QString fpart,spart;
 	jfOperandElem* res = NULL;
-    int semiloc,slen;
+    int semiloc;
     bool istit, iscs;
 
 	// checking to see if this is an embedded filter
@@ -284,7 +284,6 @@ jfOperandElem* jfExpParserClass::MakeOperand(const QString& source) {
 		// otherwise...
 		else {
 			// we split things into two parts
-			slen = xsrc.length();
             fpart = xsrc.mid(0,semiloc);
             fpart = fpart.trimmed();
             spart = xsrc.mid(semiloc+1);

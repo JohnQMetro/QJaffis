@@ -65,88 +65,88 @@ jfFetchAndParsePage::~jfFetchAndParsePage() {
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void jfFetchAndParsePage::StartProcessing() {
-  const QString fname = "jfFetchAndParsePage::StartProcessing";
-  // temp variable
-  const QString* ures = NULL;
-  jfFETCH_ERROR currError = jff_NOERROR;
-  jfDownloadResults *resultStore;
-  QString parse_err;
-  void* res_data;
-  size_t new_pagecount;
-  // initial do once setup
-  started = true;
-  initLog("FetchAndParse");
-  downloader = new jfFetchPage();
-  downloader->SetParams(parser);
-  // the main loop, continues until we get a NULL URL
-  while (fname,true) {
-    // getting the URL (may block)
-    ures = channel->GetUrl(urlIndex);
-    // checking URL afterwards
-    if (ures==NULL) break;
-    urlToGet = *ures;
-    currError = DownloadMethod(pause_before);
-    if (currError==jff_NOERROR) {
-      /**/tLog(fname,6);
-      // time to parse!
-      parser->ParseDownloadedPage((*fetched_page),urlIndex);
-      delete fetched_page;
-      fetched_page = NULL;
-      // parsing went okay
-      if (parser->isPageParsed()) {
-        /**/tLog(fname,7);
-        res_data = parser->getResults();
-        new_pagecount = parser->getPageCount();
-        /**/tLogS(fname,8,new_pagecount);
-        channel->ResultResultData(res_data,new_pagecount);
-        /**/tLog(fname,9);
-      }
-      // parsing did not go okay
-      else {
-        parse_err = parser->getParseErrorMessage();
-        tParseError(fname,parse_err);
-        resultStore = new jfDownloadResults();
-        (resultStore->fetchResults).why_more = parse_err;
-        (resultStore->fetchResults).why = jfa_PARSEERR;
-        (resultStore->fetchResults).halt = true;
-        /**/tLog(fname,11);
-        channel->ReturnResults(resultStore);
-        /**/tLog(fname,12);
-      }
-      /**/tLog(fname,13);
+    const QString fname = "jfFetchAndParsePage::StartProcessing";
+    // temp variable
+    const QString* ures = NULL;
+    jfFETCH_ERROR currError = jff_NOERROR;
+    jfDownloadResults *resultStore;
+    QString parse_err;
+    void* res_data;
+    size_t new_pagecount;
+    // initial do once setup
+    started = true;
+    initLog("FetchAndParse");
+    downloader = new jfFetchPage();
+    downloader->SetParams(parser);
+    // the main loop, continues until we get a NULL URL
+    while (true) {
+        // getting the URL (may block)
+        ures = channel->GetUrl(urlIndex);
+        // checking URL afterwards
+        if (ures==NULL) break;
+        urlToGet = *ures;
+        currError = DownloadMethod(pause_before);
+        if (currError==jff_NOERROR) {
+            /**/tLog(fname,6);
+            // time to parse!
+            parser->ParseDownloadedPage((*fetched_page),urlIndex);
+            delete fetched_page;
+            fetched_page = NULL;
+            // parsing went okay
+            if (parser->isPageParsed()) {
+                /**/tLog(fname,7);
+                res_data = parser->getResults();
+                new_pagecount = parser->getPageCount();
+                /**/tLogS(fname,8,new_pagecount);
+                channel->ResultResultData(res_data,new_pagecount);
+                /**/tLog(fname,9);
+            }
+            // parsing did not go okay
+            else {
+                parse_err = parser->getParseErrorMessage();
+                tParseError(fname,parse_err);
+                resultStore = new jfDownloadResults();
+                (resultStore->fetchResults).why_more = parse_err;
+                (resultStore->fetchResults).why = jfa_PARSEERR;
+                (resultStore->fetchResults).halt = true;
+                /**/tLog(fname,11);
+                channel->ReturnResults(resultStore);
+                /**/tLog(fname,12);
+            }
+            /**/tLog(fname,13);
+        }
+        else {
+            // sending back an error message instead
+            /**/tLog(fname,14);
+            // redirection
+            if (currError == jff_REDIRECTION) {
+                /**/tLog(fname,15);
+                resultStore = new jfDownloadResults(redirectionResult);
+            }
+            // some other problem
+            else {
+                /**/tLog(fname,16,jf_FetchErr2String(currError,false));
+                resultStore = new jfDownloadResults();
+                (resultStore->fetchResults).why = jf_Error2AfterMath(currError);
+                /**/tLog(fname,17);
+                (resultStore->fetchResults).halt = true;
+            }
+            /**/tLog(fname,18);
+            // passing back the result
+            channel->ReturnResults(resultStore);
+            /**/tLog(fname,19);
+        }
+        // going on to the next item...
+        /**/tLog(fname,20);
     }
-    else {
-      // sending back an error message instead
-      /**/tLog(fname,14);
-      // redirection
-      if (currError == jff_REDIRECTION) {
-        /**/tLog(fname,15);
-        resultStore = new jfDownloadResults(redirectionResult);
-      }
-      // some other problem
-      else {
-        /**/tLog(fname,16,jf_FetchErr2String(currError,false));
-        resultStore = new jfDownloadResults();
-        (resultStore->fetchResults).why = jf_Error2AfterMath(currError);
-        /**/tLog(fname,17);
-        (resultStore->fetchResults).halt = true;
-      }
-      /**/tLog(fname,18);
-      // passing back the result
-      channel->ReturnResults(resultStore);
-      /**/tLog(fname,19);
-    }
-    // going on to the next item...
-    /**/tLog(fname,20);
-  }
-  // we are done with this thread
-  /**/tLog(fname,21);
-  started = false;
-  delete downloader;
-  downloader = NULL;
-  CloseLog();
-  /**/tLog(fname,22);
-  emit processingFinished();
+    // we are done with this thread
+    /**/tLog(fname,21);
+    started = false;
+    delete downloader;
+    downloader = NULL;
+    CloseLog();
+    /**/tLog(fname,22);
+    emit processingFinished();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++
 // bundles a few downloading related lines

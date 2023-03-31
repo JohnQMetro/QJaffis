@@ -36,7 +36,7 @@ class jfMatchOneTagFilterBase : public jfMultiMatchBaseFilter {
   protected:
     bool InternalMatch(const QStringList& incheck) const;
 
-    virtual bool CoreMatch(const jfBasePD* testelem) const = 0;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
 
     const jfGeneralTagListsGroup* source_list;
 
@@ -73,7 +73,7 @@ class jfMatchPercentTagFilterBase : public jfMultiMatchBaseFilter {
     bool InternalMatch(const QStringList& incheck) const;
     virtual void CoreCopy(const jfMatchPercentTagFilterBase& mm_source, bool setup_miss_counter);
 
-    virtual bool CoreMatch(const jfBasePD* testelem) const = 0;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
 
     size_t min_percentage;
     bool match_empty;
@@ -117,7 +117,7 @@ class jfMatchFilteredPercentTagFilterBase : public jfMultiMatchBaseFilter {
     bool InternalMatch(const QStringList& incheck) const;
     virtual void CoreCopy(const jfMatchFilteredPercentTagFilterBase& mm_source, bool setup_miss_counter);
 
-    virtual bool CoreMatch(const jfBasePD* testelem) const = 0;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
 
     size_t min_percentage;
     bool match_empty;

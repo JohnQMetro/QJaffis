@@ -38,9 +38,9 @@ class jfTagRowView : public QWidget {
   signals:
     void statusChange();
   public slots:
-    void handleIncludeClicked(bool checked);
-    void handleExcludeClicked(bool checked);
-    void handleAlternateClicked(bool checked);
+    void handleIncludeClicked(bool value);
+    void handleExcludeClicked(bool value);
+    void handleAlternateClicked(bool value);
   protected:
     void SetupWidgets(QString tagtext);
     // setup helpers
@@ -77,6 +77,7 @@ class jfTagStatusPicker : public QWidget {
     void handleStatusChange();
   protected:
     // helper methods
+    size_t ListSize() const;
     bool SetListFromTags();
     bool LoadStatusesToList();
     bool SaveStatusesFromList();

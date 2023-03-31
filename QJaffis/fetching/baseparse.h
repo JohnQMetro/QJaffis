@@ -3,7 +3,7 @@ Name    : baseparse.h
 Basic   : Declares a base class that handles page parsing (and redirection)
 Author  : John Q Metro
 Started : June 13, 2016
-Updated : June 21, 2022
+Updated : March 11, 2023
 
 ******************************************************************************/
 #ifndef BASEPARSE_H
@@ -22,6 +22,8 @@ Updated : June 21, 2022
 #ifndef THREADBASE_H
   #include "threadbase.h"
 #endif // THREADBASE_H
+
+#include "../core/objs/itemutils.h"
 /*****************************************************************************/
 /* a lower abstract parser class than jfPageParserBase, no redirection / truncate */
 class jfPageParserCore {
@@ -74,7 +76,7 @@ class jfPageParserBase: public virtual jfPageParserCore {
     // virtual uint getPause() const = 0;
 };
 //===============================================================================
-/* A still abstract derived class, for searches that produce lists of jfBasePD
+/* A still abstract derived class, for searches that produce lists of jfSearchResultItem
  * derived items when parsing each page. */
 class jfItemsPageParserBase : public jfPageParserBase {
   public:
@@ -89,11 +91,16 @@ class jfItemsPageParserBase : public jfPageParserBase {
     size_t CategorySort();
     size_t Condense();
     void PostPageProcessing();
+
     // list of items produced
     size_t start_itemcount;
-    jfPDVector* page_results;
+    std::vector<jfItemFlagGroup>* page_results;
     // useful external links
     jfSearchCore* search_ptr;
+
+    jfItemParseBase* item_parser;
+    jfResultItemOutputter* item_outputter;
+
 };
 
 

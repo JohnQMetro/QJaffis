@@ -44,12 +44,13 @@ jfBaseFilter* jfTagFilterEditor::GetFilter() {
   // variables
   jfTagFilterCore* tvalue;
   const jfTagListing* tcopy;
-  bool testval;
+
   // creating filters and loading tags
   tvalue = GetTagFilter();
   if (isListLong()) tcopy = longlist_panel->SaveAndGetTagData();
   else tcopy = shortlist_panel->GetTagList();
-  testval = tvalue->SetTags(tcopy);
+
+  tvalue->SetTags(tcopy);
   // name setting
   namedesc_edit->ChangeObj(tvalue);
   return tvalue;

@@ -57,15 +57,15 @@ bool jfProgressPanelOne::ChangeLayout(bool sidelayout) {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++
 void jfProgressPanelOne::MoreError(bool dohalt) {
-  if (dohalt) {
-    if (lasterror.why==jff_HALTED) statstring = "HALTED";
-    else statstring = "FAILED";
-    pause_resume->setEnabled(false);
-  }
-  else {
-    statstring = "SKIPPING";
-  }
-  main_status->setText(statstring);
+    if (dohalt) {
+        if (lasterror.why == jfa_HALT) statstring = "HALTED";
+        else statstring = "FAILED";
+        pause_resume->setEnabled(false);
+    }
+    else {
+        statstring = "SKIPPING";
+    }
+    main_status->setText(statstring);
 }
 //--------------------------------------------------
 void jfProgressPanelOne::DoLayout() {

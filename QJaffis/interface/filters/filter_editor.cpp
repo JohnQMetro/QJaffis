@@ -247,22 +247,20 @@ jfFilterMapEditor::jfFilterMapEditor(jfFilterMap* inlink,bool in_global, const Q
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //data setting
 bool jfFilterMapEditor::ChangeMap(jfFilterMap* inlink) {
-  // basic checks
-  size_t fcounty;
-  assert(inlink!=NULL);
-  if (fdata!=inlink) fdata = inlink;
-  // we start loading the data
-  picker->SetContents(fdata);
-  fcounty = fdata->GetCount();
-  // if the filter map is empty, we remove the editing panel and use a blank
-  if (fdata->noFilters()) SetNoFilter();
-  // the filter map is not empty, we have to change the filter to the first one
-  else {
-    ChangeFilter(0);
-    BtnEnable(true);
-  }
-  // done
-  return true;
+    // basic checks
+    assert(inlink!=NULL);
+    if (fdata!=inlink) fdata = inlink;
+    // we start loading the data
+    picker->SetContents(fdata);
+    // if the filter map is empty, we remove the editing panel and use a blank
+    if (fdata->noFilters()) SetNoFilter();
+    // the filter map is not empty, we have to change the filter to the first one
+    else {
+        ChangeFilter(0);
+        BtnEnable(true);
+    }
+    // done
+    return true;
 }
 //------------------------------------------------------------------------
 // changes the filter to one at a particular index

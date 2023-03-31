@@ -33,7 +33,6 @@ jfSearchCore::~jfSearchCore() {}
 bool jfSearchCore::Check() const {
   if (categories==NULL) return false;
   if (def_filtermap==NULL) return false;
-  size_t gc = categories->GetCount();
   if (local_map==NULL) return false;
   return true;
 }
@@ -131,14 +130,14 @@ void jfSearchCore::SendNewcount(size_t icount) {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /* if we do not use the default (leftover) result category, we return
 TRUE if the paramster has no category marks */
-bool jfSearchCore::NoCatTest(const jfBasePD* testee) const {
-  assert(testee!=NULL);
-  assert(categories!=NULL);
-  if (!(categories->UsesDefault())) {
-    if (testee->mark.any()) return false;
-    else return true;
-  }
-  else return false;
+bool jfSearchCore::NoCatTest(const jfItemMetaFlags* testee) const {
+    assert(testee!=NULL);
+    assert(categories!=NULL);
+    if (!(categories->UsesDefault())) {
+        if ((testee->category).any()) return false;
+        else return true;
+    }
+    else return false;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void jfSearchCore::ClearLocalSkeleton() {

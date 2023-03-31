@@ -5,7 +5,7 @@
 //              jfBasePD
 // Created:     May 7, 2009
 // Conversion to Qt Started November 9, 2013
-// Updated:     July 12, 2017
+// Updated:     March 11, 2023 (Complete overhaul)
 ******************************************************************************/
 #ifndef TYPEDCOLLECT_H_INCLUDED
 #define TYPEDCOLLECT_H_INCLUDED
@@ -18,14 +18,82 @@
 #ifndef LOGGING_H_INCLUDED
   #include "../utils/logging.h"
 #endif // LOGGING_H_INCLUDED
+
+#include "../objs/baseitem.h"
 //----------------------------------
 #include <assert.h>
 /*****************************************************************************/
-// class Q must be a descendant of jfBasePD
+
 template <class Q>
+class jfSearchResultsCollection : public jfSearchResultItemCollectionBase {
+  public:
+    // constructors
+    jfSearchResultsCollection(QString&& in_name, size_t in_num_id);
+    jfSearchResultsCollection(const QString& in_name, size_t in_num_id);
+    // Id filtering
+    // adding
+    size_t Append(Q* in_item, jfItemMetaFlags* in_flags);
+    bool InsertNewResults(jfSearchResultsCollection<Q>* insrc);
+  protected:
+};
+// ========================================================================
+// constructor
+
+template <class Q>
+jfSearchResultsCollection< Q >::jfSearchResultsCollection(QString&& in_name, size_t in_num_id):jfSearchResultItemCollectionBase(in_name, in_num_id) {
+
+}
+// ------------------------------
+template <class Q>
+jfSearchResultsCollection< Q >::jfSearchResultsCollection(const QString& in_name, size_t in_num_id):jfSearchResultItemCollectionBase(in_name,in_num_id) {
+
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// appending an item
+template <class Q>
+size_t jfSearchResultsCollection< Q >::Append(Q* in_item, jfItemMetaFlags* in_flags) {
+  assert(in_item !=NULL);
+  mainlist.push_back(new jfItemFlagGroup{ in_item, in_flags } );
+  return mainlist.size();
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// inserting a list, usually for updating (FFN)
+template <class Q>
+bool jfSearchResultsCollection< Q >::InsertNewResults(jfSearchResultsCollection<Q>* insrc) {
+    // checks
+    assert(insrc!=NULL);
+    // variables
+    i_const_iterator this_start, that_start, that_end;
+    // we start with getting the iterators
+    this_start = mainlist.begin();
+    that_start = (insrc->mainlist).begin();
+    that_end = (insrc->mainlist).end();
+    // we can now insert in a single op
+    mainlist.insert(this_start,that_start,that_end);
+    // we next update some counts
+    grand_total += insrc->grand_total;
+    insert_index = insrc->insert_index;
+    // updating the indexes
+    /*
+    if (item_index>=0) item_index += insrc->item_count;
+    if (backup_index>=0) backup_index += insrc->item_count;
+    */
+    //other values are either temp values, or stuff that should be the same
+    // (category and search data links), we will not check though
+
+    //finally, we get rid of the old data, since it will not do to have
+    // two collections pointing to the same items
+    insrc->ClearContents(false);
+    // done
+    return true;
+}
+
+// ================================================================================
+
+/*
 class jfTypedCollection : public jfUrlItemCollection {
   public:
-	typedef typename std::vector<Q*>::const_iterator q_const_iterator;
+    typedef typename std::vector<Q*>::const_iterator q_const_iterator;
 	// constructor
     jfTypedCollection();
     jfTypedCollection(size_t src_id, const QString& nname);
@@ -181,9 +249,11 @@ bool jfTypedCollection< Q >::ToIndex(const int& newindex) {
   curr_item = mainlist[item_index];
   return true;
 }
+*/
 //-------------------------------------------------------------------------------
 /* counts how many items are marked as belonging to a particular result
 category. 32 counts as no category at all */
+/*
 template <class Q>
 size_t jfTypedCollection< Q >::CountRCategory(size_t which) const {
   assert(which<33);
@@ -295,10 +365,12 @@ QStringList* jfTypedCollection< Q >::GetTypeList() const {
   // done
   return result;
 }
+*/
 //-----------------------------------------------------------------------------
 /* when deleting at an index, we keep the stored indexes the same unless the
 stored index points towards the last item, in which case we move it to the
 previosu index. The actual items will change, though */
+/*
 template <class Q>
 bool jfTypedCollection< Q >::DeleteAtIndex(const size_t& dindex) {
   // data values
@@ -389,8 +461,7 @@ bool jfTypedCollection< Q >::ReadRestFromFile(jfFileReader* infile) {
   Q* initem;
   // starting
   if (!ReadDelta(infile)) return false;
-  /* item count is already read, we assume the line index is just before
-  the first item */
+  // item count is already read, we assume the line index is just before the first item
   for (loopc=0;loopc<item_count;loopc++) {
     // we prepare to read the item
     initem = new Q();
@@ -406,9 +477,12 @@ bool jfTypedCollection< Q >::ReadRestFromFile(jfFileReader* infile) {
   return true;
 }
 //----------------------------------------------------------------------------
+*/
 /* iterates over the items, producing a QString contatining an HTML representation
 suitable for an HTML file */
+/*
 template <class Q>
+
 bool jfTypedCollection< Q >::ToHTMLList(jfHtmlParams* indata, bool single) const {
   // local variables
   QString result;
@@ -433,8 +507,7 @@ bool jfTypedCollection< Q >::ToHTMLList(jfHtmlParams* indata, bool single) const
     }
     // we only do the next if use_it is true
     if (use_it) {
-      /* we add a separator first (since there is no way to tell if there
-      are any following items */
+      // we add a separator first (since there is no way to tell if there are any following items.
       if (numresults!=0) {
         tvalue = (single)?(indata->Single()->item_separator):(indata->Multiple()->item_separator);
         result = indata->MakeResult(tvalue);
@@ -453,4 +526,5 @@ bool jfTypedCollection< Q >::ToHTMLList(jfHtmlParams* indata, bool single) const
   // done
   return true;
 }
+*/
 /*****************************************************************************/

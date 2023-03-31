@@ -172,6 +172,7 @@ void jfUrlBase::SetValid() {
 //*****************************************************************************
 // --- jfBasePD Methods
 // ==========================================================================
+/*
 // the default constructor
 jfBasePD::jfBasePD():jfUrlBase() {
   included = true;
@@ -202,10 +203,12 @@ jfResultUnit* jfBasePD::makeResultUnit() const {
   result->slink = this;
   return result;
 }
+*/
 //-----------------------------------------------------------------------
 /* full fimfanfic.net descriptions are sometimes so long that HTML listview boxes
 are messed up. This method is intended to get a truncated version, limited in number
 of lines and total characters */
+/*
 QString jfBasePD::GetDescExtract(size_t lines, size_t maxlen) const {
   // special cases
   if ((lines==0) || (maxlen==0)) return "";
@@ -383,5 +386,5 @@ bool jfResultUnit::SameID(const size_t& cval) const {
 const jfBasePD* jfResultUnit::Sourcelink() const {
   return slink;
 }
-
+*/
 //****************************************************************************

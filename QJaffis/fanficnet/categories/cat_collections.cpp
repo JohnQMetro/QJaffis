@@ -606,7 +606,7 @@ jfFFN_CrossoverCategory* jfFFN_CrossCatStore::AddUpdateCategory(jfFFN_CrossoverC
   // working variables
   jfFFN_CrossoverSet::iterator xi;
   jfFFN_CrossoverCategory* oldcat;
-  bool old_deleted = false;
+
   // trying to add a NULL value, bad!
   assert(toadd != NULL);
   // if there is an equivalent category already, we erase the existing one

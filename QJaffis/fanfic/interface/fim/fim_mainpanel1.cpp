@@ -136,7 +136,7 @@ jfDownloadRootItems* jfFIMOnePanelSearch::MakeTypedThread() const {
 }
 /*****************************************************************************/
 jfFIMMain::jfFIMMain(jfSearchCore* searchin, bool notebook, QWidget* parent):
-      jfMainSearchGroup(searchin,rtype_BASIC,notebook,false,parent) {
+                                    jfMainSearchGroup(searchin,notebook,parent) {
   // the usual constant
 	const QString fname = "jfFIMMain::jfFIMMain";
   // preparing notebook and results display

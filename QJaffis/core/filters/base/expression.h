@@ -53,7 +53,7 @@ class jfExpressionFilter : public jfBaseFilter {
     ~jfExpressionFilter();
   protected:
     // private methods
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     virtual void SetValid();
     virtual size_t ExtraLines() const;
     virtual bool AddRestToFile(QTextStream* outfile) const;

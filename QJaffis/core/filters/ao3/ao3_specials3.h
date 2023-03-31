@@ -51,7 +51,7 @@ class jfAO3FandomFilter : public jfBaseFilter {
     ~jfAO3FandomFilter();
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     // file i/o
     virtual bool AddRestToFile(QTextStream* outfile) const;
     virtual bool ReadRestFromFile(jfFileReader* infile);
@@ -78,11 +78,11 @@ class jfAO3KudoFilter : public jfMinMaxUFilter {
     jfAO3KudoFilter(size_t inmin, size_t inmax);
     jfAO3KudoFilter(const jfAO3KudoFilter& source);
     // redefined virtual methods
-    virtual QString GetTypeID() const;
-    virtual QString GetTypeDescription() const;
-    virtual jfBaseFilter* GenCopy() const;
+    virtual QString GetTypeID() const override;
+    virtual QString GetTypeDescription() const override;
+    virtual jfBaseFilter* GenCopy() const override;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
 };
 /*****************************************************************************/

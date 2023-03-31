@@ -326,7 +326,7 @@ void jfCheckList::appendMultiCheckItems(const QStringList& labels) {
 //---------------------
 void jfCheckList::appendMultiCheckItems(const QString inlabels[], size_t labcount) {
   if (labcount>0) {
-    for (int lindex = 0;lindex<labcount;lindex++) {
+    for (size_t lindex = 0;lindex<labcount;lindex++) {
       appendCheckItem(inlabels[lindex]);
     }
   }
@@ -344,7 +344,7 @@ void jfCheckList::replaceItems(const QStringList& labels) {
 // gets the check status at the list index
 Qt::CheckState jfCheckList::GetState(size_t which) const {
   QListWidgetItem* titem;
-  int rcount = count();
+  size_t rcount = count();
   if (which>=rcount) return Qt::Unchecked;
   titem = item(which);
   return titem->checkState();
@@ -353,7 +353,7 @@ Qt::CheckState jfCheckList::GetState(size_t which) const {
 // gets the boolean check status (false if unchecked, true otherwise) at the list index
 bool jfCheckList::GetBoolState(size_t which) const {
   QListWidgetItem* titem;
-  int rcount = count();
+  size_t rcount = count();
   if (which>=rcount) return false;
   titem = item(which);
   return (Qt::Unchecked!=(titem->checkState()));
@@ -434,7 +434,7 @@ int jfCheckList::CheckByName(QString name, Qt::CheckState new_value) {
 //---------------------
 bool jfCheckList::SetCheck(size_t which,Qt::CheckState new_value) {
   QListWidgetItem* titem;
-  if (which>=count()) return false;
+  if (which >= ((size_t)count())) return false;
   titem = item(which);
   titem->setCheckState(new_value);
   return true;
@@ -442,7 +442,7 @@ bool jfCheckList::SetCheck(size_t which,Qt::CheckState new_value) {
 //---------------------
 bool jfCheckList::SetCheckNS(size_t which,Qt::CheckState new_value) {
   QListWidgetItem* titem;
-  if (which>=count()) return false;
+  if (which >= ((size_t)count())) return false;
   titem = item(which);
   blockSignals(true);
   titem->setCheckState(new_value);
@@ -463,37 +463,37 @@ void jfCheckList::CheckAllDisable(bool check) {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 size_t jfCheckList::CheckNames(const QStringList* inlist) {
-  if (inlist==NULL) return NULL;
-  // variables
-  QListWidgetItem* titem;
-  QList<QListWidgetItem *> zogy;
-  int lwcount, lwindex;
-  size_t lindex, lcount;
-  size_t rcounter;
-  // starting
-  lcount = inlist->size();
-  rcounter = 0;
-  blockSignals(true);
-  // the main loop
-  for (lindex = 0 ; lindex < lcount; lindex++) {
+    assert(inlist != NULL);
+    // variables
+    QListWidgetItem* titem;
+    QList<QListWidgetItem *> zogy;
+    int lwcount, lwindex;
+    size_t lindex, lcount;
+    size_t rcounter;
     // starting
-    zogy = findItems(inlist->at(lindex),Qt::MatchFixedString|Qt::MatchCaseSensitive);
-    lwcount = zogy.count();
-    if (lwcount==0) continue;
-    // there really should be only one, we will ignore any others
-    titem = zogy[0];
-    lwindex = row(titem);
-    // doing it!
-    titem->setCheckState(Qt::Checked);
-    cs_store[lwindex] = Qt::Checked;
-    rcounter++;
-  }
-  blockSignals(false);
-  return rcounter;
+    lcount = inlist->size();
+    rcounter = 0;
+    blockSignals(true);
+    // the main loop
+    for (lindex = 0 ; lindex < lcount; lindex++) {
+        // starting
+        zogy = findItems(inlist->at(lindex),Qt::MatchFixedString|Qt::MatchCaseSensitive);
+        lwcount = zogy.count();
+        if (lwcount==0) continue;
+        // there really should be only one, we will ignore any others
+        titem = zogy[0];
+        lwindex = row(titem);
+        // doing it!
+        titem->setCheckState(Qt::Checked);
+        cs_store[lwindex] = Qt::Checked;
+        rcounter++;
+    }
+    blockSignals(false);
+    return rcounter;
 }
 //-------------------------------------------
 size_t jfCheckList::CheckAndDisableNames(jfStrBoolList* inlist) {
-  if (inlist==NULL) return NULL;
+  if (inlist==NULL) return 0;
   // variables
   QListWidgetItem* titem;
   QList<QListWidgetItem *> zogy;
@@ -528,7 +528,7 @@ size_t jfCheckList::CheckAndDisableNames(jfStrBoolList* inlist) {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++
 // other
 bool jfCheckList::setSelectionNS(size_t which) {
-  if (which>=count()) return false;
+  if (which >= ((size_t)count())) return false;
   blockSignals(true);
   setCurrentRow(which);
   blockSignals(false);
@@ -542,7 +542,7 @@ bool jfCheckList::clearAll() {
 }
 //------------------------------------
 bool jfCheckList::RemoveCheckItem(size_t index) {
-  if (index>=count()) return false;
+  if (index >= ((size_t)count())) return false;
   QListWidgetItem* titem;
   titem = takeItem(index);
   cs_store.erase(cs_store.begin()+index);

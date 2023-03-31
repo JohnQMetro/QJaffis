@@ -199,7 +199,7 @@ jfBaseFilter* jfFilterMap::GetItem(const QString& itemname) {
 //-----------------------------------------------------------------------------
 /* returns true iff all the filters in this map return true when using inval
 as an input to thier Match() methods */
-bool jfFilterMap::MatchAll(const jfBasePD* inval) const {
+bool jfFilterMap::MatchAll(const jfSearchResultItem* inval) const {
   const QString fname = "jfFilterMap::MatchAll";
   // local variables
   stl_FilterMap::const_iterator findex;
@@ -254,7 +254,7 @@ bool jfFilterMap::AddFilter(jfBaseFilter* infilter, size_t& outindex) {
   xres = GetIndexByName(filtername,qindex);
   item_count++;
   // repositioning the index
-  if (qindex<=item_index) ToIndex(item_index+1);
+  if (((int)qindex) <= item_index) ToIndex(item_index+1);
   outindex = qindex;
   return xres;
 }
@@ -488,7 +488,7 @@ bool jfFilterMap::RestoreIndex() {
 bool jfFilterMap::NextIndex() {
   // 4 cases here
   if (item_index==-2) return false;
-  else if (item_index==(item_count-1)) {
+  else if (item_index==(((int)item_count)-1)) {
     item_index = -2;
     curr_item = NULL;
     curr_iterat = coredata.end();
@@ -539,7 +539,7 @@ void jfFilterMap::ResetIndex() {
 bool jfFilterMap::ToIndex(const int& newindex) {
   size_t q;
   // basic checks
-  if ((newindex<-2) || (newindex>=item_count)) return false;
+  if ((newindex<-2) || (newindex >= ((int)item_count))) return false;
   if (newindex<0) {
     item_index = newindex;
     curr_item = NULL;
@@ -640,23 +640,23 @@ QStringList* jfFilterMap::GetTypeList() const {
 //-----------------------------------------------------------------------------
 bool jfFilterMap::DeleteAtIndex(const size_t& dindex) {
   stl_FilterMap::iterator deldex;
-  size_t q;
+  int q; int ddex = dindex;
   int old_itemindex;
   // we check the index against the size
   if (dindex>=item_count) return false;
   // we now check the index to remove against the current index
   // if the index is the index to remove, we move it to the next one
-  if (dindex==item_index) {
+  if (ddex==item_index) {
     deldex = curr_iterat;
     NextIndex();
   }
   // otherwise, we have to loop to get the deldex
   else {
     deldex = coredata.begin();
-    for (q=0;q<=dindex;q++) deldex++;
+    for (q=0 ; q <= ddex ; q++) deldex++;
   }
   // we also check the saved index, if it matches, we just remove that index
-  if (dindex==backup_index) {
+  if (ddex == backup_index) {
     backup_index = -1;
     backup_item = NULL;
   }
@@ -667,11 +667,11 @@ bool jfFilterMap::DeleteAtIndex(const size_t& dindex) {
   item_count--;
   // resetting the pointers
   old_itemindex = item_index;
-  if (backup_index>dindex) {
+  if (backup_index>ddex) {
     ToIndex(backup_index-1);
     SaveIndex();
   }
-  if (old_itemindex>dindex) ToIndex(backup_index-1);
+  if (old_itemindex>ddex) ToIndex(backup_index-1);
   else ToIndex(backup_index);
   return true;
 }

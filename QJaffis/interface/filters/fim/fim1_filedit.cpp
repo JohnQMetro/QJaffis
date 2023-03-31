@@ -32,13 +32,12 @@ jfFIMThumbsPanel::jfFIMThumbsPanel(bool wrapped, QWidget* parent):QWidget(parent
 jfFimThumbsFilter* jfFIMThumbsPanel::GetNewFilter() const {
   // variables
   jfFimThumbsFilter* result;
-  size_t qmin;
   bool lres;
   // test
   lres = minmax->CheckMessage();
   if (!lres) return NULL;
+
   // things are okay
-  qmin = minmax->GetMin();
   result = new jfFimThumbsFilter();
   bool chk = include_rdisabled->isChecked();
   result->SetValues(minmax->GetMin(),minmax->GetMax(),chk);
@@ -61,7 +60,7 @@ jfFimThumbsFilterEditor::jfFimThumbsFilterEditor(jfFilterMap* infmap, const jfBa
       QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
   // most things are handled by the parent constructor
   // we create the insert.. the *actual* expression editor
-  insert_panel = new jfFIMThumbsPanel(NULL,NULL);
+  insert_panel = new jfFIMThumbsPanel(false);
   if (filt_pointer!=NULL) {
     insert_panel->SetFromObj(dynamic_cast<const jfFimThumbsFilter*>(filt_pointer));
   }

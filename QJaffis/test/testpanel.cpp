@@ -92,8 +92,8 @@ bool jfTestDisplay::StopUpdate() {
 // event handlers
 void jfTestDisplay::HandleStart() {
   // variables
-  const QString fname = "jfTestDisplay::HandlePanelStart";
-  int xvalue;
+  const QString fname = "jfTestDisplay::HandleStart";
+
   QString xdir;
   // starting
   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));

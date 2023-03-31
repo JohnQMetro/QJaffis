@@ -3,7 +3,7 @@ Name    :   ffnitems_thread.cpp
 Author  :   John Q Metro
 Purpose :   Downloader class for FFN fic listings
 Created :   July 24, 2016
-Updated :   July 9, 2022
+Updated :   March 26, 2023
 ******************************************************************************/
 #ifndef FFNITEMS_THREAD_H
   #include "ffnitems_thread.h"
@@ -29,16 +29,18 @@ jfFFNDownloader::jfFFNDownloader():jfMultiCatRootDownloader() {
 // virtual category related methods
 //-----------------------------------------
 bool jfFFNDownloader::NextCategory() {
-  if (!ffn_search->NextIndex()) return false;
-  current_category = ffn_search->GetCurrCat();
- ffn_search->DispatchCategory();
-  jfFFNItemCollection* newcoll = dynamic_cast<jfFFNItemCollection*>(multi_maindata->AppendNewCollection());
-  newcoll->ReplaceCat(current_category);
-  newcoll->SetName((ffn_search->GetCatName())+" Result Fics");
-  newcoll->SetID(current_category->GetID());
-  current_collection = newcoll;
-  ffn_parser->SetCategory(current_category);
-  return true;
+    if (!ffn_search->NextIndex()) return false;
+    current_category = ffn_search->GetCurrCat();
+    ffn_search->DispatchCategory();
+
+    QString new_name = (ffn_search->GetCatName())+" Result Fics";
+    size_t new_id = current_category->GetID();
+
+    jfFFNItemCollection* newcoll = dynamic_cast<jfFFNItemCollection*>(multi_maindata->AppendNewCollection(new_name, new_id));
+    newcoll->ReplaceCat(current_category);
+    current_collection = newcoll;
+    ffn_parser->SetCategory(current_category);
+    return true;
 }
 //-----------------------------------------
 void jfFFNDownloader::LoadCatInfo() {

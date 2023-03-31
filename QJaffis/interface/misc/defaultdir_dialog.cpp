@@ -218,7 +218,7 @@ void jfDefaultDirsDialog::ShowErrorMessage(int dindex) {
   msgBox.setInformativeText(themsg);
   msgBox.setStandardButtons(QMessageBox::Abort);
   // done
-  int ret = msgBox.exec();
+  msgBox.exec();
   reject();
 }
 //****************************************************************************

@@ -4,7 +4,7 @@
 // Purpose :    Matches individual extra tags against an expression, passing
 //              if the percentags of tags that match exceed the defined percentage.
 // Created:     July 23, 2022
-// Updated:     August 27, 2022
+// Updated:     March 10, 2023
 //***************************************************************************
 #ifndef AO3_PERCENT_TAGS_FILTER_H
     #include "ao3_percent_tags_filter.h"
@@ -45,7 +45,7 @@ jfAO3ExtraTagsPercentFilter* jfAO3ExtraTagsPercentFilter::Copy() const {
 }
 //+++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfAO3ExtraTagsPercentFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfAO3ExtraTagsPercentFilter::CoreMatch(const jfSearchResultItem* testelem) const {
     // checks and starts
     assert(testelem!=NULL);
     const jfAO3Fanfic* typed_item = dynamic_cast<const jfAO3Fanfic*>(testelem);

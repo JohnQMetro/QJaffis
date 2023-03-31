@@ -232,18 +232,6 @@ bool jfTagListing::Reconcile(const char* inlist[], size_t inlistcount, size_t fa
   // done
   return resval;
 }
-//===========================================================================
-QString UpdateStatus2String(const jf_FUpdateStatus& inval) {
-  QString result;
-  if (inval==jud_NONE) result.clear();
-  else if (inval==jud_NEW) result = "New!";
-  else if (inval==jud_UPDATED) result = "Updated!";
-  else if (inval==jud_MISSING) result = "Missing!";
-  else if (inval==jud_AUTHORNC) result = "Author Name Changed!";
-  else assert(false);
-  // done
-  return result;
-}
 //==========================================================================
 bool QStringSet::contains(const QString& test) const {
     return (count(test)>0);

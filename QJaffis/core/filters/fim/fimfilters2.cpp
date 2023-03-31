@@ -49,7 +49,7 @@ QString jfFIM_ShortDesc_ExprFilter::GetTypeID() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFIM_ShortDesc_ExprFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFIM_ShortDesc_ExprFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   QString datainfo;
   const jfFIM_Fanfic* typed_item;
   // checks and starts
@@ -88,7 +88,7 @@ QString jfFIM_DualDesc_ExprFilter::GetTypeID() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFIM_DualDesc_ExprFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFIM_DualDesc_ExprFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   QString datainfo;
   const jfFIM_Fanfic* typed_item;
   // checks and starts
@@ -96,7 +96,7 @@ bool jfFIM_DualDesc_ExprFilter::CoreMatch(const jfBasePD* testelem) const {
   typed_item = dynamic_cast<const jfFIM_Fanfic*>(testelem);
   datainfo = typed_item->GetCompactSummary();
   if (InternalMatch(datainfo)) return true;
-  datainfo = typed_item->GetDescription();
+  datainfo = typed_item->GetSummary();
   return InternalMatch(datainfo);
 }
 
@@ -126,7 +126,7 @@ jfBaseFilter* jfFIMGroupSCFilter::GenCopy() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFIMGroupSCFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFIMGroupSCFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const QString fname = "jfFIMGroupSCFilter::CoreMatch";
   // variables
   const jfFIMGroup* rvalue;
@@ -135,7 +135,7 @@ bool jfFIMGroupSCFilter::CoreMatch(const jfBasePD* testelem) const {
   assert(testelem!=NULL);
   // determining the type
   rvalue = dynamic_cast<const jfFIMGroup*>(testelem);
-  /**/JDEBUGLOGS(fname,1,rvalue->GetName())
+  /**/JDEBUGLOGS(fname,1,rvalue->GetTitle())
   cvalue = rvalue->GetFicCount();
   /**/JDEBUGLOGST(fname,2,cvalue)
   // checking the wordcount
@@ -169,7 +169,7 @@ jfBaseFilter* jfFIMGroupMCFilter::GenCopy() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFIMGroupMCFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFIMGroupMCFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   // variables
   const jfFIMGroup* rvalue;
   size_t cvalue;

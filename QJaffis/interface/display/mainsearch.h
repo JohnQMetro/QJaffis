@@ -40,7 +40,7 @@ class jfMainSearchGroup : public DisplayPanelCore {
     Q_OBJECT
   public:
     // the constructor
-    jfMainSearchGroup(jfSearchCore* searchin, rtype_enum rinval, bool notebook, bool multiple, QWidget* parent=NULL );
+    jfMainSearchGroup(jfSearchCore* searchin, bool notebook, QWidget* parent=NULL );
     // status data
     bool InProgress() const;
     QString GetSearchName() const;

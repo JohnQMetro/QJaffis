@@ -137,7 +137,7 @@ jfBaseFilter* jfWordCountFilter::GenCopy() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfWordCountFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfWordCountFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   // variables
   const jfGenericFanfic2* rvalue;
   size_t cvalue;

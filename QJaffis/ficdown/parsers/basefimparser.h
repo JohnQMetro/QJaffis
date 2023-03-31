@@ -3,7 +3,7 @@
  * Purpose:   Fic parsers: base abstract class and fim
  * Author:    John Q Metro
  * Created:   July 3, 2016
- * Updated:   July 4, 2016
+ * Updated:   March 24, 2023
  *
  **************************************************************/
 #ifndef BASEFIM_H
@@ -16,6 +16,8 @@
 #ifndef FICPART_H
   #include "../data/ficpart.h"
 #endif // FICPART_H
+
+#include "../../fanfic/data/fim/fim_ficutils.h"
 
 /*************************************************************/
 class jfStoryPartParseBase : public jfPageParserBase {
@@ -30,6 +32,7 @@ class jfStoryPartParseBase : public jfPageParserBase {
     virtual bool testIncomplete(const QString *page) const = 0;
     virtual QString getCookie() const = 0;
 
+    virtual ~jfStoryPartParseBase();
   protected:
     // custom virtual methods to implement
     virtual bool ParseFirstPage(const QString& indata) = 0;
@@ -50,7 +53,7 @@ class jfFIM_FicPartParser : public jfStoryPartParseBase {
     virtual bool testMissing(const QString *page) const;
     virtual bool testIncomplete(const QString *page) const;
     virtual QString getCookie() const;
-
+    virtual ~jfFIM_FicPartParser();
   protected:
     // custom virtual methods that are implemented
     virtual bool ParseFirstPage(const QString& indata);
@@ -58,6 +61,8 @@ class jfFIM_FicPartParser : public jfStoryPartParseBase {
     //helper methods
     bool HandleChapters(QString inbuffer,jfFicPart& fpoint);
     QString PartProcessing(QString inbuffer);
+
+    jfFIMExtractParser* extract_parser;
 };
 
 /*************************************************************/

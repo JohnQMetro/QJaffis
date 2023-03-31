@@ -185,7 +185,7 @@ bool jfCategoryGroup::ReadMiddleFromFile(jfFileReader* infile){
   const QString funcname = "jfCategoryGroup::ReadMiddleFromFile";
   // input data
   QString buffer;
-  quint32 marked;
+
   // reading the line
   if (!infile->ReadParseLine(2,funcname)) return false;
   if (!infile->lp.BoolVal(0,idequiv)) {

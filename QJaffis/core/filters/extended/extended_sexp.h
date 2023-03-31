@@ -27,7 +27,7 @@ class jfAuthExprFilter : public jfSimpleExpFilterCore {
     virtual QString GetTypeID() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 //===========================================================================
 // a simple expression filter that matches against the language name
@@ -42,6 +42,6 @@ class jfLanguageExprFilter : public jfSimpleExpFilterCore {
     virtual QString GetTypeID() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 //***************************************************************************

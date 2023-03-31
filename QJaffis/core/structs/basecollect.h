@@ -86,7 +86,7 @@ class jfFilterMap : public jfBaseCollection {
     bool NameExists(const QString& lookfor) const;
     stl_FilterMap::iterator RenameElem(bool& ok, const QString& oldname, const QString& newname);
     jfBaseFilter* GetItem(const QString& itemname);
-    bool MatchAll(const jfBasePD* inval) const;
+    bool MatchAll(const jfSearchResultItem* inval) const;
     bool isEmpty() const;
     bool noFilters() const;
     // some additonal methods

@@ -429,31 +429,30 @@ bool jfFicUpdateThread::HandleFanficResult(bool fres) {
 // custom virtual abstract methods
 //-------------------------------------
 bool jfFicUpdateThread::TestForAbort(jfFicExtract* new_extract) const {
-  assert(new_extract!=NULL);
-  // variables and setup
-  const QString fname = "jfFicUpdateThread::TestForAbort";
+    assert(new_extract!=NULL);
+    // variables and setup
+    const QString fname = "jfFicUpdateThread::TestForAbort";
 
-  bool changed, changed2;
-  jf_FICTYPE ft;
-  // a quick check
-  /**/tLog(fname,1);
-  changed = false;
-  // otherwise...
-  jfFicExtract* curr_stored = ficlist->at(fic_index-1);
-  ft = new_extract->GetFicType();
-  /**/tLog(fname,2,curr_stored->fic_title);
-  /**/tLog(fname,3,new_extract->fic_title);
-  changed = false;
-  if (!changed) {
-    changed = (new_extract->updated_date) > (curr_stored->updated_date);
-    // because I've found that old fanfiction.net chapter counts are unreliable
-    changed2 = ((new_extract->pcount)!=(curr_stored->pcount));
-    changed = (changed || changed2);
-    /**/tLogB(fname,5,changed);
-  }
-  // done
-  /**/tLogB(fname,6,changed);
-  return !changed;
+    bool changed2;
+
+    // a quick check
+    /**/tLog(fname,1);
+    // otherwise...
+    jfFicExtract* curr_stored = ficlist->at(fic_index-1);
+    jf_FICTYPE ft = new_extract->GetFicType();
+    /**/tLog(fname,2,curr_stored->fic_title);
+    /**/tLog(fname,3,new_extract->fic_title);
+    bool changed = false;
+    if (!changed) {
+        changed = (new_extract->updated_date) > (curr_stored->updated_date);
+        // because I've found that old fanfiction.net chapter counts are unreliable
+        changed2 = ((new_extract->pcount)!=(curr_stored->pcount));
+        changed = (changed || changed2);
+        /**/tLogB(fname,5,changed);
+    }
+    // done
+    /**/tLogB(fname,6,changed);
+    return !changed;
 
 }
 //-------------------------------------

@@ -3,7 +3,7 @@ Name    :   ffnitem_parser.h
 Author  :   John Q Metro
 Purpose :   Parser for Fanfiction.Net Category pages, to get lists of fanfics
 Created :   July 22, 2016
-Updated :   July 9, 2022
+Updated :   March 26, 2023
 ******************************************************************************/
 #ifndef FFNITEM_PARSER_H
 #define FFNITEM_PARSER_H
@@ -46,7 +46,7 @@ class jfFFNItemParser : public jfItemsPageParserBase {
     bool CheckNames();
     bool CheckCrossoverName();
     bool PageAndItemCount(size_t& itemcount);
-    virtual bool ExitCheck(jfFFNItem* tocheck) const;
+    virtual bool ExitCheck(const jfFFNItem* tocheck) const;
 
     const jfFFN_CategoryCore* this_category;
     bool newfic;

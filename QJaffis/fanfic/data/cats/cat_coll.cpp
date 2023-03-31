@@ -199,7 +199,7 @@ bool jfGenCat_PickData::RemoveByString(const QString& inval) {
   // local variables
   jfLineParse* parser;
   size_t floc;
-  bool fval;
+
   // parsing the input
   parser = new jfLineParse(inval);
   // special case faliures: the input is invalid
@@ -207,12 +207,12 @@ bool jfGenCat_PickData::RemoveByString(const QString& inval) {
     delete parser;
     return false;
   }
-  // removing
-  if (parser->Num() == 2) fval=FindItem(floc,parser->GetT(0),parser->GetT(1));
-  // next up..
-  delete parser;
-  if (!fval) return false;
-  return RemoveAtIndex(floc);
+  else {
+      bool fval = FindItem(floc,parser->GetT(0),parser->GetT(1));
+      delete parser;
+      if (!fval) return false;
+      else return RemoveAtIndex(floc);
+  }
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 /* Looks for categories within the specified group/section. Retuns NULL if nothing is

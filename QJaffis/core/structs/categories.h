@@ -19,6 +19,10 @@ latest : Changing to use jfFileReader
 #ifndef EXPRESSION_H
   #include "../filters/base/expression.h"
 #endif // EXPRESSION_H
+
+#ifndef VECTORS_H_INCLUDED
+  #include "vectors.h"
+#endif // VECTORS_H_INCLUDED
 //****************************************************************************
 /* A Category is basically an expression filter that is used to sort the
 results of a search (after filtering) into a particular group. Since a
@@ -29,6 +33,8 @@ There is some extra per-category data for saving results though. We store
 some filename/path info for placing the result files.
  */
 //=========================================================================
+
+
 class jfCategories : public jfBaseCollection {
   public:
     // data that we do not bother to hide
@@ -51,7 +57,7 @@ class jfCategories : public jfBaseCollection {
     bool NotEmpty() const;
     bool ChIndex(const size_t& catval) const;
     // uses the categories to mark the test element with catgeory info
-    bool Sort(jfBasePD* testee);
+    bool Sort(jfItemFlagGroup* testee);
     // old virtual methods we implement
     virtual bool NextIndex();
     virtual bool BackIndex();

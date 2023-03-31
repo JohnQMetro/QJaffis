@@ -52,7 +52,7 @@ QString jfAuthExprFilter::GetTypeID() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfAuthExprFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfAuthExprFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   QString datainfo;
   const jfGenericFanfic* typed_item;
   // checks and starts
@@ -92,7 +92,7 @@ QString jfLanguageExprFilter::GetTypeID() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfLanguageExprFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfLanguageExprFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   QString datainfo;
   const jfFFNItem* typed_item;
   // checks and starts

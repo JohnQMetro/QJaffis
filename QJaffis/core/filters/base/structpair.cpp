@@ -3,7 +3,7 @@ Name    :   structpair.cpp
 Author  :   John Q Metro
 Purpose :   'Structured Pair' filters
 Created :   February 16, 2023
-Updated :   February 25, 2023
+Updated :   March 29, 2023
 ******************************************************************************/
 
 #include "structpair.h"
@@ -465,16 +465,15 @@ bool jfStructuredPairFilter::DoesPairingMatch(const jfPairingStruct& target) con
     }
 }
 //-------------------------------------------
-const jfFanficPairsMixin* jfStructuredPairFilter::CheckCastElement(const jfBasePD* testelem) const {
+const jfFanficPairsMixin* jfStructuredPairFilter::CheckCastElement(const jfSearchResultItem* testelem) const {
     if (testelem == NULL) return NULL;
-    QString datatype = testelem->GetTypeID();
-    if ((datatype=="FFNItem") || (datatype=="AO3Fanfic")) {
+    if (testelem->GetTypeLabels().contains(jfFanficPairsMixin::FANFIC_PAIRS_TYPE_ID)) {
         return dynamic_cast<const jfFanficPairsMixin*>(testelem);
     }
     else return NULL;
 }
 //-------------------------------------------
-bool jfStructuredPairFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfStructuredPairFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const QString fname = "jfStructuredPairFilter::CoreMatch";
 
   const jfFanficPairsMixin* pair_fanfic = CheckCastElement(testelem);

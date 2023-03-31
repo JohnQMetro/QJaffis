@@ -384,7 +384,7 @@ void jfTagSorter::SaveTagsForHolder(jfTagContainer* hold_ptr) {
     // none
     clist = hold_ptr->Contents();
     if (clist==NULL) return;
-    for (size_t cindex = 0 ; cindex < clist->size() ; cindex++ ){
+    for (int cindex = 0 ; cindex < clist->size() ; cindex++ ){
       ctag = clist->at(cindex);
       (*tag_data)[ctag] = hold_ptr->getStatusType();
     }

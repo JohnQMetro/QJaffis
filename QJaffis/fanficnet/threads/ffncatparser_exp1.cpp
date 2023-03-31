@@ -5,8 +5,6 @@ Author  : John Q Metro
 Started : September 5, 2022
 Updated : December 18, 2022
 ******************************************************************************/
-#pragma once
-
 #include "ffncatparser_exp1.h"
 /*****************************************************************************/
 jfFFNCategory_ParserExpressions::jfFFNCategory_ParserExpressions() {

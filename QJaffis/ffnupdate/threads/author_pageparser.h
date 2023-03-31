@@ -3,7 +3,7 @@ Name    : author_pageparser.h
 Basic   : parserclass for downloaded Fanfiction.Net author pages
 Author  : John Q Metro
 Started : August 8, 2016
-Updated : August 8, 2016
+Updated : March 26, 2023
 
 ******************************************************************************/
 #ifndef AUTHOR_PAGEPARSER_H
@@ -16,7 +16,11 @@ Updated : August 8, 2016
 #ifndef AUTH_COLL_H_INCLUDED
   #include "../data/auth_coll.h"
 #endif // AUTH_COLL_H_INCLUDED
+
+#include "../data/upd_utils.h"
+#include "../../fanficnet/data/ffn_ficutils.h"
 //---------------------------------------------
+
 /*****************************************************************************/
 class jfFFNAuthorPageParser : public jfPageParserBase {
   public:
@@ -32,6 +36,7 @@ class jfFFNAuthorPageParser : public jfPageParserBase {
     virtual bool testIncomplete(const QString *page) const;
     // also
     virtual QString getCookie() const;
+    virtual ~jfFFNAuthorPageParser();
   protected:
     // parser helper methods
     bool ParseStart(size_t& authorid_out, QString& authorname_out);
@@ -39,6 +44,10 @@ class jfFFNAuthorPageParser : public jfPageParserBase {
 
     //completed data pointer
     jfAuthorStories* author_data;
+    QRegularExpression footer;
+    QRegularExpression item_start;
+
+    jfFFNAuthorFanficParser* item_parser;
 
 };
 /*****************************************************************************/

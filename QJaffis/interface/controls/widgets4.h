@@ -48,9 +48,9 @@ class jfExprEditBase : public QWidget {
     // setting data
     bool SetData(const QString& inexpr,QString& outmessage);
   public slots:
-    void PressCheckFilter(bool checked);
+    void PressCheckFilter(bool value);
     void TextChanged();
-    void TextChanged2(const QString& newtext);
+    void TextChanged2(QString value);
   protected:
     void setText(const QString intext);
     // internal helper

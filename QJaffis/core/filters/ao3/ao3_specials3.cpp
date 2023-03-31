@@ -232,7 +232,7 @@ jfAO3FandomFilter::~jfAO3FandomFilter() {
 }
 //+++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfAO3FandomFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfAO3FandomFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   // variables
   const jfAO3Fanfic* typed_item;
   QString currfandom;
@@ -405,7 +405,7 @@ jfBaseFilter* jfAO3KudoFilter::GenCopy() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfAO3KudoFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfAO3KudoFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   // variables
   const jfAO3Fanfic* rvalue;
   size_t cvalue;

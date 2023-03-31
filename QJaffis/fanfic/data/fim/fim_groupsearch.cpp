@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Group Search Object for fimfiction.net
 Created :   August 7, 2013
 Started conversion to Qt August 3, 2015
-Updated :   January 7, 2018 (Fimfiction.net has added group searching...)
+Updated :   March 12, 2023
 ******************************************************************************/
 #ifndef FIM_GROUPSEARCH_H_INCLUDED
   #include "fim_groupsearch.h"
@@ -146,9 +146,7 @@ bool jfFIMGroupSearch::ReadMiddleFromFile(jfFileReader* infile) {
 // constructor
 jfFIMGroupResColl::jfFIMGroupResColl(jfFIMGroupSearch* xsearch_in):jfResultCollection(xsearch_in, false) {
   typed_search = xsearch_in;
-  jfUrlItemCollection* xc = MakeEmptyCollection();
-  xc->SetID(1);
-  xc->SetName("The Only Collection!");
+  jfSearchResultItemCollectionBase* xc = MakeEmptyCollection();
   AddItem(xc);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -193,8 +191,8 @@ void jfFIMGroupResColl::WriteHtmlHeader(jfHtmlParams* indata) {
   (*(indata->outfile)) << buffer << '\n';
 }
 //-------------------------------------------------------------------------
-jfUrlItemCollection* jfFIMGroupResColl::MakeEmptyCollection() const {
-  return new jfFIMGroupCollection();
+jfSearchResultItemCollectionBase* jfFIMGroupResColl::MakeEmptyCollection() const {
+  return new jfFIMGroupCollection("FIM Fanfic Group List",1);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented private i/o methods

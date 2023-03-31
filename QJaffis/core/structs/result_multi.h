@@ -28,8 +28,8 @@ class
     bool toFirstCollection();
     bool toNextCollection();
     bool NoResults() const;
-    jfUrlItemCollection* AppendNewCollection();
-    jfUrlItemCollection* AppendNewCollection(const QString& cname, const size_t& cid);
+    jfSearchResultItemCollectionBase* AppendNewCollection();
+    jfSearchResultItemCollectionBase* AppendNewCollection(const QString& cname, const size_t& cid);
 
   protected:
     // internal file i/o methods
@@ -38,7 +38,8 @@ class
     // file i/o output
     virtual bool AddRestToFile(QTextStream* outfile) const =0;
     // file i/o input
-    virtual jfUrlItemCollection* MakeEmptyCollection() const = 0;
+    virtual jfSearchResultItemCollectionBase* MakeEmptyCollection() const = 0;
+    virtual jfSearchResultItemCollectionBase* MakeEmptyCollection(const QString& name, size_t cid) const = 0;
     virtual bool ReadRestFromFile(jfFileReader* infile) =0;
 
 };

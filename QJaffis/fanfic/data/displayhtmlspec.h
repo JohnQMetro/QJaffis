@@ -3,16 +3,14 @@ Name    :   displayhtmlspec.h
 Author  :   John Q Metro
 Purpose :   Data objects and helpers for ToDisplayHTML()
 Created :   August 7, 2022
-Updated :   August 8, 2022
+Updated :   March 11, 2023
 
 ******************************************************************************/
 #ifndef DISPLAYHTMLSPEC_H
 #define DISPLAYHTMLSPEC_H
 #endif // DISPLAYHTMLSPEC_
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-#ifndef JFMISCTYPES1
-  #include "../../core/objs/misc_types1.h"
-#endif
+#include "../../core/objs/baseitem.h"
 
 #include <QMap>
 //****************************************************************************
@@ -62,8 +60,7 @@ class jfDisplayHTMLHelper {
     QString ConditionalWrapText(const QString& font_name, bool prefixSeparator, const QString& pretext, bool bold_pretext, const QString& text, bool nl = false) const;
 
     // special
-    QString UpdateStatus(jf_FUpdateStatus status) const;
-    QString GetMarkColor(size_t mindex) const;
+    QString UpdateStatus(jfUpdateStatus status) const;
 
     virtual ~jfDisplayHTMLHelper();
 

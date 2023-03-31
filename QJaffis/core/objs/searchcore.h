@@ -63,7 +63,7 @@ class jfSearchCore : public QObject, public jfBaseObj {
     void SendNewcount(size_t icount);
     /* if we do not use the default (leftover) result category, we return
     TRUE if the paramster has no category marks */
-    bool NoCatTest(const jfBasePD* testee) const;
+    bool NoCatTest(const jfItemMetaFlags* testee) const;
     // used to create/overwrite the local customer html skeleton
     virtual void MakeLocalSkeleton(jfSkeletonBase* src) = 0;
     void ClearLocalSkeleton();

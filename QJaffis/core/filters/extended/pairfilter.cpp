@@ -365,7 +365,7 @@ bool jfPairFilterCore::MatchMultipleToken(const QStringList* inbase, size_t star
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the matching function is really all we will ever need for most stuff
-bool jfPairFilterCore::MainMatch(const jfBasePD* intest) const {
+bool jfPairFilterCore::MainMatch(const jfSearchResultItem* intest) const {
   // variables
   QString sumvalue;
   const QStringList* token_sum;
@@ -381,7 +381,7 @@ bool jfPairFilterCore::MainMatch(const jfBasePD* intest) const {
     if (!eval) eval = MatchMultipleToken(token_sum,0);
   }
   else {
-    sumvalue = intest->GetDescription();
+    sumvalue = intest->GetSummary();
     eval = MatchSpecialsString(sumvalue);
     if (!eval) eval = MatchMultipleString(sumvalue,0);
   }
@@ -487,7 +487,7 @@ jfPairFilterSingle* jfPairFilterSingle::Copy() const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // virtual method
-bool jfPairFilterSingle::CoreMatch(const jfBasePD* testelem) const {
+bool jfPairFilterSingle::CoreMatch(const jfSearchResultItem* testelem) const {
   return MainMatch(testelem);
 }
 //=================================================================================
@@ -526,7 +526,7 @@ jfPairFilterList* jfPairFilterList::Copy() const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // virtual method
-bool jfPairFilterList::CoreMatch(const jfBasePD* testelem) const {
+bool jfPairFilterList::CoreMatch(const jfSearchResultItem* testelem) const {
   return MainMatch(testelem);
 }
 //=================================================================================
@@ -565,7 +565,7 @@ jfPairFilterMultiple* jfPairFilterMultiple::Copy() const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // virtual method
-bool jfPairFilterMultiple::CoreMatch(const jfBasePD* testelem) const {
+bool jfPairFilterMultiple::CoreMatch(const jfSearchResultItem* testelem) const {
   // variables
   QString sumvalue;
   const QStringList* token_sum;
@@ -588,7 +588,7 @@ bool jfPairFilterMultiple::CoreMatch(const jfBasePD* testelem) const {
     }
   }
   else {
-    sumvalue = testelem->GetDescription();
+    sumvalue = testelem->GetSummary();
     eval = MatchSpecialsString(sumvalue);
     if (!eval) {
       for (nloop=0; nloop<(nmax-1); nloop++) {

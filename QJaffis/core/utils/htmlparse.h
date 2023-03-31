@@ -4,7 +4,7 @@ Basic   : Defines some utility functions and things used in manipulating html
 Author  : John Q Metro
 Started : September 13, 2009
 Conversion to QT started : March 9, 2013
-Updated : August 6, 2015 (added ConvertNewlines)
+Updated : March 12, 2023
 
 ******************************************************************************/
 #ifndef HTMLPARSE_H_INCLUDED
@@ -40,6 +40,9 @@ namespace htmlparse {
   /* it seems that some websites mix utf-8 encoding with windows-1252 characters,
   and Qt Does not convert them automatically) */
   void Win1252_ToUnicode(QString& result);
+
+  // shorten a section of html text (extract)
+  QString MakeShorterText(const QString& source_text, size_t lines, size_t maxlen);
 
 }
 /*****************************************************************************/

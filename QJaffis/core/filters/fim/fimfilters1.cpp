@@ -104,7 +104,7 @@ jfBaseFilter* jfFimThumbsFilter::GenCopy() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFimThumbsFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFimThumbsFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   // variables
   const jfFIM_Fanfic* rvalue;
   int tnet;
@@ -186,7 +186,7 @@ jfBaseFilter* jfFIMGenreFilter::GenCopy() const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFIMGenreFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFIMGenreFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfFIM_Fanfic* rvalue;
   // we start
   assert(testelem!=NULL);
@@ -247,7 +247,7 @@ jfBaseFilter* jfFIMCharacterFilter::GenCopy() const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFIMCharacterFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFIMCharacterFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfFIM_Fanfic* rvalue;
   // we start
   assert(testelem!=NULL);
@@ -321,7 +321,7 @@ QString jfFimRatingFilter::GetTypeID() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFimRatingFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFimRatingFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfFIM_Fanfic* rvalue;
   QString cvalue;
   assert(testelem!=NULL);
@@ -453,7 +453,7 @@ QString jfFimThumbPercentFilter::GetTypeID() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
-bool jfFimThumbPercentFilter::CoreMatch(const jfBasePD* testelem) const {
+bool jfFimThumbPercentFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   // constants and checks
   const jfFIM_Fanfic* rvalue;
   size_t cvalue1,cvalue2;

@@ -4,7 +4,7 @@
 // Purpose :    Defines collections involving categorization
 // Created:     April 1, 2009
 // Conversion to QT started : September 5, 2013
-// Updated:     March 27, 2022
+// Updated:     March 11, 2023
 ******************************************************************************/
 #ifndef CATEGORIES_H_INCLUDED
   #include "categories.h"
@@ -160,7 +160,7 @@ bool jfCategories::ChIndex(const size_t& catval) const {
 }
 //-------------------------------------------------------------------------
 // we do sorting
-bool jfCategories::Sort(jfBasePD* testee){
+bool jfCategories::Sort(jfItemFlagGroup* testee){
   size_t loopc;
   bool matched;
   // first, checks and special cases
@@ -168,11 +168,11 @@ bool jfCategories::Sort(jfBasePD* testee){
   if (item_count==0) return false;
   // the main loop, which marks the test elements for each matched category
   for (loopc=0;loopc<item_count;loopc++) {
-    matched = thecategories[loopc]->Match(testee);
-    (testee->mark)[loopc] = matched;
+    matched = thecategories[loopc]->Match(testee->item);
+    ((testee->flags)->category)[loopc] = matched;
   }
   // the return value is true if anything has matched
-  return testee->mark.any();
+  return ((testee->flags)->category).any();
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // old virtual methods we implement

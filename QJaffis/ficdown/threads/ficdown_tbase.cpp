@@ -163,6 +163,7 @@ bool jfFicDownloaderBase::xDownloadFic() {
   /**/tLog(fname,1);
   if (fic_data != NULL) pagecount = fic_data->pcount;
   else pagecount = 10; // pure guess!
+
   emit SendItemCount(pagecount);
   /**/tLogS(fname,2,pagecount);
   // index page

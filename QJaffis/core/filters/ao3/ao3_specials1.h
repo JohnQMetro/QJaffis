@@ -38,7 +38,7 @@ class jfSpecialsFilter : public jfBaseFilter {
     virtual bool IsFull() const = 0;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const = 0;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
     // file i/o
     virtual bool AddRestToFile(QTextStream* outfile) const;
     virtual bool ReadRestFromFile(jfFileReader* infile);
@@ -64,7 +64,7 @@ class jfAO3RatingFilter : public jfSpecialsFilter {
     virtual bool IsFull() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
 };
 //========================================================================
 
@@ -81,7 +81,7 @@ class jfAO3OrientationFilter : public jfTagFilterCore {
     virtual jfBaseFilter* GenCopy() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     virtual bool ModifyList(QStringList* templist) const;
     // check the tags against a list of pre-approved tags
     virtual bool DoVerify();

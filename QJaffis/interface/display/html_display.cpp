@@ -4,7 +4,7 @@ Author :     John Q Metro
 Purpose :    HTML listbox for showing results
 Created:     April 26, 2011
 Conversion Started : August 27, 2013
-Updated:     February 11, 2023
+Updated:     March 25, 2023
 ******************************************************************************/
 #ifndef HTML_DISPLAY_H_INCLUDED
   #include "html_display.h"
@@ -115,7 +115,7 @@ int jfExtendedModel::rowCount(const QModelIndex &parent) const {
 QVariant jfExtendedModel::data(const QModelIndex &index, int role) const {
   if (!index.isValid()) return QVariant();
   int irow = index.row();
-  if (irow>=itemcount) return QVariant();
+  if (irow >= itemcount) return QVariant();
   // returning the display data
   if (role == Qt::DisplayRole) {
     if (data_store[irow]!=NULL) return data_store[irow]->GetHTML();
@@ -191,8 +191,8 @@ void jfExtendedModel::AppendSelectedItems(jfResultUnitVector* in_results, size_t
   for (size_t ndex = 0; ndex < icount; ndex++) {
     cval = in_results->at(ndex);
     // an annoyingly complicated set of conditions
-    addthis = ((res_index<32) && (cval->Marked(res_index)));
-    addthis = (addthis || ( (res_index==32)&& (!(cval->HasMark())) ) );
+    addthis = ((res_index<32) && (cval->InCategory(res_index)));
+    addthis = (addthis || ( (res_index==32) && (!(cval->HasCategory())) ) );
     // appending
     if (addthis) {
       data_store.append(cval);
@@ -238,10 +238,13 @@ jfResultUnit* jfExtendedModel::getDataAtModelIndex(const QModelIndex& inval) {
 }
 //-------------------------
 QColor jfExtendedModel::getColorAtModelIndex(const QModelIndex& inval) const {
+    return QColor();
+
     if (inval.isValid()) return QColor();
-    if (inval.row()>=itemcount) return QColor();
-    if (data_store[inval.row()]==NULL) return QColor();
-    else return (data_store[inval.row()])->bgcolor;
+    else if (inval.row() >= itemcount) return QColor();
+    if (data_store[inval.row()] == NULL) return QColor();
+    else return (data_store[inval.row()])->Flags()->background_color;
+
 }
 //=========================================================================
 // constructor
@@ -288,9 +291,9 @@ int jfHtmlListView::AppendItems(jfResultUnitVector* in_results, bool doheader, Q
   for (size_t idex = 0; idex < icount; idex++) {
     cval = in_results->at(idex);
     if (res_index<32) {
-      if (cval->Marked(res_index)) addcount++;
+      if (cval->InCategory(res_index)) addcount++;
     }
-    else if (!(cval->HasMark())) addcount++;
+    else if (!(cval->HasCategory())) addcount++;
   }
   // the nothing to add case
   if (addcount==0) return 0;
@@ -445,9 +448,9 @@ bool jfHtmlResultCollection::ClearViewers() {
   return true;
 }
 //------------------------------------------
-bool jfHtmlResultCollection::CheckRCounts(bool uses_default,size_t ch_rcats) const {
-  if (uses_default!=uses_default) return false;
-  return (ch_rcats==num_rcats);
+bool jfHtmlResultCollection::CheckRCounts(bool in_uses_default,size_t ch_rcats) const {
+  if (in_uses_default != use_default) return false;
+  return (ch_rcats == num_rcats);
 }
 //--------------------------------------------
 int jfHtmlResultCollection::SelectedIndex() const {

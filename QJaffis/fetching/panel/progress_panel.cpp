@@ -38,7 +38,7 @@ bool jfProgressPanelBase::IsWorking() const {
 }
 //--------------
 bool jfProgressPanelBase::Error() const {
-  return (lasterror.why!=jff_NOERROR);
+  return (lasterror.why != jfa_DONE) && (lasterror.why != jfa_SKIP);
 }
 //--------------
 jfFETCH_AFTERMATH jfProgressPanelBase::GetLastError() const {

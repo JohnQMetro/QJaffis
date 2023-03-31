@@ -3,7 +3,7 @@ Name    :   displayhtmlspec.cpp
 Author  :   John Q Metro
 Purpose :   Data objects and helpers for ToDisplayHTML()
 Created :   August 7, 2022
-Updated :   August 8, 2022
+Updated :   March 11, 2023
 
 ******************************************************************************/
 #ifndef DISPLAYHTMLSPEC_H
@@ -195,8 +195,8 @@ QString jfDisplayHTMLHelper::ConditionalWrapText(const QString& font_name, bool 
 }
 // +++++++++++++++++++++++++++++++++++++
 // special
-QString jfDisplayHTMLHelper::UpdateStatus(jf_FUpdateStatus status) const {
-    if (status == jud_NONE) return "";
+QString jfDisplayHTMLHelper::UpdateStatus(jfUpdateStatus status) const {
+    if (status == jfUpdateStatus::NONE) return "";
     int current_size = 2 - relative_modifier;
     QString result = "<font";
     if (current_size != 0) {
@@ -205,18 +205,14 @@ QString jfDisplayHTMLHelper::UpdateStatus(jf_FUpdateStatus status) const {
         result += QString::number(current_size);
     }
     result += " color=";
-    if (status==jud_UPDATED) result += "Lime><b>[Updated";
-    else if (status==jud_MISSING) result += "Red><b>[Missing";
-    else if (status==jud_NEW) result += "Aqua><b>[New";
-    else if (status==jud_AUTHORNC) result += "Yellow><b>[Author Name Change";
+    if (status==jfUpdateStatus::UPDATED) result += "Lime><b>[Updated";
+    else if (status==jfUpdateStatus::MISSING) result += "Red><b>[Missing";
+    else if (status==jfUpdateStatus::NEW) result += "Aqua><b>[New";
+    else if (status==jfUpdateStatus::AUTHORNC) result += "Yellow><b>[Author Name Change";
     result += "!]</b></font>";
     return result;
 }
-// -----------------------------------------
-QString jfDisplayHTMLHelper::GetMarkColor(size_t mindex) const {
-    // currently does nothing
-    return "";
-}
+
 //++++++++++++++++++++++++++++++++++++++
 jfDisplayHTMLHelper::~jfDisplayHTMLHelper() {
     if (fontCollection.size() > 0) {

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Collections for fimfiction.net data
 Created :   May 22, 2012
 Conversion to Qt started November 9, 2013
-Updated :   June 30, 2016
+Updated :   March 19, 2023
 ******************************************************************************/
 #ifndef FIM_COLL_H_INCLUDED
 #define FIM_COLL_H_INCLUDED
@@ -22,19 +22,21 @@ Updated :   June 30, 2016
 //****************************************************************************
 class jfFIMSearch;
 //============================================================================
-class jfFIMItemCollection : public jfTypedCollection<jfFIM_Fanfic> {
+class jfFIMItemCollection : public jfSearchResultsCollection<jfFIM_Fanfic> {
   public:
     // the constructors
-    jfFIMItemCollection();
+    jfFIMItemCollection(QString&& in_name, size_t in_num_id);
+    jfFIMItemCollection(const QString& in_name, size_t in_num_id);
     // implemented page methods
-    virtual QString GetTypeID() const;
-    virtual bool LoadValues(jfSkeletonParser* inparser,size_t which) const;
+    virtual QString TypeId() const override;
+    virtual bool LoadValues(jfSkeletonParser* inparser,size_t which) const override;
     // getting more information
     jfFicExtract_FIM* FicExt_AtIndex(size_t i_index) const;
   protected:
     // some more virtual i/o methods
-    virtual bool AddDelta(QTextStream* outfile) const;
-    virtual bool ReadDelta(jfFileReader* infile);
+    virtual bool ReadItemFromFile(jfFileReader* infile, jfItemFlagGroup& target_group) const override;
+    virtual bool AddDelta(QTextStream* outfile) const override;
+    virtual bool ReadDelta(jfFileReader* infile) override;
 };
 //========================================================================
 class jfFIMResColl : public jfResultCollection {
@@ -50,7 +52,7 @@ class jfFIMResColl : public jfResultCollection {
     void WriteHtmlHeader(jfHtmlParams* indata);
     // implemented private i/o methods
     virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual jfUrlItemCollection* MakeEmptyCollection() const;
+    virtual jfSearchResultItemCollectionBase* MakeEmptyCollection() const;
     virtual bool ReadRestFromFile(jfFileReader* infile);
     // internal data
     jfFIMSearch* typed_search;

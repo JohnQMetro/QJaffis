@@ -170,10 +170,10 @@ bool jfResultDisplay::ConnectSignalsAndSlots() {
   const QString fname = "jfResultDisplay::ConnectSignalsAndSlots";
   jfProgressPanelSingle* typpan1;
   jfProgPanelMultiple* typpan2;
-  bool svres;
+
   // connecting search object signals to the display slots
   connect(search_data, SIGNAL(SendResults(jfResultUnitVector*)),mainviewer, SLOT(HandleNewResults(jfResultUnitVector*)));
-  svres = connect(search_data, SIGNAL(DispatchCount(size_t)),mainviewer, SLOT(HandleIncreaseCount(size_t)));
+  connect(search_data, SIGNAL(DispatchCount(size_t)),mainviewer, SLOT(HandleIncreaseCount(size_t)));
   connect(search_data, SIGNAL(SendCatInfo(struct jfCategoryInfoMsg)),mainviewer, SLOT(HandleNewCategory(struct jfCategoryInfoMsg)));
   // connecting the downloader objects to the progress panel (and adding the associated pauser)
   if (!multicat) {

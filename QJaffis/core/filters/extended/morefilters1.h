@@ -37,7 +37,7 @@ class jfTagFilterCore : public jfBaseFilter {
     virtual jfBaseFilter* GenCopy() const = 0;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const = 0;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
     bool MatchVsData(const QString& incheck) const;
     void MakeNullResult();
     virtual bool ModifyList(QStringList* templist) const = 0;
@@ -82,7 +82,7 @@ class jfCompletedFilter : public jfBaseFilter {
     virtual QString GetTypeID() const;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfBasePD* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
     // file i/o
     virtual bool AddRestToFile(QTextStream* outfile) const;
     virtual bool ReadRestFromFile(jfFileReader* infile);

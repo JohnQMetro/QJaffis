@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net item object
 // Created:     June 1, 2010
 // Conversion to Qt Started July 11, 2014
-// Updated:     August 15, 2016
+// Updated:     March 25, 2023
 /////////////////////////////////////////////////////////////////////////////
 #define FFN_ITEMCOLL
 
@@ -21,16 +21,17 @@
 // forward declarations
 class jfFFNSearch;
 //==========================================================================
-class jfFFNItemCollection : public jfTypedCollection<jfFFNItem> {
+class jfFFNItemCollection : public jfSearchResultsCollection<jfFFNItem> {
   public:
     size_t first_id;
     // the constructors
     jfFFNItemCollection();
+    jfFFNItemCollection(const QString& name, size_t num_id);
     jfFFNItemCollection(const jfFFN_CategoryCore* cat_linkin);
     jfFFNItemCollection(jfFFNItemCollection* insrc, bool copy);
     // implemented  methods
-    virtual QString GetTypeID() const;
-    virtual bool LoadValues(jfSkeletonParser* inparser,size_t which) const;
+    virtual QString TypeId() const override;
+    virtual bool LoadValues(jfSkeletonParser* inparser,size_t which) const override;
     // category information methods
     QString GetCatUrl() const;
     QString GetFinder() const;
@@ -40,16 +41,15 @@ class jfFFNItemCollection : public jfTypedCollection<jfFFNItem> {
     // category manipulation
     bool ReplaceCat(const jfFFN_CategoryCore* cat_linkin);
     // getting more information
-    jfFicExtract* FicExt_AtIndex(size_t i_index) const;
-    // used for updates
-    bool InsertNewResults(jfFFNItemCollection* insrc);
-    jfResultUnitVector* GetContentsAsResults();
+    jfFicExtract* FicExtractAtIndex(size_t i_index) const;
     // destructor
     ~jfFFNItemCollection();
   protected:
+    static jfItemFlagGroup CopyGroup(const jfItemFlagGroup& source);
     // some more virtual i/o methods
-    virtual bool AddDelta(QTextStream* outfile) const;
-    virtual bool ReadDelta(jfFileReader* infile);
+    virtual bool ReadItemFromFile(jfFileReader* infile, jfItemFlagGroup& target_group) const override;
+    virtual bool AddDelta(QTextStream* outfile) const override;
+    virtual bool ReadDelta(jfFileReader* infile) override;
     // external data
     const jfFFN_CategoryCore* cat_link;
     jfFFNSearch* sdata_typed;

@@ -137,41 +137,44 @@ bool jfExpressionEditor::CheckExpr(const QString& inexpr,bool& outempty,QString&
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void jfExpressionEditor::PressPickFilter(bool checked) {
-  // local variables
-  jfFilterPickerDialog* pickerdialog;
-  jfGlobalFilterPickerDialog* gpicker_dialog;
-  long iindex;
-  QString* insert_result;
-  QDialog::DialogCode dialog_result;
-  QTextCursor tval;
-  // we record the insertion point (not sure if this is necessary)
-  if (mline) {
-    tval = editcore2->textCursor();
-    iindex = tval.position();
-  }
-  else iindex = editcore1->cursorPosition();
-  // start preparations to show the dialog
-  insert_result = new QString();
-  // the global only version
-  if (isglobal) {
-    gpicker_dialog = new jfGlobalFilterPickerDialog("Pick a Global filter",insert_result,this);
-    dialog_result = (QDialog::DialogCode)gpicker_dialog->exec();
-    delete gpicker_dialog;
-  }
-  else { // or the one for local as well
-    pickerdialog = new jfFilterPickerDialog("Pick a Local or Global filter",local_fmap,insert_result,this);
-    dialog_result = (QDialog::DialogCode)pickerdialog->exec();
-    delete pickerdialog;
-  }
-  // showing
-  if (dialog_result==QDialog::Accepted) {
-    if (!(*insert_result).isEmpty()) {
-      // we insert the result in the editor
-      if (mline) editcore2->insertPlainText(*insert_result);
-      else editcore1->insert(*insert_result);
+    // local variables
+    jfFilterPickerDialog* pickerdialog;
+    jfGlobalFilterPickerDialog* gpicker_dialog;
+    QString* insert_result;
+    QDialog::DialogCode dialog_result;
+    QTextCursor tval;
+
+    // we record the insertion point (not sure if this is necessary)
+    long iindex;
+    if (mline) {
+        tval = editcore2->textCursor();
+        iindex = tval.position();
     }
-  }
-  // cleaning up the results
-  delete insert_result;
+    else iindex = editcore1->cursorPosition();
+
+    // start preparations to show the dialog
+    insert_result = new QString();
+    // the global only version
+    if (isglobal) {
+        gpicker_dialog = new jfGlobalFilterPickerDialog("Pick a Global filter",insert_result,this);
+        dialog_result = (QDialog::DialogCode)gpicker_dialog->exec();
+        delete gpicker_dialog;
+    }
+    else { // or the one for local as well
+        pickerdialog = new jfFilterPickerDialog("Pick a Local or Global filter",local_fmap,insert_result,this);
+        dialog_result = (QDialog::DialogCode)pickerdialog->exec();
+        delete pickerdialog;
+    }
+
+    // showing
+    if (dialog_result==QDialog::Accepted) {
+        if (!(*insert_result).isEmpty()) {
+            // we insert the result in the editor
+            if (mline) editcore2->insertPlainText(*insert_result);
+            else editcore1->insert(*insert_result);
+        }
+    }
+    // cleaning up the results
+    delete insert_result;
 }
 //*****************************************************************************

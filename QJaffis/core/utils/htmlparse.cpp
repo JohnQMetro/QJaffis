@@ -228,5 +228,64 @@ void htmlparse::Win1252_ToUnicode(QString& result) {
   result.replace(QChar((uint)0x93),QChar((uint)0x201C));
   result.replace(QChar(0x94),QChar(0x201D));
 }
+// ++++++++++++++++++++++++++++++++++++++++
+// shorten a section of html text (extract)
+QString htmlparse::MakeShorterText(const QString& source_text, size_t lines, size_t maxlen) {
+    // special cases
+    if ((lines==0) || (maxlen==0)) return "";
+    if (source_text.isEmpty()) return "";
+
+    // variables
+    QString buffer, runres;
+    size_t runline, runmax, linelen, templine;
+    jfStringParser* dparse;
+    int rpos1,rpos2;
+    bool truncated;
+    int lendif;
+    // initializing
+    dparse = new jfStringParser(source_text);
+    runline = 0;
+    runmax = 0;
+    truncated = false;
+    // the parsing loop
+    while (dparse->MovePastOrEnd("<br />",buffer)) {
+      // line check
+      runline++;
+      if (runline>lines) {
+        truncated = true;
+        break;
+      }
+      // line length check
+      linelen = buffer.length();
+      templine = runmax + 4 + linelen;
+      if (templine>maxlen) {
+        truncated = true;
+        lendif = templine - maxlen;
+        lendif = linelen -lendif - 4;
+        if (lendif<0) break;
+        buffer.truncate(lendif);
+        linelen = lendif;
+      }
+      // appending the value
+      if (!runres.isEmpty()) runres += "<br>";
+      runres += buffer;
+      runmax += linelen + 4;
+      if (truncated) break;
+    }
+    // post processing
+    delete dparse;
+    // finally, we make sure we do not end inside a tag
+    rpos1 = runres.lastIndexOf('<');
+    if (rpos1>=0) {
+      rpos2 = runres.lastIndexOf('>');
+      if ((rpos2<0) || (rpos2<rpos1)) {
+        runres.truncate(rpos1);
+        truncated = true;
+      }
+    }
+    if (truncated) runres += " ...";
+    runres += "</u></a></p>";
+    return runres;
+}
 
 /*****************************************************************************/

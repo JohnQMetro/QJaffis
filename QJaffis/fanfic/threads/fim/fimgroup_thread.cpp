@@ -101,14 +101,12 @@ size_t jfFIMGroup_DownThread::StoreCardResults(jfResultUnitVector* in_vector) {
 void jfFIMGroup_DownThread::DeleteCardStore() {
     // current temp pointers
     jfResultUnit* cunit;
-    jfBasePD* item;
     // the main 'going over the vector' loop
     for (size_t cardDex = 0; cardDex < card_store.size(); cardDex++) {
         // getting the result unit
         cunit = (*card_store[cardDex])[0];
         // deleting the attached result
-        item = const_cast<jfBasePD*>(cunit->Sourcelink());
-        delete item;
+        cunit->Dispose();
         // deleting the result unit
         delete cunit;
         // clearing the one item vector
@@ -185,7 +183,7 @@ void jfFIMGroup_DownThread::PrepareItemInfo(size_t pageIndex) {
     }
     else {
         const jfResultUnit* current_result = (*card_store[pageIndex-1])[0];
-        QString disp_name = htmlparse::ConvertEntities(current_result->GetName(),false);
+        QString disp_name = htmlparse::ConvertEntities(current_result->GetTitle(),false);
         infoToSend.item_name = disp_name;
         infoToSend.item_label = "Group";
   }
