@@ -137,7 +137,7 @@ bool jfMultiMatchEditor::CheckExpr(const QString& inexpr,bool& outempty,QString&
     }
 }
 // +++++++++++++++++++++++++++++++++++++++++
-void jfMultiMatchEditor::HandleMissReport() {
+void jfMultiMatchEditor::HandleMissReport(bool value) {
     if (miss_report_allowed && (miss_counter != NULL)) {
         QString filename = miss_name_input->text().trimmed();
         if (!filename.isEmpty()) miss_counter->SaveRecordedCounts(filename,4);

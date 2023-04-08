@@ -140,7 +140,7 @@ void jfFanficPopupMenu::OnDownloadFic() {
   jfFicDownDialog* mdialog;
   if (xNN()) {
     // we start by getting the fic and then the extract
-    gfic = dynamic_cast<const  jfGenericFanfic*>(GetSource());
+    gfic = dynamic_cast<const  jfGenericFanfic*>(GetSource()->SourceLink());
     gficdata = gfic->GetExtract();
     // prepare a dialog that is used to download the fic
     mdialog = new jfFicDownDialog(NULL,gficdata);

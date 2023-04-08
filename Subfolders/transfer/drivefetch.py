@@ -5,9 +5,7 @@ import os
 
 from selenium_fetch import *
 # ------------------------------------------------------------------------------------------
-DRIVER_PATH = r'/home/david/Programs/geckodriver'
-PROFILE_PATH = r'/home/david/.mozilla/firefox/ivkmfl84.default'
-USE_PROFILE = False
+
 # RANDOM_USER_ID = False
 UNDEFINE_WEBDRIVER = True
 # EXTENSION_PATH = r''

@@ -113,8 +113,8 @@ jfSkelEditSingle::jfSkelEditSingle(jfSkeletonSingle* indata, QWidget* parent):jf
   typ_item = indata;
   item = indata;
   // connecting
-  connect(save_btn, SIGNAL(clicked()), this, SLOT(SaveButton(bool)));
-  connect(rest_btn, SIGNAL(clicked()), this, SLOT(RestoreButton(bool)));
+  connect(save_btn, SIGNAL(clicked()), this, SLOT(SaveButton()));
+  connect(rest_btn, SIGNAL(clicked()), this, SLOT(RestoreButton()));
   if (indata!=NULL) ChangeSkeleton(indata);
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -141,11 +141,11 @@ bool jfSkelEditSingle::SaveSkeleton() {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // button press event handlers
 //-------------------------------------------------------------------
-void jfSkelEditSingle::SaveButton(bool clicked) {
+void jfSkelEditSingle::SaveButton() {
   SaveSkeleton();
 }
 //-------------------------------------------------------------------
-void jfSkelEditSingle::RestoreButton(bool clicked) {
+void jfSkelEditSingle::RestoreButton() {
   LoadSkeleton();
 }
 //===============================================================================
@@ -163,8 +163,8 @@ jfSkelEditMultiple::jfSkelEditMultiple(jfSkeletonMultiple* indata, QWidget* pare
   panelstore->addTab(thepanels[3],"Category Links");
   panelstore->addTab(thepanels[4],"Extra");
   // connecting
-  connect(save_btn, SIGNAL(clicked()), this, SLOT(SaveButton(bool)));
-  connect(rest_btn, SIGNAL(clicked()), this, SLOT(RestoreButton(bool)));
+  connect(save_btn, SIGNAL(clicked()), this, SLOT(SaveButton()));
+  connect(rest_btn, SIGNAL(clicked()), this, SLOT(RestoreButton()));
   // changing the item
   if (indata!=NULL) ChangeSkeleton(indata);
 }
@@ -195,11 +195,11 @@ bool jfSkelEditMultiple::SaveSkeleton() {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // button press event handlers
 //-------------------------------------------------------------------
-void jfSkelEditMultiple::SaveButton(bool clicked) {
+void jfSkelEditMultiple::SaveButton() {
   SaveSkeleton();
 }
 //-------------------------------------------------------------------
-void jfSkelEditMultiple::RestoreButton(bool clicked) {
+void jfSkelEditMultiple::RestoreButton() {
   LoadSkeleton();
 }
 //===============================================================================
@@ -217,8 +217,8 @@ jfSkelEditFicPart::jfSkelEditFicPart(jfSkeletonFicPart* indata, QWidget* parent)
   panelstore->addTab(thepanels[2],"Group Links");
   panelstore->addTab(thepanels[3],"Part Links");
   // connecting
-  connect(save_btn, SIGNAL(clicked()), this, SLOT(SaveButton(bool)));
-  connect(rest_btn, SIGNAL(clicked()), this, SLOT(RestoreButton(bool)));
+  connect(save_btn, SIGNAL(clicked()), this, SLOT(SaveButton()));
+  connect(rest_btn, SIGNAL(clicked()), this, SLOT(RestoreButton()));
   // changing the item
   if (indata!=NULL) ChangeSkeleton(indata);
 }
@@ -249,11 +249,11 @@ bool jfSkelEditFicPart::SaveSkeleton() {
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // button press event handlers
 //-------------------------------------------------------------------
-void jfSkelEditFicPart::SaveButton(bool clicked) {
+void jfSkelEditFicPart::SaveButton() {
   SaveSkeleton();
 }
 //-------------------------------------------------------------------
-void jfSkelEditFicPart::RestoreButton(bool clicked) {
+void jfSkelEditFicPart::RestoreButton() {
   LoadSkeleton();
 }
 /*****************************************************************************/

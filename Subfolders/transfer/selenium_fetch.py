@@ -14,9 +14,11 @@ from typing import Optional
 import time
 import sys
 # ==================================================================
-
-DRIVER_PATH = r'/home/~~~/Programs/geckodriver'
-CHROME_PATH= r'~~~YOUR_PATH_HERE\Chromium\Application\chrome.exe'
+# if geckodriver is not in your path, you will need to modify this file
+# DRIVER_PATH = r'/home/david/Programs/geckodriver'
+# The line below ise used, define it correctly
+# CHROME_PATH= r'<FIX HERE>\chrome.exe'
+# the value below, if set to true, will try to insert a script into the webpages that will turn the webdriver flag off.
 UNDEFINE_WEBDRIVER = False
 
 
@@ -39,7 +41,7 @@ class SeleniumFetcher:
         options.add_argument("--start-maximized")
         options.add_argument("--dns-prefetch-disable")
         # driverService = Service(DRIVER_PATH)
-        self.mbrowser = undetected_chromedriver.Chrome(options=options,version_main=109,use_subprocess=True,browser_executable_path=CHROME_PATH)
+        self.mbrowser = undetected_chromedriver.Chrome(options=options,version_main=111,use_subprocess=True,browser_executable_path=CHROME_PATH)
         self.starting = False
 
     def applyCookieString(self, cookie_string:str):
@@ -103,7 +105,7 @@ class SeleniumFetcher:
                 # found the checkbox.
                 time.sleep(2)
                 inputcb.click()
-                self.mbrowser.switch_to().parent_frame()
+                self.mbrowser.switch_to.parent_frame()
                 goodPage = EC.presence_of_element_located((By.ID, "p_footer"))
                 # waiting for a good page means if we get a challenge twice in a row, we abort
                 # (aborting will trigger re-making the browser object and trying again)

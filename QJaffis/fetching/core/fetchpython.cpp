@@ -154,7 +154,7 @@ bool jfPageFetchWithPython::StartScript() {
     script_com->setProcessChannelMode(QProcess::ForwardedErrorChannel);
     // start and wait max 10s for startup...
     script_com->start(pythonpaths->InvokeCmd(false),arg);
-    if(!script_com->waitForStarted(10000)) {
+    if(!script_com->waitForStarted(60000)) {
         // handling failed to start
         QString err = ConvertErr(script_com->error());
         jerror::Log(fname,"Failed " + err);
@@ -193,7 +193,7 @@ QString jfPageFetchWithPython::ScriptFetch(const QString& cookie) {
     // sending
     /* qint64 writeres =*/ script_com->write(tosend);
 
-    bool okay = script_com->waitForBytesWritten(3000);
+    bool okay = script_com->waitForBytesWritten(60000);
     if (!okay) {
         QString err = ConvertErr(script_com->error());
         jerror::Log(fname,"writing to process failed! " + err);
@@ -203,7 +203,7 @@ QString jfPageFetchWithPython::ScriptFetch(const QString& cookie) {
     // reading
     int waitsdone = 0;
     while (waitsdone < 30) {
-       okay = script_com->waitForReadyRead(30000); // 30 sec wait
+       okay = script_com->waitForReadyRead(60000); // 60 sec wait
        if (script_com->bytesAvailable() > 0) break;
        waitsdone++;
     }

@@ -37,8 +37,8 @@ class jfSkelEditCore : public QWidget {
     jfs_Skeltype GetSkelType() const;
   public slots:
     // button press event handlers
-    virtual void SaveButton(bool clicked) = 0;
-    virtual void RestoreButton(bool clicked) = 0;
+    virtual void SaveButton() = 0;
+    virtual void RestoreButton() = 0;
   protected:
     // internal helper methods
     bool CLoadItems(jfSkeletonCore* source);
@@ -79,8 +79,8 @@ class jfSkelEditSingle : public jfSkelEditBase {
     virtual bool SaveSkeleton();
   public slots:
     // button press event handlers
-    virtual void SaveButton(bool clicked);
-    virtual void RestoreButton(bool clicked);
+    virtual void SaveButton();
+    virtual void RestoreButton();
   protected:
     // internaldata
     jfSkeletonSingle* typ_item;
@@ -97,8 +97,8 @@ class jfSkelEditMultiple : public jfSkelEditBase {
     virtual bool SaveSkeleton();
   public slots:
     // button press event handlers
-    virtual void SaveButton(bool clicked);
-    virtual void RestoreButton(bool clicked);
+    virtual void SaveButton();
+    virtual void RestoreButton();
   protected:
     // internaldata
     jfSkeletonMultiple* typ_item;
@@ -115,8 +115,8 @@ class jfSkelEditFicPart : public jfSkelEditCore {
     virtual bool SaveSkeleton();
   public slots:
     // button press event handlers
-    virtual void SaveButton(bool clicked);
-    virtual void RestoreButton(bool clicked);
+    virtual void SaveButton();
+    virtual void RestoreButton();
   protected:
     // internaldata
     jfSkeletonFicPart* typ_item;

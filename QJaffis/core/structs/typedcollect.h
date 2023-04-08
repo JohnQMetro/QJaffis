@@ -53,7 +53,7 @@ jfSearchResultsCollection< Q >::jfSearchResultsCollection(const QString& in_name
 template <class Q>
 size_t jfSearchResultsCollection< Q >::Append(Q* in_item, jfItemMetaFlags* in_flags) {
   assert(in_item !=NULL);
-  mainlist.push_back(new jfItemFlagGroup{ in_item, in_flags } );
+  mainlist.push_back(jfItemFlagGroup{ in_item, in_flags } );
   return mainlist.size();
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

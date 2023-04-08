@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Some more miscuser interface stuff
 Created :   November 24, 2009
 Conversion to Qt started : September 15, 2013
-Updated :   July 31, 2016 (deleting tag widgets)
+Updated :   April 4, 2023 (fixed bug in GetBoth)
 ******************************************************************************/
 #ifndef WIDGETS2_H_INCLUDED
   #include "widgets2.h"
@@ -88,8 +88,8 @@ QString jfTwoTexts::Get2() const {
 void jfTwoTexts::GetBoth(QString& out1, QString& out2) const {
   if (ismulti) out1 = tebox1->toPlainText();
   else out1 = lebox1->text();
-  if (ismulti) out2 = tebox1->toPlainText();
-  else out2 = lebox1->text();
+  if (ismulti) out2 = tebox2->toPlainText();
+  else out2 = lebox2->text();
 }
 //=======================================================================
 // --- [ METHODS for jfNameEdit ]------------------------------------

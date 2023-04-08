@@ -1,534 +1,540 @@
-﻿533
-4;My Little Pony: Friendship is Magic;series;mlp-fim;136233
-5;Fluttershy;character;fluttershy;9842
-6;Twilight Sparkle;character;twilight-sparkle;32782
-7;Rainbow Dash;character;rainbow-dash;15393
-8;Pinkie Pie;character;pinkie-pie;9228
-9;Applejack;character;applejack;8375
-10;Rarity;character;rarity;8903
-12;Apple Bloom;character;apple-bloom;3041
-13;Scootaloo;character;scootaloo;4088
-14;Sweetie Belle;character;sweetie-belle;2966
-15;Spike;character;spike;15437
-16;Princess Celestia;character;princess-celestia;30733
-17;Princess Luna;character;princess-luna;25685
-18;Gilda;character;gilda;1333
-19;Zecora;character;zecora;1945
-20;Trixie;character;trixie;5053
-21;Big Macintosh;character;big-macintosh;4009
-22;Granny Smith;character;granny-smith;954
-23;Braeburn;character;braeburn;652
-24;Diamond Tiara;character;diamond-tiara;2001
-25;Silver Spoon;character;silver-spoon;1166
+﻿539
+4;My Little Pony: Friendship is Magic;series;mlp-fim;137358
+5;Fluttershy;character;fluttershy;9927
+6;Twilight Sparkle;character;twilight-sparkle;32966
+7;Rainbow Dash;character;rainbow-dash;15456
+8;Pinkie Pie;character;pinkie-pie;9255
+9;Applejack;character;applejack;8435
+10;Rarity;character;rarity;8985
+12;Apple Bloom;character;apple-bloom;3072
+13;Scootaloo;character;scootaloo;4118
+14;Sweetie Belle;character;sweetie-belle;2988
+15;Spike;character;spike;15480
+16;Princess Celestia;character;princess-celestia;30888
+17;Princess Luna;character;princess-luna;25794
+18;Gilda;character;gilda;1349
+19;Zecora;character;zecora;1950
+20;Trixie;character;trixie;5096
+21;Big Macintosh;character;big-macintosh;4003
+22;Granny Smith;character;granny-smith;960
+23;Braeburn;character;braeburn;655
+24;Diamond Tiara;character;diamond-tiara;2002
+25;Silver Spoon;character;silver-spoon;1170
 26;Twist;character;twist;225
-27;Snips;character;snips;194
-28;Snails;character;snails;267
-29;Cheerilee;character;cheerilee;1400
-30;Mayor Mare;character;mayor-mare;410
-31;Hoity Toity;character;hoity-toity;90
-32;Photo Finish;character;photo-finish;128
-33;Sapphire Shores;character;sapphire-shores;75
-34;Spitfire;character;spitfire;1611
-35;Soarin;character;soarin;1728
-36;Prince Blueblood;character;prince-blueblood;1099
-37;Little Strongheart;character;little-strongheart;84
-38;Angel;character;angel;844
-39;Winona;character;winona;233
-40;Opalescence;character;opalescence;178
-41;Gummy;character;gummy;311
-42;Owlowiscious;character;owlowiscious;164
-43;Philomena;character;philomena;236
-44;Derpy Hooves;character;derpy-hooves;4524
-45;Lyra;character;lyra;3247
-46;Bon-Bon;character;bonbon;1735
-47;DJ P0N-3;character;dj-p0n3;3752
-48;Original Character;character;original-character;54090
-49;Caramel;character;caramel;440
-50;Doctor Whooves;character;doctor-whooves;2096
-51;Octavia;character;octavia;3332
-52;Discord;character;discord;8391
-53;Nightmare Moon;character;nightmare-moon;3955
-54;Pipsqueak;character;pipsqueak;490
-55;Berry Punch;character;berry-punch;568
-56;Carrot Top;character;carrot-top;454
-57;Mare Do Well;character;mare-do-well;201
-58;Tank;character;tank;164
-59;Fancypants;character;fancypants;481
-60;Fleur de Lis;character;fleur-de-lis;533
-61;Other;character;other;33634
+27;Snips;character;snips;192
+28;Snails;character;snails;269
+29;Cheerilee;character;cheerilee;1405
+30;Mayor Mare;character;mayor-mare;419
+31;Hoity Toity;character;hoity-toity;91
+32;Photo Finish;character;photo-finish;130
+33;Sapphire Shores;character;sapphire-shores;73
+34;Spitfire;character;spitfire;1617
+35;Soarin;character;soarin;1729
+36;Prince Blueblood;character;prince-blueblood;1103
+37;Little Strongheart;character;little-strongheart;85
+38;Angel;character;angel;848
+39;Winona;character;winona;236
+40;Opalescence;character;opalescence;181
+41;Gummy;character;gummy;310
+42;Owlowiscious;character;owlowiscious;167
+43;Philomena;character;philomena;237
+44;Derpy Hooves;character;derpy-hooves;4528
+45;Lyra;character;lyra;3253
+46;Bon-Bon;character;bonbon;1750
+47;DJ P0N-3;character;dj-p0n3;3743
+48;Original Character;character;original-character;54522
+49;Caramel;character;caramel;443
+50;Doctor Whooves;character;doctor-whooves;2091
+51;Octavia;character;octavia;3331
+52;Discord;character;discord;8456
+53;Nightmare Moon;character;nightmare-moon;3973
+54;Pipsqueak;character;pipsqueak;493
+55;Berry Punch;character;berry-punch;565
+56;Carrot Top;character;carrot-top;457
+57;Mare Do Well;character;mare-do-well;203
+58;Tank;character;tank;163
+59;Fancypants;character;fancypants;478
+60;Fleur de Lis;character;fleur-de-lis;534
+61;Other;character;other;33731
 62;Daring Do;character;daring-do;1051
-63;Minuette;character;minuette;590
-64;Flim and Flam;character;flim-and-flam;398
-65;Cranky Doodle Donkey;character;cranky-doodle-donkey;88
-66;Matilda;character;matilda;34
-67;Mr. Cake;character;mr-cake;437
+63;Minuette;character;minuette;596
+64;Flim and Flam;character;flim-and-flam;405
+65;Cranky Doodle Donkey;character;cranky-doodle-donkey;87
+66;Matilda;character;matilda;33
+67;Mr. Cake;character;mr-cake;434
 68;Mrs. Cake;character;mrs-cake;540
-69;Dinky Hooves;character;dinky-hooves;1022
-70;Iron Will;character;iron-will;185
-71;Princess Cadance;character;princess-cadance;5112
-72;Shining Armor;character;shining-armor;4681
-73;Main 6;character;main-6;36590
-74;Cutie Mark Crusaders;character;cutie-mark-crusaders;9553
+69;Dinky Hooves;character;dinky-hooves;1025
+70;Iron Will;character;iron-will;184
+71;Princess Cadance;character;princess-cadance;5184
+72;Shining Armor;character;shining-armor;4733
+73;Main 6;character;main-6;36677
+74;Cutie Mark Crusaders;character;cutie-mark-crusaders;9568
 75;Wonderbolts;character;wonderbolts;1031
 76;Diamond Dogs;character;diamond-dogs;478
-77;Queen Chrysalis;character;queen-chrysalis;5020
-78;Thunderlane;character;thunderlane;640
-79;Flitter and Cloudchaser;character;flitter-and-cloudchaser;307
-80;Rumble;character;rumble;611
-81;Roseluck;character;roseluck;493
-82;King Sombra;character;king-sombra;2659
-83;Babs Seed;character;babs-seed;498
-84;Changelings;character;changelings;3968
-85;Crystal Ponies;character;crystal-ponies;419
+77;Queen Chrysalis;character;queen-chrysalis;5077
+78;Thunderlane;character;thunderlane;644
+79;Flitter and Cloudchaser;character;flitter-and-cloudchaser;311
+80;Rumble;character;rumble;619
+81;Roseluck;character;roseluck;496
+82;King Sombra;character;king-sombra;2665
+83;Babs Seed;character;babs-seed;496
+84;Changelings;character;changelings;4003
+85;Crystal Ponies;character;crystal-ponies;420
 86;Featherweight;character;featherweight;151
 87;Noteworthy;character;noteworthy;103
-88;Lightning Dust;character;lightning-dust;714
-89;Nurse Redheart;character;nurse-redheart;565
-90;Flower Ponies;character;flower-ponies;135
-91;Raindrops;character;raindrops;141
-92;Spa Ponies;character;spa-ponies;233
-93;Sunset Shimmer;character;sunset-shimmer;7208
+88;Lightning Dust;character;lightning-dust;724
+89;Nurse Redheart;character;nurse-redheart;575
+90;Flower Ponies;character;flower-ponies;134
+91;Raindrops;character;raindrops;143
+92;Spa Ponies;character;spa-ponies;232
+93;Sunset Shimmer;character;sunset-shimmer;7322
 94;Pie Sisters;character;pie-sisters;316
-95;Cherry Jubilee;character;cherry-jubilee;64
-96;Cake Twins;character;cake-twins;323
-97;Sparkler;character;sparkler;229
-98;Flash Sentry;character;flash-sentry;1474
+95;Cherry Jubilee;character;cherry-jubilee;67
+96;Cake Twins;character;cake-twins;321
+97;Sparkler;character;sparkler;230
+98;Flash Sentry;character;flash-sentry;1522
 99;Cloudkicker;character;cloudkicker;122
 100;Mane-iac;character;maneiac;110
-101;Power Ponies;character;power-ponies;148
-102;Cheese Sandwich;character;cheese-sandwich;357
-103;Maud Pie;character;maud-pie;838
-104;Coco Pommel;character;coco-pommel;356
+101;Power Ponies;character;power-ponies;149
+102;Cheese Sandwich;character;cheese-sandwich;353
+103;Maud Pie;character;maud-pie;844
+104;Coco Pommel;character;coco-pommel;354
 105;Trenderhoof;character;trenderhoof;63
-106;Breezies;character;breezies;73
-107;Suri Polomare;character;suri-polomare;101
+106;Breezies;character;breezies;75
+107;Suri Polomare;character;suri-polomare;102
 108;Ahuizotl;character;ahuizotl;136
-109;Seabreeze;character;seabreeze;27
+109;Seabreeze;character;seabreeze;26
 110;Fleetfoot;character;fleetfoot;184
-111;Bulk Biceps;character;bulk-biceps;136
-112;Tirek;character;tirek;756
-113;Adagio Dazzle;character;adagio-dazzle;1106
-114;Sonata Dusk;character;sonata-dusk;1028
-115;Aria Blaze;character;aria-blaze;874
-116;Twilight Velvet;character;twilight-velvet;535
-117;Night Light;character;night-light;337
-118;Ms. Harshwhinny;character;ms-harshwhinny;94
-119;Screwball;character;screwball;193
-120;Romance;genre;romance;42809
-122;Dark;genre;dark;34406
-123;My Little Pony: Equestria Girls;series;equestria-girls;10432
-126;Sex;warning;sex;31238
-127;Gore;warning;gore;22359
-128;Starlight Glimmer;character;starlight-glimmer;4261
-129;Ember;character;ember;428
+111;Bulk Biceps;character;bulk-biceps;138
+112;Tirek;character;tirek;762
+113;Adagio Dazzle;character;adagio-dazzle;1110
+114;Sonata Dusk;character;sonata-dusk;1021
+115;Aria Blaze;character;aria-blaze;871
+116;Twilight Velvet;character;twilight-velvet;556
+117;Night Light;character;night-light;352
+118;Ms. Harshwhinny;character;ms-harshwhinny;95
+119;Screwball;character;screwball;192
+120;Romance;genre;romance;43097
+122;Dark;genre;dark;34609
+123;My Little Pony: Equestria Girls;series;equestria-girls;10702
+126;Sex;warning;sex;31594
+127;Gore;warning;gore;22444
+128;Starlight Glimmer;character;starlight-glimmer;4371
+129;Ember;character;ember;442
 130;Chancellor Puddinghead;character;chancellor-puddinghead;21
-131;Clover the Clever;character;clover-the-clever;96
-132;Commander Hurricane;character;commander-hurricane;46
-133;Princess Platinum;character;princess-platinum;54
+131;Clover the Clever;character;clover-the-clever;98
+132;Commander Hurricane;character;commander-hurricane;47
+133;Princess Platinum;character;princess-platinum;55
 134;Private Pansy;character;private-pansy;23
 135;Smart Cookie;character;smart-cookie;23
-136;Starswirl the Bearded;character;starswirl-the-bearded;354
-137;Blossomforth;character;blossomforth;38
-138;Button Mash;character;button-mash;358
+136;Starswirl the Bearded;character;starswirl-the-bearded;360
+137;Blossomforth;character;blossomforth;39
+138;Button Mash;character;button-mash;370
 139;Cloudchaser;character;cloudchaser;32
 140;Daisy;character;daisy;32
-141;Filthy Rich;character;filthy-rich;171
+141;Filthy Rich;character;filthy-rich;173
 142;Flitter;character;flitter;42
-143;Lily;character;lily;38
-144;Limestone Pie;character;limestone-pie;153
+143;Lily;character;lily;40
+144;Limestone Pie;character;limestone-pie;155
 145;Marble Pie;character;marble-pie;163
-146;Moondancer;character;moondancer;365
-147;Moonlight Raven;character;moonlight-raven;21
+146;Moondancer;character;moondancer;378
+147;Moonlight Raven;character;moonlight-raven;20
 148;Parcel Post;character;parcel-post;7
-149;Pony Joe;character;pony-joe;47
-150;Sassy Saddles;character;sassy-saddles;56
-151;Treehugger;character;treehugger;99
-152;Troubleshoes;character;troubleshoes;34
-153;White Lightning;character;white-lightning;14
+149;Pony Joe;character;pony-joe;49
+150;Sassy Saddles;character;sassy-saddles;55
+151;Treehugger;character;treehugger;104
+152;Troubleshoes;character;troubleshoes;35
+153;White Lightning;character;white-lightning;15
 154;Wind Rider;character;wind-rider;25
-155;Steven Magnet;character;steven-magnet;5
-156;Tantabus;character;tantabus;60
-157;The Smooze;character;the-smooze;21
-158;Dazzlings;character;the-dazzlings;746
-159;Applejack (EqG);character;applejack-eqg;417
-160;Dean Cadance;character;dean-cadance;150
-162;Indigo Zap;character;indigo-zap;75
-163;Lemon Zest;character;lemon-zest;89
-164;Micro Chips;character;micro-chips;30
-165;Midnight Sparkle;character;midnight-sparkle;126
-166;Pinkie Pie (EqG);character;pinkie-pie-eqg;417
-168;Principal Cinch;character;principal-cinch;101
-169;Rainbow Dash (EqG);character;rainbow-dash-eqg;714
-170;Principal Celestia;character;principal-celestia;438
-171;Rarity (EqG);character;rarity-eqg;509
-172;Sandalwood;character;sandalwood;22
-173;Sour Sweet;character;sour-sweet;112
-174;Spike (EqG);character;spike-eqg;228
-175;Sugarcoat;character;sugarcoat;94
-176;Sunny Flare;character;sunny-flare;73
-177;Sunset Shimmer (Demon);character;sunset-shimmer-demon;82
-178;Twilight Sparkle (EqG);character;twilight-sparkle-eqg;1546
-179;Vice-Principal Luna;character;vice-principal-luna;378
-180;Nightmare Rarity;character;nightmare-rarity;38
+155;Steven Magnet;character;steven-magnet;6
+156;Tantabus;character;tantabus;61
+157;The Smooze;character;the-smooze;23
+158;Dazzlings;character;the-dazzlings;750
+159;Applejack (EqG);character;applejack-eqg;428
+160;Dean Cadance;character;dean-cadance;157
+162;Indigo Zap;character;indigo-zap;77
+163;Lemon Zest;character;lemon-zest;87
+164;Micro Chips;character;micro-chips;41
+165;Midnight Sparkle;character;midnight-sparkle;131
+166;Pinkie Pie (EqG);character;pinkie-pie-eqg;431
+168;Principal Cinch;character;principal-cinch;102
+169;Rainbow Dash (EqG);character;rainbow-dash-eqg;725
+170;Principal Celestia;character;principal-celestia;451
+171;Rarity (EqG);character;rarity-eqg;529
+172;Sandalwood;character;sandalwood;26
+173;Sour Sweet;character;sour-sweet;114
+174;Spike (EqG);character;spike-eqg;238
+175;Sugarcoat;character;sugarcoat;96
+176;Sunny Flare;character;sunny-flare;76
+177;Sunset Shimmer (Demon);character;sunset-shimmer-demon;86
+178;Twilight Sparkle (EqG);character;twilight-sparkle-eqg;1588
+179;Vice-Principal Luna;character;vice-principal-luna;386
+180;Nightmare Rarity;character;nightmare-rarity;40
 181;Tiberius;character;tiberius;8
-182;Princess Amore;character;princess-amore;26
-183;Radiant Hope;character;radiant-hope;48
-184;Zephyr Breeze;character;zephyr-breeze;156
+182;Princess Amore;character;princess-amore;27
+183;Radiant Hope;character;radiant-hope;51
+184;Zephyr Breeze;character;zephyr-breeze;165
 185;Vapor Trail;character;vapor-trail;53
 186;Sky Stinger;character;sky-stinger;42
-187;Saffron Masala;character;saffron-masala;24
+187;Saffron Masala;character;saffron-masala;25
 188;Coriander Cumin;character;coriander-cumin;10
-189;Flurry Heart;character;flurry-heart;737
-190;Sunburst;character;sunburst;484
+189;Flurry Heart;character;flurry-heart;786
+190;Sunburst;character;sunburst;508
 191;Mr. Stripes;character;mr-stripes;1
-192;Plaid Stripes;character;plaid-stripes;5
-193;Thorax;character;thorax;534
-194;Anon;character;anon;1742
-195;Self Insert;character;self-insert;785
+192;Plaid Stripes;character;plaid-stripes;6
+193;Thorax;character;thorax;557
+194;Anon;character;anon;1801
+195;Self Insert;character;self-insert;781
 196;Yaks;character;yaks;42
-197;Bat Pony;character;bat-pony;620
-198;Griffons;character;griffons;467
+197;Bat Pony;character;bat-pony;645
+198;Griffons;character;griffons;490
 199;Minotaur;character;minotaur;51
-200;Royal Guard;character;royal-guard;582
-201;Zebra;character;zebra;224
+200;Royal Guard;character;royal-guard;607
+201;Zebra;character;zebra;241
 202;Pets;character;pets;24
-203;Dragons;character;dragons;296
+203;Dragons;character;dragons;299
 204;Twinkleshine;character;twinkleshine;65
 205;Coloratura;character;coloratura;105
-206;Gabby;character;gabby;158
-207;Fluttershy (EqG);character;fluttershy-eqg;471
-208;Spoiled Rich;character;spoiled-rich;133
+206;Gabby;character;gabby;167
+207;Fluttershy (EqG);character;fluttershy-eqg;485
+208;Spoiled Rich;character;spoiled-rich;139
 209;Sunshine Smiles;character;sunshine-smiles;12
-210;Tender Taps;character;tender-taps;45
-211;Main 7 (EqG);character;main-7-eqg;2802
-212;Shadowbolts (EqG);character;shadowbolts-eqg;324
-213;Quibble Pants;character;quibble-pants;47
-214;Timber Spruce;character;timber-spruce;92
-215;Gloriosa Daisy;character;gloriosa-daisy;65
-216;Garble;character;garble;110
+210;Tender Taps;character;tender-taps;48
+211;Main 7 (EqG);character;main-7-eqg;2846
+212;Shadowbolts (EqG);character;shadowbolts-eqg;317
+213;Quibble Pants;character;quibble-pants;48
+214;Timber Spruce;character;timber-spruce;93
+215;Gloriosa Daisy;character;gloriosa-daisy;66
+216;Garble;character;garble;111
 217;Double Diamond;character;double-diamond;63
 218;Night Glider;character;night-glider;44
-219;Sugar Belle;character;sugar-belle;117
+219;Sugar Belle;character;sugar-belle;121
 220;Party Favor;character;party-favor;39
-221;Timberwolves;character;timberwolves;82
+221;Timberwolves;character;timberwolves;83
 222;Zipporwhill;character;zipporwhill;17
-223;Ruby Pinch;character;ruby-pinch;30
+223;Ruby Pinch;character;ruby-pinch;31
 224;Svengallop;character;svengallop;23
-225;Second Person;content;second-person;2590
-226;Adventure;genre;adventure;42076
-227;Anthro;content;anthro;8584
-228;Comedy;genre;comedy;41705
-229;Crossover;content;crossover;21225
-230;Drama;genre;drama;13016
-231;Horror;genre;horror;3106
-232;Human;content;human;31106
-233;Mystery;genre;mystery;4146
-234;Random;genre;random;23186
-235;Sad;genre;sad;23767
-236;Science Fiction;genre;scifi;4424
-237;Slice of Life;genre;slice-of-life;49990
-238;Thriller;genre;thriller;2695
-239;Tragedy;genre;tragedy;13437
-240;Alternate Universe;content;alternate-universe;41178
-241;Tempest Shadow;character;tempest-shadow;670
-242;My Little Pony: The Movie;series;mlp-movie;698
-243;My Little Pony Comic;series;mlp-comic;405
+225;Second Person;content;second-person;2657
+226;Adventure;genre;adventure;42489
+227;Anthro;content;anthro;8742
+228;Comedy;genre;comedy;42012
+229;Crossover;content;crossover;21460
+230;Drama;genre;drama;13356
+231;Horror;genre;horror;3226
+232;Human;content;human;31445
+233;Mystery;genre;mystery;4261
+234;Random;genre;random;23207
+235;Sad;genre;sad;23857
+236;Science Fiction;genre;scifi;4539
+237;Slice of Life;genre;slice-of-life;50487
+238;Thriller;genre;thriller;2789
+239;Tragedy;genre;tragedy;13460
+240;Alternate Universe;content;alternate-universe;41801
+241;Tempest Shadow;character;tempest-shadow;681
+242;My Little Pony: The Movie;series;mlp-movie;718
+243;My Little Pony Comic;series;mlp-comic;427
 244;Everyone;rating;everyone;40381
 245;Teen;rating;teen;52766
 246;Mature;rating;mature;21024
-249;Harry Potter;series;harry-potter-series;94
-250;Doctor Who;series;doctor-who-series;123
-251;Metroid;series;metroid-series;11
-252;Mario;series;mario-series;74
-253;The Legend of Zelda;series;zelda-series;52
-254;Lord of the Rings;series;lord-of-the-rings;25
+249;Harry Potter;series;harry-potter-series;96
+250;Doctor Who;series;doctor-who-series;127
+251;Metroid;series;metroid-series;12
+252;Mario;series;mario-series;78
+253;The Legend of Zelda;series;zelda-series;51
+254;Lord of the Rings;series;lord-of-the-rings;24
 255;Hunger Games;series;hunger-games;13
 256;Avatar: The Last Airbender;series;avatar-the-last-airbender;14
-257;Teen Titans;series;teen-titans;24
-258;Transformers;series;transformers;95
+257;Teen Titans;series;teen-titans;23
+258;Transformers;series;transformers;100
 259;Danny Phantom;series;danny-phantom;18
 260;Young Justice;series;young-justice;5
 261;South Park;series;south-park;5
-262;Teenage Mutant Ninja Turtles;series;teenage-mutant-ninja-turtles;75
+262;Teenage Mutant Ninja Turtles;series;teenage-mutant-ninja-turtles;91
 263;X-Men;series;x-men;15
 264;Legend of Korra;series;legend-of-korra;9
 265;Invader Zim;series;invader-zim;2
-266;Gravity Falls;series;gravity-falls;67
-267;Kim Possible;series;kim-possible-series;2
-268;Adventure Time;series;adventure-time;10
-269;Powerpuff Girls;series;powerpuff-girls;6
+266;Gravity Falls;series;gravity-falls;68
+267;Kim Possible;series;kim-possible-series;3
+268;Adventure Time;series;adventure-time;13
+269;Powerpuff Girls;series;powerpuff-girls;7
 270;Code Lyoko;series;code-lyoko;3
 271;Steven Universe;series;steven-universe;44
-272;Phineas and Ferb;series;phineas-and-ferb;8
-273;Ben 10;series;ben-10;35
+272;Phineas and Ferb;series;phineas-and-ferb;9
+273;Ben 10;series;ben-10;38
 274;Hey Arnold;series;hey-arnold;1
-275;Winx Club;series;winx-club;10
+275;Winx Club;series;winx-club;11
 276;Codename: Kids Next Door;series;codename-kids-next-door;4
 277;Ed, Edd n Eddy;series;ed-edd-n-eddy;5
-278;Star Wars;series;star-wars;167
-279;Avengers;series;avengers;84
+278;Star Wars;series;star-wars;175
+279;Avengers;series;avengers;90
 280;Pirates of the Carribean;series;pirates-of-the-carribean;5
 281;High School Musical;series;high-school-musical;1
-282;How to Train Your Dragon;series;how-to-train-your-dragon;12
+282;How to Train Your Dragon;series;how-to-train-your-dragon;13
 283;Rise of the Guardians;series;rise-of-the-guardians;1
-284;Star Trek;series;star-trek;61
-285;Thor;series;thor-series;5
+284;Star Trek;series;star-trek;59
+285;Thor;series;thor-series;6
 286;Frozen;series;frozen;4
 287;Labyrinth;series;labyrinth;0
-288;Batman;series;batman-series;56
+288;Batman;series;batman-series;60
 289;Captain America;series;captain-america-series;5
 290;Camp Rock;series;camp-rock;0
 291;Supernatural;series;supernatural;16
 292;Glee;series;glee;0
 293;Sherlock;series;sherlock;5
 294;Buffy: The Vampire Slayer;series;buffy-the-vampire-slayer;2
-295;Game of Thrones;series;game-of-thrones;6
+295;Game of Thrones;series;game-of-thrones;8
 296;Stargate;series;stargate;9
-297;Walking Dead;series;walking-dead;10
-298;Pok�mon;series;pokemon;237
-299;Kingdom Hearts;series;kingdom-hearts;76
-300;Sonic the Hedgehog;series;sonic-series;156
-301;Mass Effect;series;mass-effect;35
-302;Halo;series;halo;69
+297;Walking Dead;series;walking-dead;11
+298;Pok�mon;series;pokemon;247
+299;Kingdom Hearts;series;kingdom-hearts;81
+300;Sonic the Hedgehog;series;sonic-series;170
+301;Mass Effect;series;mass-effect;33
+302;Halo;series;halo;77
 303;Final Fantasy;series;final-fantasy;47
-304;The Elder Scrolls;series;the-elder-scrolls;64
+304;The Elder Scrolls;series;the-elder-scrolls;69
 305;Assassin's Creed;series;assassins-creed;20
-306;Five Nights at Freddy's;series;five-nights-at-freddys;65
-307;Warhammer;series;warhammer;113
-308;Undertale;series;undertale;105
-309;Devil May Cry;series;devil-may-cry;29
-310;Super Smash Brothers;series;super-smash-brothers;17
-311;Fallout;series;fallout;585
+306;Five Nights at Freddy's;series;five-nights-at-freddys;64
+307;Warhammer;series;warhammer;121
+308;Undertale;series;undertale;107
+309;Devil May Cry;series;devil-may-cry;32
+310;Super Smash Brothers;series;super-smash-brothers;18
+311;Fallout;series;fallout;633
 312;Persona;series;persona;36
-313;Resident Evil;series;resident-evil;23
-314;Dragon Age;series;dragon-age;4
+313;Resident Evil;series;resident-evil;22
+314;Dragon Age;series;dragon-age;7
 315;Fire Emblem;series;fire-emblem;13
-316;Minecraft;series;minecraft;32
+316;Minecraft;series;minecraft;34
 317;Touhou;series;touhou;14
-318;Dark Souls;series;dark-souls;47
-319;Dragon Ball Z;series;dragon-ball-z;121
-320;Bleach;series;bleach;11
-321;Non-consensual;warning;non-consensual;1954
-322;Narcotics;warning;narcotics;1482
-323;Fetish;warning;fetish;5984
-324;Violence;warning;violence;10508
-326;Suicide / Self Harm;warning;suicide-self-harm;1723
-327;Death;warning;death;7807
-328;Porn;genre;porn;7736
-329;Profanity;warning;profanity;9968
-331;Naruto;series;naruto;55
+318;Dark Souls;series;dark-souls;50
+319;Dragon Ball Z;series;dragon-ball-z;131
+320;Bleach;series;bleach;14
+321;Non-consensual;warning;non-consensual;2037
+322;Narcotics;warning;narcotics;1538
+323;Fetish;warning;fetish;6226
+324;Violence;warning;violence;11013
+326;Suicide / Self Harm;warning;suicide-self-harm;1794
+327;Death;warning;death;8177
+328;Porn;genre;porn;8055
+329;Profanity;warning;profanity;10435
+331;Naruto;series;naruto;54
 332;Inuyasha;series;inuyasha;1
-333;Yu-Gi-Oh;series;yu-gi-oh;124
-334;Fairy Tail;series;fairy-tail;23
+333;Yu-Gi-Oh;series;yu-gi-oh;127
+334;Fairy Tail;series;fairy-tail;26
 335;Fullmetal Alchemist;series;fullmetal-alchemist;10
-336;Digimon;series;digimon;48
-337;Sailor Moon;series;sailor-moon;11
-338;One Piece;series;one-piece;27
+336;Digimon;series;digimon;50
+337;Sailor Moon;series;sailor-moon;12
+338;One Piece;series;one-piece;28
 339;Death Note;series;death-note;4
 340;Gundam Wing;series;gundam-wing;5
 341;Cardcaptor Sakura;series;cardcaptor-sakura;2
-344;A Song of Ice and Fire;series;a-song-of-ice-and-fire;3
+344;A Song of Ice and Fire;series;a-song-of-ice-and-fire;5
 348;Harvest Moon;series;harvest-moon;0
 349;Ace Attorney;series;ace-attorney;14
-351;Warcraft;series;warcraft;52
-353;Mega Man;series;mega-man-series;20
+351;Warcraft;series;warcraft;53
+353;Mega Man;series;mega-man-series;21
 354;Tales of Symphonia;series;tales-of-symphonia;0
-355;League of Legends;series;league-of-legends;24
+355;League of Legends;series;league-of-legends;26
 357;Tekken;series;tekken;1
-358;Left 4 Dead;series;left-4-dead;4
-359;Team Fortress;series;team-fortress;37
+358;Left 4 Dead;series;left-4-dead;5
+359;Team Fortress;series;team-fortress;39
 360;Star Fox;series;star-fox;12
-361;Silent Hill;series;silent-hill;13
+361;Silent Hill;series;silent-hill;15
 362;Golden Sun;series;golden-sun;1
-363;Spyro the Dragon;series;spyro-the-dragon-series;25
+363;Spyro the Dragon;series;spyro-the-dragon-series;29
 364;Portal;series;portal;13
-365;Overwatch;series;overwatch;13
+365;Overwatch;series;overwatch;14
 366;Jak and Daxter;series;jak-and-daxter;4
 367;Dynasty Warriors;series;dynasty-warriors;1
 368;Call of Duty;series;call-of-duty;19
-369;Mortal Kombat;series;mortal-kombat;18
-370;Metal Gear;series;metal-gear;18
+369;Mortal Kombat;series;mortal-kombat;19
+370;Metal Gear;series;metal-gear;21
 371;Professor Layton;series;professor-layton;1
 372;Life is Strange;series;life-is-strange;4
-373;Kirby;series;kirby-series;21
+373;Kirby;series;kirby-series;22
 374;Tales of the Abyss;series;tales-of-the-abyss;0
 375;Starcraft;series;starcraft;19
 376;Grand Theft Auto;series;grand-theft-auto;11
-377;Bioshock;series;bioshock;12
+377;Bioshock;series;bioshock;16
 378;The World Ends With You;series;the-world-ends-with-you;4
-379;Queen Novo;character;queen-novo;68
-380;Princess Skystar;character;princess-skystar;76
-381;Captain Celaeno;character;captain-celaeno;50
+379;Queen Novo;character;queen-novo;72
+380;Princess Skystar;character;princess-skystar;82
+381;Captain Celaeno;character;captain-celaeno;52
 382;Songbird Serenade;character;songbird-serenade;35
-383;Grubber;character;grubber;55
-384;Storm King;character;storm-king;91
-385;Capper;character;capper;66
-386;Crackle;character;crackle;4
-387;Windy Whistles;character;windy-whistles;102
-388;Bow Hothoof;character;bow-hothoof;73
-389;Pear Butter;character;pear-butter;139
-390;Bright Mac;character;bright-mac;95
-391;Pharynx;character;pharynx;208
-392;Star Tracker;character;star-tracker;20
-393;Somnambula;character;somnambula;51
-394;Flash Magnus;character;flash-magnus;33
-395;Rockhoof;character;rockhoof;29
-396;Meadowbrook;character;meadowbrook;30
+383;Grubber;character;grubber;53
+384;Storm King;character;storm-king;93
+385;Capper;character;capper;69
+386;Crackle;character;crackle;5
+387;Windy Whistles;character;windy-whistles;106
+388;Bow Hothoof;character;bow-hothoof;76
+389;Pear Butter;character;pear-butter;149
+390;Bright Mac;character;bright-mac;103
+391;Pharynx;character;pharynx;222
+392;Star Tracker;character;star-tracker;21
+393;Somnambula;character;somnambula;52
+394;Flash Magnus;character;flash-magnus;37
+395;Rockhoof;character;rockhoof;31
+396;Meadowbrook;character;meadowbrook;31
 397;Mistmane;character;mistmane;16
-398;Sphinx;character;sphinx;30
-399;The Pillars;character;the-pillars;69
+398;Sphinx;character;sphinx;32
+399;The Pillars;character;the-pillars;75
 400;Kettle Corn;character;kettle-corn;9
-401;Toola Roola;character;toola-roola;19
+401;Toola Roola;character;toola-roola;21
 402;Coconut Cream;character;coconut-cream;13
 403;Gaea Everfree;character;gaea-everfree;11
 404;Chip Cutter;character;chip-cutter;2
-405;Lemon Hearts;character;lemon-hearts;44
+405;Lemon Hearts;character;lemon-hearts;45
 406;Daydream Shimmer;character;daydream-shimmer;13
-407;Feather Bangs;character;feather-bangs;48
-408;XCOM;series;xcom;17
-409;Anthology;genre;anthology;845
-410;Juniper Montage;character;juniper-montage;61
-411;Stygian;character;stygian;56
-412;Pony of Shadows;character;pony-of-shadows;38
+407;Feather Bangs;character;feather-bangs;50
+408;XCOM;series;xcom;18
+409;Anthology;genre;anthology;874
+410;Juniper Montage;character;juniper-montage;62
+411;Stygian;character;stygian;58
+412;Pony of Shadows;character;pony-of-shadows;43
 413;Half Life;series;half-life;19
-414;Wallflower Blush;character;wallflower-blush;381
-415;Strawberry Sunrise;character;strawberry-sunrise;37
-416;Raven Inkwell;character;raven-inkwell;100
-417;Gallus;character;gallus;409
-418;Ocellus;character;ocellus;266
-419;Sandbar;character;sandbar;212
-420;Silverstream;character;silverstream;253
-421;Smolder;character;smolder;324
-422;Yona;character;yona;107
-423;Chancellor Neighsay;character;chancellor-neighsay;71
+414;Wallflower Blush;character;wallflower-blush;400
+415;Strawberry Sunrise;character;strawberry-sunrise;38
+416;Raven Inkwell;character;raven-inkwell;109
+417;Gallus;character;gallus;425
+418;Ocellus;character;ocellus;289
+419;Sandbar;character;sandbar;220
+420;Silverstream;character;silverstream;271
+421;Smolder;character;smolder;346
+422;Yona;character;yona;109
+423;Chancellor Neighsay;character;chancellor-neighsay;77
 424;Prototype;series;prototype;35
-425;Mud Briar;character;mud-briar;28
-426;Percy Jackson and the Olympians;series;percy-jackson;4
+425;Mud Briar;character;mud-briar;30
+426;Percy Jackson and the Olympians;series;percy-jackson;5
 427;Grace Manewitz;character;grace-manewitz;2
 428;Zootopia;series;zootopia;1
 429;TRON;series;tron;2
-430;Dungeons and Dragons;series;dungeons-and-dragons;92
-431;Jack Pot;character;jack-pot;18
-432;Stellar Flare;character;stellar-flare;52
-433;Firelight;character;firelight;43
-434;Terramar;character;terramar;44
-435;Sky Beak;character;sky-beak;20
+430;Dungeons and Dragons;series;dungeons-and-dragons;98
+431;Jack Pot;character;jack-pot;19
+432;Stellar Flare;character;stellar-flare;53
+433;Firelight;character;firelight;46
+434;Terramar;character;terramar;49
+435;Sky Beak;character;sky-beak;21
 436;Ocean Flow;character;ocean-flow;18
-437;Petunia Paleo;character;petunia-paleo;19
+437;Petunia Paleo;character;petunia-paleo;20
 438;Dr. Caballeron;character;dr-caballeron;39
-439;Cloudy Quartz;character;cloudy-quartz;55
-440;Igneous Rock;character;igneous-rock;44
-444;Cozy Glow;character;cozy-glow;586
+439;Cloudy Quartz;character;cloudy-quartz;65
+440;Igneous Rock;character;igneous-rock;50
+444;Cozy Glow;character;cozy-glow;596
 445;Vocaloid;series;vocaloid;3
-446;Vignette Valencia;character;vignette-valencia;39
-447;Daybreaker;character;daybreaker;180
-448;Young Six;character;young-six;479
+446;Vignette Valencia;character;vignette-valencia;41
+447;Daybreaker;character;daybreaker;188
+448;Young Six;character;young-six;517
 449;Overlord;series;overlord;10
-450;Autumn Blaze;character;autumn-blaze;124
-451;Destiny;series;destiny;35
-452;Monster Hunter;series;monster-hunter;27
+450;Autumn Blaze;character;autumn-blaze;137
+451;Destiny;series;destiny;37
+452;Monster Hunter;series;monster-hunter;28
 453;Prince Rutherford;character;prince-rutherford;14
 454;She-Ra;series;she-ra;7
-455;Danganronpa;series;danganronpa;13
-456;Grogar;character;grogar;148
-457;Grand Pear;character;grand-pear;12
-458;Petunia Petals;character;petunia-petals;10
+455;Danganronpa;series;danganronpa;14
+456;Grogar;character;grogar;160
+457;Grand Pear;character;grand-pear;13
+458;Petunia Petals;character;petunia-petals;9
 459;Barrel Twins;character;barrel-twins;10
 460;Mr. Hoofington;character;mr-hoofington;2
 461;Mrs. Hoofington;character;mrs-hoofington;1
-462;Mayor Sunny Skies;character;mayor-sunny-skies;17
+462;Mayor Sunny Skies;character;mayor-sunny-skies;16
 463;Torque Wrench;character;torque-wrench;13
 464;Kerfuffle;character;kerfuffle;32
 465;Moody Root;character;moody-root;1
-466;Wind Sprint;character;wind-sprint;14
+466;Wind Sprint;character;wind-sprint;15
 467;Aunt Lofty;character;aunt-lofty;17
 468;Aunt Holiday;character;aunt-holiday;24
 469;Mr. Shy;character;mr-shy;20
-470;Mrs. Shy;character;mrs-shy;32
-471;Them's Fightin' Herds;series;thems-fightin-herds;23
-472;Cherry Berry;character;cherry-berry;22
+470;Mrs. Shy;character;mrs-shy;35
+471;Them's Fightin' Herds;series;thems-fightin-herds;28
+472;Cherry Berry;character;cherry-berry;25
 473;Rick and Morty;series;rick-and-morty;9
-474;Luster Dawn;character;luster-dawn;158
-475;Lil' Cheese;character;lil-cheese;42
-476;Kirins;character;kirins;71
-477;Deer;character;deer;35
-478;Abyssinians;character;abyssinians;11
-479;Buffalo;character;buffalo;5
-480;Seaponies;character;seaponies;19
-481;Hippogriffs;character;hippogriffs;30
+474;Luster Dawn;character;luster-dawn;164
+475;Lil' Cheese;character;lil-cheese;43
+476;Kirins;character;kirins;87
+477;Deer;character;deer;37
+478;Abyssinians;character;abyssinians;12
+479;Buffalo;character;buffalo;7
+480;Seaponies;character;seaponies;22
+481;Hippogriffs;character;hippogriffs;36
 482;Shadowbolts;character;shadowbolts;7
-483;Snap Shutter;character;snap-shutter;14
-484;Mane Allgood;character;mane-allgood;12
+483;Snap Shutter;character;snap-shutter;13
+484;Mane Allgood;character;mane-allgood;11
 485;Tokyo Ghoul;series;tokyo-ghoul;2
-486;Fate/stay night;series;fate-stay-night;4
+486;Fate/stay night;series;fate-stay-night;5
 487;Star vs. the Forces of Evil;series;star-vs-the-forces-of-evil;5
 488;Ghost Recon;series;ghost-recon;2
-489;The Division;series;the-division;3
+489;The Division;series;the-division;5
 490;Attack on Titan;series;attack-on-titan;13
 491;Hayseed Turnip Truck;character;hayseed-turnip-truck;1
-492;SCP Foundation;series;scp-foundation;28
+492;SCP Foundation;series;scp-foundation;31
 493;Pony Life;series;pony-life;26
 494;Ranma \\u00bd;series;ranma-;4
-495;Sea Swirl;character;sea-swirl;11
+495;Sea Swirl;character;sea-swirl;13
 496;Sassaflash;character;sassaflash;10
 497;BattleTech;series;battletech;4
-498;Kamen Rider;series;kamen-rider;57
+498;Kamen Rider;series;kamen-rider;71
 499;Clear Sky;character;clear-sky;8
-500;RWBY;series;rwby;21
+500;RWBY;series;rwby;26
 501;Gladmane;character;gladmane;7
 502;Potion Nova;character;potion-nova;8
-503;Minty;character;minty;23
-504;Magic: The Gathering;series;magic-the-gathering;16
+503;Minty;character;minty;25
+504;Magic: The Gathering;series;magic-the-gathering;17
 505;Goldengrape;character;goldengrape;2
-506;Pistachio;character;pistachio;6
-507;Fiddlesticks;character;fiddlesticks;44
-508;Power Rangers;series;power-rangers;35
-509;Honor Harrington;series;honor-harrington;0
-510;Boulder;character;boulder;13
+506;Pistachio;character;pistachio;9
+507;Fiddlesticks;character;fiddlesticks;51
+508;Power Rangers;series;power-rangers;42
+509;Honor Harrington;series;honor-harrington;1
+510;Boulder;character;boulder;14
 511;Glenda;character;glenda;2
-512;Deadpool;series;deadpool;2
-513;Nurse Snowheart;character;nurse-snowheart;0
+512;Deadpool;series;deadpool;3
+513;Nurse Snowheart;character;nurse-snowheart;1
 514;Nurse Tenderheart;character;nurse-tenderheart;3
-515;Nurse Sweetheart;character;nurse-sweetheart;4
-516;Hitch Trailblazer;character;hitch-trailblazer;261
-517;Izzy Moonbow;character;izzy-moonbow;311
-518;Sunny Starscout;character;sunny-starscout;384
-519;My Hero Academia;series;my-hero-academia;14
+515;Nurse Sweetheart;character;nurse-sweetheart;5
+516;Hitch Trailblazer;character;hitch-trailblazer;300
+517;Izzy Moonbow;character;izzy-moonbow;352
+518;Sunny Starscout;character;sunny-starscout;437
+519;My Hero Academia;series;my-hero-academia;19
 520;Apple Dumpling;character;apple-dumpling;1
 521;Phyllis;character;phyllis;8
-522;Pound Cake;character;pound-cake;12
-523;Pumpkin Cake;character;pumpkin-cake;15
-524;Sweet Pepper;character;sweet-pepper;3
+522;Pound Cake;character;pound-cake;14
+523;Pumpkin Cake;character;pumpkin-cake;18
+524;Sweet Pepper;character;sweet-pepper;4
 525;Stranger Things;series;stranger-things;1
-526;Apple Fritter;character;apple-fritter;4
-527;JoJo\\u2019s Bizarre Adventure;series;jojos-bizarre-adventure;12
-528;Pipp Petals;character;pipp-petals;238
-529;Zipp Storm;character;zipp-storm;245
-530;Queen Haven;character;queen-haven;38
-531;My Little Pony: A New Generation;series;mlp-g5;708
-532;Alphabittle;character;alphabittle;22
-533;Sprout;character;sprout;63
-536;Phyllis Cloverleaf;character;phyllis-cloverleaf;15
+526;Apple Fritter;character;apple-fritter;5
+527;JoJo\\u2019s Bizarre Adventure;series;jojos-bizarre-adventure;14
+528;Pipp Petals;character;pipp-petals;282
+529;Zipp Storm;character;zipp-storm;282
+530;Queen Haven;character;queen-haven;57
+531;My Little Pony: A New Generation;series;mlp-g5;868
+532;Alphabittle;character;alphabittle;30
+533;Sprout;character;sprout;70
+536;Phyllis Cloverleaf;character;phyllis-cloverleaf;20
 537;Sugar Moonlight;character;sugar-moonlight;5
 538;Dazzle Feather;character;dazzle-feather;2
-539;Argyle Starshine;character;argyle-starshine;23
-540;Lighthoof;character;lighthoof;3
-541;Shimmy Shake;character;shimmy-shake;5
-542;Windigos;character;windigos;3
-543;Super Sentai;series;super-sentai;2
+539;Argyle Starshine;character;argyle-starshine;31
+540;Lighthoof;character;lighthoof;4
+541;Shimmy Shake;character;shimmy-shake;6
+542;Windigos;character;windigos;6
+543;Super Sentai;series;super-sentai;7
 544;Splatoon;series;splatoon;1
-545;Thunder Zephyrwing;character;thunder-zephyrwing;4
-546;Zoom Zephyrwing;character;zoom-zephyrwing;5
-547;Miraculous Ladybug;series;miraculous-ladybug;2
+545;Thunder Zephyrwing;character;thunder-zephyrwing;6
+546;Zoom Zephyrwing;character;zoom-zephyrwing;6
+547;Miraculous Ladybug;series;miraculous-ladybug;4
 548;The Worst Witch;series;the-worst-witch;0
 549;Torch Song;character;torch-song;0
 550;Cherry Mango;character;cherry-mango;1
-551;Oasis Breeze;character;oasis-breeze;0
+551;Oasis Breeze;character;oasis-breeze;1
 552;Prey;series;prey;1
 553;Brave;series;brave;0
 554;Spintires Series;series;spintires;2
-555;Ninjago;series;ninjago;2
+555;Ninjago;series;ninjago;5
 556;Looney Tunes;series;looney-tunes;0
-557;Mane 5;character;mane-5;10
-558;Opaline;character;opaline;4
-559;Misty;character;misty;2
+557;Mane 5;character;mane-5;56
+558;Opaline;character;opaline;36
+559;Misty;character;misty;46
+560;Tom;character;tom;0
+561;Pippsqueaks;character;pippsqueaks;3
+562;Posey Bloom;character;posey-bloom;4
+563;Indiana Jones;series;indiana-jones;1
+564;Bluey;series;bluey;0
+565;Breaking Bad;series;breaking-bad;0

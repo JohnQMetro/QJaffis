@@ -45,7 +45,7 @@ class jfMultiMatchEditor : public jfExprEditBase {
     jfMultiMatchSource* getMatchData() const;
     virtual bool CheckExpr(const QString& inexpr,bool& outempty,QString& outmessage) const;
   protected slots:
-    void HandleMissReport();
+    void HandleMissReport(bool value);
   protected:
     void SetupMissInput(bool yes);
 

@@ -3,7 +3,7 @@ Name    : ffncatthread.cpp
 Basic   : Fanfiction.Net category downloading
 Author  : John Q Metro
 Started : July 21, 2016
-Updated : September 25, 2022
+Updated : April 7, 2023 (fixed update bug)
 
 ******************************************************************************/
 #ifndef FFNCATTHREAD_H
@@ -73,6 +73,7 @@ void jfFFN_CategoryDownloader::StartProcessing() {
   size_t esec_count = (updatemode)?4:3;
   size_t seccount = jfFFN_SECDATA::scount + esec_count;
   emit SendSectionCount(seccount);
+
   // downloading non-crossover sections
   bool xresult = DoSections(false);
   /**/tLogB(fname,3,xresult);
@@ -156,7 +157,7 @@ bool jfFFN_CategoryDownloader::DoSections(bool iscrossover) {
   url_page_index = result_page_index = 0;
   // doing it
   /**/tLog(fname,5);
-  SetupWorkers(false);
+  // SetupWorkers(false);
   bool do_result = xLoopGet();
   /**/tLogB(fname,6,do_result);
   ClearWorkers(true);
@@ -275,6 +276,7 @@ void jfFFN_CategoryDownloader::DisposeResults(void* resultdata) {
   else assert(false);
 }
 //-----------------------------------
+/* 'Item Info' is stuff that is sent to GUI widgets before we fetch the page. */
 void jfFFN_CategoryDownloader::PrepareItemInfo(size_t pageIndex) {
   infoToSend.item_index = pageIndex;
   infoToSend.startaction = "Doing";
@@ -298,60 +300,59 @@ void jfFFN_CategoryDownloader::PrepareItemInfo(size_t pageIndex) {
 }
 //-----------------------------------
 bool jfFFN_CategoryDownloader::advanceFetchIndex() {
-  const QString fname = "jfFFN_CategoryDownloader::advanceFetchIndex";
-  bool updatable = false;
-  bool done;
-  // the usual case
-  if ( phase < 3 ) url_page_index++;
-  // phase 3 updating
-  else if (updatemode) {
-    while (!updatable) {
-      url_page_index++;
-      if (url_page_index > pagecount) break;
-      done = category_data->NextUrlIndex(csection_index,updatable);
-      if (!done) break;
+    const QString fname = "jfFFN_CategoryDownloader::advanceFetchIndex";
+    bool updatable = false;
+    bool is_valid;
+    // the usual case
+    if ( phase < 3 ) url_page_index++;
+    // phase 3 updating
+    else if (updatemode) {
+        while (!updatable) {
+            url_page_index++;
+            if (url_page_index > pagecount) break;
+            is_valid = category_data->NextUrlIndex(csection_index,updatable);
+            if (!is_valid) break;
+        }
     }
-    if (url_page_index > pagecount) {
-      url_page_index = pagecount;
-      return false;
+    // phase 3 non-updating
+    else {
+        url_page_index++;
+        category_data->NextUrlIndex(csection_index);
     }
-    // if (!done) ???
-  }
-  // phase 3 non-updating
-  else {
-    url_page_index++;
-    category_data->NextUrlIndex(csection_index);
-  }
-  return true;
+    return true;
 }
 //-----------------------------------
 bool jfFFN_CategoryDownloader::advanceResultIndex() {
-  const QString fname = "jfFFN_CategoryDownloader::advanceResultIndex";
-  bool testres;
-  if ((!updatemode) || (phase < 3)) {
-    result_page_index++;
-    category_data->NextIndex();
-  }
-  else {
-    size_t skip_quantity = 0;
-    while (true) {
-      result_page_index++;
-      skip_quantity++;
-      if (result_page_index > pagecount) break;
-      category_data->NextIndex();
-      if (category_data->UpdatableAtIndex()) break;
-      // if not updatable, copy old data to new...
-      testres = category_data->CopyDataAtIndex();
-      assert(testres);
+    // The young justice error happens in this method, it returns false.
+    const QString fname = "jfFFN_CategoryDownloader::advanceResultIndex";
+    bool testres;
+    if ((!updatemode) || (phase < 3)) {
+        result_page_index++;
+        category_data->NextIndex();
     }
-    skip_quantity--;
-    if (skip_quantity>0) emit SendSkippedPages(skip_quantity);
-    if (result_page_index > pagecount) {
-      result_page_index = pagecount;
-      return false;
+    else {
+        size_t skip_quantity = 0;
+        while (true) {
+            result_page_index++;
+            skip_quantity++;
+            if (result_page_index > pagecount) {
+                break;
+            }
+            category_data->NextIndex();
+            // QString name1 = category_data->NameAtIndex();
+            if (category_data->UpdatableAtIndex()) break;
+            // if not updatable, copy old data to new...
+            testres = category_data->CopyDataAtIndex();
+            assert(testres);
+        }
+        skip_quantity--;
+        if (skip_quantity>0) emit SendSkippedPages(skip_quantity);
+        if (result_page_index > pagecount) {
+            result_page_index = pagecount;
+            return false;
+        }
     }
-  }
-  return true;
+    return true;
 }
 //-----------------------------------
 jfPageParserBase* jfFFN_CategoryDownloader::makeParser() {

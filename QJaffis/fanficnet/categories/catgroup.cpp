@@ -229,6 +229,11 @@ QString jfFFN_Categories::NameAtIndex() const {
   else assert(false);
   return xres;
 }
+// ---------------------------------
+QString jfFFN_Categories::NameAtUrlIndex(size_t section_index) const {
+    if (section_index >= jfFFN_SECDATA::scount) return "";
+    return cross_sections[section_index]->NameAtUrlIndex();
+}
 //----------------
 bool jfFFN_Categories::UpdatableAtIndex() const {
   if (phase==3) {
@@ -258,7 +263,10 @@ bool jfFFN_Categories::NextUrlIndex(size_t section_index, bool& updatable) {
   if (section_index >= jfFFN_SECDATA::scount) return false;
   return cross_sections[section_index]->NextUrlIndex(updatable);
 }
-
+//-------------------------------
+size_t jfFFN_Categories::CrossoverIndex() const {
+    return cidx;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++
 // item info
 //--------------------
@@ -423,7 +431,8 @@ bool jfFFN_Categories::CopyDataAtIndex() {
   // here, there is no update, so we copy the old data over...
   ccat_name = cross_sections[sidx]->NameAtIndex(false);
   copy_data = NULL;
-  tres = (old_data->cross_sections)[sidx]->GetIntegratedCopyByName(ccat_name,copy_data,cross_store);
+  jfFFN_CrossoverSection* old_section = (old_data->cross_sections)[sidx];
+  tres = old_section->GetIntegratedCopyByName(ccat_name,copy_data,cross_store);
   if (!tres) return false;
   tres = cross_sections[sidx]->InsertGroupAtIndex(copy_data);
   return tres;

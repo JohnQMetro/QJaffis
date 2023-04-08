@@ -114,8 +114,6 @@ void jfFFNItemParser::ParseDownloadedPage(const QString& inPage, size_t pageinde
             temp.item = temp_fic;
             temp.flags = new jfItemMetaFlags();
             page_results->push_back(temp);
-            // adding
-            page_results->push_back(temp);
             if (newfic) temp.flags->ustatus = jfUpdateStatus::NEW;
             parser->Clear();
         }

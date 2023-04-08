@@ -134,7 +134,7 @@ bool jfDateRangePanel::MakeBlock(bool from) {
   QHBoxLayout* thesizer;
   QDateEdit*  thedatepicker;
   QDate mindate = QDate(1969,1,1);
-  QDate startdate = QDate(2020,1,1);
+  QDate startdate = QDate(2050,1,1);
   // doing it
   thesizer = new QHBoxLayout();
   thedatepicker = new QDateEdit();

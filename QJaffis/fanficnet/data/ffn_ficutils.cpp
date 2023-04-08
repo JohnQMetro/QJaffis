@@ -23,7 +23,7 @@ jfFFNItemOutputter::jfFFNItemOutputter(const jfDisplayHTMLHelper* in_html_helper
 // +++++++++++++++++++++++++++++++++++++++
 void jfFFNItemOutputter::SetItemSource(const jfSearchResultItem* in_source, const jfItemMetaFlags* in_flags) {
     assert(in_source != NULL);
-    assert(in_source->GetTypeLabel() == jfFFNItemCore::FFN_CORE_TYPE_ID);
+    assert((in_source->GetTypeLabels()).contains(jfFFNItemCore::FFN_CORE_TYPE_ID));
     ffn_fanfic = dynamic_cast<const jfFFNItemCore*>(in_source);
     fanfic_source = dynamic_cast<const jfGenericFanfic*>(in_source);
     source = in_source;
