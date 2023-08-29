@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines the custom first panel for fimfiction.net group searching
 Created :   August 10, 2013
 Conversion to Qt Started August 3, 2015
-Updated :   August 4, 2015
+Updated :   August 5, 2023
 ******************************************************************************/
 #ifndef FIMGROUP_PANEL1_H_INCLUDED
   #include "fimgroup_panel1.h"
@@ -47,9 +47,8 @@ bool jfFIMGroup_DFE::SaveFiltersExtended() {
   jfFIMGroupSCFilter* storycount_filter;
   size_t oindex;
   // getting data
-  storycount_filter = new jfFIMGroupSCFilter();
+  storycount_filter = new jfFIMGroupSCFilter(DEF_fimgstoryc_name);
   storycount_filter->SetValues(sc_filedit->GetMin(),sc_filedit->GetMax());
-  storycount_filter->SetName(DEF_fimgstoryc_name);
   embedded_filters->ReplaceSame(storycount_filter,oindex);
   return true;
 }

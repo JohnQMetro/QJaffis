@@ -4,7 +4,7 @@
 // Purpose :    Declares global filter map groupings and associated stuff
 // Created:     01.08.06
 // Conversion to QT Started April 9, 2013
-// Updated:     Febuary 19, 2012
+// Updated:     April 5, 2023 (re-basing)
 /////////////////////////////////////////////////////////////////////////////
 // headers
 // ----------------------------------------------------------------------------
@@ -14,13 +14,18 @@
   #include "../structs/basecollect.h"
 #endif // BASECOLLECT_H_INCLUDED
 
+/*
 #ifndef JFBASEFILTER
   #include "filterbase.h"
 #endif
+*/
 
 #ifndef EXPRESSION_H
   #include "base/expression.h"
 #endif // EXPRESSION_H
+
+#include "base/basefilter.h"
+#include "filtermap.h"
 
 // ----------------------------------------------------------------------------
 #include <map>
@@ -28,14 +33,14 @@
 // forward declarations
 class jfMapOfFiltermaps;
 //============================================================================
-jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname);
+// jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname);
 //===========================================================================
 // the following class serves as a sort of pointer for a specific filter,
 // as well as it's context
 class jfFilterPointer{
   friend class jfMapOfFiltermaps;
   public:
-    jfBaseFilter* filter;
+    jfFilterBase* filter;
     // public methods
     QString GetMapName() const;
     bool CheckForName(const QString& fname) const;

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares some base class for filter diting
 Created :   September 10, 2012
 Conversion to Qt Started October 18, 2013
-Updated :   December 27, 2021 (Changing Orientation filter to tags)
+Updated :   August 12, 2023
 ******************************************************************************/
 #ifndef AO3_SPECIAL1_H_INCLUDED
   #include "ao3_special1.h"
@@ -27,8 +27,8 @@ Updated :   December 27, 2021 (Changing Orientation filter to tags)
 /*****************************************************************************/
 const QString ratinglist[] = { "General","Teen","Mature","Explicit","Unspecified"};
 //=============================================================================
-jfAO3_RatingFilterEditor::jfAO3_RatingFilterEditor(const jfBaseFilter* infilt, const jfFilterMap* infmap,
-         QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+jfAO3_RatingFilterEditor::jfAO3_RatingFilterEditor(const jfAO3RatingFilter* infilt, QWidget* parent)
+                                :jfBaseFilterEditor(infilt,parent) {
   // we start...
   // we create the insert.. the *actual*  editor
   insert_panel = new jfCharCheckBoxGroup("Ratings",5,ratinglist,ao3con::rating_ac,3);
@@ -42,7 +42,7 @@ jfAO3_RatingFilterEditor::jfAO3_RatingFilterEditor(const jfBaseFilter* infilt, c
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //-------------------------------------
-void jfAO3_RatingFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfAO3_RatingFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   assert(infilter!=NULL);
   filt_pointer = infilter;
   const jfAO3RatingFilter* temp = dynamic_cast<const jfAO3RatingFilter*>(infilter);
@@ -50,20 +50,22 @@ void jfAO3_RatingFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
   NameLoad();
 }
 //-------------------------------------
-jfBaseFilter* jfAO3_RatingFilterEditor::GetFilter() {
+jfFilterBase* jfAO3_RatingFilterEditor::GetFilter() {
   jfAO3RatingFilter* result = new jfAO3RatingFilter(insert_panel->GetStringValue());
-  namedesc_edit->ChangeObj(result);
+  namedesc_edit->ChangeFilter(result);
   return result;
 }
 //--------------------------------------------------------------
-bool jfAO3_RatingFilterEditor::GeneralCheck() const {
-  return true;
+bool jfAO3_RatingFilterEditor::GeneralCheck(const jfFilterMap* infmap) const {
+    if (infmap == NULL) return true;
+    else if (NameNUniq(infmap)) return false;
+    else return true;
 }
 
 //===============================================================================
 // the default constructor
-jfAO3_OrientFilterEditor::jfAO3_OrientFilterEditor(const jfFilterMap* infmap,
-              const jfAO3OrientationFilter* infilt, QWidget* parent):jfTagFilterEditor(infmap,infilt,parent) {
+jfAO3_OrientFilterEditor::jfAO3_OrientFilterEditor( const jfAO3OrientationFilter* infilt,
+                             QWidget* parent):jfTagFilterEditor(infilt,parent) {
   CompleteConstruction("Orientation",infilt);
   if (infilt==NULL) LoadBlank();
 }
@@ -72,7 +74,7 @@ jfAO3_OrientFilterEditor::jfAO3_OrientFilterEditor(const jfFilterMap* infmap,
 //---------------------------
 jfTagFilterCore* jfAO3_OrientFilterEditor::GetTagFilter() {
   jfAO3OrientationFilter* result;
-  result = new jfAO3OrientationFilter();
+  result = new jfAO3OrientationFilter(namedesc_edit->TryGetName());
   result->SetToEmpty();
   return result;
 }

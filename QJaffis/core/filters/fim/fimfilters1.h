@@ -4,23 +4,25 @@ Author  :   John Q Metro
 Purpose :   Filters for fimfiction.net
 Created :   July 4, 2012
 Conversion to QT Started September 30, 2013
-Updated :   October 10, 2019
+Updated :   May 28, 2023 (Rebasing)
 ******************************************************************************/
 #ifndef FIMFILTERS1_H_INCLUDED
 #define FIMFILTERS1_H_INCLUDED
 #endif // FIMFILTERS1_H_INCLUDED
 //-----------------------------
-#ifndef JFBASEFILTER
-  #include "../base/filterbase.h"
-#endif
+#include "../base/basefilter.h"
+
 #ifndef MOREFILTERS1_H_INCLUDED
   #include "../extended/morefilters1.h"
 #endif
 /*****************************************************************************/
-class jfFimThumbsFilter : public jfBaseFilter {
+extern const jfFilterTypeMeta FIM_THUMBS_FILTER_INFO;
+
+class jfFimThumbsFilter : public jfFilterBase {
   public:
     // constructors
-    jfFimThumbsFilter();
+    jfFimThumbsFilter(const QString& filter_name);
+    jfFimThumbsFilter(QString&& filter_name);
     jfFimThumbsFilter(int inmin, int inmax);
     // setting values
     bool SetValues(int inmin, int inmax, bool inc_disabled = false);
@@ -29,129 +31,119 @@ class jfFimThumbsFilter : public jfBaseFilter {
     int GetMax() const;
     bool GetIncludeDisabled() const;
     // redefined virtual methods
-    virtual bool isEmpty() const;
-    virtual QString GetTypeID() const;
+    virtual bool IsEmpty() const override;
     // loading from a string representation
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
-    // returns the list of element names campatible with this filter
-    virtual QString GetTypeDescription() const;
-    virtual jfBaseFilter* GenCopy() const;
+    virtual QString ToString() const override;
+
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
+    virtual jfFilterBase* GenCopy() const override;
   protected:
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
-    // file i/o
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
-    /* since different types are stored together, the text file reprentation
-    may have objects of varying length */
-    virtual size_t ExtraLines() const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
     // internal values
     int min, max;
     bool include_disabled;
 };
 //===========================================================================
+extern const jfFilterTypeMeta FIM_GENRE_FILTER_INFO;
+
 class jfFIMGenreFilter : public jfTagFilterCore {
   public:
     // constructors
-    jfFIMGenreFilter();
+    jfFIMGenreFilter(const QString& filter_name);
+    jfFIMGenreFilter(QString&& filter_name);
     jfFIMGenreFilter(const jfFIMGenreFilter& insrc);
     // getting and setting values
-    virtual bool SetToEmpty();
+    virtual bool SetToEmpty() override;
     // redefined virtual methods
-    virtual QString GetTypeID() const;
-    virtual QString GetTypeDescription() const;
-    virtual jfBaseFilter* GenCopy() const;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
+    virtual jfFilterBase* GenCopy() const override;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
-    virtual bool ModifyList(QStringList* templist) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
+    virtual bool ModifyList(QStringList* templist) const override;
     // check the tags against a list of pre-approved tags
-    virtual bool DoVerify();
+    virtual bool DoVerify() override;
+    virtual bool DoVerifyCheck(jfTagListing* to_check) const override final;
 };
 //===========================================================================
 // getting replacements
 QStringList* MakeFIMCharRep();
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++
+extern const jfFilterTypeMeta FIM_CHARACTER_FILTER_INFO;
+
 class jfFIMCharacterFilter : public jfTagFilterCore {
   public:
     // constructors
-    jfFIMCharacterFilter();
+    jfFIMCharacterFilter(const QString& filter_name);
+    jfFIMCharacterFilter(QString&& filter_name);
     jfFIMCharacterFilter(const jfFIMCharacterFilter& insrc);
     // getting and setting values
-    virtual bool SetToEmpty();
+    virtual bool SetToEmpty() override;
     // redefined virtual methods
-    virtual QString GetTypeID() const;
-    virtual QString GetTypeDescription() const;
-    virtual jfBaseFilter* GenCopy() const;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
+    virtual jfFilterBase* GenCopy() const override;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
-    virtual bool ModifyList(QStringList* templist) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
+    virtual bool ModifyList(QStringList* templist) const override;
     // check the tags against a list of pre-approved tags
-    virtual bool DoVerify();
+    virtual bool DoVerify() override;
+    virtual bool DoVerifyCheck(jfTagListing* to_check) const override final;
 };
 //================================================================
-class jfFimRatingFilter : public jfBaseFilter {
+extern const jfFilterTypeMeta FIM_RATING_FILTER_INFO;
+
+class jfFimRatingFilter : public jfFilterBase {
   public:
     // constructors
-    jfFimRatingFilter();
-    jfFimRatingFilter(QString value_in);
+    jfFimRatingFilter(const QString& filter_name);
+    jfFimRatingFilter(QString&& filter_name);
+    jfFimRatingFilter(const QString& filter_name, QString value_in);
     // match against the filter
-    virtual bool isEmpty() const;
+    virtual bool IsEmpty() const override;
     // loading from a string representation
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
+    virtual QString ToString() const override;
     // gets a description
-    virtual QString GetTypeDescription() const;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
     // copy
-    virtual jfBaseFilter* GenCopy() const;
-    // special meta-information
-    virtual QString GetTypeID() const;
+    virtual jfFilterBase* GenCopy() const override;
     // custom methods
     bool Includes(QString test) const;
   protected:
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
-    // file i/o
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
-    /* since different types are stored together, the text file reprentation
-    may have objects of varying length */
-    virtual size_t ExtraLines() const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
     // internal data
     QString value;
 };
 //================================================================
-class jfFimThumbPercentFilter : public jfBaseFilter {
+extern const jfFilterTypeMeta FIM_PERCENT_RATING_FILTER_INFO;
+
+class jfFimThumbPercentFilter : public jfFilterBase {
   public:
     // constructors
-    jfFimThumbPercentFilter();
-    jfFimThumbPercentFilter(QString value_in);
+    jfFimThumbPercentFilter(const QString& filter_name);
+    jfFimThumbPercentFilter(QString&& filter_name);
+    jfFimThumbPercentFilter(const QString& filter_name, QString value_in);
     // match against the filter
-    virtual bool isEmpty() const;
-    // loading from a string representation
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
+    virtual bool IsEmpty() const;
+    // getting a string representation
+    virtual QString ToString() const override;
+    // set and get some parts
     bool SetPercent(size_t invalue);
     void SetIncludeDisabled(bool yes);
     size_t GetPercent() const;
     bool GetIncludeDisabled() const;
-    // gets a description
-    virtual QString GetTypeDescription() const;
+    // gets a meta info object
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
     // copy
-    virtual jfBaseFilter* GenCopy() const;
-    // special meta-information
-    virtual QString GetTypeID() const;
+    virtual jfFilterBase* GenCopy() const override;
   protected:
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
-    // file i/o
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
-    /* since different types are stored together, the text file reprentation
-    may have objects of varying length */
-    virtual size_t ExtraLines() const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
     // internal data
     size_t value;
     bool include_disabled;

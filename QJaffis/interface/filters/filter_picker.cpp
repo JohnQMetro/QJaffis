@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines some custom interface elements for a filter picker dialog.
 Created :   March 25,
 Conversion to Qt Started Oct 3, 2013
-Updated :   October 29, 2013
+Updated :   August 22, 2023
 ******************************************************************************/
 #ifndef FILTER_WIDGETS_H_INCLUDED
   #include "filter_picker.h"
@@ -38,9 +38,7 @@ jfFilterPickerBase::jfFilterPickerBase(bool three_cols, QWidget* parent):QTableW
   if (three_cols) horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
   else horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
   // setting local variables
-  fnames = NULL;
-  ftypes = NULL;
-  fdesc = NULL;
+
   loaded = false;
   three_columns = three_cols;
   old_selection = -1;
@@ -53,20 +51,21 @@ size_t jfFilterPickerBase::SetContents(const jfFilterMap* data, QString inprefix
   size_t loopv, tcount;
   // some checks
   assert(data!=NULL);
+
   // clearing the old stuff
   clearContents();
   // a special case
-  tcount = data->GetCount();
+  tcount = data->FilterCount();
   prefix = inprefix;
   if (tcount==0) return 0;
   // extracting the lists
-  fnames = data->GetNameList();
-  if (three_columns) fdesc = data->GetDescriptionList();
-  ftypes = data->GetTypeList();
   loaded = true;
+
   // now, do do the loading list
-  for (loopv=0;loopv<tcount;loopv++) {
-    InsertFLine(loopv);
+  stl_FilterMap::const_iterator filter_ptr = data->GetStartIterator();
+  for (loopv=0; loopv<tcount; loopv++) {
+    InsertFLine(loopv, filter_ptr);
+    filter_ptr++;
   }
   // we no longer need the lists
   ClearLoaded();
@@ -79,17 +78,6 @@ size_t jfFilterPickerBase::SetContents(const jfFilterMap* data, QString inprefix
 //----------------------------------------------------------------------------
 bool jfFilterPickerBase::ClearLoaded() {
   if (loaded) {
-    fnames->clear();
-    delete fnames;
-    fnames = NULL;
-    if (three_columns) {
-      fdesc->clear();
-      delete fdesc;
-      fdesc = NULL;
-    }
-    ftypes->clear();
-    delete ftypes;
-    ftypes = NULL;
     loaded = false;
     return true;
   }
@@ -171,24 +159,26 @@ void jfFilterPickerBase::OnItemSelect() {
   }
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool jfFilterPickerBase::InsertFLine(const size_t& iindex) {
+bool jfFilterPickerBase::InsertFLine(const size_t& iindex, const stl_FilterMap::const_iterator& data_index) {
   // variables
   QTableWidgetItem* titem;
   QString buffer;
+  const jfFilterBase* filter_to_show;
   // we do some checks first
   assert(loaded);
-  assert(iindex<(fnames->count()));
+
   // creating the new line
   insertRow(iindex);
+  filter_to_show = data_index->second;
   // name
-  titem = new QTableWidgetItem(fnames->at(iindex));
+  titem = new QTableWidgetItem(filter_to_show->GetName());
   setItem(iindex,0,titem);
   // type
-  titem = new QTableWidgetItem(ftypes->at(iindex));
+  titem = new QTableWidgetItem(filter_to_show->GetTypeIdentifier());
   setItem(iindex,1,titem);
   // adding description
   if (three_columns) {
-    titem = new QTableWidgetItem(fdesc->at(iindex));
+    titem = new QTableWidgetItem(filter_to_show->GetDescription());
     setItem(iindex,2,titem);
   }
   // done

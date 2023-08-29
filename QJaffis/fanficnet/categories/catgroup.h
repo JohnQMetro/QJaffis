@@ -56,13 +56,11 @@ class jfFFN_Categories : public jfBaseObj {
     QString UrlAtIndex() const;
     QString UrlAtNextIndex() const;
     QString NameAtIndex() const;
-    QString NameAtUrlIndex(size_t section_index) const;
     bool UpdatableAtIndex() const;
     QString* CurrentCrossoverURL(size_t section_index) const;
     bool UrlIndexToStart(size_t section_index);
     bool NextUrlIndex(size_t section_index);
     bool NextUrlIndex(size_t section_index, bool& updatable);
-    size_t CrossoverIndex() const;
     // item info
     size_t ItemsInSection() const;
     size_t ItemsInSection(size_t sec_idx) const;

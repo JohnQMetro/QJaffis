@@ -21,7 +21,7 @@
 class jfExtraTagFilterEditor : public jfSimpleSFilterEditor {
   public:
     // the default constructor
-    jfExtraTagFilterEditor(const jfFilterMap* infmap, const jfExtraTagFilter* infilt, QWidget* parent);
+    jfExtraTagFilterEditor(const jfExtraTagFilter* infilt, QWidget* parent);
   protected:
     // internal methods
     virtual jfSimpleExpFilterCore* MakeTypedFilter(jfSimpleExpr* inpval);

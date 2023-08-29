@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    Creating matcher objects
 // Created:     August 16, 2022
-// Updated:     August 28, 2022
+// Updated:     April 6, 2023
 //***************************************************************************
 
 #include "taglist.h"
@@ -143,10 +143,16 @@ jfMatchFilterCore::~jfMatchFilterCore() {
 // ========================================================================
 
 /* Base filter that wraps a tag multimatcher */
-// the constructors
-jfMultiMatchBaseFilter::jfMultiMatchBaseFilter():jfBaseFilter() {
+jfMultiMatchBaseFilter::jfMultiMatchBaseFilter(const QString& filter_name):jfFilterBase(filter_name) {
+    old_unescape = true;
     main = NULL;
 }
+//------------------------------
+jfMultiMatchBaseFilter::jfMultiMatchBaseFilter(QString&& filter_name):jfFilterBase(filter_name) {
+    old_unescape = true;
+    main = NULL;
+}
+
 // +++++++++++++++++++++++++++++++++++++++++++++++++
 // external information
 QString jfMultiMatchBaseFilter::MainExpression() const {
@@ -163,14 +169,9 @@ bool jfMultiMatchBaseFilter::HasMissCounter() const {
     else return main->HasMissCounter();
 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++
-// returns a general filter type
-size_t jfMultiMatchBaseFilter::GetFilType() const {
-    return 1;
-}
-// ++++++++++++++++++++++++++++++++++++++++++++++++++
 // the destructor
 jfMultiMatchBaseFilter::~jfMultiMatchBaseFilter() {
-    delete main;
+    if (main != NULL) delete main;
     main = NULL;
 }
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -179,36 +180,6 @@ bool jfMultiMatchBaseFilter::SetFromSourceInternal(jfMultiMatchSource* in_source
     if (main == NULL) main = new jfMatchFilterCore();
     else main->Clear();
     return main->SetFromSource(in_source, lists);
-}
-// -------------------------
-// private methods
-size_t jfMultiMatchBaseFilter::ExtraLines() const {
-    return 1;
-}
-// ----------------------------------------------
-bool jfMultiMatchBaseFilter::AddRestToFile(QTextStream* outfile) const {
-    QString buffer;
-    // checking and special conditions
-    if (outfile==NULL) return false;
-    // composing line 4
-    QString src = ToString();
-    buffer = EscapeNL(src,IO_DELIMS);
-    (*outfile) << buffer << "\n";
-    return true;
-}
-// ----------------------------------------------
-bool jfMultiMatchBaseFilter::ReadRestFromFile(jfFileReader* infile) {
-    const QString funcname = "jfMultiMatchBaseFilter::ReadRestFromFile";
-    // input data
-    QString cline;
-    bool resx;
-    // starting checks (and reading the line)
-    assert(infile!=NULL);
-    if (!infile->ReadUnEsc(cline,funcname)) return false;
-    // there is only one line, and one field, so this is pretty simple
-    resx = FromString(cline);
-    if (!resx) return infile->BuildError("The tag match string is invalid!");
-    else return true;
 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 jfMultiMatchSource* jfMultiMatchBaseFilter::SourceCopyHelper(const jfMultiMatchSource& original_source, const jfTagMultiMatcher* in_matcher) const {
@@ -230,12 +201,67 @@ jfMultiMatchSource* jfMultiMatchBaseFilter::SourceCopyHelper(const jfMultiMatchS
 void jfMultiMatchBaseFilter::CoreCopy(const jfMultiMatchBaseFilter& mm_source, bool attach_miss_counter) {
     // copying the most basic items
     name = mm_source.name;
-    validdata = mm_source.validdata;
 
     // copying the contents
     if (main != NULL) delete main;
     if ((mm_source.main) == NULL) main = NULL;
     else main = (mm_source.main)->Duplicate(attach_miss_counter);
+}
+
+// ==============================================================================
+// the constructors
+jfMatchTagFilterBase::jfMatchTagFilterBase(const QString& filter_name):jfMultiMatchBaseFilter(filter_name) {
+    source_list = NULL;
+}
+// --------------------------------------
+jfMatchTagFilterBase::jfMatchTagFilterBase(const QString& filter_name, const jfGeneralTagListsGroup* in_source_list):jfMultiMatchBaseFilter(filter_name) {
+    assert(in_source_list != NULL);
+    source_list = in_source_list;
+}
+// --------------------------------------
+jfMatchTagFilterBase::jfMatchTagFilterBase(QString&& filter_name, const jfGeneralTagListsGroup* in_source_list):jfMultiMatchBaseFilter(filter_name) {
+    assert(in_source_list != NULL);
+}
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfMatchTagFilterBase::ChangeSourceList(const jfGeneralTagListsGroup* in_source_list) {
+    if (in_source_list == NULL) return false;
+    source_list = in_source_list;
+    return true;
+}
+    // --------------------------------------
+const jfGeneralTagListsGroup* jfMatchTagFilterBase::GetSourceList() const {
+    return source_list;
+}
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfMatchTagFilterBase::SetFromSource(jfMultiMatchSource* in_source) {
+    assert(source_list != NULL);
+    jfMatchFilterCore* new_main = new jfMatchFilterCore();
+    new_main->SetFromSource(in_source, (*source_list));
+    if (new_main->BadExpression()) {
+        delete new_main;
+        return false;
+    }
+    if (main != NULL) delete main;
+    main = new_main;
+    return true;
+}
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jfMatchTagFilterBase::~jfMatchTagFilterBase() {
+    source_list = NULL;
+}
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+jfMatchFilterCore* jfMatchTagFilterBase::FromStringsHelper(const QString& listname,
+                                     const QString& expression, QString& out_error) {
+    assert(source_list != NULL);
+    // creating main
+    jfMatchFilterCore* new_main = new jfMatchFilterCore();
+    new_main->SetFromRawParts(listname, expression, (*source_list));
+    if (new_main->BadExpression()) {
+        out_error = (new_main->matcher)->ExpressionError();
+        delete new_main;
+        return NULL;
+    }
+    return new_main;
 }
 
 //***************************************************************************

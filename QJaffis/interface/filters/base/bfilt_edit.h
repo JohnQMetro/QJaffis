@@ -4,12 +4,15 @@ Author  :   John Q Metro
 Purpose :   Declares some base class for filter diting
 Created :   July 27, 2009
 Conversion to Qt Started Oct 3, 2013
-Updated :   August 5, 2015
+Updated :   April 8, 2023 (changing base filter type, removing url filter)
 ******************************************************************************/
 #ifndef BFILT_EDIT_H_INCLUDED
 #define BFILT_EDIT_H_INCLUDED
 #endif // BFILT_EDIT_H_INCLUDED
 //---------------------------------------------------------------------------
+
+#include "../../../core/filters/base/basefilter.h"
+
 #ifndef BASECOLLECT_H_INCLUDED
   #include "../../../core/structs/basecollect.h"
 #endif // BASECOLLECT_H_INCLUDED
@@ -25,9 +28,7 @@ Updated :   August 5, 2015
 #ifndef WIDGETS3_H_INCLUDED
   #include "../../controls/widgets3.h"
 #endif // WIDGETS3_H_INCLUDED
-#ifndef URLFILTER_EDITOR_H
-  #include "urlfilter_editor.h"
-#endif // URLFILTER_EDITOR_H
+
 //-----------------------------------------
 #include <QGroupBox>
 #include <QVBoxLayout>
@@ -47,22 +48,22 @@ widgets.
 class jfBaseFilterEditor : public QWidget {
     Q_OBJECT
   public:
-    jfBaseFilterEditor(const jfFilterMap* infmap, const jfBaseFilter* infilt, QWidget* parent = NULL);
+    jfBaseFilterEditor(const jfFilterBase* infilt, QWidget* parent = NULL);
     // external filter accessing methods
-    virtual void LoadFilter(const jfBaseFilter* infilter) = 0;
-    bool ChangeFilter(const jfBaseFilter* infilter);
+    virtual void LoadFilter(const jfFilterBase* infilter) = 0;
+    bool ChangeFilter(const jfFilterBase* infilter);
     void ReloadFilter();
-    virtual jfBaseFilter* GetFilter() =0;
+    virtual jfFilterBase* GetFilter() =0;
     // checks and external methods
-    bool NameCheck() const;
-    virtual bool GeneralCheck() const = 0;
+    bool NameCheck(const jfFilterMap* filter_group) const;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const = 0;
     void ChangeBoxName(QString newname);
   public slots:
     void ReloadBtnPressed(bool click);
   protected:
     // internal helper methods
     void ArrangeSizers();
-    bool NameNUniq() const;
+    bool NameNUniq(const jfFilterMap* filter_group) const;
     void NameLoad();
     // internal GUI elements
     jfNameDescEditor* namedesc_edit;
@@ -72,8 +73,7 @@ class jfBaseFilterEditor : public QWidget {
     QHBoxLayout* realtopsizer;
     QBoxLayout* insert;
     // data pointers
-    const jfFilterMap* local_fmap;
-    const jfBaseFilter* filt_pointer;
+    const jfFilterBase* filt_pointer;
 };
 /*****************************************************************************/
 /* a wrapper for jfExpressionEditor that is an editor for an expression
@@ -81,28 +81,18 @@ filter */
 class jfExprFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfExprFilterEditor(const jfFilterMap* infmap, bool is_inglobal, const jfBaseFilter* infilt, QWidget* parent = NULL);
+    jfExprFilterEditor(const jfFilterMap* infmap, bool is_inglobal, const jfExpressionFilter* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
+    // typed methods
+    void LoadExpressionFilter(const jfExpressionFilter* infilter);
+    jfExpressionFilter* GetExpressionFilter() const;
     // checking
-    bool GeneralCheck() const;
+    bool GeneralCheck(const jfFilterMap* filter_group) const override;
   private:
     jfExpressionEditor* insert_panel;
     bool is_global;
-};
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-/* a wrapper for jfUrlFilEdit that is an editor for an url filter */
-class jfUrlFilterEditor : public jfBaseFilterEditor {
-  public:
-    // the default constructor
-    jfUrlFilterEditor(const jfFilterMap* infmap, const jfBaseFilter* infilt, QWidget* parent = NULL);
-    // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    // checking
-    bool GeneralCheck() const;
-  private:
-    jfUrlFilEdit* insert_panel;
+    const jfFilterMap* local_fmap;
 };
 /*****************************************************************************/

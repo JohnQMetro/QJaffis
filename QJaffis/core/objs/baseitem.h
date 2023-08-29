@@ -3,7 +3,7 @@ Name    : baseitem.h
 Basic   : Base class for items that can be searched, like Fanfic Info Items
 Author  : John Q Metro
 Started : March 7, 2023
-Updated : March 26, 2023
+Updated : August 25, , 2023
 Notes   : Replaces the earlier jfBasePD
 ******************************************************************************/
 #ifndef BASEITEM_H
@@ -32,11 +32,12 @@ struct jfSearchResultItemData {
     QString url;
 };
 //=============================================
+const QString& IdForBaseSearch();
+
+
 /* The base class for searched items. */
 class jfSearchResultItem {
   public:
-    static const QString BASE_TYPE_ID;
-
     jfSearchResultItem();
     jfSearchResultItem(const jfSearchResultItemData& init_data);
     jfSearchResultItem(const jfSearchResultItem& source);

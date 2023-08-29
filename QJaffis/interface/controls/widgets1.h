@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Some misc user interface stuff
 Created :   April 1, 2009
 Conversion to Qt : Started September 8, 2013
-Updated :   July 18, 2022
+Updated :   April 16, 2023
 ******************************************************************************/
 #ifndef WIDGETS1_H_INCLUDED
 #define WIDGETS1_H_INCLUDED
@@ -12,9 +12,16 @@ Updated :   July 18, 2022
 #ifndef BASEOBJ_H_INCLUDED
     #include "../../core/objs/baseobj.h"
 #endif // BASEOBJ_H_INCLUDED
+#ifndef SKELSTORE_H_INCLUDED
+    #include "../../core/objs/skelstore.h"
+#endif // SKELSTORE_H_INCLUDED
 #ifndef VECTORS_H_INCLUDED
   #include "../../core/structs/vectors.h"
 #endif // VECTORS_H_INCLUDED
+
+#include "../../core/filters/base/basefilter.h"
+#include "../../core/filters/filtermap.h"
+
 //---------------------------------
 #include <QWidget>
 #include <QLayout>
@@ -46,11 +53,16 @@ class jfNameDescEditor : public QWidget {
     bool NameStatus() const;
     bool IsVertical() const;
     bool IsMultiline() const;
-    bool ChangeObj(jfBaseObj* inobj) const;
+    // changing objects
+    bool ChangeFilter(jfFilterBase* target_filter) const;
+    bool ChangeFilterMap(jfFilterMap* target_map) const;
+    bool ChangeSkeleton(jfSkeletonCore* target_skeleton) const;
     // setting some info
     bool SetName(QString newname);
     void SetDescription(const QString& newdesc);
-    bool SetFromObj(const jfBaseObj* inobj);
+    bool SetFromFilter(const jfFilterBase* source_filter);
+    bool SetFromFilterMap(const jfFilterMap* source_map);
+    bool SetFromSkeleton(const jfSkeletonCore* source_skeleton);
     // some extra methods
     bool TryCopy() const;
     QString GetBackup() const;

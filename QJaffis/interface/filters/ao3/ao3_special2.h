@@ -27,11 +27,11 @@ Updated :   February 25, 2023
 class jfAO3_WarnFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfAO3_WarnFilterEditor(const jfBaseFilter* infilt, const jfFilterMap* infmap, QWidget* parent = NULL);
+    jfAO3_WarnFilterEditor(const jfAO3WarnFilter* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    virtual bool GeneralCheck() const;
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
+    virtual bool GeneralCheck(const jfFilterMap* infmap) const override;
   protected:
     jfCharCheckBoxGroup* insert_panel;
 };

@@ -30,12 +30,12 @@ class jfAuthorInfo {
     size_t author_id;
 };
 //=========================================================================
+const QString& IdForFFNItemAuthor();
+
 // the fic object class when extracted from an author's page
 class jfFFNItemAuthor : public jfFFNItemCore {
     friend class jfFFNAuthorFanficParser;
   public:
-    static const QString FFN_AUTHORITEM_TYPE_ID;
-
     // constructors
     jfFFNItemAuthor();
     jfFFNItemAuthor(const jfSearchResultItemData& init_data);

@@ -3,36 +3,34 @@ Name    :   ao3_specials3.h
 Author  :   John Q Metro
 Purpose :   AO3 fandom and kudos filters
 Created :   May 14, 2014
-Updated :   May 14, 2014
+Updated :   April 15, 2023
 ******************************************************************************/
 #ifndef AO3_SPECIALS3_H
 #define AO3_SPECIALS3_H
 #endif // AO3_SPECIALS3_H
 //--------------------------------------
-#ifndef JFBASEFILTER
-  #include "../base/filterbase.h"
-#endif
-#ifndef SEXP_FILTERS_H_INCLUDED
-  #include "../base/sexp_filters.h"
-#endif // SEXP_FILTERS_H_INCLUDED
+#include "../base/basefilter.h"
+#include "../base/sexp_filters.h"
+
 #ifndef MINMAX_FILTER_H
   #include "../extended/minmax.h"
 #endif // MINMAX_FILTER_H
 /*****************************************************************************/
+extern const jfFilterTypeMeta AO3_FANDOM_FILTER_INFO;
+//================================================================
 /* Intended replacement for jfACategoriesFilter, with crossover boolean, forall
 filter (mainly intended to allow excluding intra-universe crossovers) and the
 usual expression filter operating on the names of all fandoms */
-class jfAO3FandomFilter : public jfBaseFilter {
+class jfAO3FandomFilter : public jfFilterBase {
   public:
-    QString parse_error;
     // constructors
-    jfAO3FandomFilter();
+    jfAO3FandomFilter(const QString& filter_name);
+    jfAO3FandomFilter(QString&& filter_name);
     jfAO3FandomFilter(const jfAO3FandomFilter& source);
     // checks if the filter has no effect
-    virtual bool isEmpty() const;
+    virtual bool IsEmpty() const override;
     // loading from a string representation
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
+    virtual QString ToString() const override;
     // specific data setting methods
     bool GeneralFromExpr(jfSimpleExpr* in_source);
     bool PerFandomFromExpr(jfSimpleExpr* in_source);
@@ -44,22 +42,21 @@ class jfAO3FandomFilter : public jfBaseFilter {
     bool GetCrossover() const;
     bool GetAllMatch() const;
     // Additional implemented methods
-    virtual QString GetTypeDescription() const;
-    virtual jfBaseFilter* GenCopy() const;
-    virtual QString GetTypeID() const;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
+    virtual jfFilterBase* GenCopy() const override;
+
     // destructor
     ~jfAO3FandomFilter();
   protected:
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
     // file i/o
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
-    /* since different types are stored together, the text file reprentation
-    may have objects of varying length */
-    virtual size_t ExtraLines() const;
+    virtual bool CompatReadRestFromFile(jfFileReader* infile) override;
+
     // extra methods
-    jfElemArray* ParseInput(QString srcstring,QString oerr);
+    jfElemArray* ParseInput(QString srcstring, QString& oerr) const;
+
     // internal data
     bool must_crossover;
     bool allmatch;
@@ -70,17 +67,21 @@ class jfAO3FandomFilter : public jfBaseFilter {
     bool loaded;
 };
 //==========================================================================
-// numeric filter that works via the number of kudos
-class jfAO3KudoFilter : public jfMinMaxUFilter {
+// numeric filter that works via the number of kudos or favs
+
+extern const jfFilterTypeMeta FAVS_FILTER_INFO;
+// ------------------------------------------------
+
+class jfFavKudoFilter : public jfMinMaxUFilter {
   public:
     // constructors
-    jfAO3KudoFilter();
-    jfAO3KudoFilter(size_t inmin, size_t inmax);
-    jfAO3KudoFilter(const jfAO3KudoFilter& source);
+    jfFavKudoFilter(const QString& name);
+    jfFavKudoFilter(const QString& name,size_t inmin, size_t inmax);
+    jfFavKudoFilter(const jfFavKudoFilter& source);
     // redefined virtual methods
-    virtual QString GetTypeID() const override;
-    virtual QString GetTypeDescription() const override;
-    virtual jfBaseFilter* GenCopy() const override;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
+    virtual bool MatchTypeIdentifier(const QString to_match) const override;
+    virtual jfFilterBase* GenCopy() const override;
   protected:
     // the core matching method
     virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;

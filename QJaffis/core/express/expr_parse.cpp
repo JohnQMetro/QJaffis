@@ -34,7 +34,7 @@ bool IsIn(const QChar& src, const QString& place) {
 }
 //============================================================================
 // the constructor
-jfExpParserClass::jfExpParserClass(const QString& insource, bool issimple,jfFilterMap* inlocalmap) {
+jfExpParserClass::jfExpParserClass(const QString& insource, bool issimple, const jfFilterMap* inlocalmap) {
 	rawexp = insource;
 	started = false;
 	done = false;
@@ -225,7 +225,7 @@ jfOperandElem* jfExpParserClass::MakeOperand(const QString& source) {
 		// we split
 		SplitString(xsrc,semiloc,fpart,spart);
 		// initial checking for problems
-		if (fpart==EXP_FIL_TAG) {
+        if (fpart == EXPRESSION_FILTER_INFO.Identifier()) {
             MakeError("Expression filter literals are not allowed!",true);
             return NULL;
 		}
@@ -426,7 +426,7 @@ jfElemArray* MakeExprPostfix(jfElemArray* infixsrc, QString& outerr){
     QString fname1 = "MakeExprPostfix(jfElemArray* infixsrc)";
 
 	// starting....
-	assert(infixsrc!=NULL);
+    assert(infixsrc != NULL);
 	src_count = infixsrc->size();
 
 	// a basic check

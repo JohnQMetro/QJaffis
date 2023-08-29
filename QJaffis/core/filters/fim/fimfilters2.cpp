@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Filters for fimfiction.net
 Created :   July 12, 2015
 Conversion to Qt Started Aug 4, 2015
-Updated :   August 8, 2015
+Updated :   July 29, 2023
 ******************************************************************************/
 #ifndef FIMFILTERS2_H_INCLUDED
   #include "fimfilters2.h"
@@ -19,33 +19,45 @@ Updated :   August 8, 2015
   #include "../../../fanfic/data/fim/fim_groupobj.h"
 #endif // FIM_GROUPOBJ_H_INCLUDED
 /*****************************************************************************/
+const jfFilterTypeMeta FIM_SHORTDESC_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::MISC, "FIMShortDescFilter",
+                     "FIM Short Description Filter",
+          QString("The Short Description Expression Filter matches elements") +
+                  " against a boolean expression, the elements of which are " +
+                  "themselves to be matched. These elements are either strings" +
+                  " or substrings. The default source is the short summary found" +
+                  " in the 'Card View'.",
+          IdForFIMFanfics(), createFilter<jfFIM_ShortDesc_ExprFilter> );
 
 // constructors
 //----------------------------------------------------------
-jfFIM_ShortDesc_ExprFilter::jfFIM_ShortDesc_ExprFilter():jfSimpleExpFilterCore() {}
+jfFIM_ShortDesc_ExprFilter::jfFIM_ShortDesc_ExprFilter(const QString& filter_name):jfSimpleExpFilterCore(filter_name) {
+
+}
 //----------------------------------------------------------
-jfFIM_ShortDesc_ExprFilter::jfFIM_ShortDesc_ExprFilter(const jfFIM_ShortDesc_ExprFilter& source) {
+jfFIM_ShortDesc_ExprFilter::jfFIM_ShortDesc_ExprFilter(QString&& filter_name):jfSimpleExpFilterCore(filter_name) {
+
+}
+//----------------------------------------------------------
+jfFIM_ShortDesc_ExprFilter::jfFIM_ShortDesc_ExprFilter(const jfFIM_ShortDesc_ExprFilter& source)
+                                                        :jfSimpleExpFilterCore(source.name) {
   CoreCopy(source);
 }
 //----------------------------------------------------------
-jfFIM_ShortDesc_ExprFilter::jfFIM_ShortDesc_ExprFilter(jfSimpleExpr* in_source):jfSimpleExpFilterCore(in_source) {}
+jfFIM_ShortDesc_ExprFilter::jfFIM_ShortDesc_ExprFilter(const QString& filter_name,
+                            jfSimpleExpr* in_source):jfSimpleExpFilterCore(filter_name, in_source) {}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfFIM_ShortDesc_ExprFilter::GetTypeDescription() const {
-  return "The Short Description Expression Filter  matches elements against a boolean \
-expression, the elements of which are themselves to be matched. These elements \
-are either strings or substrings.";
+const jfFilterTypeMeta& jfFIM_ShortDesc_ExprFilter::GetTypeMetaInfo() const {
+    return FIM_SHORTDESC_FILTER_INFO;
 }
+
 //------------------------------------------------------------
 jfFIM_ShortDesc_ExprFilter* jfFIM_ShortDesc_ExprFilter::Copy() const {
   return new jfFIM_ShortDesc_ExprFilter(*this);
 }
 //------------------------------------------------------------
-jfBaseFilter* jfFIM_ShortDesc_ExprFilter::GenCopy() const {
+jfFilterBase* jfFIM_ShortDesc_ExprFilter::GenCopy() const {
   return Copy();
-}
-//------------------------------------------------------------
-QString jfFIM_ShortDesc_ExprFilter::GetTypeID() const {
-  return "FIMShortDescFilter";
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
@@ -59,33 +71,44 @@ bool jfFIM_ShortDesc_ExprFilter::CoreMatch(const jfSearchResultItem* testelem) c
   return InternalMatch(datainfo);
 }
 //========================================================================================
+const jfFilterTypeMeta FIM_DUAL_DESC_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::MISC, "FIMDualDescFilter",
+                     "FIM DUAL Description Filter",
+          QString("The Dual Description Expression Filter matches elements against a ") +
+                  "boolean expression, the elements of which are themselves to be " +
+                  "matched. These elements are either strings or substrings. We use either" +
+                  " the card summary of the full summary.",
+          IdForFIMFanfics(), createFilter<jfFIM_DualDesc_ExprFilter> );
+
 // constructors
 //----------------------------------------------------------
-jfFIM_DualDesc_ExprFilter::jfFIM_DualDesc_ExprFilter():jfSimpleExpFilterCore() {}
+jfFIM_DualDesc_ExprFilter::jfFIM_DualDesc_ExprFilter(const QString& filter_name):jfSimpleExpFilterCore(filter_name) {
+}
+// --------------------------------------
+jfFIM_DualDesc_ExprFilter::jfFIM_DualDesc_ExprFilter(QString&& filter_name):jfSimpleExpFilterCore(filter_name) {
+
+}
 //----------------------------------------------------------
-jfFIM_DualDesc_ExprFilter::jfFIM_DualDesc_ExprFilter(const jfFIM_DualDesc_ExprFilter& source) {
+jfFIM_DualDesc_ExprFilter::jfFIM_DualDesc_ExprFilter(const jfFIM_DualDesc_ExprFilter& source)
+                                                    :jfSimpleExpFilterCore(source.name) {
   CoreCopy(source);
 }
 //----------------------------------------------------------
-jfFIM_DualDesc_ExprFilter::jfFIM_DualDesc_ExprFilter(jfSimpleExpr* in_source):jfSimpleExpFilterCore(in_source) {}
+jfFIM_DualDesc_ExprFilter::jfFIM_DualDesc_ExprFilter(const QString& filter_name,
+                          jfSimpleExpr* in_source):jfSimpleExpFilterCore(filter_name, in_source) {}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfFIM_DualDesc_ExprFilter::GetTypeDescription() const {
-  return "The Dual Description Expression Filter  matches elements against a boolean \
-expression, the elements of which are themselves to be matched. These elements \
-are either strings or substrings.";
+const jfFilterTypeMeta& jfFIM_DualDesc_ExprFilter::GetTypeMetaInfo() const {
+    return FIM_DUAL_DESC_FILTER_INFO;
 }
 //------------------------------------------------------------
 jfFIM_DualDesc_ExprFilter* jfFIM_DualDesc_ExprFilter::Copy() const {
   return new jfFIM_DualDesc_ExprFilter(*this);
 }
 //------------------------------------------------------------
-jfBaseFilter* jfFIM_DualDesc_ExprFilter::GenCopy() const {
+jfFilterBase* jfFIM_DualDesc_ExprFilter::GenCopy() const {
   return Copy();
 }
-//------------------------------------------------------------
-QString jfFIM_DualDesc_ExprFilter::GetTypeID() const {
-  return "FIMDualDescFilter";
-}
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
 bool jfFIM_DualDesc_ExprFilter::CoreMatch(const jfSearchResultItem* testelem) const {
@@ -101,27 +124,27 @@ bool jfFIM_DualDesc_ExprFilter::CoreMatch(const jfSearchResultItem* testelem) co
 }
 
 //========================================================================================
+const jfFilterTypeMeta FIM_GROUP_STORY_COUNT_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::COUNTS, "FIMGroupSCFilter",
+                     "FIM Group Story Count",
+          QString("For Fimfiction.Net Groups, this filter passes if ") +
+                  "the number of Stories is between min and max, inclusive.",
+          IdForFIMGroups(), createFilter<jfFIMGroupSCFilter> );
+
 // constructors
 //---------------------------------------------------
-jfFIMGroupSCFilter::jfFIMGroupSCFilter():jfMinMaxUFilter() {}
+jfFIMGroupSCFilter::jfFIMGroupSCFilter(const QString& name):jfMinMaxUFilter(name) {}
 //---------------------------------------------------
-jfFIMGroupSCFilter::jfFIMGroupSCFilter(size_t inmin, size_t inmax):jfMinMaxUFilter(inmin,inmax) {}
+jfFIMGroupSCFilter::jfFIMGroupSCFilter(const QString& name, size_t inmin, size_t inmax):jfMinMaxUFilter(name, inmin,inmax) {}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfFIMGroupSCFilter::GetTypeID() const {
-  return "FIMGroupSCFilter";
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// returns the list of element names campatible with this filter
-//---------------------------------------------------
-QString jfFIMGroupSCFilter::GetTypeDescription() const {
-    return "For Fimfiction.Net Groups, this filter passes if \
-the number of Stories is between min and max, inclusive.";
+const jfFilterTypeMeta& jfFIMGroupSCFilter::GetTypeMetaInfo() const {
+    return FIM_GROUP_STORY_COUNT_FILTER_INFO;
 }
 //---------------------------------------------------
-jfBaseFilter* jfFIMGroupSCFilter::GenCopy() const {
+jfFilterBase* jfFIMGroupSCFilter::GenCopy() const {
   jfFIMGroupSCFilter* result;
-  result = new jfFIMGroupSCFilter(min,max);
-  CopyOver(result);
+  result = new jfFIMGroupSCFilter(name, min,max);
+  result->description = description;
   return result;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -144,27 +167,29 @@ bool jfFIMGroupSCFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   return tmatch;
 }
 //========================================================================
+const jfFilterTypeMeta FIM_GROUP_MEMBER_COUNT_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::COUNTS, "FIMGroupMCFilter",
+                     "FIM Group Member Count",
+          QString("For Fimfiction.Net Groups, this filter passes if ") +
+                  "the number of Members is between min and max, inclusive.",
+          IdForFIMGroups(), createFilter<jfFIMGroupMCFilter> );
+
+
 // constructors
 //---------------------------------------------------
-jfFIMGroupMCFilter::jfFIMGroupMCFilter():jfMinMaxUFilter() {}
+jfFIMGroupMCFilter::jfFIMGroupMCFilter(const QString& name):jfMinMaxUFilter(name) {}
 //---------------------------------------------------
-jfFIMGroupMCFilter::jfFIMGroupMCFilter(size_t inmin, size_t inmax):jfMinMaxUFilter(inmin,inmax) {}
+jfFIMGroupMCFilter::jfFIMGroupMCFilter(const QString& name, size_t inmin, size_t inmax):jfMinMaxUFilter(name, inmin,inmax) {}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfFIMGroupMCFilter::GetTypeID() const {
-  return "FIMGroupMCFilter";
+const jfFilterTypeMeta& jfFIMGroupMCFilter::GetTypeMetaInfo() const {
+    return FIM_GROUP_MEMBER_COUNT_FILTER_INFO;
 }
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// returns the list of element names campatible with this filter
+
 //---------------------------------------------------
-QString jfFIMGroupMCFilter::GetTypeDescription() const {
-    return "For Fanfiction.Net fics, this filter passes if \
-the number of Favs is between min and max, inclusive.";
-}
-//---------------------------------------------------
-jfBaseFilter* jfFIMGroupMCFilter::GenCopy() const {
+jfFilterBase* jfFIMGroupMCFilter::GenCopy() const {
   jfFIMGroupMCFilter* result;
-  result = new jfFIMGroupMCFilter(min,max);
-  CopyOver(result);
+  result = new jfFIMGroupMCFilter(name, min,max);
+  result->description = description;
   return result;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

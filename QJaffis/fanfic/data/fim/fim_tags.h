@@ -18,6 +18,8 @@ Updated :   Dec 30, 2017
 #ifndef JFMISCTYPES1
     #include "../../../core/objs/misc_types1.h"
 #endif
+
+#include "../../../core/utils/ltstr.h"
 //-------------------------------------------
 #include <QString>
 #include <QTextStream>

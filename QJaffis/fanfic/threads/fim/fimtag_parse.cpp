@@ -47,6 +47,10 @@ bool jfFIMTag_Extractor::testIncomplete(const QString *page) const {
     // the page only has to be complete enought to include the data we want
     return page->contains("<div class=\"button-group collapsible search-view\"");
 }
+// ------------------------
+bool jfFIMTag_Extractor::testRatelimit(const QString *page) const {
+    return true;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // also
 QString jfFIMTag_Extractor::getCookie() const {

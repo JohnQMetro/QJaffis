@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines some classes for editing date range filters
 Created :   December 8, 2011
 Conversion to Qt started October 13, 2013
-Updated :   February 15, 2014
+Updated :   August 20, 2023
 ******************************************************************************/
 #ifndef DRANGE_EDIT_H_INCLUDED
   #include "drange_edit.h"
@@ -72,7 +72,6 @@ bool jfDateRangePanel::StoreValue(jfDateRangeFilter* saveto) const {
 bool jfDateRangePanel::LoadValue(const jfDateRangeFilter* getfrom) {
   // faliure options
   if (getfrom==NULL) return false;
-  if (!getfrom->IsValid()) return false;
   // getting the from date
   QDate dvalue = getfrom->GetValue(true);
   if (!dvalue.isValid()) {
@@ -160,7 +159,7 @@ bool jfDateRangePanel::MakeBlock(bool from) {
 //*******************************************************************************
 // the default constructor
 jfUpdatedDateFilterEditor::jfUpdatedDateFilterEditor(const jfUpdatedDateFilter* infilt,
-    const jfFilterMap* infmap, QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+                    QWidget* parent):jfBaseFilterEditor(infilt,parent) {
   // starting...
   insert_panel = new jfDateRangePanel();
   // finalizing things
@@ -174,29 +173,33 @@ jfUpdatedDateFilterEditor::jfUpdatedDateFilterEditor(const jfUpdatedDateFilter* 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //---------------------------------------------------
-void jfUpdatedDateFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfUpdatedDateFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   assert(infilter!=NULL);
   filt_pointer = infilter;
   insert_panel->LoadValue(dynamic_cast<const jfUpdatedDateFilter*>(filt_pointer));
   NameLoad();
 }
 //---------------------------------------------------
-jfBaseFilter* jfUpdatedDateFilterEditor::GetFilter() {
-  jfUpdatedDateFilter* result = new jfUpdatedDateFilter();
+jfFilterBase* jfUpdatedDateFilterEditor::GetFilter() {
+  jfUpdatedDateFilter* result = new jfUpdatedDateFilter(namedesc_edit->TryGetName());
   insert_panel->StoreValue(result);
-  namedesc_edit->ChangeObj(result);
+  namedesc_edit->ChangeFilter(result);
   return result;
 }
 //---------------------------------------------------
-bool jfUpdatedDateFilterEditor::GeneralCheck() const {
-  bool rval = insert_panel->CheckOk();
-  if (!rval) insert_panel->ShowErrorMsg();
-  return rval;
+
+bool jfUpdatedDateFilterEditor::GeneralCheck(const jfFilterMap* filter_group) const {
+    if (NameNUniq(filter_group)) return false;
+    else {
+        bool rval = insert_panel->CheckOk();
+        if (!rval) insert_panel->ShowErrorMsg();
+        return rval;
+    }
 }
 //======================================================================
 // the default constructor
 jfPublishedDateFilterEditor::jfPublishedDateFilterEditor(const jfPublishedDateFilter* infilt,
-    const jfFilterMap* infmap, QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+            QWidget* parent):jfBaseFilterEditor(infilt,parent) {
   // starting...
   insert_panel = new jfDateRangePanel();
   // finalizing things
@@ -210,24 +213,28 @@ jfPublishedDateFilterEditor::jfPublishedDateFilterEditor(const jfPublishedDateFi
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //---------------------------------------------------
-void jfPublishedDateFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfPublishedDateFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   assert(infilter!=NULL);
   filt_pointer = infilter;
   insert_panel->LoadValue(dynamic_cast<const jfPublishedDateFilter*>(filt_pointer));
   NameLoad();
 }
 //---------------------------------------------------
-jfBaseFilter* jfPublishedDateFilterEditor::GetFilter() {
-  jfPublishedDateFilter* result = new jfPublishedDateFilter();
+jfFilterBase* jfPublishedDateFilterEditor::GetFilter() {
+  jfPublishedDateFilter* result = new jfPublishedDateFilter(namedesc_edit->TryGetName());
   insert_panel->StoreValue(result);
-  namedesc_edit->ChangeObj(result);
+  namedesc_edit->ChangeFilter(result);
   return result;
 }
 //---------------------------------------------------
-bool jfPublishedDateFilterEditor::GeneralCheck() const {
-  bool rval = insert_panel->CheckOk();
-  if (!rval) insert_panel->ShowErrorMsg();
-  return rval;
+
+bool jfPublishedDateFilterEditor::GeneralCheck(const jfFilterMap* filter_group) const {
+    if (NameNUniq(filter_group)) return false;
+    else {
+        bool rval = insert_panel->CheckOk();
+        if (!rval) insert_panel->ShowErrorMsg();
+        return rval;
+    }
 }
 
 /******************************************************************************/

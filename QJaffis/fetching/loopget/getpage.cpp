@@ -179,7 +179,7 @@ jfFETCH_ERROR jfGetPage::DownloadWithRetry(const QString* to_download, size_t pa
             int wait_time = downloader->GetRetryAfter();
             /**/lpt->tLogI(fname,6,wait_time);
             // unfortunatly, ao3 no longer gives a retry after time
-            if (wait_time <= 0) wait_time = 600; // assume 10 min wait
+            if (wait_time <= 0) wait_time = 300; // assume 5 min wait
             // special method
             bool dont_halt = WaitToRetry(wait_time);
             if (!dont_halt) {
@@ -189,7 +189,7 @@ jfFETCH_ERROR jfGetPage::DownloadWithRetry(const QString* to_download, size_t pa
              sleep_time = rtimes.start_wait;
              /**/lpt->tLog(fname,7);
         }
-        else if (currError != jff_TRYAGAIN) {
+        else if ((currError != jff_TRYAGAIN) && (currError != jff_INTERNAL)) {
             /**/lpt->tLog(fname,9);
             break;
         }

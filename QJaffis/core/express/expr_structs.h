@@ -42,7 +42,7 @@ public:
     size_t GetTTokCount() const;
     bool NotOperand(const size_t& index) const;
     // Specials
-    bool VerifyNames(jfNameVerif* nameobj);
+    bool VerifyNames(jfNameVerif* nameobj) const;
     bool CopyLoad();
     // clearing stuff
     size_t DeleteAll();

@@ -102,6 +102,10 @@ bool jfFIMGroupParser::testIncomplete(const QString *page) const {
   assert(page!=NULL);
   return page->contains("<!--Footer-->");
 }
+// ------------------------------------------------------
+bool jfFIMGroupParser::testRatelimit(const QString *page) const {
+    return true;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 QString jfFIMGroupParser::getCookie() const {
   return "view_mature=true";

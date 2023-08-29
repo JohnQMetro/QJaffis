@@ -3,7 +3,7 @@ Name    :   listexpr_edit.h
 Author  :   John Q Metro
 Purpose :   An expression editor for list expression filters
 Created :   March 2, 2023
-Updated :   March 3, 2023
+Updated :   April 16, 2023
 ******************************************************************************/
 #ifndef LISTEXPR_EDIT_H
    #define LISTEXPR_EDIT_H
@@ -49,12 +49,12 @@ class jfListExprEdit : public jfExprEditBase {
 class jfBaseListExprFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfBaseListExprFilterEditor(const jfFilterMap* infmap, const jfListExprFilterBase* infilt, QWidget* parent = NULL);
+    jfBaseListExprFilterEditor(const jfListExprFilterBase* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
     // checking
-    bool GeneralCheck() const;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const override;
   protected:
     // internal methods
     virtual jfListExprFilterBase* MakeTypedFilter(jfListMatchMode match_mode, jfSimpleExpr* inpval) = 0;
@@ -67,9 +67,9 @@ class jfBaseListExprFilterEditor : public jfBaseFilterEditor {
 class jfCharacterListExprFilterEditor : public jfBaseListExprFilterEditor {
   public:
     // the default constructor
-    jfCharacterListExprFilterEditor(const jfFilterMap* infmap, const jfCharListExprFilter* infilt, QWidget* parent = NULL);
+    jfCharacterListExprFilterEditor(const jfCharListExprFilter* infilt, QWidget* parent = NULL);
   protected:
     // internal methods
-    virtual jfListExprFilterBase* MakeTypedFilter(jfListMatchMode match_mode, jfSimpleExpr* inpval);
+    virtual jfListExprFilterBase* MakeTypedFilter(jfListMatchMode match_mode, jfSimpleExpr* inpval) override;
 };
 //****************************************************************************

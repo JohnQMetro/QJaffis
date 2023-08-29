@@ -15,11 +15,8 @@
 #ifndef BASECOLLECT_H_INCLUDED
   #include "../../structs/basecollect.h"
 #endif // BASECOLLECT_H_INCLUDED
-/*
-#ifndef VECTORS_H_INCLUDED
-  #include "../../structs/vectors.h"
-#endif // VECTORS_H_INCLUDED
-*/
+
+#include "../../utils/ltstr.h"
 
 #include <map>
 //***************************************************************************

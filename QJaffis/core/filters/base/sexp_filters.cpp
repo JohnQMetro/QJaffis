@@ -4,7 +4,7 @@
 // Purpose :    Simple expression filters that work on specific string data
 // Created:     November 30, 2010
 // Conversion to Qt Started September 26, 2013
-// Updated:     August 16, 2014
+// Updated:     April 2, 2023 (Rebasing)
 //***************************************************************************
 #ifndef SEXP_FILTERS_H_INCLUDED
   #include "sexp_filters.h"
@@ -13,9 +13,11 @@
 #ifndef JFEXPRPARSE
   #include "../../express/expr_parse.h"
 #endif
+/*
 #ifndef JFILTERGLOBALS
   #include "../filter_globals.h"
 #endif
+*/
 #ifndef JFEXPRMATCH
 	#include "../../express/expr_match.h"
 #endif
@@ -141,46 +143,40 @@ jfSimpleExpr::~jfSimpleExpr() {
 //==========================================================================
 // the constructors
 //----------------------------------------------------------------------
-// the basic constructor
-jfSimpleExpFilterCore::jfSimpleExpFilterCore():jfBaseFilter() {
+jfSimpleExpFilterCore::jfSimpleExpFilterCore(const QString& filter_name):jfFilterBase(filter_name) {
     parsed_expression = NULL;
-    validdata = false;
+    old_unescape = true;
 }
-//----------------------------------------------------------------------
-jfSimpleExpFilterCore::jfSimpleExpFilterCore(const QString& sourcedata) {
+// --------------------------------------------------------
+jfSimpleExpFilterCore::jfSimpleExpFilterCore(QString&& filter_name):jfFilterBase(filter_name) {
     parsed_expression = NULL;
-    validdata = false;
-    FromString(sourcedata);
+    old_unescape = true;
 }
-//----------------------------------------------------------------------
-jfSimpleExpFilterCore::jfSimpleExpFilterCore(jfSimpleExpr* in_source) {
-    parsed_expression = NULL;
-    validdata = false;
-    FromExpr(in_source);
+// --------------------------------------------------------
+jfSimpleExpFilterCore::jfSimpleExpFilterCore(const QString& filter_name, const QString& sourcedata):jfFilterBase(filter_name) {
+    QString perror;
+    bool set_okay = FromStringInner(sourcedata, perror);
+    jerror::AssertLog(set_okay, "jfSimpleExpFilterCore::jfSimpleExpFilterCore","Constructor String Expression Error: " + perror );
+    old_unescape = true;
 }
+// --------------------------------------------------------
+jfSimpleExpFilterCore::jfSimpleExpFilterCore(const QString& filter_name, jfSimpleExpr* in_source):jfFilterBase(filter_name) {
+    if ((in_source == NULL) || (in_source->isEmpty())) {
+        parsed_expression = NULL;
+    }
+    else {
+        bool okay = in_source->IsValid();
+        jerror::AssertLog(okay, "jfSimpleExpFilterCore::jfSimpleExpFilterCore","Constructor input expression is not valid!" );
+        parsed_expression = in_source;
+    }
+    old_unescape = true;
+}
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool jfSimpleExpFilterCore::isEmpty() const {
+bool jfSimpleExpFilterCore::IsEmpty() const {
     return (parsed_expression == NULL) || (parsed_expression->isEmpty());
 }
-//-----------------------------------------------------------------------------
-// returns a general filter type. The default is 0, unless overriden
-size_t jfSimpleExpFilterCore::GetFilType() const { return 1;}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// redefined virtual functions
-// loading stuff
-bool jfSimpleExpFilterCore::FromString(const QString& sourcedata) {
-  // constants
-  const QString fname = "jfSimpleExpFilterCore::FromString";
-
-  if (parsed_expression != NULL) {
-      delete parsed_expression;
-      parsed_expression = NULL;
-  }
-  parsed_expression = new jfSimpleExpr(sourcedata);
-  validdata = parsed_expression->IsValid();
-  return validdata;
-}
-//----------------------------------------------------------------------
 QString jfSimpleExpFilterCore::ToString() const {
     if (parsed_expression == NULL) return "";
     else return parsed_expression->GetSrc();
@@ -189,19 +185,26 @@ QString jfSimpleExpFilterCore::ToString() const {
 // modifying and checking the contents
 //----------------------------------------------------------------------
 bool jfSimpleExpFilterCore::FromExpr(jfSimpleExpr* in_source) {
-  if (in_source==NULL) return false;
-  else {
-      parsed_expression = in_source->Copy();
-      validdata = parsed_expression->IsValid();
-  }
-  return true;
+    if ((in_source == NULL) || (in_source->IsValid())) {
+        if (parsed_expression != NULL) {
+            delete parsed_expression;
+        }
+        if ((in_source == NULL) || (in_source->isEmpty())) {
+            parsed_expression = NULL;
+        }
+        else parsed_expression = in_source;
+        return true;
+    }
+    else return false;
 }
 //----------------------------------------------------------------------
 // returning a string representation of the parsed contents
+/*
 QString jfSimpleExpFilterCore::MakePList() const {
     if (parsed_expression == NULL) return "";
     else return parsed_expression->MakePList();
 }
+*/
 //-----------------------------------------------------------------------
 // sort of like load string, except the string is empty
 void jfSimpleExpFilterCore::EmptyFilter() {
@@ -209,7 +212,6 @@ void jfSimpleExpFilterCore::EmptyFilter() {
         delete parsed_expression;
         parsed_expression = NULL;
     }
-    validdata = true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the destructor
@@ -217,48 +219,37 @@ jfSimpleExpFilterCore::~jfSimpleExpFilterCore() {
     EmptyFilter();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+//------------------------------------------------------------------------
+bool jfSimpleExpFilterCore::FromStringInner(const QString& sourcedata, QString& error_out) {
+    jfSimpleExpr* temp_expr = new jfSimpleExpr(sourcedata);
+
+    if (temp_expr->IsValid()) {
+        if (parsed_expression != NULL) {
+            delete parsed_expression;
+        }
+        if (temp_expr->isEmpty()) parsed_expression = NULL;
+        else parsed_expression = temp_expr;
+
+        return true;
+    }
+    else {
+        error_out = temp_expr->parse_error;
+        delete temp_expr;
+        return false;
+    }
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfSimpleExpFilterCore::InternalMatch(const QString& incheck) const {
     if (parsed_expression == NULL) return true;
     else return parsed_expression->InternalMatch(incheck);
 }
 //-----------------------------------------------------------------------
-size_t jfSimpleExpFilterCore::ExtraLines() const {
-  return 1;
-}
-//-----------------------------------------------------------------------
-bool jfSimpleExpFilterCore::AddRestToFile(QTextStream* outfile) const {
-  QString buffer;
-  // checking and special conditions
-  if (outfile==NULL) return false;
-  // composing line 4
-  QString src = (parsed_expression == NULL) ? "" : parsed_expression->GetSrc();
-  buffer = EscapeNL(src,IO_DELIMS);
-  (*outfile) << buffer << "\n";
-  return true;
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool jfSimpleExpFilterCore::ReadRestFromFile(jfFileReader* infile) {
-  const QString funcname = "jfSimpleExpFilterCore::ReadRestFromFile";
-  // input data
-  QString cline;
-  bool resx;
-  // starting checks (and reading the line)
-  /**/JDEBUGLOG(funcname,1)
-  assert(infile!=NULL);
-  /**/JDEBUGLOG(funcname,2)
-  if (!infile->ReadUnEsc(cline,funcname)) return false;
-  // there is only one line, and one field, so this is pretty simple
-  /**/JDEBUGLOGS(funcname,3,cline)
-  resx = FromString(cline);
-  /**/JDEBUGLOGB(funcname,4,resx)
-  if (!resx) return infile->BuildError("The expression string is invalid!");
-  else return true;
-}
-//-----------------------------------------------------------------------
 void jfSimpleExpFilterCore::CoreCopy(const jfSimpleExpFilterCore& source) {
   // copying the most basic items
   name = source.name;
-  validdata = source.validdata;
+  description = source.description;
+
   // we just re-parse
   if (parsed_expression != NULL) {
       delete parsed_expression;

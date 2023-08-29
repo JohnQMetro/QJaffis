@@ -3,7 +3,7 @@ Name    :   ffn_special1.cpp
 Author  :   John Q Metro
 Purpose :   More Filters
 Created :   July 8, 2016
-Updated :   July 29, 2016
+Updated :   May 5, 2023
 ******************************************************************************/
 #ifndef FFN_SPECIAL1_H
   #include "ffn_special1.h"
@@ -15,21 +15,29 @@ Updated :   July 29, 2016
 #ifndef FFN_LINKDATA_H_INCLUDED
   #include "../../../fanficnet/data/ffn_linkdata.h"
 #endif // FFN_LINKDATA_H_INCLUDED
+#ifndef LOGGING_H_INCLUDED
+  #include "../../utils/logging.h"
+#endif // LOGGING_H_INCLUDED
 
 #include <assert.h>
+#include <QRegularExpression>
 /*****************************************************************************/
-/* since different types are stored together, the text file reprentation
-may have objects of varying length */
-size_t jfTagFilterCore::ExtraLines() const { return 1;}
+const jfFilterTypeMeta FFN_GENRES_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::GENRE, "FFNTagFilter", "FFN Genres Filter",
+          QString("Compares the Fanfiction.Net genres of the fic against the ") +
+                  "include/exclude/alternate list specified by the filter.",
+          IdForFFNItemCore(), createFilter<jfFFNGenresFilter> );
 //==========================================================================
-
-jfFFNGenresFilter::jfFFNGenresFilter():jfTagFilterCore() {
-  cm = "/";
+jfFFNGenresFilter::jfFFNGenresFilter(const QString& filter_name):jfTagFilterCore(filter_name) {
+    cm = "/";
+}
+// -------------------------------
+jfFFNGenresFilter::jfFFNGenresFilter(QString&& filter_name):jfTagFilterCore(filter_name) {
+    cm = "/";
 }
 //---------------------------------------------
 jfFFNGenresFilter::jfFFNGenresFilter(const jfFFNGenresFilter& insrc):jfTagFilterCore(insrc) {
   cm = "/";
-  validdata = DoVerify();
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // getting and setting values
@@ -38,17 +46,11 @@ bool jfFFNGenresFilter::SetToEmpty() {
   return true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// redefined virtual methods
-QString jfFFNGenresFilter::GetTypeID() const {
-  return "FFNTagFilter";
-}
-//-----------------------------------------------------------------------------
-QString jfFFNGenresFilter::GetTypeDescription() const {
-    return "Compares the Fanfiction.Net genres of the fic against the \
-include/exclude/alternate list specified by the filter.";
+const jfFilterTypeMeta& jfFFNGenresFilter::GetTypeMetaInfo() const {
+    return FFN_GENRES_FILTER_INFO;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-jfBaseFilter* jfFFNGenresFilter::GenCopy() const {
+jfFilterBase* jfFFNGenresFilter::GenCopy() const {
   return new jfFFNGenresFilter(*this);
 }
 //----------------------------------------------
@@ -79,56 +81,60 @@ bool jfFFNGenresFilter::CoreMatch(const jfSearchResultItem* testelem) const {
 bool jfFFNGenresFilter::DoVerify() {
   return VerifyTags(ffn_consts::taggen_list,NULL);
 }
+//------------------------------------------------
+bool jfFFNGenresFilter::DoVerifyCheck(jfTagListing* to_check) const {
+    return VerifyCheck(to_check, ffn_consts::taggen_list,NULL);
+}
+
+
 //======================================================================
+const jfFilterTypeMeta FFN_RATINGS_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::CATEGORY, "FFNRatingFilter", "FFN Rating Filter",
+          QString("Filters items depending on their rating. The default is to") +
+                  "include all ratings.",
+          IdForFFNItemCore(), createFilter<jfFFNRatingFilter> );
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 const QString FFN_RATINGS = "K+TM";
+const QRegularExpression NOT_FFN_RATINGS = QRegularExpression("[^"+FFN_RATINGS+"]");
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // constructors
 //--------------------------------------------------
-jfFFNRatingFilter::jfFFNRatingFilter() {
-  value = FFN_RATINGS;
+jfFFNRatingFilter::jfFFNRatingFilter(const QString& filter_name):jfFilterBase(filter_name) {
+    value = FFN_RATINGS;
+}
+//--------------------------------------
+jfFFNRatingFilter::jfFFNRatingFilter(QString&& filter_name):jfFilterBase(filter_name) {
+    value = FFN_RATINGS;
 }
 //--------------------------------------------------
-jfFFNRatingFilter::jfFFNRatingFilter(QString value_in) {
-  FromString(value_in);
+jfFFNRatingFilter::jfFFNRatingFilter(const QString& filter_name, QString value_in):jfFilterBase(filter_name) {
+    QString error;
+    bool okay = FromStringInner(value_in, error);
+    jerror::AssertLog(okay, "jfFFNRatingFilter" ,error);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // match against the filter, note this currently dependant on fanfiction.net
-bool jfFFNRatingFilter::isEmpty() const {
+bool jfFFNRatingFilter::IsEmpty() const {
   return (FFN_RATINGS==value);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// loading from a string representation
-//--------------------------------------------------
-bool jfFFNRatingFilter::FromString(const QString& sourcedata) {
-  QRegExp xrg = QRegExp("[^"+FFN_RATINGS+"]");
-  value = sourcedata;
-  return (!sourcedata.contains(xrg));
-}
-//--------------------------------------------------
 QString jfFFNRatingFilter::ToString() const {
   return value;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// gets a description
-QString jfFFNRatingFilter::GetTypeDescription() const {
-    return "Filters items depending on their rating. The default is to \
-include all ratings.";
+const jfFilterTypeMeta& jfFFNRatingFilter::GetTypeMetaInfo() const {
+    return FFN_RATINGS_FILTER_INFO;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // copy
-jfBaseFilter* jfFFNRatingFilter::GenCopy() const {
+jfFilterBase* jfFFNRatingFilter::GenCopy() const {
   jfFFNRatingFilter* result;
-  result = new jfFFNRatingFilter();
-  CopyOver(result);
-  result->FromString(value);
+  result = new jfFFNRatingFilter(name);
+  result->description = description;
+  result->value = value;
   return result;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// special meta-information
-QString jfFFNRatingFilter::GetTypeID() const {
-  return "FFNRatingFilter";
-}
-//--------------------------------------------------------------
 // custom methods
 bool jfFFNRatingFilter::Includes(QChar test) const {
   return value.contains(test);
@@ -144,99 +150,52 @@ bool jfFFNRatingFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   return value.contains(cvalue);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// file i/o
-//--------------------------------------------------
-bool jfFFNRatingFilter::AddRestToFile(QTextStream* outfile) const {
-  // checking and special conditions
-  if (outfile==NULL) return false;
-  // composing line 4
-  (*outfile) << value << "\n";
-  return true;
+bool jfFFNRatingFilter::FromStringInner(const QString& sourcedata, QString& error_out) {
+    if (sourcedata.contains(NOT_FFN_RATINGS)) {
+        error_out = "String contains characters not used for ratings!";
+        return false;
+    }
+    value = sourcedata;
+    return true;
 }
-//--------------------------------------------------
-bool jfFFNRatingFilter::ReadRestFromFile(jfFileReader* infile) {
-  const QString funcname = "jfFFNRatingFilter::ReadRestFromFile";
-  // input data
-  QString cline;
-  bool resx;
-  // starting checks (and reading the line)
-  assert(infile!=NULL);
-  if (!infile->ReadLine(cline,funcname)) return false;
-  // there is only one line, and one filed, so this is pretty simple
-  resx = FromString(cline);
-  if (!resx) return infile->BuildError("The completed string is invalid!");
-  else return true;
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-/* since different types are stored together, the text file reprentation
-may have objects of varying length */
-size_t jfFFNRatingFilter::ExtraLines() const {return 1;}
-//================================================================
-// FFN Favs Filter
-// constructors
-//---------------------------------------------------
-jfFFNFavsFilter::jfFFNFavsFilter():jfMinMaxUFilter() {}
-//---------------------------------------------------
-jfFFNFavsFilter::jfFFNFavsFilter(size_t inmin, size_t inmax):jfMinMaxUFilter(inmin,inmax) {}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfFFNFavsFilter::GetTypeID() const {
-  return "FFNFavsFilter";
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// returns the list of element names campatible with this filter
-//---------------------------------------------------
-QString jfFFNFavsFilter::GetTypeDescription() const {
-    return "For Fanfiction.Net fics, this filter passes if \
-the number of Favs is between min and max, inclusive.";
-}
-//---------------------------------------------------
-jfBaseFilter* jfFFNFavsFilter::GenCopy() const {
-  jfFFNFavsFilter* result;
-  result = new jfFFNFavsFilter(min,max);
-  CopyOver(result);
-  return result;
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// the core matching method
-bool jfFFNFavsFilter::CoreMatch(const jfSearchResultItem* testelem) const {
-  // variables
-  const jfFFNItemCore* rvalue;
-  size_t cvalue;
-  // checks
-  assert(testelem!=NULL);
-  // determining the type
-  rvalue = dynamic_cast<const jfFFNItemCore*>(testelem);
-  cvalue = rvalue->GetFavs();
-  // checking the wordcount
-  return TestMatch(cvalue);
-}
-//===========================================================================================
+
+//==========================================================================================
+const jfFilterTypeMeta FFN_FANDOM_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::FANDOM, "CategoryFilter", "FFN Fandom Filter",
+          QString("The Category Expression Filter matches the category name") +
+                  "against a boolean expression, the elements of which are themselves" +
+                  " to be matched. These elements are either strings or substrings.",
+          IdForFFNItemCore(), createFilter<jfFFN_CategoryExprFilter> );
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 // constructors
 //----------------------------------------------------------
-jfFFN_CategoryExprFilter::jfFFN_CategoryExprFilter():jfSimpleExpFilterCore() {}
-//----------------------------------------------------------
-jfFFN_CategoryExprFilter::jfFFN_CategoryExprFilter(const jfFFN_CategoryExprFilter& source) {
-  CoreCopy(source);
+jfFFN_CategoryExprFilter::jfFFN_CategoryExprFilter(const QString& filter_name):jfSimpleExpFilterCore(filter_name) {
+
+}
+//------------------------
+jfFFN_CategoryExprFilter::jfFFN_CategoryExprFilter(QString&& filter_name):jfSimpleExpFilterCore(filter_name) {
+
 }
 //----------------------------------------------------------
-jfFFN_CategoryExprFilter::jfFFN_CategoryExprFilter(jfSimpleExpr* in_source):jfSimpleExpFilterCore(in_source) {}
+jfFFN_CategoryExprFilter::jfFFN_CategoryExprFilter(const jfFFN_CategoryExprFilter& source):jfSimpleExpFilterCore(source) {
+
+}
+//----------------------------------------------------------
+jfFFN_CategoryExprFilter::jfFFN_CategoryExprFilter(const QString& filter_name, jfSimpleExpr* in_source):jfSimpleExpFilterCore(filter_name, in_source) {}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfFFN_CategoryExprFilter::GetTypeDescription() const {
-  return "The Category Expression Filter matches the category name against a boolean \
-expression, the elements of which are themselves to be matched. These elements \
-are either strings or substrings.";
+const jfFilterTypeMeta& jfFFN_CategoryExprFilter::GetTypeMetaInfo() const {
+    return FFN_FANDOM_FILTER_INFO;
 }
+
 //------------------------------------------------------------
 jfFFN_CategoryExprFilter* jfFFN_CategoryExprFilter::Copy() const {
   return new jfFFN_CategoryExprFilter(*this);
 }
 //------------------------------------------------------------
-jfBaseFilter* jfFFN_CategoryExprFilter::GenCopy() const {
+jfFilterBase* jfFFN_CategoryExprFilter::GenCopy() const {
   return Copy();
-}
-//------------------------------------------------------------
-QString jfFFN_CategoryExprFilter::GetTypeID() const {
-  return "CategoryFilter";
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method

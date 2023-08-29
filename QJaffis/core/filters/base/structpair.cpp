@@ -3,7 +3,7 @@ Name    :   structpair.cpp
 Author  :   John Q Metro
 Purpose :   'Structured Pair' filters
 Created :   February 16, 2023
-Updated :   March 29, 2023
+Updated :   April 9, 2023
 ******************************************************************************/
 
 #include "structpair.h"
@@ -290,20 +290,36 @@ bool jfPairFilterPair::IsAMatchFor(bool list_platonic, const QStringList& in_par
 }
 
 //=============================================================================
+const jfFilterTypeMeta STRUCTURED_PAIR_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::PAIR, "StructuredPairFilter",
+          "Pairing (in Info) Filter",
+          QString("Matches against the list of pairings that comes with fics ") +
+                  "from some sites. The filter contains lists of string pairs, " +
+                  "like 'harry / ginny', at least one of the pairings must match" +
+                  " one or all of the pairs (or polys) specified by the fic " +
+                  "(unless the filter is empty).",
+          IdForFanficPairs(), createFilter<jfStructuredPairFilter> );
+//=============================================================================
 // constructors
 //---------------------------
-jfStructuredPairFilter::jfStructuredPairFilter():jfBaseFilter() {
+jfStructuredPairFilter::jfStructuredPairFilter(const QString& filter_name):jfFilterBase(filter_name) {
     match_all = false;
     match_reader = false;
     match_original = false;
     filter_pairs = QVector<const jfPairFilterPair*>();
 }
+//---------------------------
+jfStructuredPairFilter::jfStructuredPairFilter(QString&& filter_name):jfFilterBase(filter_name) {
+    match_all = false;
+    match_reader = false;
+    match_original = false;
+    filter_pairs = QVector<const jfPairFilterPair*>();
+}
+
 //------------------------------
-jfStructuredPairFilter::jfStructuredPairFilter(const jfStructuredPairFilter& source):jfBaseFilter() {
+jfStructuredPairFilter::jfStructuredPairFilter(const jfStructuredPairFilter& source):jfFilterBase(source.name) {
   // copying base elements
   description = source.description;
-  num_id = source.num_id;
-  validdata = source.validdata;
   name = source.name + ", copy";
 
   filter_pairs = QVector<const jfPairFilterPair*>(source.filter_pairs.size());
@@ -317,7 +333,7 @@ jfStructuredPairFilter::jfStructuredPairFilter(const jfStructuredPairFilter& sou
 //+++++++++++++++++++++++++++++++++++++++++++
 // public methods implemented here
 //---------------------------
-bool jfStructuredPairFilter::isEmpty() const {
+bool jfStructuredPairFilter::IsEmpty() const {
     if (filter_pairs.isEmpty()) {
         return !(match_reader || match_original);
     }
@@ -325,24 +341,6 @@ bool jfStructuredPairFilter::isEmpty() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++
 // string conversion
-//----------------------------------
-bool jfStructuredPairFilter::FromString(const QString& sourcedata) {
-    const QString fname = "jfStructuredPairFilter::FromString";
-    validdata = false;
-    filter_pairs.clear();
-    // parsing
-    jfLineParse lparse(sourcedata);
-    if (lparse.NNotX(4)) return false;
-    // getting...
-    if (!lparse.BoolVal(0,match_all)) return false;
-    if (!lparse.BoolVal(1,match_reader)) return false;
-    if (!lparse.BoolVal(2,match_original)) return false;
-    QString srcstuff = lparse.UnEscStr(3);
-    bool okay = SetNamesData(srcstuff, false);
-    if (okay) validdata = true;
-    return validdata;
-}
-//-------------------------------
 QString jfStructuredPairFilter::ToString() const {
     jfOutString res;
     res << match_all << match_reader << match_original;
@@ -376,18 +374,11 @@ QString jfStructuredPairFilter::GetNamesData(bool nl_split) const {
   return result;
 }
 //++++++++++++++++++++++++++++++++++++++++++++
-// gets a description
-QString jfStructuredPairFilter::GetTypeDescription() const {
-  return "Matches against the list of pairings that comes with fics from some sites. The filter contains lists of string pairs, like \
-'harry' and 'ginny', at least one of the pairings must match one or all of the pairs (or polys) specified \
-by the fic (unless the filter is empty).";
-}
-//-------------------------------
 // copy
-jfBaseFilter* jfStructuredPairFilter::GenCopy() const {
+jfFilterBase* jfStructuredPairFilter::GenCopy() const {
   jfStructuredPairFilter* newfilt;
-  newfilt = new jfStructuredPairFilter();
-  CopyOver(newfilt);
+  newfilt = new jfStructuredPairFilter(name);
+  newfilt->description = description;
 
   // copying over the parts
   for (const jfPairFilterPair* source_pair : filter_pairs) {
@@ -398,10 +389,10 @@ jfBaseFilter* jfStructuredPairFilter::GenCopy() const {
   newfilt->match_original = match_original;
   return newfilt;
 }
-//------------------------------
-// special meta-information
-QString jfStructuredPairFilter::GetTypeID() const {
-  return "StructuredPairFilter";
+
+// ------------------------------
+const jfFilterTypeMeta& jfStructuredPairFilter::GetTypeMetaInfo() const {
+    return STRUCTURED_PAIR_FILTER_INFO;
 }
 //--------------------------------
 void jfStructuredPairFilter::SetMatchAll(bool inval) {
@@ -434,6 +425,40 @@ jfStructuredPairFilter::~jfStructuredPairFilter() {
     EmptyPairList(filter_pairs);
 }
 //+++++++++++++++++++++++++++++++++++++++++++
+bool jfStructuredPairFilter::FromStringInner(const QString& sourcedata, QString& error_out) {
+    const QString fname = "jfStructuredPairFilter::FromStringInner";
+    filter_pairs.clear();
+    // parsing
+    jfLineParse lparse(sourcedata);
+    if (lparse.NNotX(4)) return false;
+    // getting...
+    bool x_match_all; bool x_match_reader; bool x_match_original;
+    if (!lparse.BoolVal(0,x_match_all)) {
+        error_out = "Failed to parse the 'Match All' flag!";
+        return false;
+    }
+    if (!lparse.BoolVal(1,x_match_reader)) {
+        error_out = "Failed to parse the 'Match Reader' flag!";
+        return false;
+    }
+    if (!lparse.BoolVal(2,x_match_original)) {
+        error_out = "Failed to parse the 'Match Original Character' flag!";
+        return false;
+    }
+    QString srcstuff = lparse.UnEscStr(3);
+    bool okay = SetNamesData(srcstuff, false);
+    if (okay) {
+        match_all = x_match_all;
+        match_reader = x_match_reader;
+        match_original = x_match_original;
+        return true;
+    }
+    else {
+        error_out = "Failed to parse the pair names!";
+        return false;
+    }
+}
+//+++++++++++++++++++++++++++++++++++++++++++
 void jfStructuredPairFilter::EmptyPairList(QVector<const jfPairFilterPair*>& plist) {
     for (int pdex = 0; pdex < plist.size(); pdex++) {
         if (plist[pdex] != NULL) {
@@ -464,20 +489,13 @@ bool jfStructuredPairFilter::DoesPairingMatch(const jfPairingStruct& target) con
         return false;
     }
 }
-//-------------------------------------------
-const jfFanficPairsMixin* jfStructuredPairFilter::CheckCastElement(const jfSearchResultItem* testelem) const {
-    if (testelem == NULL) return NULL;
-    if (testelem->GetTypeLabels().contains(jfFanficPairsMixin::FANFIC_PAIRS_TYPE_ID)) {
-        return dynamic_cast<const jfFanficPairsMixin*>(testelem);
-    }
-    else return NULL;
-}
+
 //-------------------------------------------
 bool jfStructuredPairFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const QString fname = "jfStructuredPairFilter::CoreMatch";
 
-  const jfFanficPairsMixin* pair_fanfic = CheckCastElement(testelem);
-  assert(pair_fanfic != NULL);
+  const jfFanficPairsMixin* pair_fanfic;
+  pair_fanfic = dynamic_cast<const jfFanficPairsMixin*>(testelem);
 
   // if there is no pair info, we return false
   if (pair_fanfic->RelationshipCount() == 0) return false;
@@ -523,29 +541,5 @@ bool jfStructuredPairFilter::ParsePairs(const QString& inval, bool nl, QVector<c
   }
     return true;
 }
-//+++++++++++++++++++++++++++++++++++++++++++
-// file i/o
-//---------------------------
-bool jfStructuredPairFilter::AddRestToFile(QTextStream* outfile) const {
-  // checking and special conditions
-  if (outfile==NULL) return false;
-  // adding
-  (*outfile) << ToString() << "\n";
-  return true;
-}
-//---------------------------
-bool jfStructuredPairFilter::ReadRestFromFile(jfFileReader* infile) {
-  const QString funcname = "jfStructuredPairFilter::ReadRestFromFile";
-  // input data
-  QString cline;
-  // starting checks (and reading the line)
-  assert(infile!=NULL);
-  // parsing the line
-  if (!infile->ReadLine(cline,funcname)) return false;
-  if (!FromString(cline)) return infile->BuildError("The characters do not match the filter!");
-  return true;
-}
-//---------------------------
-size_t jfStructuredPairFilter::ExtraLines() const { return 1; }
-// ******************************************************************************************************
 
+// ******************************************************************************************************

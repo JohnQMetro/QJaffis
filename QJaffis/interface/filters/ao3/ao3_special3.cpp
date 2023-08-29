@@ -3,7 +3,7 @@ Name    :   ao3_special3.cpp
 Author  :   John Q Metro
 Purpose :   Defines some interface panels for some AO3 Filters
 Created :   May 14, 2014
-Updated :   August 5, 2015
+Updated :   April 16, 2023
 ******************************************************************************/
 #ifndef AO3_SPECIAL3_H
   #include "ao3_special3.h"
@@ -17,10 +17,9 @@ Updated :   August 5, 2015
 /*****************************************************************************/
 // constructor
 jfAO3FandomFilterEditor::jfAO3FandomFilterEditor(const jfAO3FandomFilter* infilt,
-    const jfFilterMap* infmap, QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+                             QWidget* parent):jfBaseFilterEditor(infilt,parent) {
   // most things are handled by the parent constructor
   QString omsg;
-  assert(infmap!=NULL);
   typed_fpointer = infilt;
   // calling the custom methods
   MakeWidgets();
@@ -31,17 +30,19 @@ jfAO3FandomFilterEditor::jfAO3FandomFilterEditor(const jfAO3FandomFilter* infilt
   ArrangeSizers();
   connect(crossover_box,SIGNAL(stateChanged(int)),this,SLOT(HandleCrossoverCheck(int)));
   // setting empty values
+  /*
   if (infilt==NULL) {
     allmatch_box->setEnabled(false);
     perf_edit->setEnabled(false);
   }
+  */
   // loafing the filter
-  else LoadFilter(typed_fpointer);
+  if (infilt != NULL) LoadFilter(typed_fpointer);
 }
 //+++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //-----------------------------------
-void jfAO3FandomFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfAO3FandomFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   // variables
   const jfAO3FandomFilter* thefilt;
   QString omsg;
@@ -60,19 +61,21 @@ void jfAO3FandomFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
   allmatch_box->setChecked(typed_fpointer->GetAllMatch());
   perf_edit->SetData(typed_fpointer->GetPerFandomSrc(),omsg);
   // enabling or disabling basic on crossover
+  /*
   allmatch_box->setEnabled(xvalue);
   perf_edit->setEnabled(xvalue);
+  */
   // done
 }
 //-----------------------------------
-jfBaseFilter* jfAO3FandomFilterEditor::GetFilter() {
+jfFilterBase* jfAO3FandomFilterEditor::GetFilter() {
   // variables
   jfSimpleExpr* toutput;
   jfAO3FandomFilter* result;
   QString omsg;
   bool cvalue;
   // building the result
-  result = new jfAO3FandomFilter();
+  result = new jfAO3FandomFilter("(dummy name");
   // adding main expression
   toutput = main_edit->CheckFilter(omsg);
   result->GeneralFromExpr(toutput);
@@ -80,55 +83,55 @@ jfBaseFilter* jfAO3FandomFilterEditor::GetFilter() {
   // adding crossover stuff
   cvalue = crossover_box->isChecked();
   result->SetCrossover(cvalue);
-  if (cvalue) {
-    result->SetAllMatch(allmatch_box->isChecked());
-    toutput = perf_edit->CheckFilter(omsg);
-    result->PerFandomFromExpr(toutput);
-    delete toutput;
-  }
+  result->SetAllMatch(allmatch_box->isChecked());
+  toutput = perf_edit->CheckFilter(omsg);
+  result->PerFandomFromExpr(toutput);
+  delete toutput;
   // final details
-  namedesc_edit->ChangeObj(result);
+  namedesc_edit->ChangeFilter(result);
   // done
   return result;
 }
 //+++++++++++++++++++++++++++++++++++++++++++
 // checking
-bool jfAO3FandomFilterEditor::GeneralCheck() const {
-  // local variables
-  const QString pfmsg = "Problem with filter contents!";
-  jfSimpleExpr* toutput;
-  QString omsg;
-  QMessageBox emsg;
-  // first we see if the name is correct
-  if (NameNUniq()) return false;
-  // next, we check the main filter
-  toutput = main_edit->CheckFilter(omsg);
-  if ((toutput!=NULL) && (toutput->IsValid())) {
-    // things are ok
-    delete toutput;
-    if (crossover_box->isChecked()) {
-      toutput = main_edit->CheckFilter(omsg);
-      if ((toutput!=NULL) && (toutput->IsValid())) {
+bool jfAO3FandomFilterEditor::GeneralCheck(const jfFilterMap* infmap) const {
+    // local variables
+    const QString pfmsg = "Problem with filter contents!";
+    jfSimpleExpr* toutput;
+    QString omsg;
+    QMessageBox emsg;
+    // first we see if the name is correct
+    if (NameNUniq(infmap)) return false;
+    // next, we check the main filter
+    toutput = main_edit->CheckFilter(omsg);
+    if ((toutput!=NULL) && (toutput->IsValid())) {
+        // things are ok
         delete toutput;
-        return true;
-      }
+        if (crossover_box->isChecked()) {
+            toutput = main_edit->CheckFilter(omsg);
+            if ((toutput!=NULL) && (toutput->IsValid())) {
+                delete toutput;
+                return true;
+            }
+        }
+        else return true;
     }
-    else return true;
-  }
-  // things are not ok    // we are in error here
-  emsg.setIcon(QMessageBox::Critical);
-  emsg.setText(omsg);
-  emsg.setWindowTitle(pfmsg);
-  emsg.exec();
-  if (toutput!=NULL) delete toutput;
-  return false;
+    // things are not ok    // we are in error here
+    emsg.setIcon(QMessageBox::Critical);
+    emsg.setText(omsg);
+    emsg.setWindowTitle(pfmsg);
+    emsg.exec();
+    if (toutput!=NULL) delete toutput;
+    return false;
 }
 //+++++++++++++++++++++++++++++++++++++++++++
 // event handlers
 void jfAO3FandomFilterEditor::HandleCrossoverCheck(int state) {
   bool ccheck = crossover_box->isChecked();
+  /*
   allmatch_box->setEnabled(ccheck);
   perf_edit->setEnabled(ccheck);
+  */
   emit SendCrossCheck(ccheck);
 }
 //+++++++++++++++++++++++++++++++++++++++++++
@@ -158,15 +161,17 @@ void jfAO3FandomFilterEditor::ArrangeSizers2() {
   msizer->addWidget(main_label,0);
   msizer->addWidget(main_edit,1);
 }
+
 //====================================================================
-jfAO3KudoFilterEditor::jfAO3KudoFilterEditor(const jfFilterMap* infmap, const jfAO3KudoFilter* infilt,
-          QWidget* parent):jfZeroToMaxFilterEditor("Kudo Count Range",25000,infmap,infilt,parent) {
+
+jfAO3KudoFilterEditor::jfAO3KudoFilterEditor(const jfFavKudoFilter* infilt, QWidget* parent):
+            jfZeroToMaxFilterEditor("Kudo Count Range",25000,infilt,parent) {
   // not much
   insert_panel->SetMinMax(0,0);
 }
 
 //--------------------------------------------------------------------
 jfMinMaxUFilter* jfAO3KudoFilterEditor::MakeTypedMinMax() const {
-  return new jfAO3KudoFilter();
+  return new jfFavKudoFilter("(dummy name)");
 }
 /*****************************************************************************/

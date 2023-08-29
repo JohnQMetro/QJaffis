@@ -28,7 +28,7 @@ void jfAO3FanficOutputter::SetFanfic(const jfAO3Fanfic* in_fim_fanfic) {
 //-------------------------------------
 void jfAO3FanficOutputter::SetItemSource(const jfSearchResultItem* in_source, const jfItemMetaFlags* in_flags) {
     assert(in_source != NULL);
-    assert(in_source->GetTypeLabel() == jfAO3Fanfic::AO3_FANFIC_TYPE_ID);
+    assert(in_source->GetTypeLabel() == IdForAO3Fanfic());
     ao3_fanfic = dynamic_cast<const jfAO3Fanfic*>(in_source);
     fanfic_source = ao3_fanfic;
     source = in_source;

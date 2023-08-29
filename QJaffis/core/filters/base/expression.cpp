@@ -4,11 +4,14 @@
 // Purpose :    Defines  the summary and title general expression filter
 // Created:     31.12.06
 // Conversion to QT Started April 11, 2013
-// Updated:     February 12, 2018 (fixed crash in destructor caused by dangling pointer)
+// Updated:     April 5, 2023 (Rebasing)
 /////////////////////////////////////////////////////////////////////////////
+///
+
 #ifndef EXPRESSION_H
   #include "expression.h"
 #endif // EXPRESSION_H
+
 //--------------------------------------
 #ifndef JFEXPRPARSE
   #include "../../express/expr_parse.h"
@@ -19,103 +22,78 @@
 #ifndef UTILS1_H_INCLUDED
   #include "../../utils/utils1.h"
 #endif // UTILS1_H_INCLUDED
-#ifndef JFILTERGLOBALS
-  #include "../filter_globals.h"
-#endif
+
 #ifndef JFEXPRMATCH
-#include "../../express/expr_match.h"
+    #include "../../express/expr_match.h"
 #endif
 //-------------------------------
 #include <assert.h>
 //*************************************************************************
 size_t efcounter;
-const QString EXP_FIL_TAG = "ExprFilter";
+
+const jfFilterTypeMeta EXPRESSION_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::EXPRESSION, "ExprFilter", "General Expression Filter",
+          QString("The Expression Filter is rather complicated; it matches ") +
+          "elements against a boolean expression, the elements of which are themselves " +
+          "to be matched. These elements are either string to match against the title or " +
+          "summary, or embedded filters, whcih can be references to global filters.",
+          IdForBaseSearch(), createFilter<jfExpressionFilter> );
+
+//===============================================================
 // --- [ methods for jfExpressionFilter ] -------------------------------
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the constructors
 //----------------------------------------------------------------------
-// the basic constructor
-jfExpressionFilter::jfExpressionFilter():jfBaseFilter() {
-  loaded = false;
-  parsedinfo = NULL;
-  validdata = false;
-  fmap_link = NULL;
+jfExpressionFilter::jfExpressionFilter(const QString& filter_name):jfFilterBase(filter_name) {
+    old_unescape = true;
+    loaded = false;
+    parsedinfo = NULL;
+    fmap_link = NULL;
+    verify_state = jfExpVerifiedState::UNCHECKED;
+}
+// --------------------------------------------
+jfExpressionFilter::jfExpressionFilter(QString&& filter_name):jfFilterBase(filter_name) {
+    old_unescape = true;
+    loaded = false;
+    parsedinfo = NULL;
+    fmap_link = NULL;
+    verify_state = jfExpVerifiedState::UNCHECKED;
 }
 //----------------------------------------------------------------------
 /* a copy constructor. I've decided, after a while, to avoid validation
 during object construction: we verify afterwards using VerifyNames.
 also, no CopyLoad done here, we wait until later (after verifynames is called) */
-jfExpressionFilter::jfExpressionFilter(const jfExpressionFilter& source,jfFilterMap* infmap_link) {
-  // copying the most basic items
-  name = source.name;
-  validdata = source.validdata;
-  parse_error = source.parse_error;
-  // copying expression filter specific stuff
-  srcstring = source.srcstring;
-  loaded = source.loaded;
-  if (source.parsedinfo!=NULL) {
-    parsedinfo = (source.parsedinfo)->Copy();
-  }
-  else parsedinfo = NULL;
-  fmap_link = infmap_link;
+jfExpressionFilter::jfExpressionFilter(const jfExpressionFilter& source, const jfFilterMap* infmap_link):jfFilterBase(source.name) {
+    old_unescape = true;
+    description = source.description;
+
+    // copying expression filter specific stuff
+    srcstring = source.srcstring;
+    loaded = source.loaded;
+    if (source.parsedinfo!=NULL) {
+        parsedinfo = (source.parsedinfo)->Copy();
+    }
+    else parsedinfo = NULL;
+    fmap_link = infmap_link;
+    if (infmap_link == source.fmap_link) {
+        verify_state = source.verify_state;
+    }
+    else verify_state = jfExpVerifiedState::UNCHECKED;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool jfExpressionFilter::isEmpty() const {
-  return (parsedinfo==NULL)||(parsedinfo->size()==0);
+jfFilterBase* jfExpressionFilter::GenCopy() const {
+    return Copy();
+}
+//-----------------------------------------------
+bool jfExpressionFilter::IsEmpty() const {
+  return (parsedinfo==NULL) || (parsedinfo->size()==0);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool jfExpressionFilter::SetFiltermapLink(jfFilterMap* infmap_link) {
+bool jfExpressionFilter::SetFiltermapLink(const jfFilterMap* infmap_link) {
   fmap_link = infmap_link;
   return (fmap_link!=NULL);
 }
-//-------------------------------------------------------------------------
-// redefined virtual functions
-// loading stuff
-bool jfExpressionFilter::FromString(const QString& sourcedata) {
-  // constants
-  const QString fname = "jfExpressionFilter::FromString";
-  // local data
-  jfExpParserClass* theparser;
-  jfElemArray* pfix;
-  size_t pcount;
-  QString oerr;
-  // setting the source
-  srcstring = sourcedata.trimmed();
-  // clearing out the old
-  if (parsedinfo!=NULL) delete parsedinfo;
-  parsedinfo = NULL;
-  parse_error.clear();
-  loaded = false;
-  // producing the new
-  theparser = new jfExpParserClass(srcstring,false,fmap_link);
-  if (!theparser->ParseExpression(pcount)) {
-      parse_error = theparser->parse_error;
-      jerror::ParseLog(fname,parse_error);
-        delete theparser;
-        validdata = false;
-        return false;
-  }
-  // parsing succeeded
-  parsedinfo = theparser->GetResult();
-  assert(parsedinfo!=NULL);
-  delete theparser;
-  // next, we postfixize it
-  pfix = MakeExprPostfix(parsedinfo,oerr);
-  delete parsedinfo;
-  parsedinfo = NULL;
-  if (pfix==NULL) {
-      jerror::ParseLog(fname,oerr);
-        parse_error = oerr;
-        validdata = false;
-        return false;
-  }
-  // things are okay
-  parsedinfo = pfix;
-  // done
-  validdata = true;
-  loaded = true;
-  return true;
-}
+
 //----------------------------------------------------------------------
 QString jfExpressionFilter::ToString() const {
   return srcstring;
@@ -123,25 +101,14 @@ QString jfExpressionFilter::ToString() const {
 //----------------------------------------------------------------------
 // returning a copy
 jfExpressionFilter* jfExpressionFilter::Copy() const {
-  return new jfExpressionFilter(*this);
+  return new jfExpressionFilter(*this, fmap_link);
 }
-//-----------------------------------------------------------------------
-jfBaseFilter* jfExpressionFilter::GenCopy() const {
-  return Copy();
-}
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // basic constants
 //----------------------------------------------------------------------
-QString jfExpressionFilter::GetTypeID() const {
-  return EXP_FIL_TAG;
-}
-//----------------------------------------------------------------------
-QString jfExpressionFilter::GetTypeDescription() const {
-  return "The Expression Filter is rather complicated; it matches \
-elements against a boolean expression, the elements of which are themselves \
-to be matched. These elements are either string to match against the title or \
-summary, or embedded filters, whcih can be references to global filters.";
-
+const jfFilterTypeMeta& jfExpressionFilter::GetTypeMetaInfo() const {
+    return EXPRESSION_FILTER_INFO;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // modifying and checking the contents
@@ -154,7 +121,7 @@ bool jfExpressionFilter::VerifyNames(jfNameVerif* nameobj, bool notinmap) {
   // verifying using the parsed info method
   tres = parsedinfo->VerifyNames(nameobj);
   // handling the result
-  validdata = tres;
+  verify_state = (tres) ? jfExpVerifiedState::VERIFIED : jfExpVerifiedState::FAILED;
   if (tres) nameobj->PopName();
   return tres;
 }
@@ -167,9 +134,13 @@ bool jfExpressionFilter::VerifyNames(jfNameVerif* nameobj, const QString& inmapn
   // verifying using the parsed info method
   tres = parsedinfo->VerifyNames(nameobj);
   // handling the result
-  validdata = tres;
+  verify_state = (tres) ? jfExpVerifiedState::VERIFIED : jfExpVerifiedState::FAILED;
   if (tres) nameobj->PopName();
   return tres;
+}
+//----------------------------------------------------------------------
+const jfExpVerifiedState& jfExpressionFilter::VerifiedState() const {
+    return verify_state;
 }
 //----------------------------------------------------------------------
 // doing the copy load
@@ -192,7 +163,12 @@ QString jfExpressionFilter::MakePList() const {
   // done
   return result;
 }
+// ------------------------------------------------------------------
+bool jfExpressionFilter::FromString(const QString& sourcedata, QString& error_out) {
+    return FromStringInner(sourcedata, error_out);
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 // sort of like load string, except the string is empty
 void jfExpressionFilter::EmptyFilter() {
   // setting the source
@@ -201,9 +177,8 @@ void jfExpressionFilter::EmptyFilter() {
   if (parsedinfo!=NULL) delete parsedinfo;
   // creating the empty data
   parsedinfo = new jfElemArray();
-  parse_error.clear();
   // done
-  validdata = true;
+  verify_state = jfExpVerifiedState::VERIFIED;
   loaded = true;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -213,43 +188,50 @@ jfExpressionFilter::~jfExpressionFilter() {
   parsedinfo = NULL;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//----------------------------------------------------------------------
+bool jfExpressionFilter::FromStringInner(const QString& sourcedata, QString& error_out) {
+    const QString fname = "jfExpressionFilter::FromStringInner";
+
+    QString srcstring_new = sourcedata.trimmed();
+    jfExpParserClass* theparser = new jfExpParserClass(srcstring_new, false, fmap_link);
+    size_t pcount;
+
+    // trying to parse
+    if (!theparser->ParseExpression(pcount)) {
+        error_out = theparser->parse_error;
+        jerror::ParseLog(fname,error_out);
+        delete theparser;
+        return false;
+    }
+    // parsing succeeded
+    jfElemArray* parsedinfo_new = theparser->GetResult();
+    assert(parsedinfo_new != NULL);
+    delete theparser;
+
+    // next, we postfixize it
+    QString oerr;
+    jfElemArray* pfix = MakeExprPostfix(parsedinfo_new,oerr);
+    delete parsedinfo_new;
+    parsedinfo_new = NULL;
+    // if postfixing failed...
+    if (pfix == NULL) {
+        jerror::ParseLog(fname,oerr);
+        error_out = oerr;
+        return false;
+    }
+    // things are okay
+    srcstring = sourcedata;
+    if (parsedinfo != NULL) delete parsedinfo;
+    parsedinfo = pfix;
+    loaded = true;
+    verify_state = jfExpVerifiedState::UNCHECKED;
+
+    return true;
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // basic matching
 bool jfExpressionFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   return FullItemExprMatch(testelem,parsedinfo);
 }
-//-----------------------------------------------------------------------
-// check for validity
-void jfExpressionFilter::SetValid() {
-  validdata = loaded;
-}
-//-----------------------------------------------------------------------
-size_t jfExpressionFilter::ExtraLines() const {
-  return 1;
-}
-//-----------------------------------------------------------------------
-bool jfExpressionFilter::AddRestToFile(QTextStream* outfile) const {
-  QString buffer;
-  // checking and special conditions
-  if (outfile==NULL) return false;
-  // composing line 4
-  buffer = EscapeNL(srcstring,IO_DELIMS);
-  (*outfile) << buffer << "\n";
-  return true;
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool jfExpressionFilter::ReadRestFromFile(jfFileReader* infile) {
-  const QString funcname = "jfExpressionFilter::ReadRestFromFile";
-  // input data
-  QString cline;
-  bool resx;
-  // starting checks (and reading the line)
-  assert(infile!=NULL);
-  if (!infile->ReadUnEsc(cline,funcname)) return false;
-  // there is only one line, and one filed, so this is pretty simple
-  resx = FromString(cline);
-  if (!resx) return infile->BuildError("The expression string is invalid!");
-  else return true;
-}
+
 
 ///////////////////////////////////////////////////////////////////////////////

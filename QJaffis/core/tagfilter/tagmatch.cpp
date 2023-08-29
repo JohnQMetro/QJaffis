@@ -118,6 +118,11 @@ bool jfTagMultiMatcher::BadExpression() const {
     else if (second_match_expression->IsValid()) return false;
     else return true;
 }
+// ---------------------------
+QString jfTagMultiMatcher::ExpressionError() const {
+    if (BadExpression()) return second_match_expression->parse_error;
+    else return "";
+}
 // ----------------------------
 bool jfTagMultiMatcher::IsUsable() const {
     return HasSet() || HasExpression();

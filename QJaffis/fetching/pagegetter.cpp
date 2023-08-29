@@ -306,6 +306,18 @@ bool jfFetchPage::TestPageDelegates() {
         thepage = NULL;
         return false;
     }
+    /**/JDEBUGLOG(fname,5)
+    rc = testsDelegate->testRatelimit(thepage);
+    /**/JDEBUGLOGB(fname,6,rc)
+    if (!rc) {
+        jerror::Log(fname,"PAGE LIMITED");
+        jerror::Log(fname,(*thepage));
+        theerror = jff_RATELIMIT;
+        delete thepage;
+        thepage = NULL;
+        retry_after = 0;
+        return false;
+    }
     /**/JDEBUGLOGS(fname,8,jf_FetchErr2String(theerror,false));
     return true;
 }

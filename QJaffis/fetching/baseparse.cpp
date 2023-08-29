@@ -3,7 +3,7 @@ Name    : baseparse.cpp
 Basic   : Defines a base class that handles page parsing (and redirection)
 Author  : John Q Metro
 Started : June 13, 2016
-Updated : March 20, 2023
+Updated : August 6, 2023
 
 ******************************************************************************/
 #ifndef BASEPARSE_H
@@ -138,19 +138,19 @@ size_t jfItemsPageParserBase::FilterByList() const {
     /**/lpt->tAssert(search_ptr->Check(),fname,"Search check failed");
     /**/lpt->tLog(fname,1);
 
-    QStringList* scheck;
+    // QStringList* scheck;
     // the constructor of the items should have them be included by default
-    /**/lpt->tLog(fname,2);
-
 
     // we use a special cases first
     if ((search_ptr->def_filtermap)==NULL) return start_itemcount;
-    fsize = (search_ptr->def_filtermap)->GetCount();
+    fsize = (search_ptr->def_filtermap)->FilterCount();
     if (fsize==0) return start_itemcount;
     /**/lpt->tLogS(fname,3,fsize);
     rcount = 0;
+    /*
     scheck = search_ptr->def_filtermap->GetNameList();
     delete scheck;
+    */
     /**/lpt->tLog(fname,6);
     FilterApplyer applyer = FilterApplyer(search_ptr->def_filtermap);
 

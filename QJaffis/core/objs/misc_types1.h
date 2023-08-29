@@ -33,7 +33,7 @@ class jfTagListing : public std::map<QString,jfTAG_STATUS> {
     bool Valset() const;
 		// tag replacement
     bool ReplaceTag(QString oldt, QString newt);
-    bool ReplaceTags(QStringList* replist);
+    bool ReplaceTags(const QStringList* replist);
 		// special, returns true if the tags match the given list
     bool MatchTags(const char* inlist[], size_t inlistcount);
 		/* special, compares inputted tags to tags already in the list. Returns

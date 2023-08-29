@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Editors for more filters : word count
 Created :   December 6, 2010
 Conversion to Qt started October 13, 2013
-Updated :   July 8, 2016 (big reorganization)
+Updated :   April 15, 2023
 ******************************************************************************/
 #ifndef FILTERS_EDIT1_H_INCLUDED
   #include "filters_edit1.h"
@@ -18,15 +18,14 @@ Updated :   July 8, 2016 (big reorganization)
 //******************************************************************************/
 
 // the default constructor
-jfTagFilterEditor::jfTagFilterEditor(const jfFilterMap* infmap, const jfTagFilterCore* infilt,
-        QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+jfTagFilterEditor::jfTagFilterEditor(const jfTagFilterCore* infilt, QWidget* parent):jfBaseFilterEditor(infilt,parent) {
   // variables and constants
 
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //----------------------------------------------
-void jfTagFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfTagFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   // variables and constants
   const jfTagFilterCore* tvalue;
   jfTagListing* tcopy;
@@ -40,7 +39,7 @@ void jfTagFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
   NameLoad();
 }
 //---------------------------------------------
-jfBaseFilter* jfTagFilterEditor::GetFilter() {
+jfFilterBase* jfTagFilterEditor::GetFilter() {
   // variables
   jfTagFilterCore* tvalue;
   const jfTagListing* tcopy;
@@ -52,13 +51,15 @@ jfBaseFilter* jfTagFilterEditor::GetFilter() {
 
   tvalue->SetTags(tcopy);
   // name setting
-  namedesc_edit->ChangeObj(tvalue);
+  namedesc_edit->ChangeFilter(tvalue);
   return tvalue;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // checking
-bool jfTagFilterEditor::GeneralCheck() const {
-  return true;
+bool jfTagFilterEditor::GeneralCheck(const jfFilterMap* infmap) const {
+    if (infmap == NULL) return true;
+    else if (NameNUniq(infmap)) return false;
+    else return true;
 }
 //-----------------------------------------------------
 void jfTagFilterEditor::CompleteConstruction(QString name, const jfTagFilterCore* infilt) {
@@ -74,7 +75,6 @@ void jfTagFilterEditor::CompleteConstruction(QString name, const jfTagFilterCore
   }
   // checking the inputted filter
   if (infilt!=NULL) {
-    assert(infilt->IsValid());
     tvalue = infilt->GetTagsCopy();
     if (isListLong()) longlist_panel->ChangeTagData(tvalue,false,false);
     else shortlist_panel->SetTagList(tvalue);
@@ -88,6 +88,7 @@ void jfTagFilterEditor::CompleteConstruction(QString name, const jfTagFilterCore
 }
 
 //===========================================================================================
+
 jfCFE_Core1::jfCFE_Core1(const jfCompletedFilter* inmap, QWidget* parent):QWidget(parent) {
   // we start
   mainval1 = new QCheckBox("Completed Stories (check to include, blank to exclude)");
@@ -106,36 +107,42 @@ bool jfCFE_Core1::StoreValue(jfCompletedFilter* saveto) const {
   if (saveto==NULL) return false;
   else {
     if ((mainval1->checkState())==Qt::PartiallyChecked) saveto->SetEmpty();
-    else saveto->SetValue((mainval1->checkState())==Qt::Checked);
+    else saveto->SetCompleted( (mainval1->checkState())==Qt::Checked );
     return true;
   }
 }
 //--------------------------------------------------------------------
 bool jfCFE_Core1::LoadValue(const jfCompletedFilter* getfrom) {
-  if (getfrom==NULL) return false;
-  else {
-    if (getfrom->isEmpty()) mainval1->setCheckState(Qt::PartiallyChecked);
+    if (getfrom==NULL) return false;
     else {
-      mainval1->setCheckState((getfrom->GetValue())?(Qt::Checked):(Qt::Unchecked));
+        jfCompletedState state = getfrom->GetValue();
+        if (state == jfCompletedState::EITHER) {
+            mainval1->setCheckState(Qt::PartiallyChecked);
+        }
+        else if (state == jfCompletedState::COMPLETE) {
+            mainval1->setCheckState(Qt::Checked);
+        }
+        else {
+            mainval1->setCheckState(Qt::Unchecked);
+        }
+        return true;
     }
-    return true;
-  }
 }
 //--------------------------------------------------------------------
 jfCompletedFilter* jfCFE_Core1::GetValue() const {
-  jfCompletedFilter* result = new jfCompletedFilter();
+  jfCompletedFilter* result = new jfCompletedFilter("(placeholder)");
   bool qval = StoreValue(result);
   assert(qval);
   return result;
 }
-//=============================================================================
-jfComplFiltEdit::jfComplFiltEdit(const jfCompletedFilter* inmap, QWidget* parent):jfCFE_Core1(inmap,parent) {}
+
 //*****************************************************************************
-jfCompletedFilterEditor::jfCompletedFilterEditor(const jfBaseFilter* infilt, const jfFilterMap* infmap,
-                               QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+
+jfCompletedFilterEditor::jfCompletedFilterEditor(const jfCompletedFilter* infilt, QWidget* parent):
+                jfBaseFilterEditor(infilt, parent) {
   // we start...
   // we create the insert.. the *actual*  editor
-  insert_panel = new jfComplFiltEdit(dynamic_cast<const jfCompletedFilter*>(infilt));
+  insert_panel = new jfCFE_Core1(infilt);
   // finalizing things
   insert = new QBoxLayout(QBoxLayout::TopToBottom);
   insert->addWidget(insert_panel,0);
@@ -146,21 +153,30 @@ jfCompletedFilterEditor::jfCompletedFilterEditor(const jfBaseFilter* infilt, con
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //-------------------------------------
-void jfCompletedFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfCompletedFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   assert(infilter!=NULL);
   filt_pointer = infilter;
   insert_panel->LoadValue(dynamic_cast<const jfCompletedFilter*>(filt_pointer));
   NameLoad();
 }
 //-------------------------------------
-jfBaseFilter* jfCompletedFilterEditor::GetFilter() {
-  jfCompletedFilter* result = insert_panel->GetValue();
-  namedesc_edit->ChangeObj(result);
-  return result;
+jfFilterBase* jfCompletedFilterEditor::GetFilter() {
+    jfCompletedFilter* result = insert_panel->GetValue();
+    namedesc_edit->ChangeFilter(result);
+    return result;
+}
+// -------------------------------
+jfCompletedFilter* jfCompletedFilterEditor::GetCompletedFilter(const QString& name) const {
+    jfCompletedFilter* result = insert_panel->GetValue();
+    namedesc_edit->ChangeFilter(result);
+    result->SetName(name);
+    return result;
 }
 //--------------------------------------------------------------
-bool jfCompletedFilterEditor::GeneralCheck() const {
-  return true;
+bool jfCompletedFilterEditor::GeneralCheck(const jfFilterMap* infmap) const {
+    if (infmap == NULL) return true;
+    else if (NameNUniq(infmap)) return false;
+    else return true;
 }
 
 //******************************************************************************/

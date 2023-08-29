@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Filters relating to dates
 Created :   November 29, 2011
 Conversion to QT Started October 1, 2013
-Updated :   July 8, 2016 (removed FFN and renamed file)
+Updated :   July 1, 2023 (rebasing)
 ******************************************************************************/
 #ifndef DATERANGE_FILTER_H
   #define DATERANGE_FILTER_H
@@ -22,68 +22,63 @@ Updated :   July 8, 2016 (removed FFN and renamed file)
 //----------------------------------------------------
 #include <QDate>
 /*****************************************************************************/
-class jfDateRangeFilter : public jfBaseFilter {
+class jfDateRangeFilter : public jfFilterBase {
   public:
     // constructors
-    jfDateRangeFilter();
-    jfDateRangeFilter(QDate instart,QDate inend);
+    jfDateRangeFilter(const QString& filter_name);
+    jfDateRangeFilter(QString&& filter_name);
+    jfDateRangeFilter(const QString& filter_name, QDate instart,QDate inend);
     // match against the filter
-    virtual bool isEmpty() const;
+    virtual bool IsEmpty() const override;
     // loading from a string representation
-    virtual bool FromString(const QString& sourcedata);
     virtual QString ToString() const;
     // setting and getting data
     bool SetDates(QDate instart,QDate inend);
     QDate GetValue(bool first) const;
-    // gets a description
-    virtual QString GetTypeDescription() const = 0;
-    // copy
-    virtual jfBaseFilter* GenCopy() const = 0;
-    // special meta-information
-    virtual QString GetTypeID() const = 0;
+    // not overriden yet...
+    // virtual const jfFilterTypeMeta& GetTypeMetaInfo() const = 0;
+    // virtual jfFilterBase* GenCopy() const = 0;
   protected:
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
     // special methdos
     QDate DayPlus(QDate inval, bool decrement) const;
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
+    // virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
     bool RealMatchCore(const QDate intest) const;
-    // file i/o
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
-    /* since different types are stored together, the text file reprentation
-    may have objects of varying length */
-    virtual size_t ExtraLines() const;
+
     // internal data
     QDate newdate, olddate;
 };
 //============================================================================
+extern const jfFilterTypeMeta UPDATED_DATE_FILTER_INFO;
+
 class jfUpdatedDateFilter : public jfDateRangeFilter {
   public:
     // constructors
-    jfUpdatedDateFilter();
-    jfUpdatedDateFilter(QDate instart,QDate inend);
-    // gets a description
-    virtual QString GetTypeDescription() const;
+    jfUpdatedDateFilter(const QString& filter_name);
+    jfUpdatedDateFilter(QString&& filter_name);
+    jfUpdatedDateFilter(const QString& filter_name, QDate instart,QDate inend);
+    // gets type info
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
     // copy
-    virtual jfBaseFilter* GenCopy() const;
-    // special meta-information
-    virtual QString GetTypeID() const;
+    virtual jfFilterBase* GenCopy() const override;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
 };
 //============================================================================
+extern const jfFilterTypeMeta PUBLISHED_DATE_FILTER_INFO;
+
 class jfPublishedDateFilter : public jfDateRangeFilter {
   public:
     // constructors
-    jfPublishedDateFilter();
-    jfPublishedDateFilter(QDate instart,QDate inend);
-    // gets a description
-    virtual QString GetTypeDescription() const;
+    jfPublishedDateFilter(const QString& filter_name);
+    jfPublishedDateFilter(QString&& filter_name);
+    jfPublishedDateFilter(const QString& filter_name, QDate instart,QDate inend);
+    // gets type info
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
     // copy
-    virtual jfBaseFilter* GenCopy() const;
-    // special meta-information
-    virtual QString GetTypeID() const;
+    virtual jfFilterBase* GenCopy() const;
   protected:
     // the core matching method
     virtual bool CoreMatch(const jfSearchResultItem* testelem) const;

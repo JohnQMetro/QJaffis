@@ -3,7 +3,7 @@ Name    :   sexp_extended.cpp
 Author  :   John Q Metro
 Purpose :   Extended simple expression filter editors
 Created :   July 8, 2016 (split from sfilt_edit.h)
-Updated :   March 3, 2023
+Updated :   August 12, 2023
 ******************************************************************************/
 #ifndef SEXP_EXTENDED_H_INCLUDED
   #include "sexp_extended.h"
@@ -11,26 +11,26 @@ Updated :   March 3, 2023
 //-------------------------------------------------
 /******************************************************************************/
 // the default constructor
-jfAuthorFilterEditor::jfAuthorFilterEditor(const jfFilterMap* infmap, const jfAuthExprFilter* infilt,
-      QWidget* parent):jfSimpleSFilterEditor(infmap,infilt,parent) {
+jfAuthorFilterEditor::jfAuthorFilterEditor(const jfAuthExprFilter* infilt, QWidget* parent):
+                                            jfSimpleSFilterEditor(infilt,parent) {
   // most things are handled by the parent constructor
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // creating a filter from a simple expression
 jfSimpleExpFilterCore* jfAuthorFilterEditor::MakeTypedFilter(jfSimpleExpr* inpval) {
-  jfAuthExprFilter* result = new jfAuthExprFilter(inpval);
+  jfAuthExprFilter* result = new jfAuthExprFilter(namedesc_edit->TryGetName(), inpval);
   return result;
 }
 //================================================================================
 // the default constructor
-jfLanguageFilterEditor::jfLanguageFilterEditor(const jfFilterMap* infmap,
-    const jfLanguageExprFilter* infilt, QWidget* parent):jfSimpleSFilterEditor(infmap,infilt,parent) {
+jfLanguageFilterEditor::jfLanguageFilterEditor(const jfLanguageExprFilter* infilt,
+                                         QWidget* parent):jfSimpleSFilterEditor(infilt,parent) {
   // most things are handled by the parent constructor
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // creating a filter from a simple expression
 jfSimpleExpFilterCore* jfLanguageFilterEditor::MakeTypedFilter(jfSimpleExpr* inpval) {
-  jfLanguageExprFilter* result = new jfLanguageExprFilter(inpval);
+  jfLanguageExprFilter* result = new jfLanguageExprFilter(namedesc_edit->TryGetName(), inpval);
   return result;
 }
 /*****************************************************************************/

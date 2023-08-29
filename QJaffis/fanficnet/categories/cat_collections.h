@@ -16,6 +16,8 @@
 #ifndef JFFFNSCATCORE
   #include "ffn_catcore.h"
 #endif // JFFFNSCATCORE
+
+#include "../../core/utils/ltstr.h"
 //---------------------------------------
 #include <set>
 #include <map>

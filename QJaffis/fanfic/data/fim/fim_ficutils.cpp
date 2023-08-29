@@ -32,7 +32,7 @@ void jfFIMFanficOutputter::SetFanfic(const jfFIM_Fanfic* in_fim_fanfic) {
 // --------------------------------------
 void jfFIMFanficOutputter::SetItemSource(const jfSearchResultItem* in_source, const jfItemMetaFlags* in_flags) {
     assert(in_source != NULL);
-    assert(in_source->GetTypeLabel() == jfFIM_Fanfic::FIM_FANFIC_TYPE_ID);
+    assert(in_source->GetTypeLabel() == IdForFIMFanfics());
     fim_fanfic = dynamic_cast<const jfFIM_Fanfic*>(in_source);
     fanfic_source = fim_fanfic;
     source = in_source;

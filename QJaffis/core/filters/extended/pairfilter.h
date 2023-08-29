@@ -4,7 +4,7 @@
 // Purpose :    Relationship/Pairing filters are complicated.
 // Created:     January 1, 2011
 // Conversion to QT Started April 11, 2013
-// Updated:     August 22, 2012 (adding jfFileReader)
+// Updated:     August 24, 2023
 //***************************************************************************
 #ifndef PAIRFILTER_H_INCLUDED
 #define PAIRFILTER_H_INCLUDED
@@ -13,18 +13,19 @@
 #ifndef PAIRFILTER_TOOLS_H_INCLUDED
   #include "pairfilter_tools.h"
 #endif // PAIRFILTER_TOOLS_H_INCLUDED
-#ifndef JFBASEFILTER
-  #include "filterbase.h"
-#endif
+
+#include "../base/basefilter.h"
 //***************************************************************************
-class jfPairFilterCore : public jfBaseFilter {
+class jfPairFilterCore : public jfFilterBase {
   public:
     // core constructor
-    jfPairFilterCore();
+    jfPairFilterCore(const QString& filter_name);
+    jfPairFilterCore(QString&& filter_name);
     jfPairFilterCore(const jfPairFilterCore& insrc);
     // setting data
     bool SetSeparators(QString inval);
-    jfPF_flaghold& GetFlagsRef() const;
+    const jfPF_flaghold& GetFlagsRef() const;
+    jfPF_flaghold& GetMutFlagsRef();
     bool AddNameset(QString inval);
     bool AddSpecials(QString inval);
     // getting data
@@ -36,22 +37,16 @@ class jfPairFilterCore : public jfBaseFilter {
     bool ChangeName(QString inname);
     bool StartLogging();
     bool WriteLog();
-    // returns a general filter type
-    virtual size_t GetFilType() const;
     // overloaded filter/baseobj methods
-    virtual bool isEmpty() const;
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
-    virtual QString GetTypeID() const = 0;
-    virtual QString GetTypeDescription() const = 0;
+    virtual bool IsEmpty() const override;
+    virtual QString ToString() const override;
     // virtual copt methods
-    virtual jfBaseFilter* GenCopy() const = 0;
     virtual jfPairFilterCore* PairFilterCopy() const = 0;
     // destructor
     ~jfPairFilterCore();
   protected:
-    // virtual method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
+
     // internal helper matching methods
     bool DoMatchString(QString inbase, size_t ninindex1, size_t ninindex2) const;
     bool DoMatchToken(const QStringList* inbase, size_t ninindex1, size_t ninindex2) const;
@@ -61,9 +56,7 @@ class jfPairFilterCore : public jfBaseFilter {
     bool MatchMultipleToken(const QStringList* inbase, size_t startat) const;
     bool MainMatch(const jfSearchResultItem* intest) const;
     // file i/o
-    virtual size_t ExtraLines() const;
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
+    virtual bool CompatReadRestFromFile(jfFileReader* infile) override;
     // internal data
     mutable jfPF_flaghold flags;
     QString sepchars;
@@ -74,58 +67,63 @@ class jfPairFilterCore : public jfBaseFilter {
     jfPairStats* logdata;
 };
 //==========================================================================
+extern const jfFilterTypeMeta SINGLE_PAIR_FILTER_INFO;
 // pairing filter: two namesets max
 class jfPairFilterSingle : public jfPairFilterCore {
   public:
     // core constructor
-    jfPairFilterSingle();
+    jfPairFilterSingle(const QString& filter_name);
+    jfPairFilterSingle(QString&& filter_name);
     jfPairFilterSingle(const jfPairFilterSingle& insrc);
-    // overloaded filter/baseobj methods
-    virtual QString GetTypeID() const;
-    virtual QString GetTypeDescription() const;
     // returns the list of element names campatible with this filter
-    virtual jfBaseFilter* GenCopy() const;
-    virtual jfPairFilterCore* PairFilterCopy() const;
+    virtual jfFilterBase* GenCopy() const override;
+    virtual jfPairFilterCore* PairFilterCopy() const override;
     jfPairFilterSingle* Copy() const;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
   protected:
     // virtual method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
 };
 //===========================================================================
+extern const jfFilterTypeMeta LIST_PAIR_FILTER_INFO;
+
 // pairing filter: one pairset paired with a list of others
 class jfPairFilterList : public jfPairFilterCore {
   public:
     // core constructor
-    jfPairFilterList();
+    jfPairFilterList(const QString& filter_name);
+    jfPairFilterList(QString&& filter_name);
     jfPairFilterList(const jfPairFilterList& insrc);
     // overloaded filter/baseobj methods
-    virtual QString GetTypeID() const;
-    virtual QString GetTypeDescription() const;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
     // returns the list of element names campatible with this filter
-    virtual jfBaseFilter* GenCopy() const;
-    virtual jfPairFilterCore* PairFilterCopy() const;
+    virtual jfFilterBase* GenCopy() const override;
+    virtual jfPairFilterCore* PairFilterCopy() const override;
     jfPairFilterList* Copy() const;
   protected:
     // virtual method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
 };
 //===========================================================================
+extern const jfFilterTypeMeta MULTIPLE_PAIR_FILTER_INFO;
+
 // pairing filter: every nameset matched against the other
 class jfPairFilterMultiple : public jfPairFilterCore {
   public:
     // core constructor
-    jfPairFilterMultiple();
+    jfPairFilterMultiple(const QString& filter_name);
+    jfPairFilterMultiple(QString&& filter_name);
     jfPairFilterMultiple(const jfPairFilterMultiple& insrc);
     // overloaded filter/baseobj methods
-    virtual QString GetTypeID() const;
-    virtual QString GetTypeDescription() const;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
     // returns the list of element names campatible with this filter
-    virtual jfBaseFilter* GenCopy() const;
-    virtual jfPairFilterCore* PairFilterCopy() const;
+    virtual jfFilterBase* GenCopy() const override;
+    virtual jfPairFilterCore* PairFilterCopy() const override;
     jfPairFilterMultiple* Copy() const;
   protected:
     // virtual method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
 };
 
 //***************************************************************************
+bool IsOldPairFilter(jfFilterBase* filter);

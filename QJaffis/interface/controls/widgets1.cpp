@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Some misc user interface stuff
 Created :   April 1, 2009
 Conversion to Qt : Started September 8, 2013
-Updated :   August 10, 2014
+Updated :   April 16, 2023 (filter no long base obj)
 ******************************************************************************/
 #ifndef WIDGETS1_H_INCLUDED
   #include "widgets1.h"
@@ -172,16 +172,36 @@ bool jfNameDescEditor::IsVertical() const {
 bool jfNameDescEditor::IsMultiline() const {
   return multiline;
 }
-//------------------------------------------------------------------
-// changes the name and description in inobj to what is in the controls
-bool jfNameDescEditor::ChangeObj(jfBaseObj* inobj) const {
-  // things that make us return false
-  if (inobj==NULL) return false;
-  if (!NameStatus()) return false;
-  // setting the data
-  inobj->SetName(TryGetName());
-  inobj->SetDescription(GetDesc());
-  return true;
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// changes the name and description in the filter to what is in the controls
+bool jfNameDescEditor::ChangeFilter(jfFilterBase* target_filter) const {
+    // things that make us return false
+    if (target_filter==NULL) return false;
+    if (!NameStatus()) return false;
+    // setting the data
+    target_filter->SetName(TryGetName());
+    target_filter->SetDescription(GetDesc());
+    return true;
+}
+// --------------------------------------------------
+bool jfNameDescEditor::ChangeFilterMap(jfFilterMap* target_map) const {
+    // things that make us return false
+    if (target_map==NULL) return false;
+    if (!NameStatus()) return false;
+    // setting the data
+    target_map->SetName(TryGetName());
+    target_map->SetDescription(GetDesc());
+    return true;
+}
+// -------------------------------------------------------
+bool jfNameDescEditor::ChangeSkeleton(jfSkeletonCore* target_skeleton) const {
+    // things that make us return false
+    if (target_skeleton==NULL) return false;
+    if (!NameStatus()) return false;
+    // setting the data
+    target_skeleton->SetName(TryGetName());
+    target_skeleton->SetDescription(GetDesc());
+    return true;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // setting some info
@@ -202,13 +222,27 @@ void jfNameDescEditor::SetDescription(const QString& newdesc) {
   else desc_edit2->setPlainText(newdesc);
 }
 //------------------------------------------------------------------
-// loading name and description from an object
-bool jfNameDescEditor::SetFromObj(const jfBaseObj* inobj) {
-  if (inobj==NULL) return false;
+bool jfNameDescEditor::SetFromFilter(const jfFilterBase* source_filter) {
+    if (source_filter==NULL) return false;
 
-  if (!SetName(inobj->GetName())) return false;
-  SetDescription(inobj->GetDescription());
-  return true;
+    if (!SetName(source_filter->GetName())) return false;
+    SetDescription(source_filter->GetDescription());
+    return true;
+}
+//------------------------------------------------------------------
+bool jfNameDescEditor::SetFromFilterMap(const jfFilterMap* source_map) {
+    if (source_map==NULL) return false;
+
+    if (!SetName(source_map->GetName())) return false;
+    SetDescription(source_map->GetDescription());
+    return true;
+}
+// -----------------------------------------------------
+bool jfNameDescEditor::SetFromSkeleton(const jfSkeletonCore* source_skeleton) {
+    if (source_skeleton == NULL) return false;
+    if (!SetName(source_skeleton->GetName())) return false;
+    SetDescription(source_skeleton->GetDescription());
+    return true;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfNameDescEditor::TryCopy() const {

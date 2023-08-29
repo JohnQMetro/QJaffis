@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   AO3 pairing and warning filters
 Created :   October 4, 2012
 Conversion to Qt Started Oct 2, 2013
-Updated :   February 19, 2023
+Updated :   May 6, 2023
 ******************************************************************************/
 #ifndef AO3_SPECIALS2_H_INCLUDED
   #include "ao3_specials2.h"
@@ -30,40 +30,35 @@ const QString warn3_ac = "VDRPN";
 const QString warnlist[5] = {"Violence","Character Death","Rape","Underage Sex","Warnings Avoided"};
 
 /*****************************************************************************/
+const jfFilterTypeMeta AO3_WARNINGS_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::MISC, "AO3WarnFilter", "AO3 Warning Filter",
+          QString("Excludes fics based on whether they have the specified archive warnings."),
+          IdForAO3Fanfic(), createFilter<jfAO3WarnFilter> );
 
-jfAO3WarnFilter::jfAO3WarnFilter():jfSpecialsFilter()  {}
+// -----------------------------------------------
+const QRegularExpression NOT_A_WARNING = QRegularExpression("[^"+warn3_ac+"]");
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+jfAO3WarnFilter::jfAO3WarnFilter(const QString& filter_name):jfSpecialsFilter(filter_name) {}
+// --------------------------------------
+jfAO3WarnFilter::jfAO3WarnFilter(QString&& filter_name):jfSpecialsFilter(filter_name) {}
 //---------------------------
-jfAO3WarnFilter::jfAO3WarnFilter(const QString& insrc):jfSpecialsFilter() {
-  FromString(insrc);
+jfAO3WarnFilter::jfAO3WarnFilter(const QString& filter_name, const QString& insrc):jfSpecialsFilter(filter_name) {
+    QString error;
+    bool okay = FromStringInner(insrc, error);
+    jerror::AssertLog(okay, "jfAO3WarnFilter::jfAO3WarnFilter", error);
 }
 //---------------------------
-// string conversion
-bool jfAO3WarnFilter::FromString(const QString& sourcedata) {
-  QRegExp xrpos = QRegExp("[^"+warn3_ac+"]");
-  if (!sourcedata.contains(xrpos)) {
-    value = sourcedata;
-    validdata = true;
-  }
-  else validdata = false;
-  return validdata;
-}
-
-//---------------------------
-// gets a description
-QString jfAO3WarnFilter::GetTypeDescription() const {
-  return "Excludes fics based on whether they have the \
-specified archive warnings.";
+const jfFilterTypeMeta& jfAO3WarnFilter::GetTypeMetaInfo() const {
+    return AO3_WARNINGS_FILTER_INFO;
 }
 //---------------------------
 // copy
-jfBaseFilter* jfAO3WarnFilter::GenCopy() const {
-  jfAO3WarnFilter* qval = new jfAO3WarnFilter(value);
+jfFilterBase* jfAO3WarnFilter::GenCopy() const {
+  jfAO3WarnFilter* qval = new jfAO3WarnFilter(name, value);
+  qval->description = description;
   return qval;
-}
-//---------------------------
-// special meta-information
-QString jfAO3WarnFilter::GetTypeID() const {
-  return "AO3WarnFilter";
 }
 //---------------------------
 // custom methods
@@ -74,7 +69,16 @@ void jfAO3WarnFilter::SetToFull() {
 bool jfAO3WarnFilter::IsFull() const {
   return value==warn3_ac;
 }
-//---------------------------
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfAO3WarnFilter::FromStringInner(const QString& sourcedata, QString& error_out) {
+    if (sourcedata.contains(NOT_A_WARNING)) {
+        error_out = "Input contains non-warning characters!";
+        return false;
+    }
+    value = sourcedata;
+    return true;
+}
+// ---------------------------------------------
 // the core matching method
 bool jfAO3WarnFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const QString fname = "jfAO3WarnFilter::CoreMatch";

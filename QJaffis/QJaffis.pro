@@ -12,8 +12,10 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     core/filters/ao3/ao3_percent_tags_filter.cpp \
+    core/filters/base/basefilter.cpp \
     core/filters/base/structpair.cpp \
     core/filters/extended/list_sexp.cpp \
+    core/filters/filtermap.cpp \
     core/objs/baseitem.cpp \
     core/objs/itemutils.cpp \
     core/tagfilter/base_tagfilters.cpp \
@@ -59,6 +61,7 @@ SOURCES += main.cpp\
     interface/filters/ao3/ao3_list_percent_filter_editor.cpp \
     interface/filters/base/relpair_edit.cpp \
     interface/filters/extended/listexpr_edit.cpp \
+    interface/filters/global_filter_editor.cpp \
     interface/filters/tagfilter/filter_match.cpp \
     interface/filters/tagfilter/multimatch.cpp \
     interface/filters/tagfilter/tag_match_filter_edits.cpp \
@@ -73,7 +76,6 @@ SOURCES += main.cpp\
     core/filters/ao3/ao3_specials2.cpp \
     core/filters/ao3/ao3_specials1.cpp \
     core/filters/base/sexp_filters.cpp \
-    core/filters/base/filterbase.cpp \
     core/filters/base/expression.cpp \
     core/filters/extended/pairfilter_tools.cpp \
     core/filters/extended/pairfilter.cpp \
@@ -161,7 +163,6 @@ SOURCES += main.cpp\
     interface/filters/ao3/ao3_special2.cpp \
     interface/filters/ao3/ao3_special1.cpp \
     interface/filters/ao3/ao3_sexpeditors.cpp \
-    interface/filters/base/urlfilter_editor.cpp \
     interface/filters/base/sfilt_edit.cpp \
     interface/filters/base/sexpr_edit.cpp \
     interface/filters/base/expr_editor.cpp \
@@ -239,8 +240,10 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     core/filters/ao3/ao3_percent_tags_filter.h \
+    core/filters/base/basefilter.h \
     core/filters/base/structpair.h \
     core/filters/extended/list_sexp.h \
+    core/filters/filtermap.h \
     core/objs/baseitem.h \
     core/objs/itemutils.h \
     core/tagfilter/base_tagfilters.h \
@@ -248,6 +251,7 @@ HEADERS  += mainwindow.h \
     core/tagfilter/stringcounter.h \
     core/tagfilter/taglist.h \
     core/tagfilter/tagmatch.h \
+    core/utils/ltstr.h \
     defaultpaths.h \
     fanfic/data/ao3/ao3_ficutils.h \
     fanfic/data/ao3/ao3_lookvals.h \
@@ -285,7 +289,6 @@ HEADERS  += mainwindow.h \
     core/filters/ao3/ao3_specials2.h \
     core/filters/ao3/ao3_specials1.h \
     core/filters/base/sexp_filters.h \
-    core/filters/base/filterbase.h \
     core/filters/base/expression.h \
     core/filters/extended/pairfilter_tools.h \
     core/filters/extended/pairfilter.h \
@@ -383,7 +386,6 @@ HEADERS  += mainwindow.h \
     interface/filters/ao3/ao3_special1.h \
     interface/filters/ao3/ao3_sexpeditors.h \
     interface/filters/base/relpair_edit.h \
-    interface/filters/base/urlfilter_editor.h \
     interface/filters/base/sfilt_edit.h \
     interface/filters/base/sexpr_edit.h \
     interface/filters/base/expr_editor.h \
@@ -403,6 +405,7 @@ HEADERS  += mainwindow.h \
     interface/filters/filter_utils.h \
     interface/filters/filter_picker.h \
     interface/filters/filter_editor.h \
+    interface/filters/global_filter_editor.h \
     interface/filters/tagfilter/filter_match.h \
     interface/filters/tagfilter/multimatch.h \
     interface/filters/tagfilter/tag_match_filter_edits.h \

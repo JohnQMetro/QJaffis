@@ -18,16 +18,19 @@ Updated :   March 21, 2023
 //----------------------------------------------------------------------
 
 //******************************************************************************
-const QString jfFIMGroup::FIMGROUP_TYPE_ID = QString("FIMGroup");
+const QString& IdForFIMGroups() {
+    static QString FIMGROUP_TYPE_ID = QString("FIMGroup");
+    return FIMGROUP_TYPE_ID;
+}
 // ++++++++++++++++++++++++++++++++++++++++++++++++
 // constructor
 jfFIMGroup::jfFIMGroup():jfSearchResultItem() {
-    type_labels.append(FIMGROUP_TYPE_ID);
+    type_labels.append(IdForFIMGroups());
     ficcount = memcount = 0;
 }
 //---------------------------------
 jfFIMGroup::jfFIMGroup(const jfFIMGroup& init_data):jfSearchResultItem(init_data) {
-    type_labels.append(FIMGROUP_TYPE_ID);
+    type_labels.append(IdForFIMGroups());
     ficcount = init_data.ficcount;
     memcount = init_data.memcount;
     forumlink = init_data.forumlink;
@@ -36,7 +39,7 @@ jfFIMGroup::jfFIMGroup(const jfFIMGroup& init_data):jfSearchResultItem(init_data
 }
 // -------------------------------------
 jfFIMGroup::jfFIMGroup(const jfSearchResultItem& source):jfSearchResultItem(source) {
-    type_labels.append(FIMGROUP_TYPE_ID);
+    type_labels.append(IdForFIMGroups());
     ficcount = memcount = 0;
 }
 
@@ -130,7 +133,7 @@ void jfFIMGroupOutputter::SetSource(const jfFIMGroup* in_source, const jfItemMet
 // ------------------------------
 void jfFIMGroupOutputter::SetItemSource(const jfSearchResultItem* in_source, const jfItemMetaFlags* in_flags) {
     assert(in_source != NULL);
-    assert(in_source->GetTypeLabel() == jfFIMGroup::FIMGROUP_TYPE_ID);
+    assert(in_source->GetTypeLabel() == IdForFIMGroups());
     fim_group_source = dynamic_cast<const jfFIMGroup*>(in_source);
     source = in_source;
     flags = in_flags;

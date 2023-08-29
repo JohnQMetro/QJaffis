@@ -30,6 +30,7 @@ class jfFIMCompactParser:public jfPageParserBase {
     // test methods
     virtual bool testMissing(const QString *page) const;
     virtual bool testIncomplete(const QString *page) const;
+    virtual bool testRatelimit(const QString *page) const;
     // also
     virtual QString getCookie() const;
   protected:

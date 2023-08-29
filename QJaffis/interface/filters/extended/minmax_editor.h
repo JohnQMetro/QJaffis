@@ -3,7 +3,7 @@ Name    :   minmax_editor.h
 Author  :   John Q Metro
 Purpose :   Declares some editors for numeric range filters
 Created :   June 8, 2016 (Taken from other sources)
-Updated :   June 8, 2016
+Updated :   April 15, 2023
 ******************************************************************************/
 #ifndef MINMAX_EDITOR_H
   #define MINMAX_EDITOR_H
@@ -17,12 +17,12 @@ Updated :   June 8, 2016
 class jfZeroToMaxFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfZeroToMaxFilterEditor(QString typname, size_t xmax, const jfFilterMap* infmap, const jfMinMaxUFilter* infilt, QWidget* parent = NULL);
+    jfZeroToMaxFilterEditor(QString typname, size_t xmax, const jfMinMaxUFilter* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
+    virtual void LoadFilter(const jfFilterBase* infilter) override final;
+    virtual jfFilterBase* GetFilter() override;
     // checking
-    bool GeneralCheck() const;
+    bool GeneralCheck(const jfFilterMap* filter_group) const override;
   protected:
     virtual jfMinMaxUFilter* MakeTypedMinMax() const = 0;
     jfZeroToMaxEditor* insert_panel;
@@ -32,7 +32,7 @@ class jfZeroToMaxFilterEditor : public jfBaseFilterEditor {
 class jfWCFilterEditor : public jfZeroToMaxFilterEditor {
   public:
     // the default constructor
-    jfWCFilterEditor(const jfFilterMap* infmap, const jfWordCountFilter* infilt, QWidget* parent = NULL);
+    jfWCFilterEditor(const jfWordCountFilter* infilt, QWidget* parent = NULL);
   private:
     virtual jfMinMaxUFilter* MakeTypedMinMax() const;
 };

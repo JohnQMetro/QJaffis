@@ -4,7 +4,7 @@
 // Purpose :    Simple expression filters specific to archiveofourown.org
 // Created:     September 8, 2012
 // Conversion to Qt Started Oct 3, 2013
-// Updated:     May 15, 2014
+// Updated:     April 15, 2023
 //***************************************************************************
 #ifndef AO3_STRINGFILTERS_H_INCLUDED
   #include "ao3_stringfilters.h"
@@ -15,32 +15,41 @@
 #endif // AO3_FICOBJ_H_INCLUDED
 #include <assert.h>
 //****************************************************************************
+const jfFilterTypeMeta EXTRATAG_EXPR_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::MISC, "ExtraTagFilter", "Extra Tags Filter",
+          QString("The Extra Tag Filter matches the contents of the extra tags") +
+                  " against a boolean expression, the elements of which are " +
+                  "themselves to be matched. These elements are either strings" +
+                  " or substrings.",
+          IdForAO3Fanfic(), createFilter<jfExtraTagFilter> );
+// =========================================================
 // constructors
 //----------------------------------------------------------
-jfExtraTagFilter::jfExtraTagFilter():jfSimpleExpFilterCore() {}
-//----------------------------------------------------------
-jfExtraTagFilter::jfExtraTagFilter(const jfExtraTagFilter& source):jfSimpleExpFilterCore() {
-  CoreCopy(source);
+jfExtraTagFilter::jfExtraTagFilter(const QString& filter_name):jfSimpleExpFilterCore(filter_name) {
+
 }
-//----------------------------------------------------------
-jfExtraTagFilter::jfExtraTagFilter(jfSimpleExpr* in_source):jfSimpleExpFilterCore(in_source) {}
+//---------------------------
+jfExtraTagFilter::jfExtraTagFilter(QString&& filter_name):jfSimpleExpFilterCore(filter_name) {
+
+}
+//---------------------------
+jfExtraTagFilter::jfExtraTagFilter(const jfExtraTagFilter& source):jfSimpleExpFilterCore(source.name) {
+    CoreCopy(source);
+}
+// -------------------------------
+jfExtraTagFilter::jfExtraTagFilter(const QString& filter_name, jfSimpleExpr* in_source):jfSimpleExpFilterCore(filter_name, in_source) {
+
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfExtraTagFilter::GetTypeDescription() const {
-  return "The Extra Tag Filter matches the contents of the extra tags against\
- a boolean expression, the elements of which are themselves to be matched. These \
-elements are either strings or substrings.";
-}
-//------------------------------------------------------------
 jfExtraTagFilter* jfExtraTagFilter::Copy() const {
   return new jfExtraTagFilter(*this);
 }
 //------------------------------------------------------------
-jfBaseFilter* jfExtraTagFilter::GenCopy() const {
+jfFilterBase* jfExtraTagFilter::GenCopy() const {
   return Copy();
 }
-//------------------------------------------------------------
-QString jfExtraTagFilter::GetTypeID() const {
-  return "ExtraTagFilter";
+const jfFilterTypeMeta& jfExtraTagFilter::GetTypeMetaInfo() const {
+    return EXTRATAG_EXPR_FILTER_INFO;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method

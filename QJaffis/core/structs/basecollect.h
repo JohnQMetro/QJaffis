@@ -4,7 +4,7 @@
 // Purpose :    Declares core item collection classes
 // Created:     March 19, 2009
 // Conversion to QT Started April 8, 2013
-// Updated:     January 18, 2018 (added the isEmpty method to jfFilterMap)
+// Updated:    April 2, 2023 (replacing the base filter type)
 ******************************************************************************/
 #ifndef BASECOLLECT_H_INCLUDED
   #define BASECOLLECT_H_INCLUDED
@@ -12,9 +12,13 @@
 #ifndef BASEOBJ_H_INCLUDED
     #include "../objs/baseobj.h"
 #endif // BASEOBJ_H_INCLUDED
+/*
 #ifndef JFBASEFILTER
   #include "../filters/base/filterbase.h"
 #endif
+*/
+
+#include "../filters/base/basefilter.h"
 //----------------------------------
 #include <map>
 #include <QString>
@@ -65,6 +69,7 @@ class jfBaseCollection : public jfBaseObj {
     jfBaseObj* backup_item;
 };
 //*****************************************************************************
+/*
 // how the map template will calculate it's comaparisons
 struct ltstr {
   bool operator()(const QString& s1, const QString& s2) const {
@@ -73,7 +78,7 @@ struct ltstr {
   }
 };
 //*****************************************************************************
-class stl_FilterMap : public std::map<QString,jfBaseFilter*,ltstr> {
+class stl_FilterMap : public std::map<QString,jfFilterBase*,ltstr> {
 };
 //*****************************************************************************
 // the filter map uses the filter names as keys, store multiple types of filters
@@ -85,18 +90,18 @@ class jfFilterMap : public jfBaseCollection {
     // simple filter map specific methods
     bool NameExists(const QString& lookfor) const;
     stl_FilterMap::iterator RenameElem(bool& ok, const QString& oldname, const QString& newname);
-    jfBaseFilter* GetItem(const QString& itemname);
+    jfFilterBase* GetItem(const QString& itemname);
     bool MatchAll(const jfSearchResultItem* inval) const;
     bool isEmpty() const;
     bool noFilters() const;
     // some additonal methods
-    bool AddFilter(jfBaseFilter* infilter, size_t& outindex);
+    bool AddFilter(jfFilterBase* infilter, size_t& outindex);
     bool GetIndexByName(const QString& findname, size_t& outindex) const;
-    jfBaseFilter* GetItem(const size_t& findex);
-    const jfBaseFilter* GetItemConst(const size_t& findex) const;
+    jfFilterBase* GetItem(const size_t& findex);
+    const jfFilterBase* GetItemConst(const size_t& findex) const;
     bool DeleteByName(const QString& findname);
-    bool ReplaceByName(QString nameold, jfBaseFilter* newfilter, size_t& outindex);
-    bool ReplaceSame(jfBaseFilter* newfilter,size_t& outindex);
+    bool ReplaceByName(QString nameold, jfFilterBase* newfilter, size_t& outindex);
+    bool ReplaceSame(jfFilterBase* newfilter,size_t& outindex);
     size_t CopyLoad();
     bool VerifyNames(QString& omsg, bool notinmap);
     size_t PairFilterLogging(bool write);
@@ -130,4 +135,5 @@ class jfFilterMap : public jfBaseCollection {
     // external links
     jfFilterMap* exlocmap;
 };
+*/
 //*****************************************************************************

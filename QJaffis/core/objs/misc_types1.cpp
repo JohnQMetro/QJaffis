@@ -153,7 +153,7 @@ bool jfTagListing::ReplaceTag(QString oldt, QString newt) {
     return true;
 }
 //--------------------------------------------------------------------
-bool jfTagListing::ReplaceTags(QStringList* replist) {
+bool jfTagListing::ReplaceTags(const QStringList* replist) {
     // bad numbers of items
     if (replist==NULL) return false;
     if (replist->isEmpty()) return false;

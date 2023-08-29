@@ -4,7 +4,7 @@
 // Purpose :    agentofourown.org interface
 // Created:     September 3, 2012
 // Conversion to Qt Started April 6, 2014
-// Updated:     March 4, 2023
+// Updated:     August 24, 2023
 //**************************************************************************
 #ifndef AO3_PANEL1_H_INCLUDED
   #include "ao3_panel1.h"
@@ -25,13 +25,16 @@
 #endif // AO3_SPECIAL1_H_INCLUDED
 #ifndef EXTENDED_SEXP_FILTER_H
   #include "../../../core/filters/extended/extended_sexp.h"
+
 #endif // EXTENDED_SEXP_FILTER_H
 #ifndef MOREFILTERS1_H_INCLUDED
   #include "../../../core/filters/extended/morefilters1.h"
 #endif
+
 #ifndef AO3_SPECIALS1_H_INCLUDED
   #include "../../../core/filters/ao3/ao3_specials1.h"
 #endif // AO3_SPECIALS1_H_INCLUDED
+
 //--------------------------------------
 #include <assert.h>
 #include <QSizePolicy>
@@ -96,35 +99,32 @@ bool jfAO3_DFE::SaveFiltersExtended() {
   jfAuthExprFilter* author_filter;
   jfCharListExprFilter* char_filter;
   jfExtraTagFilter* et_filter;
-  jfAO3KudoFilter* kc_filter;
+  jfFavKudoFilter* kc_filter;
   size_t wmin, wmax;
+
   // the author filter
   exprval = auth_filedit->CheckFilter(omsg);
   assert(exprval!=NULL);
-  author_filter = new jfAuthExprFilter(exprval);
-  author_filter->SetName(DEF_ao3author_name);
+  author_filter = new jfAuthExprFilter(DEF_ao3author_name, exprval);
   embedded_filters->ReplaceSame(author_filter,oindex);
 
   // the character filter
   exprval = char_filedit->CheckFilter(omsg);
   assert(exprval!=NULL);
   jfListMatchMode match_mode = char_filedit->GetMatchMode();
-  char_filter = new jfCharListExprFilter(match_mode, exprval);
-  char_filter->SetName(DEF_ao3chars_name);
+  char_filter = new jfCharListExprFilter(DEF_ao3chars_name, match_mode, exprval);
   embedded_filters->ReplaceSame(char_filter,oindex);
 
   // the kudo count filter
   wmin = kc_picker->GetMin();
   wmax = kc_picker->GetMax();
-  kc_filter = new jfAO3KudoFilter(wmin,wmax);
-  kc_filter->SetName(DEF_ao3kudof_name);
+  kc_filter = new jfFavKudoFilter(DEF_ao3kudof_name, wmin,wmax);
   embedded_filters->ReplaceSame(kc_filter,oindex);
 
   // extra tags filter
   exprval = tag_filedit->CheckFilter(omsg);
   assert(exprval!=NULL);
-  et_filter = new jfExtraTagFilter(exprval);
-  et_filter->SetName(DEF_ao3etf_name);
+  et_filter = new jfExtraTagFilter(DEF_ao3etf_name, exprval);
   embedded_filters->ReplaceSame(et_filter,oindex);
   // done
   return true;
@@ -138,7 +138,7 @@ bool jfAO3_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   jfCharListExprFilter* char_filter;
 
   jfExtraTagFilter* et_filter;
-  jfAO3KudoFilter* kc_filter;
+  jfFavKudoFilter* kc_filter;
   jfIntPair* xvalue;
   bool atest;
   /**/JDEBUGLOG(fname,1);
@@ -158,7 +158,7 @@ bool jfAO3_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   }
 
   // the kudo count filter
-  kc_filter = dynamic_cast<jfAO3KudoFilter*>(embedded_filters->GetItem(DEF_ao3kudof_name));
+  kc_filter = dynamic_cast<jfFavKudoFilter*>(embedded_filters->GetItem(DEF_ao3kudof_name));
   if (kc_filter!=NULL) {
     xvalue = kc_filter->GetMinMax();
     atest = kc_picker->SetMinMax(xvalue);

@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Filter editors (wraping the core). Simple expression & more
 Created :   December 5, 2010
 Conversion to Qt Started October 8, 2013
-Updated :   July 8, 2016 (removing the more specific filters to a new file).
+Updated :   April 9, 2023 (rebasing)
 ******************************************************************************/
 #ifndef SFILT_EDIT_H_INCLUDED
 #define SFILT_EDIT_H_INCLUDED
@@ -21,12 +21,12 @@ Updated :   July 8, 2016 (removing the more specific filters to a new file).
 class jfSimpleSFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfSimpleSFilterEditor(const jfFilterMap* infmap, const jfSimpleExpFilterCore* infilt, QWidget* parent = NULL);
+    jfSimpleSFilterEditor(const jfSimpleExpFilterCore* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
+    virtual void LoadFilter(const jfFilterBase* infilter);
+    virtual jfFilterBase* GetFilter();
     // checking
-    bool GeneralCheck() const;
+    bool GeneralCheck(const jfFilterMap* filter_group) const;
   protected:
     // internal methods
     virtual jfSimpleExpFilterCore* MakeTypedFilter(jfSimpleExpr* inpval) = 0;

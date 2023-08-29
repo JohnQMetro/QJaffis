@@ -55,11 +55,11 @@ class jfDateRangePanel : public QWidget {
 class jfUpdatedDateFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfUpdatedDateFilterEditor(const jfUpdatedDateFilter* infilt, const jfFilterMap* infmap, QWidget* parent = NULL);
+    jfUpdatedDateFilterEditor(const jfUpdatedDateFilter* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    virtual bool GeneralCheck() const;
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const override;
   protected:
     jfDateRangePanel* insert_panel;
 };
@@ -68,11 +68,11 @@ class jfUpdatedDateFilterEditor : public jfBaseFilterEditor {
 class jfPublishedDateFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfPublishedDateFilterEditor(const jfPublishedDateFilter* infilt, const jfFilterMap* infmap, QWidget* parent = NULL);
+    jfPublishedDateFilterEditor(const jfPublishedDateFilter* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    virtual bool GeneralCheck() const;
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const override;
   protected:
     jfDateRangePanel* insert_panel;
 };

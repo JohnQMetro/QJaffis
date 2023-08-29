@@ -4,7 +4,7 @@
 // Purpose :    Relationship/Pairing filters editing, various panels.
 // Created:     January 2, 2011
 // Conversion to Qt Started October 18, 2013
-// Updated:     January 2, 2011
+// Updated:     August 19, 2023
 //***************************************************************************
 #ifndef PAIRS_EDIT_H_INCLUDED
 #define PAIRS_EDIT_H_INCLUDED
@@ -22,12 +22,12 @@
 class jfPairFS_Editor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfPairFS_Editor(const jfFilterMap* infmap,const jfPairFilterSingle* infilt, QWidget* parent = NULL);
+    jfPairFS_Editor(const jfPairFilterSingle* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
     // checking
-    virtual bool GeneralCheck() const;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const override;
   private:
     jfPairFilEditPanelSingle* insert_panel;
 };
@@ -36,12 +36,12 @@ class jfPairFS_Editor : public jfBaseFilterEditor {
 class jfPairFL_Editor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfPairFL_Editor(const jfFilterMap* infmap,const jfPairFilterList* infilt, QWidget* parent = NULL);
+    jfPairFL_Editor(const jfPairFilterList* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
     // checking
-    virtual bool GeneralCheck() const;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const override;
   private:
     jfPairFilEditPanelList* insert_panel;
 };
@@ -50,12 +50,12 @@ class jfPairFL_Editor : public jfBaseFilterEditor {
 class jfPairFM_Editor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfPairFM_Editor(const jfFilterMap* infmap,const jfPairFilterMultiple* infilt, QWidget* parent = NULL);
+    jfPairFM_Editor(const jfPairFilterMultiple* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
     // checking
-    virtual bool GeneralCheck() const;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const override;
   private:
     jfPairFilEditPanelMulti* insert_panel;
 };

@@ -43,6 +43,10 @@ bool jfFFNCatParserBase::testIncomplete(const QString *page) const {
   else if (page->contains(footer1)) return true;
   else return page->contains(footer2);
 }
+// -------------------------------
+bool jfFFNCatParserBase::testRatelimit(const QString *page) const {
+    return true;
+}
 //--------------------------
 QString jfFFNCatParserBase::getCookie() const {
   return "";

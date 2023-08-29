@@ -3,7 +3,7 @@ Name    :   ao3cat_parser.cpp
 Author  :   John Q Metro
 Purpose :   Parser for AO3 section pages to lists of categories/fandoms
 Created :   June 21, 2016
-Updated :   February 11, 2023
+Updated :   August 27, 2023
 ******************************************************************************/
 #ifndef AO3CAT_PARSER_H
   #include "ao3cat_parser.h"
@@ -89,6 +89,17 @@ bool jfAO3CatParser::testMissing(const QString *page) const {
 //---------------------------
 bool jfAO3CatParser::testIncomplete(const QString *page) const {
   assert(page!=NULL);
-  return page->contains("<!-- BEGIN footer -->");
+
+  const QString trunc1 = "<!-- BEGIN footer -->";
+  const QString trunc2 = "<title>You're clicking too fast!</title>";
+  // checking
+  assert(page!=NULL);
+  if (page->contains(trunc1)) return true;
+  return (page->contains(trunc2));
+}
+//------------------------------------
+bool jfAO3CatParser::testRatelimit(const QString *page) const {
+    const QString trunc2 = "<title>You're clicking too fast!</title>";
+    return !(page->contains(trunc2));
 }
 /*****************************************************************************/

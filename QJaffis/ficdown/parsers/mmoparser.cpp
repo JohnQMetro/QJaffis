@@ -34,6 +34,10 @@ bool jfMMO_FicPartParser::testIncomplete(const QString *page) const{
   assert(page!=NULL);
   return page->contains("<footer>");
 }
+// -----------------------------------------------
+bool jfMMO_FicPartParser::testRatelimit(const QString *page) const {
+    return true;
+}
 //------------------------------------
 QString jfMMO_FicPartParser::getCookie() const {
   return "";

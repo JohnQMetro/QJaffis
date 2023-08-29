@@ -3,7 +3,7 @@ Name    : testswrapper.h
 Basic   : An implementation of jfTestsDelegate that wraps a pointer to jfPageParserBase
 Author  : John Q Metro
 Started : May 21, 2022
-Updated : June 29, 2022
+Updated : August 27, 2023
 
 ******************************************************************************/
 #ifndef TESTSWRAPPER_H
@@ -23,13 +23,14 @@ class jfTestsParserWrapper : public virtual jfTestsDelegate {
   public:
     jfTestsParserWrapper(jfPageParserBase* parser_old);
 
-    virtual bool setPageIndex(const size_t& page_index);
+    virtual bool setPageIndex(const size_t& page_index) override;
 
-    virtual QString GetCookie() const;
-    virtual bool TestIsBlocked(const QString* downpage) const;
-    virtual bool TestNotMissing(const QString* downpage) const;
-    virtual bool TestNotTruncated(const QString* downpage) const;
-    virtual bool ResolveRedirect(const QString& raw_redirect, QString& full_redirect) const;
+    virtual QString GetCookie() const override;
+    virtual bool TestIsBlocked(const QString* downpage) const override;
+    virtual bool TestNotMissing(const QString* downpage) const override;
+    virtual bool TestNotTruncated(const QString* downpage) const override;
+    virtual bool TestNotRateLimited(const QString* downpage) const override;
+    virtual bool ResolveRedirect(const QString& raw_redirect, QString& full_redirect) const override;
     virtual ~jfTestsParserWrapper();
   protected:
     jfPageParserBase* parser_link;

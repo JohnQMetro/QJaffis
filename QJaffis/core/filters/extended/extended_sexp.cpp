@@ -4,7 +4,7 @@
 // Purpose :    Specializations of string expressions for particular strings
 // Created:     November 30, 2010
 // Conversion to Qt Started September 26, 2013
-// Updated:     March 3, 2023 (removed character filter)
+// Updated:     May 3, 2023
 //***************************************************************************
 #ifndef EXTENDED_SEXP_FILTER_H
   #include "extended_sexp.h"
@@ -22,33 +22,40 @@
 //--------------------------------
 #include <assert.h>
 /***************************************************************************/
+const jfFilterTypeMeta AUTHOR_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::MISC, "AuthorFilter", "Author Filter",
+          QString("The Author Expression Filter  matches elements against a boolean") +
+                  " expression, the elements of which are themselves to be matched. " +
+                  "These elements are either strings or substrings.",
+          IdForGenericFanfic(), createFilter<jfAuthExprFilter> );
 
 // constructors
 //----------------------------------------------------------
-jfAuthExprFilter::jfAuthExprFilter():jfSimpleExpFilterCore() {}
-//----------------------------------------------------------
-jfAuthExprFilter::jfAuthExprFilter(const jfAuthExprFilter& source):jfSimpleExpFilterCore() {
-  CoreCopy(source);
+jfAuthExprFilter::jfAuthExprFilter(const QString& filter_name):jfSimpleExpFilterCore(filter_name) {
+
+}
+// ------------------------------
+jfAuthExprFilter::jfAuthExprFilter(QString&& filter_name):jfSimpleExpFilterCore(filter_name){
+
 }
 //----------------------------------------------------------
-jfAuthExprFilter::jfAuthExprFilter(jfSimpleExpr* in_source):jfSimpleExpFilterCore(in_source) {}
+jfAuthExprFilter::jfAuthExprFilter(const jfAuthExprFilter& source):jfSimpleExpFilterCore(source.name, source.parsed_expression) {
+    description = source.description;
+}
+//----------------------------------------------------------
+jfAuthExprFilter::jfAuthExprFilter(const QString& filter_name, jfSimpleExpr* in_source):jfSimpleExpFilterCore(filter_name, in_source) {}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfAuthExprFilter::GetTypeDescription() const {
-  return "The Author Expression Filter  matches elements against a boolean \
-expression, the elements of which are themselves to be matched. These elements \
-are either strings or substrings.";
+
+const jfFilterTypeMeta& jfAuthExprFilter::GetTypeMetaInfo() const {
+    return AUTHOR_FILTER_INFO;
 }
-//------------------------------------------------------------
+// --------------------------------------------------------
 jfAuthExprFilter* jfAuthExprFilter::Copy() const {
   return new jfAuthExprFilter(*this);
 }
 //------------------------------------------------------------
-jfBaseFilter* jfAuthExprFilter::GenCopy() const {
+jfFilterBase* jfAuthExprFilter::GenCopy() const {
   return Copy();
-}
-//------------------------------------------------------------
-QString jfAuthExprFilter::GetTypeID() const {
-  return "AuthorFilter";
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
@@ -63,32 +70,37 @@ bool jfAuthExprFilter::CoreMatch(const jfSearchResultItem* testelem) const {
 }
 
 //===========================================================================================
+const jfFilterTypeMeta LANGUAGE_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::MISC, "LanguageFilter", "Language Filter",
+          QString("The Language Expression Filter matches the language name ") +
+                  "against a boolean expression, the elements of which are " +
+                  "themselves to be matched. These elements are either strings" +
+                  " or substrings.",
+          IdForFFNItemCore(), createFilter<jfLanguageExprFilter> );
+
+
 // constructors
 //----------------------------------------------------------
-jfLanguageExprFilter::jfLanguageExprFilter():jfSimpleExpFilterCore() {}
+jfLanguageExprFilter::jfLanguageExprFilter(const QString& filter_name):jfSimpleExpFilterCore(filter_name) {}
+// ----------------------------------------------------------
+jfLanguageExprFilter::jfLanguageExprFilter(QString&& filter_name):jfSimpleExpFilterCore(filter_name) {}
 //----------------------------------------------------------
-jfLanguageExprFilter::jfLanguageExprFilter(const jfLanguageExprFilter& source) {
-  CoreCopy(source);
+jfLanguageExprFilter::jfLanguageExprFilter(const jfLanguageExprFilter& source):jfSimpleExpFilterCore(source.name, source.parsed_expression) {
+  description = source.description;
 }
 //----------------------------------------------------------
-jfLanguageExprFilter::jfLanguageExprFilter(jfSimpleExpr* in_source):jfSimpleExpFilterCore(in_source) {}
+jfLanguageExprFilter::jfLanguageExprFilter(const QString& filter_name, jfSimpleExpr* in_source):jfSimpleExpFilterCore(filter_name, in_source) {}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfLanguageExprFilter::GetTypeDescription() const {
-  return "The Language Expression Filter matches the language name against a boolean \
-expression, the elements of which are themselves to be matched. These elements \
-are either strings or substrings.";
+const jfFilterTypeMeta& jfLanguageExprFilter::GetTypeMetaInfo() const {
+    return LANGUAGE_FILTER_INFO;
 }
 //------------------------------------------------------------
 jfLanguageExprFilter* jfLanguageExprFilter::Copy() const {
   return new jfLanguageExprFilter(*this);
 }
 //------------------------------------------------------------
-jfBaseFilter* jfLanguageExprFilter::GenCopy() const {
+jfFilterBase* jfLanguageExprFilter::GenCopy() const {
   return Copy();
-}
-//------------------------------------------------------------
-QString jfLanguageExprFilter::GetTypeID() const {
-  return "LanguageFilter";
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method

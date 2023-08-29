@@ -18,13 +18,12 @@ Updated :   March 18, 2023
 
 #include <QLocale>
 /*****************************************************************************/
-
+const QString& IdForFIMFanfics();
 
 //==========================================================================
 class jfFIM_Fanfic : public jfGenericFanfic3 {
     friend class jfFIMFanficItemParser;
   public:
-    static const QString FIM_FANFIC_TYPE_ID;
     // default constructors
     jfFIM_Fanfic();
     jfFIM_Fanfic(const jfSearchResultItemData& init_data);

@@ -17,9 +17,7 @@ Updated :   February 12, 2018 (Filter Check fixes)
   #include "../../../core/filters/base/expression.h"
 #endif // EXPRESSION_H
 
-#ifndef JFBASEFILTER
-  #include "../../../core/filters/base/filterbase.h"
-#endif
+
 #ifndef WIDGETS4_H
     #include "../../controls/widgets4.h"
 #endif // WIDGETS4_H

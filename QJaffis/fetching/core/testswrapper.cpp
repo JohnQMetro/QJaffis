@@ -48,6 +48,11 @@ bool jfTestsParserWrapper::TestNotTruncated(const QString* downpage) const {
         return false;
     }
 }
+// -------------------------------------------------------
+bool jfTestsParserWrapper::TestNotRateLimited(const QString* downpage) const {
+    return (parser_link->testRatelimit(downpage));
+}
+// +++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfTestsParserWrapper::ResolveRedirect(const QString& raw_redirect, QString& full_redirect) const {
     QString* red = parser_link->makeRedirectedURL(raw_redirect);
     if (red == NULL) return false;

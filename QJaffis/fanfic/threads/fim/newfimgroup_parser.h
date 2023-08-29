@@ -26,6 +26,7 @@ class jfNewFIMGroupParser : public jfItemsPageParserBase {
     // test methods
     virtual bool testMissing(const QString *page) const;
     virtual bool testIncomplete(const QString *page) const;
+    virtual bool testRatelimit(const QString *page) const;
     // another implemented method
     virtual QString getCookie() const;
   protected:

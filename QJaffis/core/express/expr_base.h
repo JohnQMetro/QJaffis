@@ -7,13 +7,13 @@
 // Updated:     August 6, 2022 (added jfWholeStringElem)
 /////////////////////////////////////////////////////////////////////////////
 // headers
-#ifndef JFBASEFILTER
-#include "../filters/base/filterbase.h"
-#endif
 
 #ifndef BASECOLLECT_H_INCLUDED
     #include "../structs/basecollect.h"
 #endif // BASECOLLECT_H_INCLUDED
+
+#include "../filters/base/basefilter.h"
+#include "../filters/filtermap.h"
 
 
 #define JFEXPRBASE
@@ -180,7 +180,7 @@ public:
     ~jfLiteralFilterElem();
 protected:
     QString filttype, source;
-    jfBaseFilter* thefilter;
+    jfFilterBase* thefilter;
 };
 //=============================================================================
 /* the basic class for filter references, either to a local or global source.
@@ -196,7 +196,7 @@ public:
     virtual bool VerfyNames(jfNameVerif* nameobj) = 0;
     virtual bool CopyLoad() = 0;
 protected:
-    jfBaseFilter* thefilter;
+    jfFilterBase* thefilter;
     QString filter_name;
 };
 //=============================================================================
@@ -221,7 +221,7 @@ protected:
 // USABLE ! ---- Local Filter Reference
 class jfLocalFilterElem : public jfFilterElem {
 public:
-    jfLocalFilterElem(jfFilterMap* inlocalmap, const QString& filtername);
+    jfLocalFilterElem(const jfFilterMap* inlocalmap, const QString& filtername);
     jfLocalFilterElem(const jfLocalFilterElem& source);
     virtual bool IsExpr() const;
     virtual bool VerfyNames(jfNameVerif* nameobj);
@@ -229,7 +229,7 @@ public:
     virtual QString String() const;
     ~jfLocalFilterElem();
 protected:
-    jfFilterMap* localmap;
+    const jfFilterMap* localmap;
 };
 
 //****************************************************************************

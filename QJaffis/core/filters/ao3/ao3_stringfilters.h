@@ -4,26 +4,32 @@
 // Purpose :    Simple expression filters specific to archiveofourown.org
 // Created:     September 7, 2012
 // Conversion to Qt Started Oct 3, 2013
-// Updated:     May 15, 2014
+// Updated:     April 15, 2023 (rebasing)
 //***************************************************************************
 #ifndef AO3_STRINGFILTERS_H_INCLUDED
 #define AO3_STRINGFILTERS_H_INCLUDED
 #endif // AO3_STRINGFILTERS_H_INCLUDED
 //--------------------------------------
-#ifndef SEXP_FILTERS_H_INCLUDED
-  #include "../base/sexp_filters.h"
-#endif // SEXP_FILTERS_H_INCLUDED
+
+#include "../base/sexp_filters.h"
+#include "../base/basefilter.h"
+
 //***************************************************************************
+extern const jfFilterTypeMeta EXTRATAG_EXPR_FILTER_INFO;
+// -----------------------------------------------------
 // Filtering the extra tags
 class jfExtraTagFilter : public jfSimpleExpFilterCore {
   public:
-    jfExtraTagFilter();
+
+    jfExtraTagFilter(const QString& filter_name);
+    jfExtraTagFilter(QString&& filter_name);
     jfExtraTagFilter(const jfExtraTagFilter& source);
-    jfExtraTagFilter(jfSimpleExpr* in_source);
-    virtual QString GetTypeDescription() const override;
+    jfExtraTagFilter(const QString& filter_name, jfSimpleExpr* in_source);
+
     virtual jfExtraTagFilter* Copy() const;
-    virtual jfBaseFilter* GenCopy() const override;
-    virtual QString GetTypeID() const override;
+    virtual jfFilterBase* GenCopy() const override;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
+
   protected:
     // the core matching method
     virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;

@@ -4,7 +4,7 @@
 // Purpose :    Editor for a filter which matches an expression against the extra
 // tags, and passes if the percetage of matches is greater than the specified amount.
 // Created:     July 24, 2022
-// Updated:     August 27, 2022
+// Updated:     April 16, 2023
 //***************************************************************************
 #ifndef AO3_LIST_PERCENT_FILTER_EDITOR_H
     #define AO3_LIST_PERCENT_FILTER_EDITOR_H
@@ -22,8 +22,8 @@
 class jfAO3PercentExpressionTagFilterEditor : public jfFilteredPercentTagMatchFilterEditor {
   public:
     // the default constructor
-    jfAO3PercentExpressionTagFilterEditor(const jfFilterMap* infmap, QWidget* parent);
-    jfAO3PercentExpressionTagFilterEditor(const jfFilterMap* infmap, const jfAO3ExtraTagsPercentFilter* infilt, QWidget* parent);
+    jfAO3PercentExpressionTagFilterEditor(QWidget* parent);
+    jfAO3PercentExpressionTagFilterEditor(const jfAO3ExtraTagsPercentFilter* infilt, QWidget* parent);
   protected:
     // internal methods
     virtual jfMatchFilteredPercentTagFilterBase* MakeTypedFilter(const jfGeneralTagListsGroup* in_source_list);

@@ -61,6 +61,10 @@ bool jfTestWrapParser::testMissing(const QString *page) const {
 bool jfTestWrapParser::testIncomplete(const QString *page) const {
     return (*parsers)[test_index]->testIncomplete(page);
 }
+// ----------------------------------
+bool jfTestWrapParser::testRatelimit(const QString *page) const {
+    return (*parsers)[test_index]->testRatelimit(page);
+}
 //---------------------------------------
 bool jfTestWrapParser::setPageIndex(const size_t& page_index) {
     test_index = page_index - 1;

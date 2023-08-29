@@ -3,7 +3,7 @@
  * Purpose:   a single function to make a fic parser
  * Author:    John Q Metro
  * Created:   July 10, 2016
- * Updated:   February 12, 2023
+ * Updated:   August 27, 2023
  *
  **************************************************************/
 #ifndef MAKEPARSER_H
@@ -112,6 +112,13 @@ bool jfFanficUpdateWrapParser::testMissing(const QString *page) const {
 bool jfFanficUpdateWrapParser::testIncomplete(const QString *page) const {
     if (has_current_type) {
         return fetchParserFor(current_type)->testIncomplete(page);
+    }
+    return false;
+}
+// ----------------------------------------
+bool jfFanficUpdateWrapParser::testRatelimit(const QString *page) const {
+    if (has_current_type) {
+        return fetchParserFor(current_type)->testRatelimit(page);
     }
     return false;
 }

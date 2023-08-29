@@ -3,7 +3,7 @@ Name    :   ffn_filteredit1.h
 Author  :   John Q Metro
 Purpose :   Declares some custom FNN Filter Editors
 Created :   July 8, 2016 (classes taken from other files)
-Updated :   July 8, 2016
+Updated :   August 22, 2023
 ******************************************************************************/
 #ifndef FFN_FILTEREDIT1_H
   #define FFN_FILTEREDIT1_H
@@ -23,7 +23,7 @@ Updated :   July 8, 2016
 class jfFFN_CategoryFilterEditor : public jfSimpleSFilterEditor {
   public:
     // the default constructor
-    jfFFN_CategoryFilterEditor(const jfFilterMap* infmap, const jfFFN_CategoryExprFilter* infilt, QWidget* parent = NULL);
+    jfFFN_CategoryFilterEditor(const jfFFN_CategoryExprFilter* infilt, QWidget* parent = NULL);
   protected:
     // internal methods
     virtual jfSimpleExpFilterCore* MakeTypedFilter(jfSimpleExpr* inpval);
@@ -33,7 +33,7 @@ class jfFFN_CategoryFilterEditor : public jfSimpleSFilterEditor {
 class jfFFNGenresFilterEditor : public jfTagFilterEditor {
   public:
     // the default constructor
-    jfFFNGenresFilterEditor(const jfFilterMap* infmap, const jfFFNGenresFilter* infilt, QWidget* parent = NULL);
+    jfFFNGenresFilterEditor(const jfFFNGenresFilter* infilt, QWidget* parent = NULL);
     // extra methods
     virtual jfTagFilterCore* GetTagFilter();
     virtual void LoadBlank();
@@ -47,7 +47,7 @@ class jfFFN_RatingEditPanel : public QWidget {
     // setting and getting values
     bool StoreValue(jfFFNRatingFilter* saveto) const;
     bool LoadValue(const jfFFNRatingFilter* getfrom);
-    jfFFNRatingFilter* GetValue() const;
+    jfFFNRatingFilter* GetValue(const QString& name) const;
   protected:
     // gui
     QCheckBox *kch, *kpch, *tch, *mch;
@@ -61,33 +61,13 @@ class jfFFN_RatingEditPanel : public QWidget {
 class jfFFN_RatingFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfFFN_RatingFilterEditor(const jfBaseFilter* infilt, const jfFilterMap* infmap, QWidget* parent = NULL);
+    jfFFN_RatingFilterEditor(const jfFFNRatingFilter* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    virtual bool GeneralCheck() const;
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const override;
   protected:
     jfFFN_RatingEditPanel* insert_panel;
 };
-//===========================================================================
-class jfFavsCountPanel : public jfMinMaxEditor {
-  public:
-    // constructor
-    jfFavsCountPanel(bool wrapped, QWidget* parent = NULL );
-  protected:
-};
-//-------------------------------------------
-// A Fanfiction.Net Favs filter editor, a wrapper for jfMinMaxUPanel
-class jfFFNFavsFilterEditor : public jfBaseFilterEditor {
-  public:
-    // the default constructor
-    jfFFNFavsFilterEditor(const jfFilterMap* infmap, const jfFFNFavsFilter* infilt, QWidget* parent = NULL);
-    // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    // checking
-    bool GeneralCheck() const;
-  private:
-    jfFavsCountPanel* insert_panel;
-};
+
 /*****************************************************************************/

@@ -9,11 +9,11 @@
 #ifndef BASECOLLECT_H_INCLUDED
   #include "basecollect.h"
 #endif // BASECOLLECT_H_INCLUDED
-
+/*
 #ifndef JFILTERGLOBALS
   #include "../filters/filter_globals.h"
 #endif
-
+*/
 #ifndef UTILS1_H_INCLUDED
   #include "../utils/utils1.h"
 #endif // UTILS1_H_INCLUDED
@@ -131,6 +131,7 @@ bool jfBaseCollection::ReadMiddleFromFile(jfFileReader* infile) {
   return ReadMid2FromFile(infile);
 }
 //=============================================================================
+/*
 // the default constructor
 jfFilterMap::jfFilterMap():jfBaseCollection() {
   curr_iterat = coredata.end();
@@ -158,7 +159,7 @@ bool jfFilterMap::NameExists(const QString& lookfor) const {
 // renaming map elements via removal and reinsertion
 stl_FilterMap::iterator jfFilterMap::RenameElem(bool& ok, const QString& oldname, const QString& newname) {
   // local varaibles
-  jfBaseFilter* temp;
+  jfFilterBase* temp;
   // checks
   assert(NameExists(oldname));
   // the new name is already in?
@@ -184,7 +185,7 @@ stl_FilterMap::iterator jfFilterMap::RenameElem(bool& ok, const QString& oldname
 }
 //--------------------------------------------------------------------------
 // returns the filter at the name
-jfBaseFilter* jfFilterMap::GetItem(const QString& itemname) {
+jfFilterBase* jfFilterMap::GetItem(const QString& itemname) {
   // constants
   const QString fname = "jfFilterMap::GetItem";
   // variables
@@ -196,9 +197,11 @@ jfBaseFilter* jfFilterMap::GetItem(const QString& itemname) {
   if (findex==coredata.end()) return NULL;
   else return findex->second;
 }
+*/
 //-----------------------------------------------------------------------------
 /* returns true iff all the filters in this map return true when using inval
 as an input to thier Match() methods */
+/*
 bool jfFilterMap::MatchAll(const jfSearchResultItem* inval) const {
   const QString fname = "jfFilterMap::MatchAll";
   // local variables
@@ -215,19 +218,21 @@ bool jfFilterMap::MatchAll(const jfSearchResultItem* inval) const {
   }
   return true;
 }
+*/
 //---------------------------------------------------------------------
 /* Returns true if there are no filters, or all of the filters have isEmpty
  * methods that also return true. */
+/*
 bool jfFilterMap::isEmpty() const {
     // local variables
     stl_FilterMap::const_iterator findex;
-    const jfBaseFilter* cfilter;
+    const jfFilterBase* cfilter;
     // a check
     if (coredata.empty()) return true;
     // the loop
     for (findex = coredata.begin(); findex!=coredata.end(); findex++) {
       cfilter = findex->second;
-      if (!(cfilter->isEmpty())) return false;
+      if (!(cfilter->IsEmpty())) return false;
     }
     return true;
 }
@@ -239,7 +244,7 @@ bool jfFilterMap::noFilters() const {
 // some additonal methods
 //------------------------------------------------------------------------
 // adds a filter to the map, the position is given in outindex
-bool jfFilterMap::AddFilter(jfBaseFilter* infilter, size_t& outindex) {
+bool jfFilterMap::AddFilter(jfFilterBase* infilter, size_t& outindex) {
   // local variables
   QString filtername;
   bool xres;
@@ -271,7 +276,7 @@ bool jfFilterMap::GetIndexByName(const QString& findname, size_t& outindex) cons
   return (findex!=coredata.end());
 }
 //-----------------------------------------------------------------------------
-jfBaseFilter* jfFilterMap::GetItem(const size_t& findex) {
+jfFilterBase* jfFilterMap::GetItem(const size_t& findex) {
   stl_FilterMap::const_iterator xfindex;
   size_t loopind;
   if (findex>=GetCount()) return NULL;
@@ -282,7 +287,7 @@ jfBaseFilter* jfFilterMap::GetItem(const size_t& findex) {
   return xfindex->second;
 }
 //-----------------------------------------------------------------------------
-const jfBaseFilter* jfFilterMap::GetItemConst(const size_t& findex) const {
+const jfFilterBase* jfFilterMap::GetItemConst(const size_t& findex) const {
     stl_FilterMap::const_iterator xfindex;
     size_t loopind;
     if (findex>=GetCount()) return NULL;
@@ -309,7 +314,7 @@ bool jfFilterMap::DeleteByName(const QString& findname) {
 }
 //----------------------------------------------------------------------------
 // replaces a filter, if need be removing and re-inserting
-bool jfFilterMap::ReplaceByName(QString nameold, jfBaseFilter* newfilter, size_t& outindex) {
+bool jfFilterMap::ReplaceByName(QString nameold, jfFilterBase* newfilter, size_t& outindex) {
   // local variables
   stl_FilterMap::iterator findex;
   QString newname;
@@ -351,10 +356,12 @@ bool jfFilterMap::ReplaceByName(QString nameold, jfBaseFilter* newfilter, size_t
   return true;
 
 }
+*/
 //-----------------------------------------------------------------------------
 /* Adds a filter if a filter with the same name is not in a map, otherwise
 there is a replacement */
-bool jfFilterMap::ReplaceSame(jfBaseFilter* newfilter, size_t& outindex) {
+/*
+bool jfFilterMap::ReplaceSame(jfFilterBase* newfilter, size_t& outindex) {
     // local variables
   stl_FilterMap::iterator findex;
   QString newname;
@@ -450,7 +457,7 @@ size_t jfFilterMap::PairFilterLogging(bool write) {
   // local variables
   stl_FilterMap::iterator findex;
   stl_FilterMap::iterator thelast;
-  /*
+  [[
   jfPairFilterCore* exprfil;
   size_t tagval, resval;
   // intialization
@@ -466,7 +473,7 @@ size_t jfFilterMap::PairFilterLogging(bool write) {
       resval++;
     }
   }
-  */
+  ]]
   // done
   return false;
   //return resval;
@@ -726,26 +733,28 @@ bool jfFilterMap::AddRestToFile(QTextStream* outfile) const {
 bool jfFilterMap::ReadMid2FromFile(jfFileReader* infile) {
   return true;
 }
+*/
 //--------------------------------------------------------------------
 /* reads in the list. slighty complicated because the items can be of different
 types */
+/*
 bool jfFilterMap::ReadRestFromFile(jfFileReader* infile) {
   // constants
   const QString fname = "jfFilterMap::ReadRestFromFile";
   // local variables
   size_t loopc;
   QString typid;
-  jfBaseFilter* newitem;
+  jfFilterBase* newitem;
   jfExpressionFilter* exp_item;
   // the usual initial checks
-  /**/JDEBUGLOGST(fname,1,item_count)
+  //JDEBUGLOGST(fname,1,item_count)
   assert(infile!=NULL);
   // the loop
   for (loopc=0;loopc<item_count;loopc++) {
-    /**/JDEBUGLOGST(fname,3,loopc)
+    //JDEBUGLOGST(fname,3,loopc)
     // gets the filter type string (and also the line index)
     if (!infile->GetType(typid,fname)) return false;
-    /**/JDEBUGLOGS(fname,4,typid)
+    //JDEBUGLOGS(fname,4,typid)
     // we make an empty default filter
     newitem = MakeFilter(typid,QString::number(loopc));
     // expression filters
@@ -754,25 +763,26 @@ bool jfFilterMap::ReadRestFromFile(jfFileReader* infile) {
       if (exlocmap!=NULL) exp_item->SetFiltermapLink(exlocmap);
       else exp_item->SetFiltermapLink(this);
     }
-    /**/JDEBUGLOGS(fname,6,newitem->GetTypeDescription())
+    //JDEBUGLOGS(fname,6,newitem->GetTypeDescription())
     if (newitem==NULL) {
         jerror::Log(fname,"Unrecognized Filter type!");
         return infile->BuildError("Unrecognized Filter type!");
     }
     assert(newitem!=NULL);
-    /**/JDEBUGLOG(fname,7)
+    //JDEBUGLOG(fname,7)
     // and then load
     if (!newitem->GetFromFile(infile)) {
       delete newitem;
        jerror::Log(fname,"Filtermap load from file failed.");
       return false;
     }
-    /**/JDEBUGLOGS(fname,9,newitem->GetName())
+    //JDEBUGLOGS(fname,9,newitem->GetName())
     // we add the newly loaded item to the list
     coredata[newitem->GetName()] = newitem;
-    /**/JDEBUGLOG(fname,10)
+    //JDEBUGLOG(fname,10)
   }
   return true;
   // done
 }
+*/
 //*****************************************************************************

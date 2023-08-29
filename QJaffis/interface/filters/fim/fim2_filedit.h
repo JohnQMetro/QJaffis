@@ -3,7 +3,7 @@ Name    :   fim2_filedit.h
 Author  :   John Q Metro
 Purpose :   More Editors for fim filters
 Created :   August 5, 2015
-Updated :   October 15, 2019
+Updated :   August 5, 2023
 ******************************************************************************/
 #ifndef FIM2_FILEDIT_H
 #define FIM2_FILEDIT_H
@@ -30,7 +30,7 @@ Updated :   October 15, 2019
 class jfFIMShortDesc_FilterEditor : public jfSimpleSFilterEditor {
   public:
     // the default constructor
-    jfFIMShortDesc_FilterEditor(const jfFilterMap* infmap, const jfFIM_ShortDesc_ExprFilter* infilt, QWidget* parent = NULL);
+    jfFIMShortDesc_FilterEditor(const jfFIM_ShortDesc_ExprFilter* infilt, QWidget* parent = NULL);
   protected:
     // internal methods
     virtual jfSimpleExpFilterCore* MakeTypedFilter(jfSimpleExpr* inpval);
@@ -40,7 +40,7 @@ class jfFIMShortDesc_FilterEditor : public jfSimpleSFilterEditor {
 class jfFIMDualDesc_FilterEditor : public jfSimpleSFilterEditor {
   public:
     // the default constructor
-    jfFIMDualDesc_FilterEditor(const jfFilterMap* infmap, const jfFIM_DualDesc_ExprFilter* infilt, QWidget* parent = NULL);
+    jfFIMDualDesc_FilterEditor(const jfFIM_DualDesc_ExprFilter* infilt, QWidget* parent = NULL);
   protected:
     // internal methods
     virtual jfSimpleExpFilterCore* MakeTypedFilter(jfSimpleExpr* inpval);
@@ -52,7 +52,7 @@ class jfFIMDualDesc_FilterEditor : public jfSimpleSFilterEditor {
 class jfFIMGroupSCFilterEditor : public jfZeroToMaxFilterEditor {
   public:
     // the default constructor
-    jfFIMGroupSCFilterEditor(const jfFilterMap* infmap, const jfFIMGroupSCFilter* infilt, QWidget* parent = NULL);
+    jfFIMGroupSCFilterEditor(const jfFIMGroupSCFilter* infilt, QWidget* parent = NULL);
   private:
     virtual jfMinMaxUFilter* MakeTypedMinMax() const;
 };
@@ -61,7 +61,7 @@ class jfFIMGroupSCFilterEditor : public jfZeroToMaxFilterEditor {
 class jfFIMGroupMCFilterEditor : public jfZeroToMaxFilterEditor {
   public:
     // the default constructor
-    jfFIMGroupMCFilterEditor(const jfFilterMap* infmap, const jfFIMGroupMCFilter* infilt, QWidget* parent = NULL);
+    jfFIMGroupMCFilterEditor(const jfFIMGroupMCFilter* infilt, QWidget* parent = NULL);
   private:
     virtual jfMinMaxUFilter* MakeTypedMinMax() const;
 };
@@ -72,7 +72,7 @@ class jfFimThumbPercentPanel : public QWidget {
     // the constructor
     jfFimThumbPercentPanel(QWidget* parent = NULL );
     // get
-    jfFimThumbPercentFilter* GetNewFilter() const;
+    jfFimThumbPercentFilter* GetNewFilter(const QString& name) const;
     // set
     bool SetFromObj(const jfFimThumbPercentFilter* inval);
     void SetDefault();
@@ -87,11 +87,11 @@ class jfFimThumbPercentPanel : public QWidget {
 class jfFimThumbPercentFilterEditor : public jfBaseFilterEditor {
     // the default constructor
   public:
-    jfFimThumbPercentFilterEditor(const jfFilterMap* infmap, const jfFimThumbPercentFilter* infilt, QWidget* parent = NULL);
+    jfFimThumbPercentFilterEditor(const jfFimThumbPercentFilter* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    virtual bool GeneralCheck() const;
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const override;
   protected:
     jfFimThumbPercentPanel* insert_panel;
 };

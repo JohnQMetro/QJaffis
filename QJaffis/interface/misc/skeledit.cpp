@@ -72,7 +72,7 @@ bool jfSkelEditCore::CLoadItems(jfSkeletonCore* source) {
   help_desc->setPlainText(source->GetGuide());
   thepanels[0]->SetBoth(source->header_skel,source->footer_skel);
   thepanels[1]->SetBoth(source->item_skel,source->item_separator);
-  ndesce->SetFromObj(source);
+  ndesce->SetFromSkeleton(source);
   return true;
 }
 //---------------------------------------------------------------------------
@@ -81,7 +81,7 @@ bool jfSkelEditCore::CStoreItems(jfSkeletonCore* destination) const {
   destination->SetGuide(help_desc->toPlainText());
   thepanels[0]->GetBoth(destination->header_skel,destination->footer_skel);
   thepanels[1]->GetBoth(destination->item_skel,destination->item_separator);
-  ndesce->ChangeObj(destination);
+  ndesce->ChangeSkeleton(destination);
   return true;
 }
 //===============================================================================

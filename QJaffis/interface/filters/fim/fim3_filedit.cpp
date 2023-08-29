@@ -3,7 +3,7 @@ Name    :   fim3_filedit.cpp
 Author  :   John Q Metro
 Purpose :   Editors for fim filters : 2018 and later
 Created :   January 21, 2018
-Updated :   January 21, 2018
+Updated :   August 24, 2023
 ******************************************************************************/
 #ifndef FIM3_FILEDIT_H
     #include "fim3_filedit.h"
@@ -18,8 +18,8 @@ Updated :   January 21, 2018
 #include <assert.h>
 /*****************************************************************************/
 // the default constructor
-jfFimContentTypeFilterEditor::jfFimContentTypeFilterEditor(const jfFilterMap* infmap, const jfFIMContentTypeFilter* infilt,
-          QWidget* parent):jfTagFilterEditor(infmap,infilt,parent) {
+jfFimContentTypeFilterEditor::jfFimContentTypeFilterEditor(const jfFIMContentTypeFilter* infilt,
+                                            QWidget* parent):jfTagFilterEditor(infilt,parent) {
   CompleteConstruction("Content Types",infilt);
   if (infilt==NULL) LoadBlank();
 }
@@ -28,7 +28,7 @@ jfFimContentTypeFilterEditor::jfFimContentTypeFilterEditor(const jfFilterMap* in
 //---------------------------
 jfTagFilterCore* jfFimContentTypeFilterEditor::GetTagFilter() {
   jfFIMContentTypeFilter* result;
-  result = new jfFIMContentTypeFilter();
+  result = new jfFIMContentTypeFilter(namedesc_edit->TryGetName());
   result->SetToEmpty();
   return result;
 }
@@ -45,8 +45,8 @@ void jfFimContentTypeFilterEditor::LoadBlank() {
 }
 //============================================================================
 // the default constructor
-jfFimWarningsFilterEditor::jfFimWarningsFilterEditor(const jfFilterMap* infmap, const jfFIMWarningsFilter* infilt,
-          QWidget* parent):jfTagFilterEditor(infmap,infilt,parent) {
+jfFimWarningsFilterEditor::jfFimWarningsFilterEditor(const jfFIMWarningsFilter* infilt,
+                                QWidget* parent):jfTagFilterEditor(infilt,parent) {
   CompleteConstruction("Warnings",infilt);
   if (infilt==NULL) LoadBlank();
 }
@@ -55,7 +55,7 @@ jfFimWarningsFilterEditor::jfFimWarningsFilterEditor(const jfFilterMap* infmap, 
 //---------------------------
 jfTagFilterCore* jfFimWarningsFilterEditor::GetTagFilter() {
   jfFIMWarningsFilter* result;
-  result = new jfFIMWarningsFilter();
+  result = new jfFIMWarningsFilter(namedesc_edit->TryGetName());
   result->SetToEmpty();
   return result;
 }

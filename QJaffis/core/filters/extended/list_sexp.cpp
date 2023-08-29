@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    String expression based filters for lists of strings
 // Created:     February 26, 2023
-// Updated:     February 26, 2023
+// Updated:     April 9, 2023
 //***************************************************************************
 #include "list_sexp.h"
 
@@ -13,31 +13,32 @@
 //***************************************************************************
 // the constructors
 //----------------------------------------------------------------------
-// the basic constructor
-jfListExprFilterBase::jfListExprFilterBase():jfBaseFilter() {
+jfListExprFilterBase::jfListExprFilterBase(const QString& filter_name):jfFilterBase(filter_name) {
     parsed_expression = NULL;
     match_mode = jfListMatchMode::MATCH_MERGED;
-    validdata = true;
 }
-//----------------------------------------------------------------------
-jfListExprFilterBase::jfListExprFilterBase(const QString& sourcedata):jfBaseFilter() {
+//-----------------------------
+jfListExprFilterBase::jfListExprFilterBase(QString&& filter_name):jfFilterBase(filter_name) {
     parsed_expression = NULL;
     match_mode = jfListMatchMode::MATCH_MERGED;
-    validdata = false;
-    FromString(sourcedata);
 }
-//----------------------------------------------------------------------
-jfListExprFilterBase::jfListExprFilterBase(jfListMatchMode in_match_mode, jfSimpleExpr* in_source):jfBaseFilter() {
+//-----------------------------
+jfListExprFilterBase::jfListExprFilterBase(jfListMatchMode in_match_mode, jfSimpleExpr* in_source):jfFilterBase("(List Filter)") {
     parsed_expression = NULL;
+    bool validdata = FromExpr(in_source);
+    assert(validdata);
     match_mode = in_match_mode;
-    validdata = false;
-    FromExpr(in_source);
 }
-//----------------------------------------------------------------------
-jfListExprFilterBase::jfListExprFilterBase(const jfListExprFilterBase& source):jfBaseFilter() {
-    num_id = source.num_id;
-    validdata = source.validdata;
-    name = source.name;
+//-----------------------------
+jfListExprFilterBase::jfListExprFilterBase(const QString& filter_name,
+        jfListMatchMode in_match_mode, jfSimpleExpr* in_source):jfFilterBase(filter_name) {
+    parsed_expression = NULL;
+    bool validdata = FromExpr(in_source);
+    assert(validdata);
+    match_mode = in_match_mode;
+}
+//-----------------------------
+jfListExprFilterBase::jfListExprFilterBase(const jfListExprFilterBase& source):jfFilterBase(source.name) {
     description = source.description;
     match_mode = source.match_mode;
     if (source.parsed_expression == NULL) {
@@ -48,48 +49,12 @@ jfListExprFilterBase::jfListExprFilterBase(const jfListExprFilterBase& source):j
     }
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool jfListExprFilterBase::isEmpty() const {
+bool jfListExprFilterBase::IsEmpty() const {
     return (parsed_expression == NULL) || (parsed_expression->isEmpty());
 }
-//-----------------------------------------------------------------------------
-// returns a general filter type. The default is 0, unless overriden
-size_t jfListExprFilterBase::GetFilType() const { return 1;}
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // redefined virtual functions
-// loading stuff
-bool jfListExprFilterBase::FromString(const QString& sourcedata) {
-    // constants
-    const QString fname = "jfListExprFilterBase::FromString";
-
-    if (sourcedata.isEmpty()) {
-        EmptyFilter();
-        match_mode = jfListMatchMode::MATCH_MERGED;
-        validdata = true;
-        return true;
-    }
-    else {
-       jfLineParse* lparser = new jfLineParse(sourcedata);
-       if (lparser->NNotX(2)) {
-           delete lparser;
-           return false;
-       }
-       // the first field should be the match mode
-       jfListMatchMode in_match_mode = StringToMode(lparser->Get(0));
-       jfSimpleExpr* new_expr = new jfSimpleExpr(lparser->UnEscStr(1));
-       delete lparser;
-       bool okay_expr = (new_expr->IsValid()) || (new_expr->isEmpty());
-       if (okay_expr) {
-           EmptyFilter();
-           match_mode = in_match_mode;
-           validdata = true;
-           if (new_expr->isEmpty()) parsed_expression = NULL;
-           else parsed_expression = new_expr;
-       }
-       else delete new_expr;
-       return okay_expr;
-    }
-}
-//----------------------------------------------------------------------
 QString jfListExprFilterBase::ToString() const {
     if (parsed_expression == NULL) return "";
     else {
@@ -111,18 +76,23 @@ void jfListExprFilterBase::SetMatchMode(jfListMatchMode in_match_mode) {
 //----------------------------------------------------------------------
 bool jfListExprFilterBase::FromExpr(jfSimpleExpr* in_source) {
   if (in_source==NULL) return false;
+  else if ((in_source->IsValid()) == false) return false;
   else {
+      if (parsed_expression != NULL) {
+          delete parsed_expression;
+      }
       parsed_expression = in_source->Copy();
-      validdata = parsed_expression->IsValid();
+      return true;
   }
-  return true;
 }
 //----------------------------------------------------------------------
 // returning a string representation of the parsed contents
+/*
 QString jfListExprFilterBase::MakePList() const {
     if (parsed_expression == NULL) return "";
     else return parsed_expression->MakePList();
 }
+*/
 //-----------------------------------------------------------------------
 // sort of like load string, except the string is empty
 void jfListExprFilterBase::EmptyFilter() {
@@ -130,7 +100,7 @@ void jfListExprFilterBase::EmptyFilter() {
         delete parsed_expression;
         parsed_expression = NULL;
     }
-    validdata = true;
+    match_mode = jfListMatchMode::MATCH_MERGED;
 }
 //-----------------------------------------------------------------------
 QString jfListExprFilterBase::GetExpression() const {
@@ -143,6 +113,39 @@ jfListExprFilterBase::~jfListExprFilterBase() {
     EmptyFilter();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfListExprFilterBase::FromStringInner(const QString& sourcedata, QString& error_out) {
+    const QString fname = "jfListExprFilterBase::FromStringInner";
+
+    if (sourcedata.isEmpty()) {
+        EmptyFilter();
+        return true;
+    }
+    else {
+       jfLineParse* lparser = new jfLineParse(sourcedata);
+       if (lparser->NNotX(2)) {
+           delete lparser;
+           error_out = "The input string was not 2 fields!";
+           return false;
+       }
+       // the first field should be the match mode
+       jfListMatchMode in_match_mode = StringToMode(lparser->Get(0));
+       jfSimpleExpr* new_expr = new jfSimpleExpr(lparser->UnEscStr(1));
+       delete lparser;
+       bool okay_expr = (new_expr->IsValid()) || (new_expr->isEmpty());
+       if (okay_expr) {
+           EmptyFilter();
+           match_mode = in_match_mode;
+           if (new_expr->isEmpty()) parsed_expression = NULL;
+           else parsed_expression = new_expr;
+       }
+       else {
+           error_out = new_expr->parse_error;
+           delete new_expr;
+       }
+       return okay_expr;
+    }
+}
+// -----------------------------------------------------------------------------
 QString jfListExprFilterBase::ModeToString(jfListMatchMode in_match_mode) const {
     if (in_match_mode == jfListMatchMode::MATCH_ALL) return "ALL";
     else if (in_match_mode == jfListMatchMode::MATCH_ONE) return "ONE";
@@ -213,39 +216,12 @@ bool jfListExprFilterBase::InternalMatch(const QStringList& to_match) const {
     }
 }
 
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-size_t jfListExprFilterBase::ExtraLines() const {
-  return 1;
-}
-//-----------------------------------------------------------------------
-bool jfListExprFilterBase::AddRestToFile(QTextStream* outfile) const {
-  QString buffer;
-  // checking and special conditions
-  if (outfile==NULL) return false;
-  // composing line 4
-  (*outfile) << ToString() << "\n";
-  return true;
-}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-bool jfListExprFilterBase::ReadRestFromFile(jfFileReader* infile) {
-  const QString funcname = "jfListExprFilterBase::ReadRestFromFile";
-  // input data
-  QString cline;
-  bool resx;
-  // starting checks (and reading the line)
-  assert(infile!=NULL);
-  if (!infile->ReadLine(cline, funcname)) return false;
-  resx = FromString(cline);
-  if (!resx) return infile->BuildError("The source or expression string is invalid!");
-  else return true;
-}
-//-----------------------------------------------------------------------
+
 void jfListExprFilterBase::CoreCopy(const jfListExprFilterBase& source) {
-    num_id = source.num_id;
-    validdata = source.validdata;
     name = source.name;
     description = source.description;
-    match_mode = source.match_mode;
+    EmptyFilter();
     if (source.parsed_expression == NULL) {
         parsed_expression = NULL;
     }
@@ -253,46 +229,58 @@ void jfListExprFilterBase::CoreCopy(const jfListExprFilterBase& source) {
         parsed_expression = source.parsed_expression->Copy();
     }
 }
+
 // ==========================================================================================
+const jfFilterTypeMeta CHARACTER_LIST_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::CHARACTERS, "CharacterListFilter",
+                     "Character List Filter", QString("The Character List ") +
+                     "Expression Filter matches the list of characters against" +
+                     " a boolean expression, the elements of which are themselves" +
+                     " to be matched. These elements are either strings or " +
+                     "substrings. The user can choose to match a merged list, all" +
+                     " characters, or at least one character.",
+          IdForGenericFanfic2(), createFilter<jfCharListExprFilter> );
+// =======================================================================
 // constructors
-//----------------------------------------------------------
-jfCharListExprFilter::jfCharListExprFilter():jfListExprFilterBase() {}
-//----------------------------------------------------------
+jfCharListExprFilter::jfCharListExprFilter(const QString& filter_name):jfListExprFilterBase(filter_name) {
+
+}
+//----------------------------------------
+jfCharListExprFilter::jfCharListExprFilter(QString&& filter_name):jfListExprFilterBase(filter_name) {
+
+}
+//----------------------------------------
 jfCharListExprFilter::jfCharListExprFilter(const jfCharListExprFilter& source):jfListExprFilterBase(source) {
 
 }
-//----------------------------------------------------------
-jfCharListExprFilter::jfCharListExprFilter(jfListMatchMode in_match_mode, jfSimpleExpr* in_source):jfListExprFilterBase(in_match_mode, in_source) {}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfCharListExprFilter::GetTypeDescription() const {
-  return "The Character List Expression Filter matches the list of characters against a boolean \
-expression, the elements of which are themselves to be matched. These elements \
-are either strings or substrings. The user can choose to match a merged list, all characters, or at least one character.";
+//----------------------------------------
+jfCharListExprFilter::jfCharListExprFilter(const QString& filter_name,
+        jfListMatchMode in_match_mode, jfSimpleExpr* in_source):jfListExprFilterBase(in_match_mode, in_source) {
+
 }
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 //------------------------------------------------------------
 jfCharListExprFilter* jfCharListExprFilter::Copy() const {
   return new jfCharListExprFilter(*this);
 }
 //------------------------------------------------------------
-jfBaseFilter* jfCharListExprFilter::GenCopy() const {
+jfFilterBase* jfCharListExprFilter::GenCopy() const {
   return Copy();
 }
 //------------------------------------------------------------
-QString jfCharListExprFilter::GetTypeID() const {
-  return "CharacterListFilter";
+const jfFilterTypeMeta& jfCharListExprFilter::GetTypeMetaInfo() const {
+    return CHARACTER_LIST_FILTER_INFO;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
 bool jfCharListExprFilter::CoreMatch(const jfSearchResultItem* testelem) const {
-  const jfGenericFanfic2* fanfic_item = NULL;
-  // checks and starts
-  assert(testelem!=NULL);
-  // type checking
-  if (testelem->GetTypeLabels().contains(jfGenericFanfic2::GENERIC_FANFIC_2_TYPE_ID)) {
-      fanfic_item = dynamic_cast<const jfGenericFanfic2*>(testelem);
-      return InternalMatch(fanfic_item->GetCharacterList());
-  }
-  else assert(false);
+    const jfGenericFanfic2* fanfic_item = NULL;
+    // checks and starts
+    assert(testelem!=NULL);
+    // type checking
+    fanfic_item = dynamic_cast<const jfGenericFanfic2*>(testelem);
+    return InternalMatch(fanfic_item->GetCharacterList());
 }
 
 //*******************************************************************************************

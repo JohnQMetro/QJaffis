@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    Includes for the main window
 // Created:     July 14, 2016.
-// Updated:     March 30, 2018
+// Updated:     April 17, 2023
 //***************************************************************************
 #ifndef MW_INCLUDES_H
   #define MW_INCLUDES_H
@@ -41,6 +41,8 @@
 #ifndef JFILTERGLOBALS
   #include "core/filters/filter_globals.h"
 #endif
+
+#include "interface/filters/global_filter_editor.h"
 
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++

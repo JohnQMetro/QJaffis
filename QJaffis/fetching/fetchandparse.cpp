@@ -210,7 +210,7 @@ jfFETCH_ERROR jfFetchAndParsePage::DownloadMethod(uint pre_pause) {
           downloader->Reset();
       }
       // hard download error, trying gain means nothing
-      else if (currError != jff_TRYAGAIN){
+      else if ((currError != jff_TRYAGAIN) && (currError != jff_INTERNAL)) {
           /**/tLog(fname,7);
         downloader->Reset();
         break;

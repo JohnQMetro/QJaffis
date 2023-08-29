@@ -4,15 +4,12 @@
 // Purpose :    Simple expression filters that work on specific string data
 // Created:     November 30, 2010
 // Conversion to Qt Started September 26, 2013
-// Updated:     July 26, 2022
+// Updated:     April 2, 2023 (Rebasing)
 //***************************************************************************
-#ifndef SEXP_FILTERS_H_INCLUDED
-#define SEXP_FILTERS_H_INCLUDED
-#endif // SEXP_FILTERS_H_INCLUDED
-//-------------------------------------------------------------------------
-#ifndef JFBASEFILTER
-  #include "filterbase.h"
-#endif
+#pragma once
+
+#include "basefilter.h"
+
 #ifndef JFEXPRSTRUCTS
   #include "../../express/expr_structs.h"
 #endif
@@ -49,30 +46,26 @@ class jfSimpleExpr {
 /* The simple expression filter: Holds a boolean expression.
  the operands of the expression, which can evaluate to true or false, are
  for either string matching/searching. */
-class jfSimpleExpFilterCore : public jfBaseFilter {
+class jfSimpleExpFilterCore : public jfFilterBase {
   public:
     // the constructors
-    jfSimpleExpFilterCore();
-    jfSimpleExpFilterCore(const QString& sourcedata);
-    jfSimpleExpFilterCore(jfSimpleExpr* in_source);
+    jfSimpleExpFilterCore(const QString& filter_name);
+    jfSimpleExpFilterCore(QString&& filter_name);
+    jfSimpleExpFilterCore(const QString& filter_name, const QString& sourcedata);
+    jfSimpleExpFilterCore(const QString& filter_name, jfSimpleExpr* in_source);
     // redefined virtual functions
-    virtual bool isEmpty() const;
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
+    virtual bool IsEmpty() const override;
+    virtual QString ToString() const override;
     // extra methods
     bool FromExpr(jfSimpleExpr* in_source);
-    QString MakePList() const;
+    // QString MakePList() const;
     void EmptyFilter();
-    // returns a general filter type
-    virtual size_t GetFilType() const;
     // the destructor
     ~jfSimpleExpFilterCore();
   protected:
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override final;
     // private methods
     bool InternalMatch(const QString& incheck) const;
-    virtual size_t ExtraLines() const;
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
     void CoreCopy(const jfSimpleExpFilterCore& source);
     // private data
     jfSimpleExpr* parsed_expression;

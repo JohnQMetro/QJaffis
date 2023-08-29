@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    The base tag filters
 // Created:     August 20, 2022
-// Updated:     August 28, 2022
+// Updated:     April 8, 2023 (Rebasing)
 //***************************************************************************
 #pragma once
 
@@ -13,43 +13,36 @@
 //***************************************************************************
 
 // base filter where a single match in a list counts
-class jfMatchOneTagFilterBase : public jfMultiMatchBaseFilter {
+class jfMatchOneTagFilterBase : public jfMatchTagFilterBase {
   public:
     // the constructors
-    jfMatchOneTagFilterBase(const jfGeneralTagListsGroup* in_source_list);
-    bool ChangeSourceList(const jfGeneralTagListsGroup* in_source_list);
-    bool SetFromSource(jfMultiMatchSource* in_source);
+    jfMatchOneTagFilterBase(const QString& filter_name);
+    jfMatchOneTagFilterBase(const QString& filter_name, const jfGeneralTagListsGroup* in_source_list);
+    jfMatchOneTagFilterBase(QString&& filter_name, const jfGeneralTagListsGroup* in_source_list);
 
     // implemented methods
-    virtual bool isEmpty() const;
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
-    virtual bool IsUsable() const;
-
-    // to implement
-    virtual QString GetTypeID() const = 0;
-    virtual QString GetTypeDescription() const = 0;
-    virtual jfBaseFilter* GenCopy() const = 0;
+    virtual bool IsEmpty() const override;
+    virtual QString ToString() const override;
+    virtual bool IsUsable() const override;
 
     virtual ~jfMatchOneTagFilterBase();
 
   protected:
-    bool InternalMatch(const QStringList& incheck) const;
-
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
+    virtual bool InternalMatch(const QStringList& incheck) const override;
 
     const jfGeneralTagListsGroup* source_list;
 
 };
 //============================================================
 // base percentage tag match filter
-class jfMatchPercentTagFilterBase : public jfMultiMatchBaseFilter {
+class jfMatchPercentTagFilterBase : public jfMatchTagFilterBase {
   public:
     // the constructors
-    jfMatchPercentTagFilterBase(const jfGeneralTagListsGroup* in_source_list);
-    bool ChangeSourceList(const jfGeneralTagListsGroup* in_source_list);
-    const jfGeneralTagListsGroup* GetSourceList() const;
-    bool SetFromSource(jfMultiMatchSource* in_source);
+    jfMatchPercentTagFilterBase(const QString& filter_name);
+    jfMatchPercentTagFilterBase(const QString& filter_name, const jfGeneralTagListsGroup* in_source_list);
+    jfMatchPercentTagFilterBase(QString&& filter_name, const jfGeneralTagListsGroup* in_source_list);
+
     bool SetPercent(size_t in_min_percentage, bool in_match_empty);
 
     // info methods
@@ -57,23 +50,16 @@ class jfMatchPercentTagFilterBase : public jfMultiMatchBaseFilter {
     bool GetMatchEmpty() const;
 
     // implemented methods
-    virtual bool isEmpty() const;
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
-    virtual bool IsUsable() const;
-
-    // to implement
-    virtual QString GetTypeID() const = 0;
-    virtual QString GetTypeDescription() const = 0;
-    virtual jfBaseFilter* GenCopy() const = 0;
+    virtual bool IsEmpty() const override;
+    virtual QString ToString() const override;
+    virtual bool IsUsable() const override;
 
     virtual ~jfMatchPercentTagFilterBase();
 
   protected:
-    bool InternalMatch(const QStringList& incheck) const;
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
+    virtual bool InternalMatch(const QStringList& incheck) const override;
     virtual void CoreCopy(const jfMatchPercentTagFilterBase& mm_source, bool setup_miss_counter);
-
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
 
     size_t min_percentage;
     bool match_empty;
@@ -81,14 +67,15 @@ class jfMatchPercentTagFilterBase : public jfMultiMatchBaseFilter {
 
 };
 //============================================================
-// base percentage tag match filter
-class jfMatchFilteredPercentTagFilterBase : public jfMultiMatchBaseFilter {
+// base percentage tag match filter, but with an extra 'pre filter'
+class jfMatchFilteredPercentTagFilterBase : public jfMatchTagFilterBase {
   public:
     // the constructors
-    jfMatchFilteredPercentTagFilterBase(const jfGeneralTagListsGroup* in_source_list);
-    bool ChangeSourceList(const jfGeneralTagListsGroup* in_source_list);
-    const jfGeneralTagListsGroup* GetSourceList() const;
-    bool SetMainFromSource(jfMultiMatchSource* in_source);
+    jfMatchFilteredPercentTagFilterBase(const QString& filter_name);
+    jfMatchFilteredPercentTagFilterBase(const QString& filter_name, const jfGeneralTagListsGroup* in_source_list);
+    jfMatchFilteredPercentTagFilterBase(QString&& filter_name, const jfGeneralTagListsGroup* in_source_list);
+
+    // bool SetFromSource(jfMultiMatchSource* in_source);
     bool SetPercent(size_t in_min_percentage, bool in_match_empty);
 
     // info methods
@@ -96,28 +83,22 @@ class jfMatchFilteredPercentTagFilterBase : public jfMultiMatchBaseFilter {
     bool GetMatchEmpty() const;
 
     // implemented methods
-    virtual bool isEmpty() const;
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
-    virtual bool IsUsable() const;
+    virtual bool IsEmpty() const override;
+    virtual QString ToString() const override;
+    virtual bool IsUsable() const override;
 
     // the pre-filter
     bool SetPreFilterFromSource(jfMultiMatchSource* in_source);
+    void ClearPreFilter();
     QString PreFilterExpression() const;
     QStringList PreFilterListNames() const;
-
-    // to implement
-    virtual QString GetTypeID() const = 0;
-    virtual QString GetTypeDescription() const = 0;
-    virtual jfBaseFilter* GenCopy() const = 0;
 
     virtual ~jfMatchFilteredPercentTagFilterBase();
 
   protected:
-    bool InternalMatch(const QStringList& incheck) const;
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
+    virtual bool InternalMatch(const QStringList& incheck) const override;
     virtual void CoreCopy(const jfMatchFilteredPercentTagFilterBase& mm_source, bool setup_miss_counter);
-
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const = 0;
 
     size_t min_percentage;
     bool match_empty;

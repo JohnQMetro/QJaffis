@@ -3,7 +3,7 @@ Name    :   tag_match_filter_edits.cpp
 Author  :   John Q Metro
 Purpose :   Filter edit widgets for tag matchers
 Created :   August 27, 2022
-Updated :   August 27, 2022
+Updated :   April 16, 2023
 ******************************************************************************/
 #include "tag_match_filter_edits.h"
 
@@ -11,11 +11,11 @@ Updated :   August 27, 2022
 /*****************************************************************************/
 // core wrapper for jfSimpleExprEdit
 // the default constructor
-jfPercentTagMatchFilterEditor::jfPercentTagMatchFilterEditor(const jfFilterMap* infmap, const jfMatchPercentTagFilterBase* infilt, QWidget* parent):
-                                                                    jfBaseFilterEditor(infmap, infilt, parent) {
+jfPercentTagMatchFilterEditor::jfPercentTagMatchFilterEditor(
+        const jfMatchPercentTagFilterBase* infilt, QWidget* parent):
+        jfBaseFilterEditor(infilt, parent) {
 
     // most things are handled by the parent constructor
-    assert(infmap!=NULL);
     assert(infilt!=NULL);
     // we create the insert.. the *actual* expression editor
     typed_fpointer = infilt;
@@ -38,10 +38,10 @@ jfPercentTagMatchFilterEditor::jfPercentTagMatchFilterEditor(const jfFilterMap* 
 }
 // --------------------------------------------------
 // the constructor to use if we have no filter to start with
-jfPercentTagMatchFilterEditor::jfPercentTagMatchFilterEditor(const jfFilterMap* infmap, const jfGeneralTagListsGroup* in_source_list, QWidget* parent):
-                                                                    jfBaseFilterEditor(infmap, NULL, parent) {
+jfPercentTagMatchFilterEditor::jfPercentTagMatchFilterEditor(
+        const jfGeneralTagListsGroup* in_source_list, QWidget* parent):
+        jfBaseFilterEditor(NULL, parent) {
     // most things are handled by the parent constructor
-    assert(infmap!=NULL);
     assert(in_source_list!=NULL);
     // we create the insert.. the *actual* expression editor
     typed_fpointer = NULL;
@@ -58,7 +58,7 @@ jfPercentTagMatchFilterEditor::jfPercentTagMatchFilterEditor(const jfFilterMap* 
 
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
-void jfPercentTagMatchFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfPercentTagMatchFilterEditor::LoadFilter(const jfFilterBase* infilter) {
     assert(infilter!=NULL);
 
     // loading the filter object
@@ -83,7 +83,7 @@ void jfPercentTagMatchFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
     NameLoad();
 }
 // ----------------------------------------------
-jfBaseFilter* jfPercentTagMatchFilterEditor::GetFilter() {
+jfFilterBase* jfPercentTagMatchFilterEditor::GetFilter() {
 
     jfMatchPercentTagFilterBase* result = NULL;
     jfMultiMatchSource* match_source = NULL;
@@ -96,20 +96,20 @@ jfBaseFilter* jfPercentTagMatchFilterEditor::GetFilter() {
     result->SetFromSource(match_source);
     result->SetPercent(insert_panel->GetPercent(), insert_panel->IsMatchEmpty());
 
-    namedesc_edit->ChangeObj(result);
+    namedesc_edit->ChangeFilter(result);
     // done
     return result;
 
 }
 // +++++++++++++++++++++++++++++++++++++++++++++++++++++
 // checking
-bool jfPercentTagMatchFilterEditor::GeneralCheck() const {
+bool jfPercentTagMatchFilterEditor::GeneralCheck(const jfFilterMap* infmap) const {
     // local variables
     jfSimpleExpr* toutput;
     QString omsg;
     QMessageBox emsg;
     // first we see if the name is correct
-    if (NameNUniq()) return false;
+    if (NameNUniq(infmap)) return false;
     // next, we check the filter
     toutput = insert_panel->CheckFilter(omsg);
     if ((toutput!=NULL) && (toutput->IsValid())) {
@@ -130,10 +130,11 @@ bool jfPercentTagMatchFilterEditor::GeneralCheck() const {
 
 
 /*****************************************************************************/
-jfFilteredPercentTagMatchFilterEditor::jfFilteredPercentTagMatchFilterEditor(const jfFilterMap* infmap, const jfMatchFilteredPercentTagFilterBase* infilt, QWidget* parent):
-                                                                                    jfBaseFilterEditor(infmap, infilt, parent) {
+jfFilteredPercentTagMatchFilterEditor::jfFilteredPercentTagMatchFilterEditor(
+        const jfMatchFilteredPercentTagFilterBase* infilt, QWidget* parent):
+        jfBaseFilterEditor(infilt, parent) {
+
     // many things are handled by the parent constructor
-    assert(infmap!=NULL);
     assert(infilt!=NULL);
     // we create the insert.. the *actual* editor
     typed_fpointer = infilt;
@@ -161,10 +162,11 @@ jfFilteredPercentTagMatchFilterEditor::jfFilteredPercentTagMatchFilterEditor(con
     NameLoad();
 }
 // ---------------------------------------
-jfFilteredPercentTagMatchFilterEditor::jfFilteredPercentTagMatchFilterEditor(const jfFilterMap* infmap, const jfGeneralTagListsGroup* in_source_list, QWidget* parent):
-                                                                                        jfBaseFilterEditor(infmap, NULL, parent) {
+jfFilteredPercentTagMatchFilterEditor::jfFilteredPercentTagMatchFilterEditor(
+        const jfGeneralTagListsGroup* in_source_list, QWidget* parent):
+        jfBaseFilterEditor(NULL, parent) {
+
     // many things are handled by the parent constructor
-    assert(infmap!=NULL);
     assert(in_source_list!=NULL);
     // we create the insert.. the *actual* editor
     typed_fpointer = NULL;
@@ -182,7 +184,7 @@ jfFilteredPercentTagMatchFilterEditor::jfFilteredPercentTagMatchFilterEditor(con
 // ++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 // ---------------------------------------
-void jfFilteredPercentTagMatchFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfFilteredPercentTagMatchFilterEditor::LoadFilter(const jfFilterBase* infilter) {
     assert(infilter!=NULL);
 
     // loading the filter object
@@ -212,7 +214,7 @@ void jfFilteredPercentTagMatchFilterEditor::LoadFilter(const jfBaseFilter* infil
     NameLoad();
 }
 // ---------------------------------------
-jfBaseFilter* jfFilteredPercentTagMatchFilterEditor::GetFilter() {
+jfFilterBase* jfFilteredPercentTagMatchFilterEditor::GetFilter() {
 
     jfMatchFilteredPercentTagFilterBase* result = NULL;
     jfMultiMatchSource* prefilter_source = NULL;
@@ -226,23 +228,23 @@ jfBaseFilter* jfFilteredPercentTagMatchFilterEditor::GetFilter() {
     result = MakeTypedFilter(source_list);
     if (result == NULL) return NULL;
 
-    result->SetMainFromSource(match_source);
+    result->SetFromSource(match_source);
     result->SetPreFilterFromSource(prefilter_source);
     result->SetPercent(insert_panel->GetPercent(), insert_panel->IsMatchEmpty());
 
-    namedesc_edit->ChangeObj(result);
+    namedesc_edit->ChangeFilter(result);
     // done
     return result;
 
 }
 // ++++++++++++++++++++++++++++++++++++++++++++++
 // checking
-bool jfFilteredPercentTagMatchFilterEditor::GeneralCheck() const {
+bool jfFilteredPercentTagMatchFilterEditor::GeneralCheck(const jfFilterMap* infmap) const {
     // local variables
     QString omsg;
     QMessageBox emsg;
     // first we see if the name is correct
-    if (NameNUniq()) return false;
+    if (NameNUniq(infmap)) return false;
 
     // next, we check the filters
     bool in_prefilter;

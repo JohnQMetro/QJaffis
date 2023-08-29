@@ -4,8 +4,7 @@
 // Purpose :    Declares collections involving categorization
 // Created:     April 1, 2009
 // Conversion to QT started : September 5, 2013
-// Updated:     August 21, 2012
-latest : Changing to use jfFileReader
+// Updated:     August 5, 2023
 ******************************************************************************/
 #ifndef CATEGORIES_H_INCLUDED
 #define CATEGORIES_H_INCLUDED
@@ -13,9 +12,6 @@ latest : Changing to use jfFileReader
 //-----------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#ifndef BASECOLLECT_H_INCLUDED
-  #include "basecollect.h"
-#endif // BASECOLLECT_H_INCLUDED
 #ifndef EXPRESSION_H
   #include "../filters/base/expression.h"
 #endif // EXPRESSION_H
@@ -35,7 +31,7 @@ some filename/path info for placing the result files.
 //=========================================================================
 
 
-class jfCategories : public jfBaseCollection {
+class jfCategories {
   public:
     // data that we do not bother to hide
     jfFilterMap* localmap_ptr;
@@ -53,21 +49,25 @@ class jfCategories : public jfBaseCollection {
     size_t CopyLoad();
     bool VerifyNames(QString& omsg);
     // getting info
+    size_t GetCount() const;
     bool UsesDefault() const;
     bool NotEmpty() const;
     bool ChIndex(const size_t& catval) const;
+    QString GetName() const;
+    QString GetDescription() const;
+    void SetNameDescription(const QString& in_name, const QString& in_description);
     // uses the categories to mark the test element with catgeory info
     bool Sort(jfItemFlagGroup* testee);
     // old virtual methods we implement
-    virtual bool NextIndex();
-    virtual bool BackIndex();
-    virtual void ResetIndex();
-    virtual bool ToIndex(const int& newindex);
-    virtual QString GetTypeID() const;
+    // virtual bool NextIndex();
+    // virtual bool BackIndex();
+    // virtual void ResetIndex();
+    // virtual bool ToIndex(const int& newindex);
+    QString GetTypeID() const;
     // some more formerly abstract methods
-    virtual QStringList* GetNameList() const;
-    virtual QStringList* GetDescriptionList() const;
-    virtual QStringList* GetTypeList() const;
+    // virtual QStringList* GetNameList() const;
+    // virtual QStringList* GetDescriptionList() const;
+    // virtual QStringList* GetTypeList() const;
     bool DeleteAtIndex(const size_t& dindex);
     // getting information
     jfExpressionFilter* GetAtIndex(size_t gindex);
@@ -79,6 +79,9 @@ class jfCategories : public jfBaseCollection {
     // setting information
     void ReplaceAtIndex(size_t gindex, jfExpressionFilter* replacement);
     void SetFilePath(size_t gindex,const QString& src_fpath, bool relative);
+    // file i/o
+    virtual bool AddToFile(QTextStream* outfile) const;
+    bool GetFromFile(jfFileReader* infile);
     // the destructor
     ~jfCategories();
   protected:
@@ -94,6 +97,9 @@ class jfCategories : public jfBaseCollection {
     bool frelative[33];
     // if we use the default category, we set this to true
     bool usedefault;
+
+    size_t item_count;
+    QString name,description; // stories item name and description
 
 };
 

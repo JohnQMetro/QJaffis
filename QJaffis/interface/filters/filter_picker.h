@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares some custom interface elements for a filter picker dialog.
 Created :   March 25, 2009
 Conversion to Qt Started Oct 3, 2013
-Updated :   October 29, 2013
+Updated :   August 22, 2023
 ******************************************************************************/
 #ifndef FILTER_WIDGETS_H_INCLUDED
 #define FILTER_WIDGETS_H_INCLUDED
@@ -52,12 +52,11 @@ class jfFilterPickerBase : public QTableWidget {
     void SendSelected();
   protected:
     // a helper method for setting contents
-    bool InsertFLine(const size_t& iindex);
+    bool InsertFLine(const size_t& iindex, const stl_FilterMap::const_iterator& data_index);
     bool SelectNoEvent(size_t index, bool issel);
     bool SetSelected();
     // local stuff
     bool loaded;
-    QStringList *fnames, *ftypes, *fdesc;
     QString prefix;
     // selection info
     bool sloaded;

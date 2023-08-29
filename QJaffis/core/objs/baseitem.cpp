@@ -3,7 +3,7 @@ Name    : baseitem.cpp
 Basic   : Base class for items that can be searched, like Fanfic Info Items
 Author  : John Q Metro
 Started : March 7, 2023
-Updated : March 26, 2023
+Updated : August 25, 2023
 Notes   : Replaces the earlier jfBasePD
 ******************************************************************************/
 #include "baseitem.h"
@@ -12,17 +12,20 @@ Notes   : Replaces the earlier jfBasePD
   #include "../utils/utils3.h"
 #endif // UTILS3_H_INCLUDED
 /*****************************************************************************/
+const QString& IdForBaseSearch() {
+    static QString BASE_TYPE_ID = QString("Core");
+    return BASE_TYPE_ID;
+}
 
-const QString jfSearchResultItem::BASE_TYPE_ID = QString("Core");
 // ++++++++++++++++++++++++++++++++++++++
 // constructors
 jfSearchResultItem::jfSearchResultItem() {
-    type_labels.append(BASE_TYPE_ID);
+    type_labels.append(IdForBaseSearch());
     numeric_id = 0;
 }
 // --------------------------------------
 jfSearchResultItem::jfSearchResultItem(const jfSearchResultItemData& init_data) {
-    type_labels.append(BASE_TYPE_ID);
+    type_labels.append(IdForBaseSearch());
     numeric_id = init_data.numeric_id;
     title = init_data.title;
     summary = init_data.summary;
@@ -30,7 +33,7 @@ jfSearchResultItem::jfSearchResultItem(const jfSearchResultItemData& init_data) 
 }
 // --------------------------------------
 jfSearchResultItem::jfSearchResultItem(const jfSearchResultItem& source) {
-    type_labels.append(BASE_TYPE_ID);
+    type_labels.append(IdForBaseSearch());
     numeric_id = source.numeric_id;
     title = source.title;
     summary = source.summary;

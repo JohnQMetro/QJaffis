@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Editors for fim filters : thumbs rating
 Created :   July 5, 2012
 Conversion to Qt started October 15, 2013
-Updated :   October 14, 2019
+Updated :   August 5, 2023
 ******************************************************************************/
 #ifndef FIM1_FILEDIT_H_INCLUDED
 #define FIM1_FILEDIT_H_INCLUDED
@@ -30,7 +30,7 @@ class jfFIMThumbsPanel : public QWidget {
     // the constructor
     jfFIMThumbsPanel(bool wrapped, QWidget* parent = NULL );
     // get
-    jfFimThumbsFilter* GetNewFilter() const;
+    jfFimThumbsFilter* GetNewFilter(const QString& startName) const;
     // set
     bool SetFromObj(const jfFimThumbsFilter* inval);
   protected:
@@ -44,12 +44,12 @@ class jfFIMThumbsPanel : public QWidget {
 class jfFimThumbsFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfFimThumbsFilterEditor(jfFilterMap* infmap, const jfBaseFilter* infilt, QWidget* parent = NULL);
+    jfFimThumbsFilterEditor(const jfFilterBase* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
     // checking
-    bool GeneralCheck() const;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const override;
   private:
     jfFIMThumbsPanel* insert_panel;
 };
@@ -57,7 +57,7 @@ class jfFimThumbsFilterEditor : public jfBaseFilterEditor {
 class jfFimGenreFilterEditor : public jfTagFilterEditor {
   public:
     // the default constructor
-    jfFimGenreFilterEditor(const jfFilterMap* infmap, const jfFIMGenreFilter* infilt, QWidget* parent = NULL);
+    jfFimGenreFilterEditor(const jfFIMGenreFilter* infilt, QWidget* parent = NULL);
     // extra methods
     virtual jfTagFilterCore* GetTagFilter();
     virtual bool isListLong() const;
@@ -67,7 +67,7 @@ class jfFimGenreFilterEditor : public jfTagFilterEditor {
 class jfFimCharacterFilterEditor : public jfTagFilterEditor {
   public:
     // the default constructor
-    jfFimCharacterFilterEditor(const jfFilterMap* infmap, const jfFIMCharacterFilter* infilt, QWidget* parent = NULL);
+    jfFimCharacterFilterEditor(const jfFIMCharacterFilter* infilt, QWidget* parent = NULL);
     // extra methods
     virtual jfTagFilterCore* GetTagFilter();
     virtual bool isListLong() const;
@@ -81,7 +81,7 @@ class jfFIM_RatingEditPanel : public QWidget {
     // setting and getting values
     bool StoreValue(jfFimRatingFilter* saveto) const;
     bool LoadValue(const jfFimRatingFilter* getfrom);
-    jfFimRatingFilter* GetValue() const;
+    jfFimRatingFilter* GetValue(const QString& name) const;
   protected:
     // gui
     QCheckBox *ech, *tch, *mch;
@@ -93,11 +93,11 @@ class jfFIM_RatingEditPanel : public QWidget {
 class jfFIM_RatingFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfFIM_RatingFilterEditor(const jfBaseFilter* infilt, const jfFilterMap* infmap, QWidget* parent = NULL);
+    jfFIM_RatingFilterEditor(const jfFimRatingFilter* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    virtual bool GeneralCheck() const;
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const override;
   protected:
     jfFIM_RatingEditPanel* insert_panel;
 };

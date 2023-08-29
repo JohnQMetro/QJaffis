@@ -22,22 +22,25 @@ Updated :   March 18, 2023
 #include <QDateTime>
 
 /*****************************************************************************/
-const QString jfFIM_Fanfic::FIM_FANFIC_TYPE_ID = QString("FIM_Fanfic");
+const QString& IdForFIMFanfics() {
+    static QString FIM_FANFIC_TYPE_ID = QString("FIM_Fanfic");
+    return FIM_FANFIC_TYPE_ID;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 jfFIM_Fanfic::jfFIM_Fanfic():jfGenericFanfic3() {
-    type_labels.append(FIM_FANFIC_TYPE_ID);
+    type_labels.append(IdForFIMFanfics());
     thumbsup = 0;
     thumbsdown = 0;
 }
 // -------------------------------------
 jfFIM_Fanfic::jfFIM_Fanfic(const jfSearchResultItemData& init_data):jfGenericFanfic3(init_data) {
-    type_labels.append(FIM_FANFIC_TYPE_ID);
+    type_labels.append(IdForFIMFanfics());
     thumbsup = 0;
     thumbsdown = 0;
 }
 //----------------------------------------------
 jfFIM_Fanfic::jfFIM_Fanfic(const jfFIM_Fanfic& src):jfGenericFanfic3(src) {
-    type_labels.append(FIM_FANFIC_TYPE_ID);
+    type_labels.append(IdForFIMFanfics());
     thumbsup = src.thumbsup;
     thumbsdown = src.thumbsdown;
     rating = src.rating;

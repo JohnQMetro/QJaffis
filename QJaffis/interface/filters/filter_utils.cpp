@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   A filter editor creator, and anything else that comes to mind
 Created :   December 27, 2010
 Conversion to Qt Started Oct 24, 2013
-Updated :   March 3, 2023
+Updated :   August 24, 2023
 ******************************************************************************/
 #ifndef FILTER_UTILS_H_INCLUDED
   #include "filter_utils.h"
@@ -20,9 +20,7 @@ Updated :   March 3, 2023
 #ifndef MOREFILTERS1_H_INCLUDED
   #include "../../core/filters/extended/morefilters1.h"
 #endif
-#ifndef SEXP_FILTERS_H_INCLUDED
-  #include "../../core/filters/base/sexp_filters.h"
-#endif // SEXP_FILTERS_H_INCLUDED
+
 #ifndef BFILT_EDIT_H_INCLUDED
   #include "bfilt_edit.h"
 #endif // BFILT_EDIT_H_INCLUDED
@@ -105,8 +103,9 @@ Updated :   March 3, 2023
 
 //***************************************************************************
 // creates an appropriate editor using the provided links
-jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilterMap* containing_map,
-                           jfBaseFilter* input_filter, bool isglobal) {
+jfBaseFilterEditor* MakeFilterEditor(QWidget* parent,
+                                     jfFilterMap* containing_map, bool isglobal,
+                                     jfFilterBase* input_filter) {
     const QString fname = "MakeFilterEditor";
   // we first check the inputs. anything wrong results in assert faliure
     /**/JDEBUGLOG(fname,1)
@@ -116,7 +115,7 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
   /**/JDEBUGLOG(fname,2)
   // variables
   // filters of the right type
-  jfUrlFilter*          a01;
+
   jfExpressionFilter*   a02;
 
   jfAuthExprFilter*     a03;
@@ -146,8 +145,8 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
   jfAO3OrientationFilter* a23;
   jfStructuredPairFilter* a24;
   jfAO3WarnFilter*        a25;
-  jfAO3KudoFilter*        a26;
-  jfFFNFavsFilter*        a27;
+  jfFavKudoFilter*        a26;
+
 
   jfFimThumbPercentFilter* a28;
   jfFIMGroupSCFilter* a29;
@@ -163,147 +162,139 @@ jfBaseFilterEditor* MakeFilterEditor(QString in_typeid, QWidget* parent, jfFilte
   // filter link
   jfBaseFilterEditor* result;
   // the main check
-  if (in_typeid=="UrlFilter") {
-    a01 = dynamic_cast<jfUrlFilter*>(input_filter);
-    result = new jfUrlFilterEditor(containing_map,a01,parent);
-  }
-  else if (in_typeid=="ExprFilter") {
+  if (input_filter->GetTypeIdentifier() == EXPRESSION_FILTER_INFO.Identifier()) {
     a02 = dynamic_cast<jfExpressionFilter*>(input_filter);
     result = new jfExprFilterEditor(containing_map,isglobal,a02,parent);
   }
 
-  else if (in_typeid=="AuthorFilter") {
+  else if (input_filter->GetTypeIdentifier() == AUTHOR_FILTER_INFO.Identifier()) {
     a03 = dynamic_cast<jfAuthExprFilter*>(input_filter);
-    result = new jfAuthorFilterEditor(containing_map,a03,parent);
+    result = new jfAuthorFilterEditor(a03,parent);
   }
-  else if (in_typeid=="CharacterListFilter") {
+  else if (input_filter->GetTypeIdentifier() == CHARACTER_LIST_FILTER_INFO.Identifier()) {
     a04 = dynamic_cast<jfCharListExprFilter*>(input_filter);
-    result = new jfCharacterListExprFilterEditor(containing_map,a04,parent);
+    result = new jfCharacterListExprFilterEditor(a04,parent);
   }
-  else if (in_typeid=="CategoryFilter") {
+  else if (input_filter->GetTypeIdentifier() =="CategoryFilter") {
     a05 = dynamic_cast<jfFFN_CategoryExprFilter*>(input_filter);
-    result = new jfFFN_CategoryFilterEditor(containing_map,a05,parent);
+    result = new jfFFN_CategoryFilterEditor(a05,parent);
   }
-  else if (in_typeid=="WordCountFilter") {
+  else if (input_filter->GetTypeIdentifier() =="WordCountFilter") {
     a06 = dynamic_cast<jfWordCountFilter*>(input_filter);
-    result = new jfWCFilterEditor(containing_map,a06,parent);
+    result = new jfWCFilterEditor(a06,parent);
   }
-  else if (in_typeid=="FFNTagFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FFNTagFilter") {
     a07 = dynamic_cast<jfFFNGenresFilter*>(input_filter);
-    result = new jfFFNGenresFilterEditor(containing_map,a07,parent);
+    result = new jfFFNGenresFilterEditor(a07,parent);
   }
-  else if (in_typeid=="PairFilterSingle") {
+  else if (input_filter->GetTypeIdentifier() =="PairFilterSingle") {
     a08 = dynamic_cast<jfPairFilterSingle*>(input_filter);
-    result = new jfPairFS_Editor(containing_map,a08,parent);
+    result = new jfPairFS_Editor(a08,parent);
   }
-  else if (in_typeid=="PairFilterList") {
+  else if (input_filter->GetTypeIdentifier() =="PairFilterList") {
     a09 = dynamic_cast<jfPairFilterList*>(input_filter);
-    result = new jfPairFL_Editor(containing_map,a09,parent);
+    result = new jfPairFL_Editor(a09,parent);
   }
-  else if (in_typeid=="PairFilterMultiple") {
+  else if (input_filter->GetTypeIdentifier() =="PairFilterMultiple") {
     a10 = dynamic_cast<jfPairFilterMultiple*>(input_filter);
-    result = new jfPairFM_Editor(containing_map,a10,parent);
+    result = new jfPairFM_Editor(a10,parent);
   }
-  else if (in_typeid=="CompletedFilter") {
+  else if (input_filter->GetTypeIdentifier() =="CompletedFilter") {
     a11 = dynamic_cast<jfCompletedFilter*>(input_filter);
-    result = new jfCompletedFilterEditor(a11,containing_map,parent);
+    result = new jfCompletedFilterEditor(a11, parent);
   }
-  else if (in_typeid=="LanguageFilter") {
+  else if (input_filter->GetTypeIdentifier() =="LanguageFilter") {
     a12 = dynamic_cast<jfLanguageExprFilter*>(input_filter);
-    result = new jfLanguageFilterEditor(containing_map,a12,parent);
+    result = new jfLanguageFilterEditor(a12,parent);
   }
-  else if (in_typeid=="FFNRatingFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FFNRatingFilter") {
     a13 = dynamic_cast<jfFFNRatingFilter*>(input_filter);
-    result = new jfFFN_RatingFilterEditor(a13,containing_map,parent);
+    result = new jfFFN_RatingFilterEditor(a13, parent);
   }
-  else if (in_typeid=="UpdatedDateFilter") {
+  else if (input_filter->GetTypeIdentifier() =="UpdatedDateFilter") {
     a14 = dynamic_cast<jfUpdatedDateFilter*>(input_filter);
-    result = new jfUpdatedDateFilterEditor(a14, containing_map,parent);
+    result = new jfUpdatedDateFilterEditor(a14, parent);
   }
-  else if (in_typeid=="PublishedDateFilter") {
+  else if (input_filter->GetTypeIdentifier() =="PublishedDateFilter") {
     a15 = dynamic_cast<jfPublishedDateFilter*>(input_filter);
-    result = new jfPublishedDateFilterEditor(a15,containing_map,parent);
+    result = new jfPublishedDateFilterEditor(a15, parent);
   }
-  else if (in_typeid=="FimThumbsFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FimThumbsFilter") {
     a16 = dynamic_cast<jfFimThumbsFilter*>(input_filter);
-    result = new jfFimThumbsFilterEditor(containing_map,a16,parent);
+    result = new jfFimThumbsFilterEditor(a16,parent);
   }
-  else if (in_typeid=="FIMGenreFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FIMGenreFilter") {
     a17 = dynamic_cast<jfFIMGenreFilter*>(input_filter);
-    result = new jfFimGenreFilterEditor(containing_map,a17,parent);
+    result = new jfFimGenreFilterEditor(a17,parent);
   }
-  else if (in_typeid=="FIMCharacterFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FIMCharacterFilter") {
     a18 = dynamic_cast<jfFIMCharacterFilter*>(input_filter);
-    result = new jfFimCharacterFilterEditor(containing_map,a18,parent);
+    result = new jfFimCharacterFilterEditor(a18,parent);
   }
-  else if (in_typeid=="FIMContentTypeFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FIMContentTypeFilter") {
     a33 = dynamic_cast<jfFIMContentTypeFilter*>(input_filter);
-    result = new jfFimContentTypeFilterEditor(containing_map,a33,parent);
+    result = new jfFimContentTypeFilterEditor(a33,parent);
   }
-  else if (in_typeid=="FIMWarningFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FIMWarningFilter") {
     a34 = dynamic_cast<jfFIMWarningsFilter*>(input_filter);
-    result = new jfFimWarningsFilterEditor(containing_map,a34,parent);
+    result = new jfFimWarningsFilterEditor(a34,parent);
   }
-  else if (in_typeid=="FimRatingFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FimRatingFilter") {
     a19 = dynamic_cast<jfFimRatingFilter*>(input_filter);
-    result = new jfFIM_RatingFilterEditor(a19,containing_map,parent);
+    result = new jfFIM_RatingFilterEditor(a19,parent);
   }
-  else if (in_typeid=="ExtraTagFilter") {
+  else if (input_filter->GetTypeIdentifier() =="ExtraTagFilter") {
     a20 = dynamic_cast<jfExtraTagFilter*>(input_filter);
-    result = new jfExtraTagFilterEditor(containing_map,a20,parent);
+    result = new jfExtraTagFilterEditor(a20,parent);
   }
-  else if (in_typeid=="AO3FandomFilter") {
+  else if (input_filter->GetTypeIdentifier() =="AO3FandomFilter") {
     a21 = dynamic_cast<jfAO3FandomFilter*>(input_filter);
-    result = new jfAO3FandomFilterEditor(a21,containing_map,parent);
+    result = new jfAO3FandomFilterEditor(a21,parent);
   }
-  else if (in_typeid=="AO3RatingFilter") {
+  else if (input_filter->GetTypeIdentifier() =="AO3RatingFilter") {
     a22 = dynamic_cast<jfAO3RatingFilter*>(input_filter);
-    result = new jfAO3_RatingFilterEditor(a22,containing_map,parent);
+    result = new jfAO3_RatingFilterEditor(a22,parent);
   }
-  else if (in_typeid=="AO3OrientationFilter") {
+  else if (input_filter->GetTypeIdentifier() =="AO3OrientationFilter") {
     a23 = dynamic_cast<jfAO3OrientationFilter*>(input_filter);
-    result = new jfAO3_OrientFilterEditor(containing_map,a23,parent);
+    result = new jfAO3_OrientFilterEditor(a23,parent);
       /**/JDEBUGLOG(fname,5)
   }
-  else if (in_typeid=="StructuredPairFilter") {
+  else if (input_filter->GetTypeIdentifier() =="StructuredPairFilter") {
     a24 = dynamic_cast<jfStructuredPairFilter*>(input_filter);
-    result = new jfStr_PairingFilterEditor(a24,containing_map,parent);
+    result = new jfStr_PairingFilterEditor(a24,parent);
   }
-  else if (in_typeid=="AO3WarnFilter") {
+  else if (input_filter->GetTypeIdentifier() =="AO3WarnFilter") {
     a25 = dynamic_cast<jfAO3WarnFilter*>(input_filter);
-    result = new jfAO3_WarnFilterEditor(a25,containing_map,parent);
+    result = new jfAO3_WarnFilterEditor(a25,parent);
   }
-  else if (in_typeid=="AO3KudoCountFilter") {
-    a26 = dynamic_cast<jfAO3KudoFilter*>(input_filter);
-    result = new jfAO3KudoFilterEditor(containing_map,a26,parent);
+  else if (input_filter->GetTypeIdentifier() =="KudoCountFilter") {
+    a26 = dynamic_cast<jfFavKudoFilter*>(input_filter);
+    result = new jfAO3KudoFilterEditor(a26,parent);
   }
-  else if (in_typeid=="FFNFavsFilter") {
-    a27 = dynamic_cast<jfFFNFavsFilter*>(input_filter);
-    result = new jfFFNFavsFilterEditor(containing_map,a27,parent);
-  }
-  else if (in_typeid=="FimThumbPercentFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FimThumbPercentFilter") {
     a28 = dynamic_cast<jfFimThumbPercentFilter*>(input_filter);
-    result = new jfFimThumbPercentFilterEditor(containing_map,a28,parent);
+    result = new jfFimThumbPercentFilterEditor(a28,parent);
   }
-  else if (in_typeid=="FIMGroupSCFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FIMGroupSCFilter") {
     a29 = dynamic_cast<jfFIMGroupSCFilter*>(input_filter);
-    result = new jfFIMGroupSCFilterEditor(containing_map,a29,parent);
+    result = new jfFIMGroupSCFilterEditor(a29,parent);
   }
-  else if (in_typeid=="FIMGroupMCFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FIMGroupMCFilter") {
     a30 = dynamic_cast<jfFIMGroupMCFilter*>(input_filter);
-    result = new jfFIMGroupMCFilterEditor(containing_map,a30,parent);
+    result = new jfFIMGroupMCFilterEditor(a30,parent);
   }
-  else if (in_typeid=="FIMShortDescFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FIMShortDescFilter") {
     a31 = dynamic_cast<jfFIM_ShortDesc_ExprFilter*>(input_filter);
-    result = new jfFIMShortDesc_FilterEditor(containing_map,a31,parent);
+    result = new jfFIMShortDesc_FilterEditor(a31,parent);
   }
-  else if (in_typeid=="FIMDualDescFilter") {
+  else if (input_filter->GetTypeIdentifier() =="FIMDualDescFilter") {
     a32 = dynamic_cast<jfFIM_DualDesc_ExprFilter*>(input_filter);
-    result = new jfFIMDualDesc_FilterEditor(containing_map,a32,parent);
+    result = new jfFIMDualDesc_FilterEditor(a32,parent);
   }
-  else if (in_typeid=="AO3ExtraTagsPercentFilter") {
+  else if (input_filter->GetTypeIdentifier() =="AO3ExtraTagsPercentFilter") {
     a35 = dynamic_cast<jfAO3ExtraTagsPercentFilter*>(input_filter);
-    result = new jfAO3PercentExpressionTagFilterEditor(containing_map,a35,parent);
+    result = new jfAO3PercentExpressionTagFilterEditor(a35,parent);
   }
 
   else assert(false);

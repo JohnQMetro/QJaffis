@@ -4,8 +4,8 @@ Author  :   John Q Metro
 Purpose :   Declares fanfic objects that hold fanfic info
 Created :   April 2, 2012
 // Conversion to QT started : April 20, 2013
-Updated :   March 26, 2023
-// Renamed from ficobj2.h
+Updated :   August 25, 2023
+// Replacing static ids with functions to avoid order problems
 ******************************************************************************/
 #ifndef FICBASE_H
   #define FICBASE_H
@@ -23,12 +23,13 @@ Updated :   March 26, 2023
 #include "../../core/filters/base/structpair.h"
 #include <QVector>
 
-
 //****************************************************************************
+
+const QString& IdForGenericFanfic();
+
 /* A common base class for Fanfic Items (description) */
 class jfGenericFanfic : public jfSearchResultItem {
   public:
-    static const QString GENERIC_FANFIC_TYPE_ID;
     // default constructor
     jfGenericFanfic();
     jfGenericFanfic(const jfSearchResultItemData& init_data);
@@ -63,11 +64,11 @@ class jfGenericFanfic : public jfSearchResultItem {
     QDate updated_date;
 };
 //==================================================================
+const QString& IdForGenericFanfic2();
+
 /* A base class for fanfic items that have some extras like characters, word counts, and completed state. */
 class jfGenericFanfic2 : public jfGenericFanfic {
   public:
-    static const QString GENERIC_FANFIC_2_TYPE_ID;
-
     // default constructor
     jfGenericFanfic2();
     jfGenericFanfic2(const jfSearchResultItemData& init_data);
@@ -92,11 +93,11 @@ class jfGenericFanfic2 : public jfGenericFanfic {
     QStringList characters;
 };
 // ================================================================
+const QString& IdForFanficPairs();
+
 // a mixin class for fanfic items that have pairing info
 class jfFanficPairsMixin {
   public:
-    static const QString FANFIC_PAIRS_TYPE_ID;
-
     int RelationshipCount() const;
     const QVector<const jfPairingStruct*>& GetRelationships() const;
     QString RelationshipsAsDisplayString(bool rom_pipe) const;
@@ -111,10 +112,10 @@ class jfFanficPairsMixin {
     QVector<const jfPairingStruct*> char_pairs;
 };
 //==================================================================
+const QString& IdForGenericFanfic3();
+
 class jfGenericFanfic3 : public jfGenericFanfic2 {
   public:
-    static const QString GENERIC_FANFIC_3_TYPE_ID;
-
     // default constructors
     jfGenericFanfic3();
     jfGenericFanfic3(const jfSearchResultItemData& init_data);

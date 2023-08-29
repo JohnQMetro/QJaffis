@@ -11,15 +11,20 @@
 #ifndef JFILTERGROUPS
   #include "filter_groups.h"
 #endif
-#ifndef BASECOLLECT_H_INCLUDED
-  #include "../structs/basecollect.h"
-#endif // BASECOLLECT_H_INCLUDED
-#ifndef LOGGING_H_INCLUDED
-  #include "../utils/logging.h"
-#endif // LOGGING_H_INCLUDED
 #ifndef UTILS3_H_INCLUDED
   #include "../utils/utils3.h"
 #endif // UTILS3_H_INCLUDED
+
+#ifndef LOGGING_H_INCLUDED
+  #include "../utils/logging.h"
+#endif // LOGGING_H_INCLUDED
+
+/*
+#ifndef BASECOLLECT_H_INCLUDED
+  #include "../structs/basecollect.h"
+#endif // BASECOLLECT_H_INCLUDED
+
+
 
 #ifndef SEXP_FILTERS_H_INCLUDED
   #include "base/sexp_filters.h"
@@ -69,6 +74,7 @@
 
 #include "base/structpair.h"
 #include "extended/list_sexp.h"
+*/
 
 
 //-----------------------------------------
@@ -78,6 +84,7 @@
 #include <QMessageBox>
 
 //*****************************************************************************
+/*
 jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname) {
   // local variables
   jfBaseFilter* result;
@@ -152,11 +159,12 @@ jfBaseFilter* MakeFilter(const QString& typestring, const QString& newname) {
   else if (typestring=="FIMDualDescFilter") result = new jfFIM_DualDesc_ExprFilter();
   else result = NULL;
   // setting the name
-  /**/JDEBUGLOGS("MakeFilter",1,newname);
+  JDEBUGLOGS("MakeFilter",1,newname);
   if (result!=NULL) result->SetName(newname);
   // done
   return result;
 }
+*/
 //=============================================================================
 // returns the name of the map
 QString jfFilterPointer::GetMapName() const {

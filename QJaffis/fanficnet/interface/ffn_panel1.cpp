@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net search, first panel
 // Created:     June 25, 2010
 // conversion to Qt started July 27, 2014
-// Updated:     March 3, 2023 (new character list filter)
+// Updated:     August 24, 2023
 //**************************************************************************
 #ifndef FFN_PANEL1
   #include "ffn_panel1.h"
@@ -28,6 +28,10 @@
   #include "../../core/filters/extended/morefilters1.h"
 #endif
 
+#ifndef AO3_SPECIALS3_H
+  #include "../../core/filters/ao3/ao3_specials3.h"
+#endif // AO3_SPECIALS3_H
+
 #include "../../core/filters/extended/list_sexp.h"
 //-----------------------------
 #include <assert.h>
@@ -39,7 +43,7 @@ jfFFN_DFE::jfFFN_DFE(jfFFNSearch* inobj, QWidget* parent):jfDefaultFilterEditorB
     /**/JDEBUGLOG(fname,1)
   // the genre picker, completed tag, and language filter
   genre_picker = new jfTagStatusPicker("Genres",false);
-  cpicker = new jfComplFiltEdit(NULL);
+  cpicker = new jfCompletedFilterEditor(new jfCompletedFilter("Completed Filter"));
   lang_fillabel = new QLabel("Language Filter :");
   lang_filedit = new jfSimpleExprEdit(false);
   /**/JDEBUGLOG(fname,2)
@@ -68,7 +72,7 @@ jfFFN_DFE::jfFFN_DFE(jfFFNSearch* inobj, QWidget* parent):jfDefaultFilterEditorB
   wc_picker = new jfGenMinMaxEditor("Word Count",true,false);
   wc_picker->SetValueRange(0,9999999);
   // faborites filter
-  favs_filedit = new jfFavsCountPanel(true);
+  favs_filedit = new jfZeroToMaxEditor("Favs",false, true);
   /**/JDEBUGLOG(fname,5)
   // arranging the extra filters
   lsizer2 = new QBoxLayout(QBoxLayout::LeftToRight);
@@ -110,52 +114,45 @@ bool jfFFN_DFE::SaveFiltersExtended() {
   jfWordCountFilter* wc_filter;
   jfCompletedFilter* cm_filter;
   jfLanguageExprFilter* lang_filter;
-  jfFFNFavsFilter* favs_filter;
+  jfFavKudoFilter* favs_filter;
   bool atest;
   int wmin, wmax;
   // saving the tag filter
   listing = genre_picker->GetTagList();
-  tag_filter = new jfFFNGenresFilter();
+  tag_filter = new jfFFNGenresFilter(DEF_genretag_name);
   atest = tag_filter->SetTags(listing);
   assert(atest);
-  tag_filter->SetName(DEF_genretag_name);
   embedded_filters->ReplaceSame(tag_filter,oindex);
   // the author filter
   exprval = auth_filedit->CheckFilter(omsg);
   assert(exprval!=NULL);
-  author_filter = new jfAuthExprFilter(exprval);
-  author_filter->SetName(DEF_ffnauthor_name);
+  author_filter = new jfAuthExprFilter(DEF_ffnauthor_name, exprval);
   embedded_filters->ReplaceSame(author_filter,oindex);
 
   // the character filter
   exprval = char_filedit->CheckFilter(omsg);
   assert(exprval!=NULL);
   jfListMatchMode match_mode = char_filedit->GetMatchMode();
-  char_filter = new jfCharListExprFilter(match_mode,exprval);
-  char_filter->SetName(DEF_ffnchars_name);
+  char_filter = new jfCharListExprFilter(DEF_ffnchars_name,match_mode,exprval);
   embedded_filters->ReplaceSame(char_filter,oindex);
 
   // the word count filter
   wmin = wc_picker->GetMin();
   wmax = wc_picker->GetMax();
-  wc_filter = new jfWordCountFilter(wmin,wmax);
-  wc_filter->SetName(DEF_ffnwc_name);
+  wc_filter = new jfWordCountFilter(DEF_ffnwc_name, wmin,wmax);
   embedded_filters->ReplaceSame(wc_filter,oindex);
   // the favorites filter
   wmin = favs_filedit->GetMin();
   wmax = favs_filedit->GetMax();
-  favs_filter = new jfFFNFavsFilter(wmin,wmax);
-  favs_filter->SetName(DEF_ffnfavs_name);
+  favs_filter = new jfFavKudoFilter(DEF_ffnfavs_name, wmin,wmax);
   embedded_filters->ReplaceSame(favs_filter,oindex);
   // completed filter
-  cm_filter = cpicker->GetValue();
-  cm_filter->SetName(DEF_ffncom_name);
+  cm_filter = cpicker->GetCompletedFilter(DEF_ffncom_name);
   embedded_filters->ReplaceSame(cm_filter,oindex);
   // the language filter
   exprval = lang_filedit->CheckFilter(omsg);
   assert(exprval!=NULL);
-  lang_filter = new jfLanguageExprFilter(exprval);
-  lang_filter->SetName(DEF_ffnlang_name);
+  lang_filter = new jfLanguageExprFilter(DEF_ffnlang_name, exprval);
   embedded_filters->ReplaceSame(lang_filter,oindex);
 
   // done
@@ -163,86 +160,84 @@ bool jfFFN_DFE::SaveFiltersExtended() {
 }
 //--------------------------------------------------------------------
 bool jfFFN_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
-  const QString fname = "jfFFN_DFE::ChangeSearchExtended";
-  // local variables
-  bool notagfil;
-  QString omsg;
-  jfBaseFilter* test1;
-  jfTagListing* listing;
-  jfFFNGenresFilter* tag_filter;
-  jfAuthExprFilter* author_filter;
-  jfCharListExprFilter* char_filter;
-  jfWordCountFilter* wc_filter;
-  jfCompletedFilter* cm_filter;
-  jfLanguageExprFilter* lang_filter;
-  jfFFNFavsFilter* favs_filter;
-  bool atest;
-  IntPair* wcpair;
-  /**/JDEBUGLOG(fname,1)
-  // we start with the genres filter
-  test1 = embedded_filters->GetItem(DEF_genretag_name);
-  tag_filter = dynamic_cast<jfFFNGenresFilter*>(test1);
-  notagfil = (tag_filter==NULL);
-  /**/JDEBUGLOG(fname,2)
-  // if we have no genres filter, we make a blank one
-  if (notagfil) {
-    tag_filter = new jfFFNGenresFilter();
-    tag_filter->SetToEmpty();
-  }
-  /**/JDEBUGLOG(fname,3)
-  listing = tag_filter->GetTagsCopy();
-  genre_picker->SetOrChangeTags(listing);
-  if (notagfil) delete tag_filter;
-  /**/JDEBUGLOG(fname,4)
-  // next up, the author expression filter
-  author_filter = dynamic_cast<jfAuthExprFilter*>(embedded_filters->GetItem(DEF_ffnauthor_name));
-  if (author_filter!=NULL) {
-    atest = auth_filedit->SetData(author_filter->ToString(),omsg);
-    assert(atest);
-  }
-  /**/JDEBUGLOG(fname,5)
-  // then, the character expression filter
-  char_filter = dynamic_cast<jfCharListExprFilter*>(embedded_filters->GetItem(DEF_ffnchars_name));
-  if (char_filter!=NULL) {
-    atest = char_filedit->SetData(char_filter->GetExpression(),omsg);
-    assert(atest);
-    char_filedit->SetMatchMode(char_filter->GetMatchMode());
-  }
-  /**/JDEBUGLOG(fname,6)
-  // the word count filter
-  wc_filter = dynamic_cast<jfWordCountFilter*>(embedded_filters->GetItem(DEF_ffnwc_name));
-  if (wc_filter!=NULL) {
-    wcpair = wc_filter->GetMinMax();
-    atest = wc_picker->SetMinMax(wcpair);
-    delete wcpair;
-    assert(atest);
-  }
-  /**/JDEBUGLOG(fname,7)
-  // the favs filter
-  favs_filter = dynamic_cast<jfFFNFavsFilter*>(embedded_filters->GetItem(DEF_ffnfavs_name));
-  if (favs_filter !=NULL) {
-    wcpair = favs_filter->GetMinMax();
-    atest = favs_filedit->SetMinMax(wcpair);
-    delete wcpair;
-    assert(atest);
-  }
-  /**/JDEBUGLOG(fname,8)
-  // the completed filter
-  cm_filter = dynamic_cast<jfCompletedFilter*>(embedded_filters->GetItem(DEF_ffncom_name));
-  if (cm_filter!=NULL) {
-    atest = cpicker->LoadValue(cm_filter);
-    assert(atest);
-  }
-  /**/JDEBUGLOG(fname,9)
-  // next up, the language expression filter
-  lang_filter = dynamic_cast<jfLanguageExprFilter*>(embedded_filters->GetItem(DEF_ffnlang_name));
-  if (lang_filter!=NULL) {
-    atest = lang_filedit->SetData(lang_filter->ToString(),omsg);
-    assert(atest);
-  }
-  /**/JDEBUGLOG(fname,10)
-  // done
-  return true;
+    const QString fname = "jfFFN_DFE::ChangeSearchExtended";
+    // local variables
+    bool notagfil;
+    QString omsg;
+    // jfBaseFilter* test1;
+    jfTagListing* listing;
+    jfFFNGenresFilter* tag_filter;
+    jfAuthExprFilter* author_filter;
+    jfCharListExprFilter* char_filter;
+    jfWordCountFilter* wc_filter;
+    jfCompletedFilter* cm_filter;
+    jfLanguageExprFilter* lang_filter;
+    jfFavKudoFilter* favs_filter;
+    bool atest;
+    IntPair* wcpair;
+    /**/JDEBUGLOG(fname,1)
+    // we start with the genres filter
+    tag_filter = dynamic_cast<jfFFNGenresFilter*>(embedded_filters->GetItem(DEF_genretag_name));
+    notagfil = (tag_filter==NULL);
+    /**/JDEBUGLOG(fname,2)
+    // if we have no genres filter, we make a blank one
+    if (notagfil) {
+        tag_filter = new jfFFNGenresFilter(DEF_genretag_name);
+        tag_filter->SetToEmpty();
+    }
+    /**/JDEBUGLOG(fname,3)
+    listing = tag_filter->GetTagsCopy();
+    genre_picker->SetOrChangeTags(listing);
+    if (notagfil) delete tag_filter;
+    /**/JDEBUGLOG(fname,4)
+    // next up, the author expression filter
+    author_filter = dynamic_cast<jfAuthExprFilter*>(embedded_filters->GetItem(DEF_ffnauthor_name));
+    if (author_filter!=NULL) {
+        atest = auth_filedit->SetData(author_filter->ToString(),omsg);
+        assert(atest);
+    }
+    /**/JDEBUGLOG(fname,5)
+    // then, the character expression filter
+    char_filter = dynamic_cast<jfCharListExprFilter*>(embedded_filters->GetItem(DEF_ffnchars_name));
+    if (char_filter!=NULL) {
+        atest = char_filedit->SetData(char_filter->GetExpression(),omsg);
+        assert(atest);
+        char_filedit->SetMatchMode(char_filter->GetMatchMode());
+    }
+    /**/JDEBUGLOG(fname,6)
+    // the word count filter
+    wc_filter = dynamic_cast<jfWordCountFilter*>(embedded_filters->GetItem(DEF_ffnwc_name));
+    if (wc_filter!=NULL) {
+        wcpair = wc_filter->GetMinMax();
+        atest = wc_picker->SetMinMax(wcpair);
+        delete wcpair;
+        assert(atest);
+    }
+    /**/JDEBUGLOG(fname,7)
+    // the favs filter
+    favs_filter = dynamic_cast<jfFavKudoFilter*>(embedded_filters->GetItem(DEF_ffnfavs_name));
+    if (favs_filter !=NULL) {
+        wcpair = favs_filter->GetMinMax();
+        atest = favs_filedit->SetMinMax(wcpair);
+        delete wcpair;
+        assert(atest);
+    }
+    /**/JDEBUGLOG(fname,8)
+    // the completed filter
+    cm_filter = dynamic_cast<jfCompletedFilter*>(embedded_filters->GetItem(DEF_ffncom_name));
+    if (cm_filter!=NULL) {
+        cpicker->LoadFilter(cm_filter);
+    }
+    /**/JDEBUGLOG(fname,9)
+    // next up, the language expression filter
+    lang_filter = dynamic_cast<jfLanguageExprFilter*>(embedded_filters->GetItem(DEF_ffnlang_name));
+    if (lang_filter!=NULL) {
+        atest = lang_filedit->SetData(lang_filter->ToString(),omsg);
+        assert(atest);
+    }
+    /**/JDEBUGLOG(fname,10)
+    // done
+    return true;
 }
 //=========================================================================
 // the constructor

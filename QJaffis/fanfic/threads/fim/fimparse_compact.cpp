@@ -100,6 +100,10 @@ bool jfFIMCompactParser::testIncomplete(const QString *page) const {
   const QString footer_string = "<!--Footer-->";
   return page->contains(footer_string);
 }
+// --------------------------------------------
+bool jfFIMCompactParser::testRatelimit(const QString *page) const {
+    return true;
+}
 //------------------------------
 QString jfFIMCompactParser::getCookie() const {
   if (domature) return "view_mature=true";

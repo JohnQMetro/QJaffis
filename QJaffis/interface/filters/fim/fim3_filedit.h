@@ -19,7 +19,7 @@ Updated :   January 21, 2018
 class jfFimContentTypeFilterEditor : public jfTagFilterEditor {
   public:
     // the default constructor
-    jfFimContentTypeFilterEditor(const jfFilterMap* infmap, const jfFIMContentTypeFilter* infilt, QWidget* parent = NULL);
+    jfFimContentTypeFilterEditor(const jfFIMContentTypeFilter* infilt, QWidget* parent = NULL);
     // extra methods
     virtual jfTagFilterCore* GetTagFilter();
     virtual bool isListLong() const;
@@ -29,7 +29,7 @@ class jfFimContentTypeFilterEditor : public jfTagFilterEditor {
 class jfFimWarningsFilterEditor : public jfTagFilterEditor {
   public:
     // the default constructor
-    jfFimWarningsFilterEditor(const jfFilterMap* infmap, const jfFIMWarningsFilter* infilt, QWidget* parent = NULL);
+    jfFimWarningsFilterEditor(const jfFIMWarningsFilter* infilt, QWidget* parent = NULL);
     // extra methods
     virtual jfTagFilterCore* GetTagFilter();
     virtual bool isListLong() const;

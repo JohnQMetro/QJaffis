@@ -37,6 +37,7 @@ class jfTagMultiMatcher {
     // info flags
     bool IsEmpty() const;
     bool BadExpression() const;
+    QString ExpressionError() const;
     bool IsUsable() const;
     bool HasSet() const;
     bool HasExpression() const;

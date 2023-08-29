@@ -3,7 +3,7 @@ Name    :   relpair_edit.cpp
 Author  :   John Q Metro
 Purpose :   GUI Editing for Structured Pair Filter
 Created :   February 24, 2023
-Created :   February 25, 2023
+Created :   April 17, 2023
 ******************************************************************************/
 
 #include "relpair_edit.h"
@@ -75,7 +75,7 @@ bool jfStrPairingPanel::GetOriginalCheck() const {
 // filter based i/o
 //-------------------------------------
 jfStructuredPairFilter* jfStrPairingPanel::GetFilter() const {
-  jfStructuredPairFilter* result = new jfStructuredPairFilter();
+  jfStructuredPairFilter* result = new jfStructuredPairFilter("(no name)");
   bool rb = readerbox->isChecked();
   bool ob = originalbox->isChecked();
   bool hn = result->SetNamesData(pairlistbox->toPlainText(), true);
@@ -100,7 +100,6 @@ bool jfStrPairingPanel::StoreToFilter(jfStructuredPairFilter* outval) {
 //-------------------------------------
 bool jfStrPairingPanel::LoadFromFilter(const jfStructuredPairFilter* inval) {
   assert(inval!=NULL);
-  if (!inval->IsValid()) return false;
   pairlistbox->setPlainText(inval->GetNamesData(true));
   matchallbox->setChecked(inval->GetMatchAll());
   readerbox->setChecked(inval->GetMatchReader());
@@ -108,8 +107,8 @@ bool jfStrPairingPanel::LoadFromFilter(const jfStructuredPairFilter* inval) {
   return true;
 }
 //=============================================================================
-jfStr_PairingFilterEditor::jfStr_PairingFilterEditor(const jfBaseFilter* infilt, const jfFilterMap* infmap,
-               QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+jfStr_PairingFilterEditor::jfStr_PairingFilterEditor(const jfStructuredPairFilter* infilt,
+               QWidget* parent):jfBaseFilterEditor(infilt,parent) {
   // we start...
   // we create the insert.. the *actual*  editor
   insert_panel = new jfStrPairingPanel();
@@ -123,7 +122,7 @@ jfStr_PairingFilterEditor::jfStr_PairingFilterEditor(const jfBaseFilter* infilt,
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //-------------------------------------
-void jfStr_PairingFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfStr_PairingFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   assert(infilter!=NULL);
   filt_pointer = infilter;
   const jfStructuredPairFilter* temp = dynamic_cast<const jfStructuredPairFilter*>(infilter);
@@ -131,18 +130,19 @@ void jfStr_PairingFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
   NameLoad();
 }
 //-------------------------------------
-jfBaseFilter* jfStr_PairingFilterEditor::GetFilter() {
-  jfStructuredPairFilter* result = insert_panel->GetFilter();
-  namedesc_edit->ChangeObj(result);
-  return result;
+jfFilterBase* jfStr_PairingFilterEditor::GetFilter() {
+    jfStructuredPairFilter* result = insert_panel->GetFilter();
+    namedesc_edit->ChangeFilter(result);
+    return result;
 }
 //--------------------------------------------------------------
-bool jfStr_PairingFilterEditor::GeneralCheck() const {
-  const jfStructuredPairFilter* result = insert_panel->GetFilter();
-  if (result == NULL) return false;
-  bool resval = result->IsValid();
-  delete result;
-  return resval;
+bool jfStr_PairingFilterEditor::GeneralCheck(const jfFilterMap* filter_group) const {
+    const jfStructuredPairFilter* result = insert_panel->GetFilter();
+    if (result == NULL) return false;
+    if (filter_group != NULL) {
+        if (NameNUniq(filter_group)) return false;
+    }
+    return true;
 }
 
 

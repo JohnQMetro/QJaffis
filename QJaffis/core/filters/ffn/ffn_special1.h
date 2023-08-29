@@ -3,7 +3,7 @@ Name    :   ffn_special1.h
 Author  :   John Q Metro
 Purpose :   More Filters
 Created :   July 8, 2016
-Updated :   July 8, 2016 (created using filters taken from other files)
+Updated :   May 5, 2023
 ******************************************************************************/
 #ifndef FFN_SPECIAL1_H
   #define FFN_SPECIAL1_H
@@ -20,84 +20,70 @@ Updated :   July 8, 2016 (created using filters taken from other files)
   #include "../base/sexp_filters.h"
 #endif // SEXP_FILTERS_H_INCLUDED
 /*****************************************************************************/
+extern const jfFilterTypeMeta FFN_GENRES_FILTER_INFO;
+
 class jfFFNGenresFilter : public jfTagFilterCore {
   public:
     // constructors
-    jfFFNGenresFilter();
+    jfFFNGenresFilter(const QString& filter_name);
+    jfFFNGenresFilter(QString&& filter_name);
     jfFFNGenresFilter(const jfFFNGenresFilter& insrc);
     // getting and setting values
-    virtual bool SetToEmpty();
+    virtual bool SetToEmpty() override;
     // redefined virtual methods
-    virtual QString GetTypeID() const;
-    virtual QString GetTypeDescription() const;
-    virtual jfBaseFilter* GenCopy() const;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
+    virtual jfFilterBase* GenCopy() const override;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
-    virtual bool ModifyList(QStringList* templist) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
+    virtual bool ModifyList(QStringList* templist) const override;
     // check the tags against a list of pre-approved tags
-    virtual bool DoVerify();
+    virtual bool DoVerify() override;
+    virtual bool DoVerifyCheck(jfTagListing* to_check) const override;
 };
 //===============================================================
+extern const jfFilterTypeMeta FFN_RATINGS_FILTER_INFO;
+
 extern const QString FFN_RATINGS;
 //--------------------------------------------------------------------
-class jfFFNRatingFilter : public jfBaseFilter {
+class jfFFNRatingFilter : public jfFilterBase {
   public:
     // constructors
-    jfFFNRatingFilter();
-    jfFFNRatingFilter(QString value_in);
+    jfFFNRatingFilter(const QString& filter_name);
+    jfFFNRatingFilter(QString&& filter_name);
+    jfFFNRatingFilter(const QString& filter_name, QString value_in);
     // match against the filter
-    virtual bool isEmpty() const;
+    virtual bool IsEmpty() const override;
     // loading from a string representation
-    virtual bool FromString(const QString& sourcedata);
-    virtual QString ToString() const;
+    virtual QString ToString() const override;
     // gets a description
-    virtual QString GetTypeDescription() const;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
     // copy
-    virtual jfBaseFilter* GenCopy() const;
-    // special meta-information
-    virtual QString GetTypeID() const;
+    virtual jfFilterBase* GenCopy() const override;
     // custom methods
     bool Includes(QChar test) const;
   protected:
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
-    // file i/o
-    virtual bool AddRestToFile(QTextStream* outfile) const;
-    virtual bool ReadRestFromFile(jfFileReader* infile);
-    /* since different types are stored together, the text file reprentation
-    may have objects of varying length */
-    virtual size_t ExtraLines() const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
     // internal data
     QString value;
 };
-//======================================================================
-class jfFFNFavsFilter : public jfMinMaxUFilter {
-  public:
-    // constructors
-    jfFFNFavsFilter();
-    jfFFNFavsFilter(size_t inmin, size_t inmax);
-    // redefined virtual methods
-    virtual QString GetTypeID() const;
-    virtual QString GetTypeDescription() const;
-    virtual jfBaseFilter* GenCopy() const;
-  protected:
-    // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
-};
 //===========================================================================
+extern const jfFilterTypeMeta FFN_FANDOM_FILTER_INFO;
+
 // a simple expression filter that matches against the category name
 class jfFFN_CategoryExprFilter : public jfSimpleExpFilterCore {
   public:
-    jfFFN_CategoryExprFilter();
+    jfFFN_CategoryExprFilter(const QString& filter_name);
+    jfFFN_CategoryExprFilter(QString&& filter_name);
     jfFFN_CategoryExprFilter(const jfFFN_CategoryExprFilter& source);
-    jfFFN_CategoryExprFilter(jfSimpleExpr* in_source);
-    virtual QString GetTypeDescription() const;
+    jfFFN_CategoryExprFilter(const QString& filter_name, jfSimpleExpr* in_source);
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
     virtual jfFFN_CategoryExprFilter* Copy() const;
-    virtual jfBaseFilter* GenCopy() const;
-    virtual QString GetTypeID() const;
+    virtual jfFilterBase* GenCopy() const override;
   protected:
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
 };
 /*****************************************************************************/

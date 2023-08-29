@@ -4,7 +4,7 @@ Basic   : Declares some more utility functions and things used in the other file
 Author  : John Q Metro
 Started : May 13, 2009
 Conversion to QT started : February 22, 2013
-Updated : July 19, 2022 (added IBoundVal)
+Updated : August 25, 2023
 Notes   :
 
 ******************************************************************************/
@@ -106,6 +106,10 @@ class jfFileReader {
     bool ReadParseSLine(size_t fcount, const QString& finname = "");
     bool ReadParseLine(size_t fcount, const QString& finname = "");
     bool ReadParseLine(size_t fmin, size_t fmax, const QString& finname = "");
+
+    // we use the internal 'oldline' without reading a new one. Useful if you need to try and parse a line more than twice
+    bool ParseOldSLine(size_t fcount, const QString& finname = "");
+
     bool ReadLast(const QString& finname = "");
     bool GetType(QString& outtype, const QString& finname = "");
     bool ReadUnEsc(QString& outline, const QString& finname = "");

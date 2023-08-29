@@ -531,7 +531,6 @@ bool jfFFN_CrossoverSection::NextUrlIndex() {
 //----------------------------
 bool jfFFN_CrossoverSection::NextUrlIndex(bool& isupdatable) {
   bool xres = NextUrlIndex();
-  QString name = url_index->second.catlink->GetName();
   if (xres) isupdatable = UpdatableAtUrlIndex();
   else isupdatable = false;
   return xres;
@@ -650,31 +649,30 @@ bool jfFFN_CrossoverSection::SetNoUpdateAtIndex() {
 }
 //------------------------------------------------------
 bool jfFFN_CrossoverSection::SetUpdatesByComparing(const jfFFN_CrossoverSection* old_data) {
-    // quick checks
-    if (old_data == NULL) return false;
-    if (old_data == this) return false;
-    // variables
-    int old_esc, new_esc;
-    size_t nuc;
-    QString new_name;
-    // preparing to loop
-    ResetIndex();
-    nuc = 0;
-    // the checking and un-updating loop
-    while (NextIndex()) {
-        new_name = NameAtIndex(false);
-        new_esc = old_data->EstStoryCount(new_name);
-
-        if (new_esc!=-1) {
-            old_esc = StoryCountAtIndex();
-            if ((old_esc==new_esc) && (old_esc<50)) {
-                SetNoUpdateAtIndex();
-            }
-        }
+  // quick checks
+  if (old_data == NULL) return false;
+  if (old_data == this) return false;
+  // variables
+  int old_esc, new_esc;
+  size_t nuc;
+  QString new_name;
+  // preparing to loop
+  ResetIndex();
+  nuc = 0;
+  // the checking and un-updating loop
+  while (NextIndex()) {
+    new_name = NameAtIndex(false);
+    new_esc = old_data->EstStoryCount(new_name);
+    if (new_esc!=-1) {
+      old_esc = StoryCountAtIndex();
+      if ((old_esc==new_esc) && (old_esc<50)) {
+        SetNoUpdateAtIndex();
+      }
     }
-    // finally
-    uccount = crossgroups.size() - nuc;
-    return true;
+  }
+  // finally
+  uccount = crossgroups.size() - nuc;
+  return true;
 }
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -718,12 +716,6 @@ QString jfFFN_CrossoverSection::NameAtIndex(bool addcross) const {
   if (addcross) bname += " Crossovers";
   return bname;
 }
-// -----------------------------------------------
-QString jfFFN_CrossoverSection::NameAtUrlIndex() const {
-    if (url_index==crossgroups.end()) return "";
-    if (before_first_url) return "";
-    return ((url_index->second).catlink)->GetName();
-}
 //---------------------------------------------------
 int jfFFN_CrossoverSection::StoryCountAtIndex() const {
   if (index==crossgroups.end()) return -1;
@@ -742,8 +734,7 @@ int jfFFN_CrossoverSection::EstStoryCount(const QString& hcross_name) const {
 bool jfFFN_CrossoverSection::GetDoUpdateAtIndex() const {
     if (index==crossgroups.end()) return false;
     if (before_first) return false;
-    jfFFN_HalfCrossover* check = (index->second).catlink;
-    return check->doupdate;
+    return ((index->second).catlink)->doupdate;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++
 // getting crossover pointers
@@ -967,7 +958,6 @@ bool jfFFN_CrossoverSection::GetIntegratedCopyByName(const QString& oldname, jfF
   if (new_catstore==NULL) return false;
   if (crossgroups.size()==0)  return false;
   if (crossgroups.count(oldname)==0) return false;
-
   // getting a pointer to the right group
   jfFFN_CrossSectionMap::const_iterator twi;
   twi = crossgroups.find(oldname);

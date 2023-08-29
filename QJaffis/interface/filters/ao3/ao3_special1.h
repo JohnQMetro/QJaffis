@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares some base class for filter diting
 Created :   September 10, 2012
 Conversion to Qt Started October 18, 2013
-Updated :   December 27, 2021 (Changing Orientation filter to tags)
+Updated :   August 12, 2023
 ******************************************************************************/
 #ifndef AO3_SPECIAL1_H_INCLUDED
 #define AO3_SPECIAL1_H_INCLUDED
@@ -30,11 +30,11 @@ extern const QString orientlist[];
 class jfAO3_RatingFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfAO3_RatingFilterEditor(const jfBaseFilter* infilt, const jfFilterMap* infmap, QWidget* parent = NULL);
+    jfAO3_RatingFilterEditor(const jfAO3RatingFilter* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    virtual bool GeneralCheck() const;
+    virtual void LoadFilter(const jfFilterBase* infilter) override;
+    virtual jfFilterBase* GetFilter() override;
+    virtual bool GeneralCheck(const jfFilterMap* infmap) const override;
   protected:
     jfCharCheckBoxGroup* insert_panel;
 };
@@ -44,7 +44,7 @@ class jfAO3_RatingFilterEditor : public jfBaseFilterEditor {
 class jfAO3_OrientFilterEditor : public jfTagFilterEditor {
   public:
     // the default constructor
-    jfAO3_OrientFilterEditor(const jfFilterMap* infmap, const jfAO3OrientationFilter* infilt, QWidget* parent = NULL);
+    jfAO3_OrientFilterEditor(const jfAO3OrientationFilter* infilt, QWidget* parent = NULL);
     // extra methods
     virtual jfTagFilterCore* GetTagFilter();
     virtual bool isListLong() const;

@@ -202,8 +202,7 @@ void jfDefaultCategoryEditor::SetDefaultEnable(bool xenable) {
 }
 //---------------------------------------------------
 void jfDefaultCategoryEditor::SaveDefault() {
-  datalink->SetName(ndesc_edit->TryGetName());
-  datalink->SetDescription(ndesc_edit->GetDesc());
+    datalink->SetNameDescription(ndesc_edit->TryGetName(), ndesc_edit->GetDesc());
   datalink->SetUseDefault(use_default->isChecked());
 }
 //------------------------------------------------------
@@ -212,7 +211,8 @@ void jfDefaultCategoryEditor::EnableCheck(bool value) {
 }
 //---------------------------------------------------------
 void jfDefaultCategoryEditor::ReloadNames() {
-	ndesc_edit->SetFromObj(datalink);
+    ndesc_edit->SetName(datalink->GetName());
+    ndesc_edit->SetDescription(datalink->GetDescription());
 	filepicker->ReloadNames();
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

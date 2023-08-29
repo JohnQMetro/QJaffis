@@ -20,11 +20,11 @@
 #define JFFNFICOBJ
 //*************************************************************************
 /* */
+const QString& IdForFFNItemCore();
 //------------------------------------------------------------------------
 class jfFFNItemCore : public jfGenericFanfic3, public jfFanficPairsMixin {
     friend class jfFFNFanficParseBase;
   public:
-    static const QString FFN_CORE_TYPE_ID;
 
     // constructors
     jfFFNItemCore();
@@ -62,12 +62,11 @@ class jfFFNItemCore : public jfGenericFanfic3, public jfFanficPairsMixin {
     size_t favs;
 };
 //========================================================================
+const QString& IdForFFNItem();
 
 class jfFFNItem : public jfFFNItemCore {
     friend class jfFFNFanficParse;
   public:
-    static const QString FFN_ITEM_TYPE_ID;
-
     // constructors
     jfFFNItem();
     jfFFNItem(const jfSearchResultItemData& init_data);

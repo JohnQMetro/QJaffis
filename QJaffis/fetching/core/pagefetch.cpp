@@ -149,7 +149,16 @@ bool jfPageFetcher::TestPageDelegates(const QString* newpage) {
     }
     // truncated
     bool trunc_test = tester->TestNotTruncated(newpage);
-    if (!trunc_test) theerror = jff_TRYAGAIN;
+    if (!trunc_test) {
+        theerror = jff_TRYAGAIN;
+        return false;
+    }
+    // rate limited
+    bool rate_test = tester->TestNotRateLimited(newpage);
+    if (!rate_test) {
+        theerror = jff_RATELIMIT;
+        return false;
+    }
     return trunc_test;
 }
 //------------------------

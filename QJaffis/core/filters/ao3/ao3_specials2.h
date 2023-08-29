@@ -1,18 +1,16 @@
 /******************************************************************************
 Name    :   ao3_specials2.h
 Author  :   John Q Metro
-Purpose :   AO3 pairing and warning filters
+Purpose :   AO3 warning filters
 Created :   October 4, 2012
 Conversion to Qt Started Oct 2, 2013
-Updated :   February 19, 2023
+Updated :   May 6, 2023
 ******************************************************************************/
 #ifndef AO3_SPECIALS2_H_INCLUDED
 #define AO3_SPECIALS2_H_INCLUDED
 #endif // AO3_SPECIALS2_H_INCLUDED
 //--------------------------------
-#ifndef JFBASEFILTER
-  #include "../base/filterbase.h"
-#endif
+
 #ifndef AO3_SPECIALS1_H_INCLUDED
   #include "ao3_specials1.h"
 #endif // AO3_SPECIALS1_H_INCLUDED
@@ -24,26 +22,26 @@ extern const QString warnlist[];
 //-----------------------------
 
 //========================================================================
+extern const jfFilterTypeMeta AO3_WARNINGS_FILTER_INFO;
+
 // excludes fics based on warnings
 class jfAO3WarnFilter : public jfSpecialsFilter {
   public:
-    // constrcutors
-    jfAO3WarnFilter();
-    jfAO3WarnFilter(const QString& insrc);
-    // string conversion
-    virtual bool FromString(const QString& sourcedata);
+    // constructors
+    jfAO3WarnFilter(const QString& filter_name);
+    jfAO3WarnFilter(QString&& filter_name);
+    jfAO3WarnFilter(const QString& filter_name, const QString& insrc);
     // gets a description
-    virtual QString GetTypeDescription() const;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
     // copy
-    virtual jfBaseFilter* GenCopy() const;
-    // special meta-information
-    virtual QString GetTypeID() const;
+    virtual jfFilterBase* GenCopy() const override;
     // custom methods
     bool Includes(QChar test) const;
-    virtual void SetToFull();
-    virtual bool IsFull() const;
+    virtual void SetToFull() override;
+    virtual bool IsFull() const override;
   protected:
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override final;
     // the core matching method
-    virtual bool CoreMatch(const jfSearchResultItem* testelem) const;
+    virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
 };
 /*****************************************************************************/

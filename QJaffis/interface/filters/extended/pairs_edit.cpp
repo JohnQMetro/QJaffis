@@ -4,7 +4,7 @@
 // Purpose :    Relationship/Pairing filters editing, various panels.
 // Created:     January 2, 2011
 // Conversion to Qt Started October 18, 2013
-// Updated:     January 2, 2011
+// Updated:     August 19, 2023
 //***************************************************************************
 #ifndef PAIRS_EDIT_H_INCLUDED
   #include "pairs_edit.h"
@@ -13,11 +13,10 @@
 #include <assert.h>
 //***************************************************************************
 // the default constructor
-jfPairFS_Editor::jfPairFS_Editor(const jfFilterMap* infmap, const jfPairFilterSingle* infilt,
-        QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+jfPairFS_Editor::jfPairFS_Editor(const jfPairFilterSingle* infilt, QWidget* parent):
+                                 jfBaseFilterEditor(infilt, parent) {
   // most things are handled by the parent constructor
   QString omsg;
-  assert(infmap!=NULL);
   // the typed filter
   // we create the insert.. the *actual* filter editor
   insert_panel = new jfPairFilEditPanelSingle(infilt);
@@ -28,7 +27,7 @@ jfPairFS_Editor::jfPairFS_Editor(const jfFilterMap* infmap, const jfPairFilterSi
   ArrangeSizers();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfPairFS_Editor::LoadFilter(const jfBaseFilter* infilter) {
+void jfPairFS_Editor::LoadFilter(const jfFilterBase* infilter) {
   // checks
   assert(infilter!=NULL);
   // variables
@@ -41,35 +40,29 @@ void jfPairFS_Editor::LoadFilter(const jfBaseFilter* infilter) {
   NameLoad();
 }
 //------------------------------------------------------------------------------
-jfBaseFilter* jfPairFS_Editor::GetFilter() {
-  jfPairFilterSingle* toutput;
-  // creating the result
-  toutput = new jfPairFilterSingle();
-  // getting the output
-  if (insert_panel->SaveFilterData(toutput)) {
-    namedesc_edit->ChangeObj(toutput);
-    return toutput;
-  }
-  else return NULL;
+jfFilterBase* jfPairFS_Editor::GetFilter() {
+    jfPairFilterSingle* toutput;
+    // creating the result
+    toutput = new jfPairFilterSingle(namedesc_edit->TryGetName());
+    // getting the output
+    if (insert_panel->SaveFilterData(toutput)) {
+        namedesc_edit->ChangeFilter(toutput);
+        return toutput;
+    }
+    else return NULL;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // checks if the contents are ok, returns false if they are not
-bool jfPairFS_Editor::GeneralCheck() const {
-  // local variables
-  bool resval;
-  // first we see if the name is correct
-  if (NameNUniq()) return false;
-  // next, we check the filter
-  resval = insert_panel->CheckValid();
-  return resval;
+bool jfPairFS_Editor::GeneralCheck(const jfFilterMap* filter_group) const {
+    if (NameNUniq(filter_group)) return false;
+    else return insert_panel->CheckValid();
 }
 //=============================================================================
 // the default constructor
-jfPairFL_Editor::jfPairFL_Editor(const jfFilterMap* infmap, const jfPairFilterList* infilt,
-                QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+jfPairFL_Editor::jfPairFL_Editor(const jfPairFilterList* infilt, QWidget* parent):
+                                 jfBaseFilterEditor( infilt,parent) {
   // most things are handled by the parent constructor
   QString omsg;
-  assert(infmap!=NULL);
   // the typed filter
   // we create the insert.. the *actual* filter editor
   insert_panel = new jfPairFilEditPanelList(infilt);
@@ -80,7 +73,7 @@ jfPairFL_Editor::jfPairFL_Editor(const jfFilterMap* infmap, const jfPairFilterLi
   ArrangeSizers();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfPairFL_Editor::LoadFilter(const jfBaseFilter* infilter) {
+void jfPairFL_Editor::LoadFilter(const jfFilterBase* infilter) {
   // checks
   assert(infilter!=NULL);
   // variables
@@ -93,35 +86,27 @@ void jfPairFL_Editor::LoadFilter(const jfBaseFilter* infilter) {
   NameLoad();
 }
 //------------------------------------------------------------------------------
-jfBaseFilter* jfPairFL_Editor::GetFilter() {
-  jfPairFilterList* toutput;
-  // creating the result
-  toutput = new jfPairFilterList();
-  // getting the output
-  if (insert_panel->SaveFilterData(toutput)) {
-    namedesc_edit->ChangeObj(toutput);
-    return toutput;
-  }
-  else return NULL;
+jfFilterBase* jfPairFL_Editor::GetFilter() {
+    jfPairFilterList* toutput;
+    // creating the result
+    toutput = new jfPairFilterList(namedesc_edit->TryGetName());
+    // getting the output
+    if (insert_panel->SaveFilterData(toutput)) {
+        namedesc_edit->ChangeFilter(toutput);
+        return toutput;
+    }
+    else return NULL;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// checks if the contents are ok, returns false if they are not
-bool jfPairFL_Editor::GeneralCheck() const {
-  // local variables
-  bool resval;
-  // first we see if the name is correct
-  if (NameNUniq()) return false;
-  // next, we check the filter
-  resval = insert_panel->CheckValid();
-  return resval;
+bool jfPairFL_Editor::GeneralCheck(const jfFilterMap* filter_group) const {
+    if (NameNUniq(filter_group)) return false;
+    else return insert_panel->CheckValid();
 }
 //=============================================================================
 // the default constructor
-jfPairFM_Editor::jfPairFM_Editor(const jfFilterMap* infmap, const jfPairFilterMultiple* infilt,
-        QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+jfPairFM_Editor::jfPairFM_Editor(const jfPairFilterMultiple* infilt, QWidget* parent):jfBaseFilterEditor(infilt,parent) {
   // most things are handled by the parent constructor
   QString omsg;
-  assert(infmap!=NULL);
   // the typed filter
   // we create the insert.. the *actual* filter editor
   insert_panel = new jfPairFilEditPanelMulti(infilt);
@@ -132,7 +117,7 @@ jfPairFM_Editor::jfPairFM_Editor(const jfFilterMap* infmap, const jfPairFilterMu
   ArrangeSizers();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfPairFM_Editor::LoadFilter(const jfBaseFilter* infilter) {
+void jfPairFM_Editor::LoadFilter(const jfFilterBase* infilter) {
   // checks
   assert(infilter!=NULL);
   // variables
@@ -145,26 +130,21 @@ void jfPairFM_Editor::LoadFilter(const jfBaseFilter* infilter) {
   NameLoad();
 }
 //------------------------------------------------------------------------------
-jfBaseFilter* jfPairFM_Editor::GetFilter() {
-  jfPairFilterMultiple* toutput;
-  // creating the result
-  toutput = new jfPairFilterMultiple();
-  // getting the output
-  if (insert_panel->SaveFilterData(toutput)) {
-    namedesc_edit->ChangeObj(toutput);
-    return toutput;
-  }
-  else return NULL;
+jfFilterBase* jfPairFM_Editor::GetFilter() {
+    jfPairFilterMultiple* toutput;
+    // creating the result
+    toutput = new jfPairFilterMultiple(namedesc_edit->TryGetName());
+    // getting the output
+    if (insert_panel->SaveFilterData(toutput)) {
+        namedesc_edit->ChangeFilter(toutput);
+        return toutput;
+    }
+    else return NULL;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // checks if the contents are ok, returns false if they are not
-bool jfPairFM_Editor::GeneralCheck() const {
-  // local variables
-  bool resval;
-  // first we see if the name is correct
-  if (NameNUniq()) return false;
-  // next, we check the filter
-  resval = insert_panel->CheckValid();
-  return resval;
+bool jfPairFM_Editor::GeneralCheck(const jfFilterMap* filter_group) const {
+    if (NameNUniq(filter_group)) return false;
+    else return insert_panel->CheckValid();
 }
 //***************************************************************************

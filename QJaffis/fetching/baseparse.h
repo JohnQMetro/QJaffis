@@ -3,7 +3,7 @@ Name    : baseparse.h
 Basic   : Declares a base class that handles page parsing (and redirection)
 Author  : John Q Metro
 Started : June 13, 2016
-Updated : March 11, 2023
+Updated : August 27, 2023
 
 ******************************************************************************/
 #ifndef BASEPARSE_H
@@ -69,6 +69,7 @@ class jfPageParserBase: public virtual jfPageParserCore {
     // test methods
     virtual bool testMissing(const QString *page) const = 0;
     virtual bool testIncomplete(const QString *page) const = 0;
+    virtual bool testRatelimit(const QString *page) const = 0;
     // getting results
     virtual bool setPageIndex(const size_t& page_index);
     // also

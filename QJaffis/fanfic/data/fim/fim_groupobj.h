@@ -18,11 +18,11 @@ Updated :   March 21, 2023
 #endif // TYPEDCOLLECT_H_INCLUDED
 
 //******************************************************************************
+const QString& IdForFIMGroups();
+
 class jfFIMGroup : public jfSearchResultItem {
     friend class jfFIMGroupItemParser;
   public:
-    static const QString FIMGROUP_TYPE_ID;
-
     // constructor
     jfFIMGroup();
     jfFIMGroup(const jfFIMGroup& init_data);

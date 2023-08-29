@@ -23,10 +23,11 @@ Updated :  March 18, 2023
 #include <vector>
 #include <QLocale>
 //**************************************************************************
+const QString& IdForAO3Fanfic();
+
 class jfAO3Fanfic : public jfGenericFanfic2, public jfFanficPairsMixin {
     friend class jfAO3FanficItemParser;
   public:
-    static const QString AO3_FANFIC_TYPE_ID;
     // default constructors
     jfAO3Fanfic();
     jfAO3Fanfic(const jfSearchResultItemData& init_data);

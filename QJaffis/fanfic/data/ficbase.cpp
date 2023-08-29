@@ -22,20 +22,23 @@ Renamed from ficobj2.cpp
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 #include <assert.h>
 //****************************************************************************
-const QString jfGenericFanfic::GENERIC_FANFIC_TYPE_ID = QString("GenericFanfic");
+const QString& IdForGenericFanfic() {
+    static QString GENERIC_FANFIC_TYPE_ID = QString("GenericFanfic");
+    return GENERIC_FANFIC_TYPE_ID;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 jfGenericFanfic::jfGenericFanfic():jfSearchResultItem() {
-    type_labels.append(GENERIC_FANFIC_TYPE_ID);
+    type_labels.append(IdForGenericFanfic());
     part_count = 1;
 }
 //-------------------------------------------------------------------------
 jfGenericFanfic::jfGenericFanfic(const jfSearchResultItemData& init_data):jfSearchResultItem(init_data) {
-    type_labels.append(GENERIC_FANFIC_TYPE_ID);
+    type_labels.append(IdForGenericFanfic());
     part_count = 1;
 }
 //--------------------------------------------------------------------------
 jfGenericFanfic::jfGenericFanfic(const jfGenericFanfic& src):jfSearchResultItem(src) {
-    type_labels.append(GENERIC_FANFIC_TYPE_ID);
+    type_labels.append(IdForGenericFanfic());
     // new stuff for Fic objects
     part_count = src.part_count;
     updated_date = src.updated_date;
@@ -107,22 +110,26 @@ void jfGenericFanfic::LoadIntoExtractCore(jfFicExtract* into) const {
 
 
 //===========================================================================
-const QString jfGenericFanfic2::GENERIC_FANFIC_2_TYPE_ID = QString("GenericFanfic2");
+const QString& IdForGenericFanfic2() {
+    static QString GENERIC_FANFIC_2_TYPE_ID = QString("GenericFanfic2");
+    return GENERIC_FANFIC_2_TYPE_ID;
+}
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 jfGenericFanfic2::jfGenericFanfic2():jfGenericFanfic() {
-    type_labels.append(GENERIC_FANFIC_2_TYPE_ID);
+    type_labels.append(IdForGenericFanfic2());
     word_count = 0;
     completed = false;
 }
 // -------------------------------------------------------
 jfGenericFanfic2::jfGenericFanfic2(const jfSearchResultItemData& init_data):jfGenericFanfic(init_data) {
-    type_labels.append(GENERIC_FANFIC_2_TYPE_ID);
+    type_labels.append(IdForGenericFanfic2());
     word_count = 0;
     completed = false;
 }
 //--------------------------------------------------------
 jfGenericFanfic2::jfGenericFanfic2(const jfGenericFanfic2& src):jfGenericFanfic(src) {
-    type_labels.append(GENERIC_FANFIC_2_TYPE_ID);
+    type_labels.append(IdForGenericFanfic2());
     word_count = src.word_count;
     completed = src.completed;
     characters = src.characters;
@@ -218,7 +225,10 @@ bool jfGenericFanfic2::ReadRestFromFile(jfFileReader* infile) {
 // ==========================================================================
 // a mixin class for fanfic items that have pairing info
 //++++++++++++++++++++++++++++++++++++++++++++++
-const QString jfFanficPairsMixin::FANFIC_PAIRS_TYPE_ID = QString("FanficPairsMixin");
+const QString& IdForFanficPairs() {
+    static QString FANFIC_PAIRS_TYPE_ID = QString("FanficPairsMixin");
+    return FANFIC_PAIRS_TYPE_ID;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 int jfFanficPairsMixin::RelationshipCount() const {
     return char_pairs.size();
@@ -317,22 +327,25 @@ bool jfFanficPairsMixin::ParseAndAddPair(const QString& source, bool display) {
 // QVector<const jfPairingStruct*> char_pairs;
 
 //===========================================================================
-const QString jfGenericFanfic3::GENERIC_FANFIC_3_TYPE_ID = QString("GenericFanfic3");
+const QString& IdForGenericFanfic3() {
+    static QString GENERIC_FANFIC_3_TYPE_ID = QString("GenericFanfic3");
+    return GENERIC_FANFIC_3_TYPE_ID;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // default constructors
 //----------------------------------------------------------
 jfGenericFanfic3::jfGenericFanfic3():jfGenericFanfic2() {
-    type_labels.append(GENERIC_FANFIC_3_TYPE_ID);
+    type_labels.append(IdForGenericFanfic3());
     author_id = 0;
 }
 //----------------------------------------------------------
 jfGenericFanfic3::jfGenericFanfic3(const jfSearchResultItemData& init_data):jfGenericFanfic2(init_data) {
-    type_labels.append(GENERIC_FANFIC_3_TYPE_ID);
+    type_labels.append(IdForGenericFanfic3());
     author_id = 0;
 }
 //----------------------------------------------------------
 jfGenericFanfic3::jfGenericFanfic3(const jfGenericFanfic3& src):jfGenericFanfic2(src) {
-    type_labels.append(GENERIC_FANFIC_3_TYPE_ID);
+    type_labels.append(IdForGenericFanfic3());
     author_id = src.author_id;
     genres = src.genres;
 }

@@ -3,7 +3,7 @@ Name    :   fim2_filedit.cpp
 Author  :   John Q Metro
 Purpose :   More Editors for fim filters
 Created :   August 5, 2015
-Updated :   October 15, 2019
+Updated :   August 22, 2023
 ******************************************************************************/
 #ifndef FIM2_FILEDIT_H
 #include "fim2_filedit.h"
@@ -13,52 +13,52 @@ Updated :   October 15, 2019
 /*****************************************************************************/
 
 // the default constructor
-jfFIMShortDesc_FilterEditor::jfFIMShortDesc_FilterEditor(const jfFilterMap* infmap,
-   const jfFIM_ShortDesc_ExprFilter* infilt, QWidget* parent):jfSimpleSFilterEditor(infmap,infilt,parent) {
+jfFIMShortDesc_FilterEditor::jfFIMShortDesc_FilterEditor(const jfFIM_ShortDesc_ExprFilter* infilt,
+                                        QWidget* parent):jfSimpleSFilterEditor(infilt,parent) {
  // things are handled by the parent
 }
 
 //------------------------------------------------------------------------------
 // internal methods
 jfSimpleExpFilterCore* jfFIMShortDesc_FilterEditor::MakeTypedFilter(jfSimpleExpr* inpval) {
-  jfFIM_ShortDesc_ExprFilter* result = new jfFIM_ShortDesc_ExprFilter(inpval);
+  jfFIM_ShortDesc_ExprFilter* result = new jfFIM_ShortDesc_ExprFilter(namedesc_edit->TryGetName(),inpval);
   return result;
 }
 //==========================================================================================
 // the default constructor
-jfFIMDualDesc_FilterEditor::jfFIMDualDesc_FilterEditor(const jfFilterMap* infmap,
-   const jfFIM_DualDesc_ExprFilter* infilt, QWidget* parent):jfSimpleSFilterEditor(infmap,infilt,parent) {
+jfFIMDualDesc_FilterEditor::jfFIMDualDesc_FilterEditor( const jfFIM_DualDesc_ExprFilter* infilt,
+                                        QWidget* parent):jfSimpleSFilterEditor(infilt,parent) {
  // things are handled by the parent
 }
 
 //------------------------------------------------------------------------------
 // internal methods
 jfSimpleExpFilterCore* jfFIMDualDesc_FilterEditor::MakeTypedFilter(jfSimpleExpr* inpval) {
-  jfFIM_DualDesc_ExprFilter* result = new jfFIM_DualDesc_ExprFilter(inpval);
+  jfFIM_DualDesc_ExprFilter* result = new jfFIM_DualDesc_ExprFilter(namedesc_edit->TryGetName(), inpval);
   return result;
 }
 
 //===========================================================================================
-jfFIMGroupSCFilterEditor::jfFIMGroupSCFilterEditor(const jfFilterMap* infmap, const jfFIMGroupSCFilter* infilt,
-          QWidget* parent):jfZeroToMaxFilterEditor("Story Count Range",999999,infmap,infilt,parent) {
+jfFIMGroupSCFilterEditor::jfFIMGroupSCFilterEditor(const jfFIMGroupSCFilter* infilt,
+          QWidget* parent):jfZeroToMaxFilterEditor("Story Count Range",999999,infilt,parent) {
   // not much
   insert_panel->SetMinMax(0,0);
 }
 
 //--------------------------------------------------------------------
 jfMinMaxUFilter* jfFIMGroupSCFilterEditor::MakeTypedMinMax() const {
-  return new jfFIMGroupSCFilter();
+  return new jfFIMGroupSCFilter(namedesc_edit->TryGetName());
 }
 //====================================================================
-jfFIMGroupMCFilterEditor::jfFIMGroupMCFilterEditor(const jfFilterMap* infmap, const jfFIMGroupMCFilter* infilt,
-          QWidget* parent):jfZeroToMaxFilterEditor("Story Count Range",30000,infmap,infilt,parent) {
+jfFIMGroupMCFilterEditor::jfFIMGroupMCFilterEditor(const jfFIMGroupMCFilter* infilt, QWidget* parent):
+                        jfZeroToMaxFilterEditor("Story Count Range",30000, infilt,parent) {
   // not much
   insert_panel->SetMinMax(0,0);
 }
 
 //--------------------------------------------------------------------
 jfMinMaxUFilter* jfFIMGroupMCFilterEditor::MakeTypedMinMax() const {
-  return new jfFIMGroupMCFilter();
+  return new jfFIMGroupMCFilter(namedesc_edit->TryGetName());
 }
 /*****************************************************************************/
 jfFimThumbPercentPanel::jfFimThumbPercentPanel(QWidget* parent):QWidget(parent) {
@@ -70,14 +70,14 @@ jfFimThumbPercentPanel::jfFimThumbPercentPanel(QWidget* parent):QWidget(parent) 
     setLayout(top_layout);
 }
 //----------------------------------------------
-jfFimThumbPercentFilter* jfFimThumbPercentPanel::GetNewFilter() const {
+jfFimThumbPercentFilter* jfFimThumbPercentPanel::GetNewFilter(const QString& name) const {
     // the values
     int tval;
     jfFimThumbPercentFilter* outfilt;
     // getting the value
     tval = min_perc->GetValue();
     // creating
-    outfilt = new jfFimThumbPercentFilter();
+    outfilt = new jfFimThumbPercentFilter(name);
     outfilt->SetPercent(tval);
     outfilt->SetIncludeDisabled(include_rdisabled->isChecked());
     return outfilt;
@@ -86,7 +86,6 @@ jfFimThumbPercentFilter* jfFimThumbPercentPanel::GetNewFilter() const {
 bool jfFimThumbPercentPanel::SetFromObj(const jfFimThumbPercentFilter* inval) {
     // the cases where things are wrong
     if (inval==NULL) return false;
-    if (!(inval->IsValid())) return false;
     // setting things
     min_perc->SetValue(inval->GetPercent());
     include_rdisabled->setChecked(inval->GetIncludeDisabled());
@@ -99,8 +98,8 @@ void jfFimThumbPercentPanel::SetDefault() {
 }
 
 /*****************************************************************************/
-jfFimThumbPercentFilterEditor::jfFimThumbPercentFilterEditor(const jfFilterMap* infmap,
-        const jfFimThumbPercentFilter* infilt, QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+jfFimThumbPercentFilterEditor::jfFimThumbPercentFilterEditor(const jfFimThumbPercentFilter* infilt,
+                                              QWidget* parent):jfBaseFilterEditor(infilt,parent) {
   // we start...
   // we create the insert.. the *actual*  editor
   insert_panel = new jfFimThumbPercentPanel();
@@ -117,7 +116,7 @@ jfFimThumbPercentFilterEditor::jfFimThumbPercentFilterEditor(const jfFilterMap* 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //-------------------------------------
-void jfFimThumbPercentFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfFimThumbPercentFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   assert(infilter!=NULL);
   const jfFimThumbPercentFilter* xvalue;
   filt_pointer = infilter;
@@ -126,14 +125,15 @@ void jfFimThumbPercentFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
   NameLoad();
 }
 //-------------------------------------
-jfBaseFilter* jfFimThumbPercentFilterEditor::GetFilter() {
+jfFilterBase* jfFimThumbPercentFilterEditor::GetFilter() {
   // the values
-  jfFimThumbPercentFilter* outfilt = insert_panel->GetNewFilter();
-  namedesc_edit->ChangeObj(outfilt);
+  jfFimThumbPercentFilter* outfilt = insert_panel->GetNewFilter(namedesc_edit->TryGetName());
+  namedesc_edit->ChangeFilter(outfilt);
   return outfilt;
 }
 //--------------------------------------------------------------
-bool jfFimThumbPercentFilterEditor::GeneralCheck() const {
-  return true;
+bool jfFimThumbPercentFilterEditor::GeneralCheck(const jfFilterMap* filter_group) const {
+    if (NameNUniq(filter_group)) return false;
+    else return true;
 }
 /*****************************************************************************/

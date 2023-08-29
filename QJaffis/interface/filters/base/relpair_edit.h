@@ -3,7 +3,7 @@ Name    :   relpair_edit.h
 Author  :   John Q Metro
 Purpose :   GUI Editing for Structured Pair Filter
 Created :   February 24, 2023
-Created :   February 25, 2023
+Created :   April 17, 2023
 ******************************************************************************/
 #pragma once
 
@@ -55,11 +55,11 @@ class jfStrPairingPanel : public QWidget {
 class jfStr_PairingFilterEditor : public jfBaseFilterEditor {
   public:
     // the default constructor
-    jfStr_PairingFilterEditor(const jfBaseFilter* infilt, const jfFilterMap* infmap, QWidget* parent = NULL);
+    jfStr_PairingFilterEditor(const jfStructuredPairFilter* infilt, QWidget* parent = NULL);
     // implemented virtual methods
-    virtual void LoadFilter(const jfBaseFilter* infilter);
-    virtual jfBaseFilter* GetFilter();
-    virtual bool GeneralCheck() const;
+    virtual void LoadFilter(const jfFilterBase* infilter);
+    virtual jfFilterBase* GetFilter();
+    virtual bool GeneralCheck(const jfFilterMap* filter_group) const;
   protected:
     jfStrPairingPanel* insert_panel;
 };

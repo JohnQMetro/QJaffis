@@ -538,9 +538,10 @@ jfLiteralFilterElem::jfLiteralFilterElem(const QString& ftype, const QString& ra
 	thefilter = NULL;
 
 	// checking
-	assert(filttype!=EXP_FIL_TAG);
+    assert(filttype != EXPRESSION_FILTER_INFO.Identifier());
 	// we try to create the filter
-    thefilter = MakeFilter(ftype,"tempnamex1");
+    thefilter = allfilters::MakeFilter(ftype, "tempnamex1");
+
 	if (thefilter!=NULL) {
 		testx = thefilter->FromString(rawdata);
 		if (!testx) {
@@ -632,7 +633,8 @@ jfGlobalFilterElem::jfGlobalFilterElem(const jfGlobalFilterElem& source) {
 bool jfGlobalFilterElem::IsExpr() const {
 	if (c_pointer==NULL) return false;
 	else {
-		return ((c_pointer->filter)->MatchTypeid(EXP_FIL_TAG));
+        QString type_id = (c_pointer->filter)->GetTypeIdentifier();
+        return (EXPRESSION_FILTER_INFO.Identifier() == type_id);
 	}
 }
 //-------------------------------------------------------------------------
@@ -731,7 +733,7 @@ jfGlobalFilterElem::~jfGlobalFilterElem() {
 }
 //===========================================================================
 // the constructor for the referenced filter
-jfLocalFilterElem::jfLocalFilterElem(jfFilterMap* inlocalmap, const QString& filtername) {
+jfLocalFilterElem::jfLocalFilterElem(const jfFilterMap* inlocalmap, const QString& filtername) {
 	// starting
 	assert(inlocalmap!=NULL);
 	// settling the basic values
@@ -756,7 +758,8 @@ jfLocalFilterElem::jfLocalFilterElem(const jfLocalFilterElem& source) {
 bool jfLocalFilterElem::IsExpr() const {
 	if (thefilter==NULL) return false;
 	else {
-		return (thefilter->MatchTypeid(EXP_FIL_TAG));
+        QString type_id = thefilter->GetTypeIdentifier();
+        return (EXPRESSION_FILTER_INFO.Identifier() == type_id);
 	}
 }
 //---------------------------------------------------------------------------

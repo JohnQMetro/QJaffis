@@ -29,14 +29,17 @@ Updated :   March 18, 2023
 #include <QRegExp>
 #include <QRegularExpression>
 //**************************************************************************
+const QString& IdForAO3Fanfic() {
+    static QString AO3_FANFIC_TYPE_ID = QString("AO3Fanfic");
+    return AO3_FANFIC_TYPE_ID;
+}
 
-const QString jfAO3Fanfic::AO3_FANFIC_TYPE_ID = QString("AO3Fanfic");
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // default constructors
 //----------------------------
 jfAO3Fanfic::jfAO3Fanfic():jfGenericFanfic2() {
-    type_labels.append(FANFIC_PAIRS_TYPE_ID);
-    type_labels.append(AO3_FANFIC_TYPE_ID);
+    type_labels.append(IdForFanficPairs());
+    type_labels.append(IdForAO3Fanfic());
 
     rating = warn = ao3con::unchar;
     eccount = -1;
@@ -45,8 +48,8 @@ jfAO3Fanfic::jfAO3Fanfic():jfGenericFanfic2() {
 }
 // --------------------------
 jfAO3Fanfic::jfAO3Fanfic(const jfSearchResultItemData& init_data):jfGenericFanfic2(init_data) {
-    type_labels.append(FANFIC_PAIRS_TYPE_ID);
-    type_labels.append(AO3_FANFIC_TYPE_ID);
+    type_labels.append(IdForFanficPairs());
+    type_labels.append(IdForAO3Fanfic());
 
     rating = warn = ao3con::unchar;
     eccount = -1;
@@ -55,8 +58,8 @@ jfAO3Fanfic::jfAO3Fanfic(const jfSearchResultItemData& init_data):jfGenericFanfi
 }
 //----------------------------
 jfAO3Fanfic::jfAO3Fanfic(const jfAO3Fanfic& src):jfGenericFanfic2(src) {
-    type_labels.append(FANFIC_PAIRS_TYPE_ID);
-    type_labels.append(AO3_FANFIC_TYPE_ID);
+    type_labels.append(IdForFanficPairs());
+    type_labels.append(IdForAO3Fanfic());
 
     rating = src.rating;
     orientations = src.orientations;

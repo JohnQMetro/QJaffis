@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Declares a base class containing search info and parameters
 Created :   May 4, 2009
 Conversion to Qt started November 5, 2013
-Updated :   April 30, 2014
+Updated :   July 29, 2023
 ******************************************************************************/
 #ifndef SEARCHCORE_H_INCLUDED
   #include "searchcore.h"
@@ -41,9 +41,9 @@ bool jfSearchCore::NoFilters() const {
     bool emptyDef;
     bool emptyLocal;
     if (def_filtermap == NULL) emptyDef = true;
-    else emptyDef = def_filtermap->isEmpty();
+    else emptyDef = def_filtermap->IsEmpty();
     if (local_map == NULL) emptyLocal = true;
-    else emptyLocal = local_map->isEmpty();
+    else emptyLocal = local_map->IsEmpty();
     return (emptyDef && emptyLocal);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -82,7 +82,7 @@ bool jfSearchCore::VerifyNames(QString&outmsg) {
   bool rval;
   // calling CopyLoad on subparts
   /**/JDEBUGLOGB(fname,1,def_filtermap==NULL)
-  /**/JDEBUGLOGST(fname,2,def_filtermap->GetCount())
+  /**/JDEBUGLOGST(fname,2,def_filtermap->FilterCount())
   rval = def_filtermap->VerifyNames(omsg,true);
   if (!rval) {
     outmsg = omsg + " in included filters.";
@@ -244,7 +244,7 @@ bool jfSearchCore::ReadRestFromFile(jfFileReader* infile) {
   if (local_map!=NULL) delete local_map;
   local_map = new jfFilterMap();
   /**/JDEBUGLOG(fname,6)
-  local_map->SetMapPtr(local_map);
+  local_map->SetMapPointer(local_map);
   if (!local_map->GetFromFile(infile)) return false;
   /**/JDEBUGLOG(fname,7)
   // built-in filters
@@ -252,7 +252,7 @@ bool jfSearchCore::ReadRestFromFile(jfFileReader* infile) {
   /**/JDEBUGLOG(fname,8)
   // the built-in filters
   def_filtermap = new jfFilterMap();
-  def_filtermap->SetMapPtr(local_map);
+  def_filtermap->SetMapPointer(local_map);
   if (!def_filtermap->GetFromFile(infile)) return false;
   /**/JDEBUGLOG(fname,9)
   // the categories

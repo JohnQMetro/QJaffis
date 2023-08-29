@@ -3,7 +3,7 @@ Name    :   minmax_editor.cpp
 Author  :   John Q Metro
 Purpose :   Defines some editors for numeric range filters
 Created :   June 8, 2016 (Taken from other sources)
-Updated :   June 8, 2016
+Updated :   April 15, 2023
 ******************************************************************************/
 #ifndef MINMAX_EDITOR_H
   #include "minmax_editor.h"
@@ -14,8 +14,7 @@ Updated :   June 8, 2016
 
 // the default constructor
 jfZeroToMaxFilterEditor::jfZeroToMaxFilterEditor(QString typname, size_t xmax,
-       const jfFilterMap* infmap, const jfMinMaxUFilter* infilt, QWidget* parent):
-  jfBaseFilterEditor(infmap,infilt,parent) {
+            const jfMinMaxUFilter* infilt, QWidget* parent):jfBaseFilterEditor(infilt,parent) {
   // most things are handled by the parent constructor
   assert(xmax!=0);
   // we create the insert.. the *actual* panel
@@ -31,7 +30,7 @@ jfZeroToMaxFilterEditor::jfZeroToMaxFilterEditor(QString typname, size_t xmax,
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //---------------------------------------------
-void jfZeroToMaxFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfZeroToMaxFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   const jfMinMaxUFilter* xfilt;
   if (infilter!=NULL) {
     xfilt = dynamic_cast<const jfMinMaxUFilter*>(infilter);
@@ -39,28 +38,30 @@ void jfZeroToMaxFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
   }
 }
 //-----------------------------------------------------
-jfBaseFilter* jfZeroToMaxFilterEditor::GetFilter() {
+jfFilterBase* jfZeroToMaxFilterEditor::GetFilter() {
   jfMinMaxUFilter* result;
   result = MakeTypedMinMax();
   result->SetValues(insert_panel->GetMin(),insert_panel->GetMax());
-  namedesc_edit->ChangeObj(result);
+  namedesc_edit->ChangeFilter(result);
   return result;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // checking
-bool jfZeroToMaxFilterEditor::GeneralCheck() const {
-  return insert_panel->Check();
+bool jfZeroToMaxFilterEditor::GeneralCheck(const jfFilterMap *filter_group) const {
+    if (filter_group == NULL) return true;
+    else if (NameNUniq(filter_group)) return false;
+    else return insert_panel->Check();
 }
 //========================================================================
-jfWCFilterEditor::jfWCFilterEditor(const jfFilterMap* infmap, const jfWordCountFilter* infilt,
-          QWidget* parent):jfZeroToMaxFilterEditor("Word Count Range",999999999,infmap,infilt,parent) {
+jfWCFilterEditor::jfWCFilterEditor(const jfWordCountFilter* infilt, QWidget* parent):
+        jfZeroToMaxFilterEditor("Word Count Range",999999999,infilt,parent) {
   // not much
   insert_panel->SetMinMax(0,0);
 }
 
 //--------------------------------------------------------------------
 jfMinMaxUFilter* jfWCFilterEditor::MakeTypedMinMax() const {
-  return new jfWordCountFilter();
+  return new jfWordCountFilter("(dummy name");
 }
 /*****************************************************************************/
 

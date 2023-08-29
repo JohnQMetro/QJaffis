@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Defines the custom first panel for fimfiction.net searching
 Created :   June 23, 2012
 Conversion to Qt started February 3, 2014
-Updated :   October 15, 2019
+Updated :   August 6, 2023
 ******************************************************************************/
 #ifndef FIM_PANEL1_H_INCLUDED
   #include "fim_panel1.h"
@@ -65,18 +65,15 @@ bool jfFIM_DFE::SaveFiltersExtended() {
   QString test_msg;
 
   // saving general thumbs data
-  thumbs_filter = tud_filedit->GetNewFilter();
-  thumbs_filter->SetName(DEF_fimthumbs_name);
+  thumbs_filter = tud_filedit->GetNewFilter(DEF_fimthumbs_name);
   embedded_filters->ReplaceSame(thumbs_filter,oindex);
   // saving percent thumbs stuff
-  thumb_perfilter = tper_edit->GetNewFilter();
-  thumb_perfilter->SetName(DEF_fimpthumbs_name);
+  thumb_perfilter = tper_edit->GetNewFilter(DEF_fimpthumbs_name);
   embedded_filters->ReplaceSame(thumb_perfilter,oindex);
   // saving dual expr filter stuff
   testval = dual_expredit->CheckFilter(test_msg);
   if (testval==NULL) return false;
-  dualexpr_filter = new jfFIM_DualDesc_ExprFilter(testval);
-  dualexpr_filter->SetName(DEF_fimdualdesc_name);
+  dualexpr_filter = new jfFIM_DualDesc_ExprFilter(DEF_fimdualdesc_name, testval);
   embedded_filters->ReplaceSame(dualexpr_filter,oindex);
   // done
   return true;
@@ -109,7 +106,7 @@ bool jfFIM_DFE::ChangeSearchExtended(jfSearchCore* obj_data) {
   }
   /**/JDEBUGLOG(fname,6)
   // dual summary expression match filter
-  jfBaseFilter* bddesc = embedded_filters->GetItem(DEF_fimdualdesc_name);
+  jfFilterBase* bddesc = embedded_filters->GetItem(DEF_fimdualdesc_name);
   /**/JDEBUGLOGB(fname,7,(bddesc == NULL))
   qvalue = dynamic_cast<jfFIM_DualDesc_ExprFilter*>(bddesc);
   if (qvalue!=NULL) {

@@ -4,7 +4,7 @@
 // Purpose :    Fanfiction.Net search, first panel
 // Created:     June 25, 2010
 // conversion to Qt started July 27, 2014
-// Updated:     March 3, 2023 (new character filter editor)
+// Updated:     August 24, 2023
 //**************************************************************************
 #define FFN_PANEL1
 
@@ -65,8 +65,8 @@ class jfFFN_DFE : public jfDefaultFilterEditorBase {
     jfSimpleExprEdit* auth_filedit;
     jfListExprEdit* char_filedit;
     jfGenMinMaxEditor* wc_picker;
-    jfFavsCountPanel* favs_filedit;
-    jfComplFiltEdit* cpicker;
+    jfZeroToMaxEditor* favs_filedit;
+    jfCompletedFilterEditor* cpicker;
     QLabel* lang_fillabel;
     jfSimpleExprEdit* lang_filedit;
     // an extra set of sizers

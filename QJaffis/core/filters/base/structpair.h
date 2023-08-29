@@ -3,7 +3,7 @@ Name    :   structpair.h
 Author  :   John Q Metro
 Purpose :   'Structured Pair' filters
 Created :   February 16, 2023
-Updated :   March 10, 2023
+Updated :   April 9, 2023 (Rebasing)
 ******************************************************************************/
 #pragma once
 
@@ -11,11 +11,10 @@ Updated :   March 10, 2023
     #define STRUCTPAIR_H
 #endif // STRUCTPAIR_H
 //--------------------------------
-#ifndef JFBASEFILTER
-  #include "../base/filterbase.h"
-#endif
+
 
 #include "../../objs/baseitem.h"
+#include "../../filters/base/basefilter.h"
 
 #include <QVector>
 /*****************************************************************************/
@@ -83,26 +82,26 @@ class jfPairFilterPair {
     QStringList participants; // the should be lowercase only
 };
 //------------------------------------------------------
+extern const jfFilterTypeMeta STRUCTURED_PAIR_FILTER_INFO;
+//------------------------------------------------------
 class jfFanficPairsMixin;
 
-class jfStructuredPairFilter : public jfBaseFilter {
+class jfStructuredPairFilter : public jfFilterBase {
   public:
     // constructors
-    jfStructuredPairFilter();
+    jfStructuredPairFilter(const QString& filter_name);
+    jfStructuredPairFilter(QString&& filter_name);
     jfStructuredPairFilter(const jfStructuredPairFilter& source);
     // match against the filter
-    virtual bool isEmpty() const override;
+    virtual bool IsEmpty() const override;
     // loading from a string representation
-    virtual bool FromString(const QString& sourcedata) override;
     virtual QString ToString() const override;
     bool SetNamesData(const QString& sourcedata, bool nl_split);
     QString GetNamesData(bool nl_split) const;
-    // gets a description
-    virtual QString GetTypeDescription() const override;
     // copy
-    virtual jfBaseFilter* GenCopy() const override;
+    virtual jfFilterBase* GenCopy() const override;
     // special meta-information
-    virtual QString GetTypeID() const override;
+    virtual const jfFilterTypeMeta& GetTypeMetaInfo() const override;
     // other methods
     void SetMatchAll(bool inval);
     bool GetMatchAll() const;
@@ -113,20 +112,13 @@ class jfStructuredPairFilter : public jfBaseFilter {
     // destructor
     virtual ~jfStructuredPairFilter();
   protected:
+    virtual bool FromStringInner(const QString& sourcedata, QString& error_out) override;
     static void EmptyPairList(QVector<const jfPairFilterPair*>& plist);
     bool DoesPairingMatch(const jfPairingStruct& target) const;
-    const jfFanficPairsMixin* CheckCastElement(const jfSearchResultItem* testelem) const;
     // the core matching method
     virtual bool CoreMatch(const jfSearchResultItem* testelem) const override;
     bool ParsePairs(const QString& inval, bool nl, QVector<const jfPairFilterPair*>& target) const;
-    // file i/o
-    virtual bool AddRestToFile(QTextStream* outfile) const override;
-    virtual bool ReadRestFromFile(jfFileReader* infile) override;
 
-    /* since different types are stored together, the text file reprentation
-    may have objects of varying length */
-
-    virtual size_t ExtraLines() const override;
     // internal data
     QVector<const jfPairFilterPair*> filter_pairs;
     bool match_all;

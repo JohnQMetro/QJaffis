@@ -183,6 +183,10 @@ bool jfFFNItemParser::testIncomplete(const QString *page) const {
   if (page->contains(footer1)) return true;
   else return page->contains(footer2);
 }
+// ---------------------------------
+bool jfFFNItemParser::testRatelimit(const QString *page) const {
+    return true;
+}
 //----------------------------------
 QString jfFFNItemParser::getCookie() const {
   return "";

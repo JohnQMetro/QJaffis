@@ -4,7 +4,7 @@
 // Purpose :    Defines collections involving categorization
 // Created:     April 1, 2009
 // Conversion to QT started : September 5, 2013
-// Updated:     March 11, 2023
+// Updated:     August 22, 2023
 ******************************************************************************/
 #ifndef CATEGORIES_H_INCLUDED
   #include "categories.h"
@@ -33,26 +33,27 @@
 
 //*****************************************************************************
 // the defualt constructor
-jfCategories::jfCategories() : jfBaseCollection() {
-  size_t icount;
-  for (icount=0;icount<32;icount++) {
-    thecategories[icount]=NULL;
-    fname_path[icount]=NULL;
-    frelative[icount] = true;
-  }
-  localmap_ptr = NULL;
-  // the default stuff
-  usedefault = false;
-  fname_path[32]=NULL;
-  frelative[32] = true;  
-  base_outputdir = jglobal::settings.paths.GetPathFor(jglobal::DEFAULT_PATH_TYPE::SAVED_RESULTS);
+jfCategories::jfCategories() {
+    item_count = 0;
+    name = "Category Holder Default Name";
+    size_t icount;
+    for (icount=0;icount<32;icount++) {
+        thecategories[icount]=NULL;
+        fname_path[icount]=NULL;
+        frelative[icount] = true;
+    }
+    localmap_ptr = NULL;
+    // the default stuff
+    usedefault = false;
+    fname_path[32]=NULL;
+    frelative[32] = true;
+    base_outputdir = jglobal::settings.paths.GetPathFor(jglobal::DEFAULT_PATH_TYPE::SAVED_RESULTS);
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // creates an empty new filter as and makes it the last category
 jfExpressionFilter* jfCategories::AddNewCategory(const QString& newname) {
   if (item_count==32) return NULL;
-  thecategories[item_count] = new jfExpressionFilter();
-  thecategories[item_count]->SetName(newname);
+  thecategories[item_count] = new jfExpressionFilter(newname);
   thecategories[item_count]->SetFiltermapLink(localmap_ptr);
   fname_path[item_count] = new QString(newname+".html");
   frelative[item_count] = true;
@@ -143,12 +144,16 @@ bool jfCategories::VerifyNames(QString& omsg) {
   return qval;;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+size_t jfCategories::GetCount() const {
+    return item_count;
+}
+// ----------------------------------------------------------
 bool jfCategories::UsesDefault() const {
   return usedefault;
 }
 //------------------------------------------------------------------------
 bool jfCategories::NotEmpty() const {
-  return (UsesDefault() || (!isEmpty()));
+  return (UsesDefault() || (item_count > 0));
 }
 //-----------------------------------------------------------------------
 bool jfCategories::ChIndex(const size_t& catval) const {
@@ -157,6 +162,18 @@ bool jfCategories::ChIndex(const size_t& catval) const {
     return (catval<item_count);
   }
   return false;
+}
+//-----------------------------------------------------------------------
+QString jfCategories::GetName() const {
+    return name;
+}
+QString jfCategories::GetDescription() const {
+    return description;
+}
+// ----------------------------------------------
+void jfCategories::SetNameDescription(const QString& in_name, const QString& in_description) {
+    name = in_name;
+    description = in_description;
 }
 //-------------------------------------------------------------------------
 // we do sorting
@@ -177,6 +194,7 @@ bool jfCategories::Sort(jfItemFlagGroup* testee){
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // old virtual methods we implement
 //--------------------------------------------------------------------------
+/*
 bool jfCategories::NextIndex() {
   // special case, we are already off the end
   if (item_index==-2) return false;
@@ -223,13 +241,17 @@ bool jfCategories::ToIndex(const int& newindex)  {
   curr_item = thecategories[item_index];
   return true;
 }
+*/
 //-------------------------------------------------------------------------
+
 QString jfCategories::GetTypeID() const {
   return QString("jfCategories");
 }
+
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // some more formerly abstract methods
 //--------------------------------------------------------------------------
+/*
 QStringList* jfCategories::GetNameList() const {
   QStringList* result;
   size_t loopindex;
@@ -243,7 +265,9 @@ QStringList* jfCategories::GetNameList() const {
   // done
   return result;
 }
+*/
 //--------------------------------------------------------------------------
+/*
 QStringList* jfCategories::GetDescriptionList() const {
   QStringList* result;
   size_t loopindex;
@@ -256,8 +280,9 @@ QStringList* jfCategories::GetDescriptionList() const {
   }
   // done
   return result;
-}
+} */
 //--------------------------------------------------------------------------
+/*
 QStringList* jfCategories::GetTypeList() const {
   QStringList* result;
   size_t loopindex;
@@ -266,44 +291,35 @@ QStringList* jfCategories::GetTypeList() const {
   // not null
   result = new QStringList();
   for (loopindex=0;loopindex<item_count;loopindex++) {
-    result->append(thecategories[loopindex]->GetTypeID());
+    result->append(thecategories[loopindex]->GetTypeIdentifier());
   }
   // done
   return result;
 }
+*/
 //-----------------------------------------------------------------------
+
 bool jfCategories::DeleteAtIndex(const size_t& dindex) {
-  size_t lpc;
-  if (dindex>=item_count) return false;
-  // checking the indexes
-  if (dindex==item_index) NextIndex();
-  if (dindex==backup_index) {
-    backup_item = NULL;
-    backup_index = -1;
-  }
-  // deleting the item
-  delete thecategories[dindex];
-  thecategories[dindex] = NULL;
-  delete fname_path[dindex];
-  fname_path[dindex]=NULL;
-  // moving the list
-  for (lpc=(dindex+1);lpc<item_count;lpc++) {
-    thecategories[lpc-1] = thecategories[lpc];
-    fname_path[lpc-1] = fname_path[lpc];
-  }
-  thecategories[item_count-1] = NULL;
-  fname_path[item_count-1] = NULL;
-  frelative[item_count-1] = true;
-  // finishing off
-  item_count--;
-  // resetting the indexes
-  if (item_index>dindex) BackIndex();
-  if (backup_index>dindex) {
-    backup_index--;
-    backup_item = thecategories[backup_index];
-  }
-  // done
-  return true;
+    size_t lpc;
+    if (dindex>=item_count) return false;
+
+    // deleting the item
+    delete thecategories[dindex];
+    thecategories[dindex] = NULL;
+    delete fname_path[dindex];
+    fname_path[dindex]=NULL;
+    // moving the list
+    for (lpc=(dindex+1);lpc<item_count;lpc++) {
+        thecategories[lpc-1] = thecategories[lpc];
+        fname_path[lpc-1] = fname_path[lpc];
+    }
+    thecategories[item_count-1] = NULL;
+    fname_path[item_count-1] = NULL;
+    frelative[item_count-1] = true;
+    // finishing off
+    item_count--;
+    // done
+    return true;
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -371,6 +387,67 @@ void jfCategories::SetFilePath(size_t gindex,const QString& src_fpath, bool rela
   if (fname_path[gindex]==NULL) fname_path[gindex] = new QString(src_fpath);
   else (*fname_path[gindex]) = src_fpath;
   frelative[gindex] = relative;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfCategories::AddToFile(QTextStream* outfile) const {
+    // constants and variables
+    const QString fname = "jfCategories::AddToFile";
+    // checking and special conditions
+    if (outfile==NULL) return false;
+    // line 1
+    (*outfile) << ("###" + GetTypeID()) << '\n';
+    // line 2
+    jfOutString s_out;
+    s_out << name << description;
+    (*outfile) << s_out << '\n';
+    // line 3
+    (*outfile) <<  QString::number(item_count) << '\n';
+    // subsequent lines are delegated to other methods
+    bool rbuf = AddMid2ToFile(outfile);
+    if (!rbuf) return false;
+    rbuf = AddRestToFile(outfile);
+    if (!rbuf) return false;
+    // adding on the footer
+    (*outfile) << "###\n";
+    return true;
+}
+//-----------------------------------------------------------------------------
+bool jfCategories::GetFromFile(jfFileReader* infile) {
+    const QString funcname="jfCategories::GetFromFile";
+    // input data
+    QString buffer;
+
+    // starting checks
+    assert(infile!=NULL);
+    // Reading and processing line 1
+    if (!infile->ReadParseSLine(1,funcname)) {
+        if (!infile->ParseOldSLine(3, funcname)) return false;
+    }
+    buffer = infile->lp.UnEscStr(0);
+    if (buffer!=GetTypeID()) {
+        return infile->BuildError("The type (" + buffer + ") does not match!");
+    }
+    // we get the next line (2)
+    if (!infile->ReadParseLine(2,funcname)) return false;
+    // the name
+    name = infile->lp.UnEscStr(0);
+    if (name.isEmpty()) infile->BuildError("The name is blank!");
+    // description
+    description = infile->lp.UnEscStr(1);
+
+    // line 3 is just the item count
+    unsigned long tval;
+    if (!infile->ReadULong(tval, funcname)) return false;
+    item_count = tval;
+
+    // finishing off...
+    if (!ReadMid2FromFile(infile)) return false;
+    if (!ReadRestFromFile(infile)) return false;
+
+    // we should be left just before a final line...
+    if (!infile->ReadLast(funcname)) return false;
+    return true;
+    // done
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the destructor
@@ -491,7 +568,7 @@ bool jfCategories::ReadRestFromFile(jfFileReader* infile) {
       return infile->BuildError("This field is not a truth value!");
     }
     // reading in...
-    thecategories[loopc] = new jfExpressionFilter();
+    thecategories[loopc] = new jfExpressionFilter("default name");
     thecategories[loopc]->SetFiltermapLink(localmap_ptr);
     rres = thecategories[loopc]->GetFromFile(infile);
     if (!rres) {

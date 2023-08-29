@@ -27,6 +27,7 @@ class jfAO3_FicPartParser : public jfStoryPartParseBase {
     virtual QString* makeRedirectedURL(const QString& inPart) const;
     virtual bool testMissing(const QString *page) const;
     virtual bool testIncomplete(const QString *page) const;
+    virtual bool testRatelimit(const QString *page) const;
     virtual QString getCookie() const;
 
   protected:

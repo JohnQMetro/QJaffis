@@ -27,6 +27,7 @@ class jfTestsDelegate {
     virtual bool TestIsBlocked(const QString* downpage) const = 0;
     virtual bool TestNotMissing(const QString* downpage) const = 0;
     virtual bool TestNotTruncated(const QString* downpage) const = 0;
+    virtual bool TestNotRateLimited(const QString* downpage) const = 0;
     virtual bool ResolveRedirect(const QString& raw_redirect, QString& full_redirect) const = 0;
 };
 

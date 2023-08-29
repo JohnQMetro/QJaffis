@@ -202,7 +202,7 @@ jfCategoryEditor::jfCategoryEditor(jfCategories* catparent, size_t cateindex, bo
   namedesc = new jfNameDescEditor(NULL,false,false,"1","");
   del_btn = new QPushButton("Delete");
   namedesc->AddItem(del_btn);
-  namedesc->SetFromObj(currdata);
+  namedesc->SetFromFilter(currdata);
   // expresion editor
   expr_label = new QLabel("Sorting Expression");
   expr_edit = new jfExpressionEditor((datalink->localmap_ptr),true,multiline,false);

@@ -4,7 +4,7 @@
 // Purpose :    Relationship/Pairing filters editing, various panels.
 // Created:     January 1, 2011
 // Conversion to Qt Started October 16, 2013
-// Updated:     April 7, 2013
+// Updated:     August 19, 2023
 //***************************************************************************
 #ifndef PAIRF_EDITOR_H_INCLUDED
   #include "pairf_editor.h"
@@ -98,10 +98,10 @@ bool jfPairFilEditPanelCore::SaveData(jfPairFilterCore* outval) const {
   bufval = spec_edit->text();
   outval->AddSpecials(bufval);
   // doing the booleans
-  (outval->GetFlagsRef()).usetokens = usetokens->isChecked();
-  (outval->GetFlagsRef()).sidespaces = sidespaces->isChecked();
-  (outval->GetFlagsRef()).nofriend = nofriend->isChecked();
-  (outval->GetFlagsRef()).nospace= nospace->isChecked();
+  (outval->GetMutFlagsRef()).usetokens = usetokens->isChecked();
+  (outval->GetMutFlagsRef()).sidespaces = sidespaces->isChecked();
+  (outval->GetMutFlagsRef()).nofriend = nofriend->isChecked();
+  (outval->GetMutFlagsRef()).nospace= nospace->isChecked();
   // done
   return true;
 }
@@ -150,7 +150,7 @@ jfPairFilEditPanelSingle::jfPairFilEditPanelSingle(const jfPairFilterSingle* inf
   // next..
   setLayout(top_sizer);
   if (infil==NULL) {
-    jfPairFilterSingle* tval = new jfPairFilterSingle();
+    jfPairFilterSingle* tval = new jfPairFilterSingle("no name");
     LoadFilterData(tval);
     delete tval;
   }
@@ -235,7 +235,7 @@ jfPairFilEditPanelList::jfPairFilEditPanelList(const jfPairFilterList* infil, QW
   // next..
   setLayout(top_sizer);
   if (infil==NULL) {
-    jfPairFilterList* tval = new jfPairFilterList();
+    jfPairFilterList* tval = new jfPairFilterList("unnamed");
     LoadFilterData(tval);
     delete tval;
   }
@@ -330,7 +330,7 @@ jfPairFilEditPanelMulti::jfPairFilEditPanelMulti(const jfPairFilterMultiple* inf
   // next..
   setLayout(top_sizer);
   if (infil==NULL) {
-    jfPairFilterList* tval = new jfPairFilterList();
+    jfPairFilterMultiple* tval = new jfPairFilterMultiple("nothing");
     LoadFilterData(tval);
     delete tval;
   }

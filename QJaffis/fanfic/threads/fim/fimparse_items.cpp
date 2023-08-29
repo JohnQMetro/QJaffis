@@ -143,6 +143,10 @@ bool jfFIMPageParser::testIncomplete(const QString *page) const {
   assert(page != NULL);
   return page->contains("<!--Footer-->");
 }
+// --------------------------------------------
+bool jfFIMPageParser::testRatelimit(const QString *page) const {
+    return true;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++
 // the cookie
 QString jfFIMPageParser::getCookie() const {

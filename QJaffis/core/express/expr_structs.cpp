@@ -136,7 +136,7 @@ bool jfElemArray::NotOperand(const size_t& index) const {
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // runs verify names on each of the elements it can
-bool jfElemArray::VerifyNames(jfNameVerif* nameobj) {
+bool jfElemArray::VerifyNames(jfNameVerif* nameobj) const {
   // constants
   const QString fname = "jfElemArray::VerifyNames";
 	// local variables

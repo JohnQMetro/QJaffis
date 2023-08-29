@@ -88,6 +88,10 @@ bool jfFIM_FicPartParser::testIncomplete(const QString *page) const {
   return rval;
 }
 //------------------------------------
+bool jfFIM_FicPartParser::testRatelimit(const QString *page) const {
+    return true;
+}
+//------------------------------------
 QString jfFIM_FicPartParser::getCookie() const {
   return "view_mature=true";
 }

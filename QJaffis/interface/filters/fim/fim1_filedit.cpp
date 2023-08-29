@@ -4,7 +4,7 @@ Author  :   John Q Metro
 Purpose :   Editors for fim filters : thumbs rating
 Created :   July 5, 2012
 Conversion to Qt started October 15, 2013
-Updated :   October 14, 2019
+Updated :   August 5, 2023
 ******************************************************************************/
 #ifndef FIM1_FILEDIT_H_INCLUDED
   #include "fim1_filedit.h"
@@ -29,117 +29,121 @@ jfFIMThumbsPanel::jfFIMThumbsPanel(bool wrapped, QWidget* parent):QWidget(parent
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // get
-jfFimThumbsFilter* jfFIMThumbsPanel::GetNewFilter() const {
-  // variables
-  jfFimThumbsFilter* result;
-  bool lres;
-  // test
-  lres = minmax->CheckMessage();
-  if (!lres) return NULL;
+jfFimThumbsFilter* jfFIMThumbsPanel::GetNewFilter(const QString& startName) const {
+    // variables
+    jfFimThumbsFilter* result;
+    bool lres;
+    // test
+    lres = minmax->CheckMessage();
+    if (!lres) return NULL;
 
-  // things are okay
-  result = new jfFimThumbsFilter();
-  bool chk = include_rdisabled->isChecked();
-  result->SetValues(minmax->GetMin(),minmax->GetMax(),chk);
-  return result;
+    // things are okay
+    result = new jfFimThumbsFilter(startName);
+    bool chk = include_rdisabled->isChecked();
+    result->SetValues(minmax->GetMin(),minmax->GetMax(),chk);
+    return result;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // set
 bool jfFIMThumbsPanel::SetFromObj(const jfFimThumbsFilter* inval) {
-  // the cases where things are wrong
-  if (inval==NULL) return false;
-  if (!(inval->IsValid())) return false;
-  // setting things
-  bool sok = minmax->SetMinMax(inval->GetMin(),inval->GetMax());
-  if (!sok) return false;
-  include_rdisabled->setChecked(inval->GetIncludeDisabled());
-  return true;
+    // the cases where things are wrong
+    if (inval==NULL) return false;
+    // setting things
+    bool sok = minmax->SetMinMax(inval->GetMin(),inval->GetMax());
+    if (!sok) return false;
+    include_rdisabled->setChecked(inval->GetIncludeDisabled());
+    return true;
 }
 //===========================================================================
-jfFimThumbsFilterEditor::jfFimThumbsFilterEditor(jfFilterMap* infmap, const jfBaseFilter* infilt,
-      QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
-  // most things are handled by the parent constructor
-  // we create the insert.. the *actual* expression editor
-  insert_panel = new jfFIMThumbsPanel(false);
-  if (filt_pointer!=NULL) {
-    insert_panel->SetFromObj(dynamic_cast<const jfFimThumbsFilter*>(filt_pointer));
-  }
-  // finalizing things
-  insert = new QBoxLayout(QBoxLayout::TopToBottom);
-  insert->addWidget(insert_panel,0);
-  insert->addStretch(1);
-  // calling the sizers
-  ArrangeSizers();
+jfFimThumbsFilterEditor::jfFimThumbsFilterEditor(const jfFilterBase* infilt, QWidget* parent):jfBaseFilterEditor(infilt,parent) {
+    // most things are handled by the parent constructor
+    // we create the insert.. the *actual* expression editor
+    insert_panel = new jfFIMThumbsPanel(false);
+    if (filt_pointer!=NULL) {
+        insert_panel->SetFromObj(dynamic_cast<const jfFimThumbsFilter*>(filt_pointer));
+    }
+    // finalizing things
+    insert = new QBoxLayout(QBoxLayout::TopToBottom);
+    insert->addWidget(insert_panel,0);
+    insert->addStretch(1);
+    // calling the sizers
+    ArrangeSizers();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfFimThumbsFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
-  const QString fname = "jfFimThumbsFilterEditor::LoadFilter";
-  assert(infilter!=NULL);
-  // loading the data
-  filt_pointer = infilter;
-  insert_panel->SetFromObj(dynamic_cast<const jfFimThumbsFilter*>(filt_pointer));
-  NameLoad();
+void jfFimThumbsFilterEditor::LoadFilter(const jfFilterBase* infilter) {
+    const QString fname = "jfFimThumbsFilterEditor::LoadFilter";
+    assert(infilter!=NULL);
+    // loading the data
+    filt_pointer = infilter;
+    insert_panel->SetFromObj(dynamic_cast<const jfFimThumbsFilter*>(filt_pointer));
+    NameLoad();
 }
 //------------------------------------------------------------------------------
-jfBaseFilter* jfFimThumbsFilterEditor::GetFilter() {
-  jfFimThumbsFilter* toutput;
-  // getting the output
-  toutput = insert_panel->GetNewFilter();
-  namedesc_edit->ChangeObj(toutput);
-  // done
-  return toutput;
+jfFilterBase* jfFimThumbsFilterEditor::GetFilter() {
+    jfFimThumbsFilter* toutput;
+    // getting the output
+    toutput = insert_panel->GetNewFilter(namedesc_edit->TryGetName());
+    namedesc_edit->ChangeFilter(toutput);
+    // done
+    return toutput;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // checks if the contents are ok, returns false if they are not
-bool jfFimThumbsFilterEditor::GeneralCheck() const {
-  return true;
+bool jfFimThumbsFilterEditor::GeneralCheck(const jfFilterMap* filter_group) const {
+    jfFimThumbsFilter* result = insert_panel->GetNewFilter(namedesc_edit->TryGetName());
+    if (result == NULL) return false;
+    if (filter_group != NULL) {
+        if (NameNUniq(filter_group)) return false;
+    }
+    return true;
 }
+
 //===============================================================================
 // the default constructor
-jfFimGenreFilterEditor::jfFimGenreFilterEditor(const jfFilterMap* infmap, const jfFIMGenreFilter* infilt,
-          QWidget* parent):jfTagFilterEditor(infmap,infilt,parent) {
-  CompleteConstruction("Genres",infilt);
-  if (infilt==NULL) LoadBlank();
+jfFimGenreFilterEditor::jfFimGenreFilterEditor(const jfFIMGenreFilter* infilt, QWidget* parent):
+                                                jfTagFilterEditor(infilt,parent) {
+    CompleteConstruction("Genres",infilt);
+    if (infilt==NULL) LoadBlank();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // extra methods
 //---------------------------
 jfTagFilterCore* jfFimGenreFilterEditor::GetTagFilter() {
-  jfFIMGenreFilter* result;
-  result = new jfFIMGenreFilter();
-  result->SetToEmpty();
-  return result;
+    jfFIMGenreFilter* result;
+    result = new jfFIMGenreFilter(namedesc_edit->TryGetName());
+    result->SetToEmpty();
+    return result;
 }
 //---------------------------
 bool jfFimGenreFilterEditor::isListLong() const {
-  return false;
+    return false;
 }
 //---------------------------
 void jfFimGenreFilterEditor::LoadBlank() {
-  assert(fimcon::tags != NULL);
-  jfTagListing* new_blank_list = new jfTagListing();
-  fimcon::tags->SetTagsToEmpty(*new_blank_list,FIMT_genre);
-  shortlist_panel->SetTagList(new_blank_list);
+    assert(fimcon::tags != NULL);
+    jfTagListing* new_blank_list = new jfTagListing();
+    fimcon::tags->SetTagsToEmpty(*new_blank_list,FIMT_genre);
+    shortlist_panel->SetTagList(new_blank_list);
 }
 //===============================================================================
 // the default constructor
-jfFimCharacterFilterEditor::jfFimCharacterFilterEditor(const jfFilterMap* infmap,
-      const jfFIMCharacterFilter* infilt, QWidget* parent):jfTagFilterEditor(infmap,infilt,parent) {
-  CompleteConstruction("Characters", infilt);
-  if (infilt==NULL) LoadBlank();
+jfFimCharacterFilterEditor::jfFimCharacterFilterEditor(const jfFIMCharacterFilter* infilt,
+                                                       QWidget* parent):jfTagFilterEditor(infilt,parent) {
+    CompleteConstruction("Characters", infilt);
+    if (infilt==NULL) LoadBlank();
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // extra methods
 //---------------------------
 jfTagFilterCore* jfFimCharacterFilterEditor::GetTagFilter() {
-  jfFIMCharacterFilter* result;
-  result = new jfFIMCharacterFilter();
-  result->SetToEmpty();
-  return result;
+    jfFIMCharacterFilter* result;
+    result = new jfFIMCharacterFilter(namedesc_edit->TryGetName());
+    result->SetToEmpty();
+    return result;
 }
 //---------------------------
 bool jfFimCharacterFilterEditor::isListLong() const {
-  return true;
+    return true;
 }
 //---------------------------
 void jfFimCharacterFilterEditor::LoadBlank() {
@@ -190,17 +194,16 @@ bool jfFIM_RatingEditPanel::LoadValue(const jfFimRatingFilter* getfrom) {
   return true;
 }
 //--------------------------------------------------------------
-jfFimRatingFilter* jfFIM_RatingEditPanel::GetValue() const {
-  jfFimRatingFilter* resval = new jfFimRatingFilter();
+jfFimRatingFilter* jfFIM_RatingEditPanel::GetValue(const QString& name) const {
+  jfFimRatingFilter* resval = new jfFimRatingFilter(name);
   StoreValue(resval);
   return resval;
 }
 /*****************************************************************************/
-jfFIM_RatingFilterEditor::jfFIM_RatingFilterEditor(const jfBaseFilter* infilt,
-         const jfFilterMap* infmap, QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+jfFIM_RatingFilterEditor::jfFIM_RatingFilterEditor(const jfFimRatingFilter* infilt, QWidget* parent):jfBaseFilterEditor(infilt,parent) {
   // we start...
   // we create the insert.. the *actual*  editor
-  insert_panel = new jfFIM_RatingEditPanel(false,dynamic_cast<const jfFimRatingFilter*>(infilt));
+  insert_panel = new jfFIM_RatingEditPanel(false,infilt);
   // finalizing things
   insert = new QBoxLayout(QBoxLayout::TopToBottom);
   insert->addWidget(insert_panel,0);
@@ -213,20 +216,25 @@ jfFIM_RatingFilterEditor::jfFIM_RatingFilterEditor(const jfBaseFilter* infilt,
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //-------------------------------------
-void jfFIM_RatingFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfFIM_RatingFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   assert(infilter!=NULL);
   filt_pointer = infilter;
   insert_panel->LoadValue(dynamic_cast<const jfFimRatingFilter*>(filt_pointer));
   NameLoad();
 }
 //-------------------------------------
-jfBaseFilter* jfFIM_RatingFilterEditor::GetFilter() {
-  jfFimRatingFilter* result = insert_panel->GetValue();
-  namedesc_edit->ChangeObj(result);
+jfFilterBase* jfFIM_RatingFilterEditor::GetFilter() {
+  jfFimRatingFilter* result = insert_panel->GetValue(namedesc_edit->TryGetName());
+  namedesc_edit->ChangeFilter(result);
   return result;
 }
 //--------------------------------------------------------------
-bool jfFIM_RatingFilterEditor::GeneralCheck() const {
-  return true;
+bool jfFIM_RatingFilterEditor::GeneralCheck(const jfFilterMap* filter_group) const {
+    jfFimRatingFilter* result = insert_panel->GetValue(namedesc_edit->TryGetName());
+    if (result == NULL) return false;
+    if (filter_group != NULL) {
+        if (NameNUniq(filter_group)) return false;
+    }
+    return true;
 }
 /*****************************************************************************/

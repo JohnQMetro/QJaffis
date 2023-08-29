@@ -39,7 +39,7 @@ class jfExpParserClass {
   public:
     QString parse_error;
     // the constructor
-    jfExpParserClass(const QString& insource,bool issimple,jfFilterMap* inlocalmap);
+    jfExpParserClass(const QString& insource,bool issimple, const jfFilterMap* inlocalmap);
     // activation
     bool ParseExpression(size_t& outsize);
     // getting the result
@@ -56,7 +56,7 @@ class jfExpParserClass {
 		bool simple;
     jfExprToker* tokenizer;
     jfElemArray* theresult;
-    jfFilterMap* localmap;
+    const jfFilterMap* localmap;
     // private parsing helper
     bool MakeError(const QString& msg, bool back=false);
     // internal parsing methods

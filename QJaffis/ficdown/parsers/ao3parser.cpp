@@ -3,7 +3,7 @@
  * Purpose:   Fic parser: Archiveofourown.org
  * Author:    John Q Metro
  * Created:   July 6, 2016
- * Updated:   July 8, 2020
+ * Updated:   August 27, 2023
  *
  **************************************************************/
 #ifndef AO3PARSER_H
@@ -47,9 +47,16 @@ bool jfAO3_FicPartParser::testMissing(const QString *page) const {
 bool jfAO3_FicPartParser::testIncomplete(const QString *page) const {
   // constants and variables
   const QString trunc1 = "<!-- BEGIN comment section -->";
+  const QString trunc2 = "<title>You're clicking too fast!</title>";
   // checking
   assert(page!=NULL);
-  return (page->contains(trunc1));
+  if (page->contains(trunc1)) return true;
+  return (page->contains(trunc2));
+}
+//------------------------------------
+bool jfAO3_FicPartParser::testRatelimit(const QString *page) const {
+    const QString trunc2 = "<title>You're clicking too fast!</title>";
+    return !(page->contains(trunc2));
 }
 //------------------------------------
 QString jfAO3_FicPartParser::getCookie() const {

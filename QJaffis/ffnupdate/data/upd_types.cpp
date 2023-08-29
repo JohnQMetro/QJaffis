@@ -52,20 +52,23 @@ QString jfAuthorInfo::GetUrl() const {
   return result;
 }
 //****************************************************************************
-const QString jfFFNItemAuthor::FFN_AUTHORITEM_TYPE_ID = QString("FFNItemAuthor");
+const QString& IdForFFNItemAuthor() {
+    static QString FFN_AUTHORITEM_TYPE_ID = QString("FFNItemAuthor");
+    return FFN_AUTHORITEM_TYPE_ID;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++
 // constructors
 //-------------------------------------------
 jfFFNItemAuthor::jfFFNItemAuthor():jfFFNItemCore() {
-    type_labels.append(FFN_AUTHORITEM_TYPE_ID);
+    type_labels.append(IdForFFNItemAuthor());
 }
 //-------------------------------------------
 jfFFNItemAuthor::jfFFNItemAuthor(const jfSearchResultItemData& init_data):jfFFNItemCore(init_data) {
-    type_labels.append(FFN_AUTHORITEM_TYPE_ID);
+    type_labels.append(IdForFFNItemAuthor());
 }
 //-------------------------------------------
 jfFFNItemAuthor::jfFFNItemAuthor(const jfFFNItemAuthor& src):jfFFNItemCore(src) {
-    type_labels.append(FFN_AUTHORITEM_TYPE_ID);
+    type_labels.append(IdForFFNItemAuthor());
     catname = src.catname;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

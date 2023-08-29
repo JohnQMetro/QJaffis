@@ -3,7 +3,7 @@ Name    :   minmax.cpp
 Author  :   John Q Metro
 Purpose :   More Filters
 Created :   July 8, 2016, extracting from older morefilters1.h
-Updated :
+Updated :  April 8, 2023
 ******************************************************************************/
 #ifndef MINMAX_FILTER_H
   #include "minmax.h"
@@ -16,25 +16,30 @@ Updated :
 /*****************************************************************************/
 // constructors
 //---------------------------------------------------
-jfMinMaxUFilter::jfMinMaxUFilter():jfBaseFilter() {
-  validdata = false;
-  min = 0;
-  max = 0;
+jfMinMaxUFilter::jfMinMaxUFilter(const QString& name):jfFilterBase(name) {
+    min = max = 0;
 }
-//---------------------------------------------------
-jfMinMaxUFilter::jfMinMaxUFilter(size_t inmin, size_t inmax):jfBaseFilter() {
-  validdata = SetValues(inmin,inmax);
+// ------------------------
+jfMinMaxUFilter::jfMinMaxUFilter(const QString& name, size_t inmin, size_t inmax):jfFilterBase(name) {
+    assert((inmax == 0) || (inmax >= inmin));
+    min = inmin;
+    max = inmax;
 }
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // setting values
 bool jfMinMaxUFilter::SetValues(size_t inmin, size_t inmax) {
-  if ((inmax>=inmin) || (inmax==0)) {
-    min = inmin;
-    max = inmax;
-    validdata = true;
-  }
-  else validdata = false;
-  return validdata;
+    if ((inmax>=inmin) || (inmax==0)) {
+        min = inmin;
+        max = inmax;
+        return true;
+    }
+    else return false;
+}
+// -------------------------------------------
+bool jfMinMaxUFilter::SetIntValues(int inmin, int inmax) {
+    if ((inmin < 0) || (inmax < 0)) return false;
+    return SetValues(inmin, inmax);
 }
 //-----------------------------------------------------------------------
 // getting values
@@ -52,22 +57,10 @@ IntPair* jfMinMaxUFilter::GetMinMax() const {
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // redefined virtual methods
-bool jfMinMaxUFilter::isEmpty() const { return false; }
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// loading from a string representation
-//---------------------------------------------------
-bool jfMinMaxUFilter::FromString(const QString& sourcedata) {
-  jfLineParse* lparser;
-  lparser = new jfLineParse(sourcedata);
-  validdata = false;
-  if (lparser->NNotX(2)) delete lparser;
-  else {
-    if ((lparser->SIntVal(0,min)) && (lparser->SIntVal(1,max))) validdata = true;
-    delete lparser;
-  }
-  return validdata;
+bool jfMinMaxUFilter::IsEmpty() const {
+    return (min == 0) && (max == 0);
 }
-//---------------------------------------------------
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 QString jfMinMaxUFilter::ToString() const {
   QString result;
   result = QString::number(min) + ";";
@@ -75,65 +68,68 @@ QString jfMinMaxUFilter::ToString() const {
   return result;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool jfMinMaxUFilter::FromStringInner(const QString& sourcedata, QString& error_out) {
+    jfLineParse* lparser;
+    lparser = new jfLineParse(sourcedata);
+    bool isvalid = false;
+
+    if (lparser->NNotX(2)) {
+        error_out = "Input does not have 2 fields!";
+    }
+    else {
+        size_t raw_min; size_t raw_max;
+        if ((lparser->SIntVal(0,raw_min)) && (lparser->SIntVal(1,raw_max))) {
+            if ((raw_max == 0) || (raw_max >= raw_min)) {
+                isvalid = true;
+                min = raw_min;
+                max = raw_max;
+            }
+            else {
+                error_out = "Input Max and Max are not ordered correctly";
+            }
+        }
+        else error_out = "One or both of the fields is not a valid unsigned number!";
+    }
+    delete lparser;
+    return isvalid;
+}
+// -------------------------------------------------------------
 bool jfMinMaxUFilter::TestMatch(size_t invalue) const {
-  assert(invalue<=999999999);
-  if (invalue<min) return false;
-  else if (max==0) return true;
-  else return (invalue<=max);
+    if (min == 0) {
+        return (max == 0) || (invalue < max);
+    }
+    else if (invalue >= min) {
+        return (max == 0) || (invalue < max);
+    }
+    else return false;
 }
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// file i/o
-//-----------------------------------
-bool jfMinMaxUFilter::AddRestToFile(QTextStream* outfile) const {
-  QString buffer;
-  // checking and special conditions
-  if (outfile==NULL) return false;
-  // composing line 4
-  buffer = ToString();
-  (*outfile) << buffer << "\n";
-  return true;
-}
-//-----------------------------------
-bool jfMinMaxUFilter::ReadRestFromFile(jfFileReader* infile) {
-  const QString funcname = "jfMinMaxUFilter::ReadRestFromFile";
-  // input data
-  QString cline;
-  bool resx;
-  // starting checks (and reading the line)
-  assert(infile!=NULL);
-  if(!infile->ReadLine(cline,funcname)) return false;
-  // there is only one line, and one filed, so this is pretty simple
-  resx = FromString(cline);
-  if (!resx) return infile->BuildError("The min-max string is invalid!");
-  else return true;
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-/* since different types are stored together, the text file reprentation
-may have objects of varying length */
-size_t jfMinMaxUFilter::ExtraLines() const { return 1;}
+
 //***************************************************************************
+const jfFilterTypeMeta WORDCOUNT_FILTER_INFO =
+    jfFilterTypeMeta(jfFilterTypeGroup::COUNTS, "WordCountFilter",
+                     "Word Count Filter",
+                     QString("For items that have word counts, this filter passes if") +
+                     "the word count is between min and max, inclusive." +
+                     " A special rule is that if max is 0, there is not upper word limit.",
+                     IdForGenericFanfic2(),
+                     createFilter<jfWordCountFilter> );
+
+// =========================================================================
 // constructors
 //---------------------------------------------------
-jfWordCountFilter::jfWordCountFilter():jfMinMaxUFilter() {}
+jfWordCountFilter::jfWordCountFilter(const QString& name):jfMinMaxUFilter(name) {}
 //---------------------------------------------------
-jfWordCountFilter::jfWordCountFilter(size_t inmin, size_t inmax):jfMinMaxUFilter(inmin,inmax) {}
+jfWordCountFilter::jfWordCountFilter(const QString& name, size_t inmin, size_t inmax):jfMinMaxUFilter(name,inmin,inmax) {}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-QString jfWordCountFilter::GetTypeID() const {
-  return "WordCountFilter";
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// returns the list of element names campatible with this filter
-//---------------------------------------------------
-QString jfWordCountFilter::GetTypeDescription() const {
-    return "For items that have word counts, this filter passes if \
-the word count is between min and max, inclusive.";
+const jfFilterTypeMeta& jfWordCountFilter::GetTypeMetaInfo() const {
+    return WORDCOUNT_FILTER_INFO;
 }
 //---------------------------------------------------
-jfBaseFilter* jfWordCountFilter::GenCopy() const {
-  jfWordCountFilter* result;
-  result = new jfWordCountFilter(min,max);
-  CopyOver(result);
-  return result;
+jfFilterBase* jfWordCountFilter::GenCopy() const {
+    jfWordCountFilter* result;
+    result = new jfWordCountFilter(name,min,max);
+    result->description = description;
+    return result;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // the core matching method
@@ -142,7 +138,6 @@ bool jfWordCountFilter::CoreMatch(const jfSearchResultItem* testelem) const {
   const jfGenericFanfic2* rvalue;
   size_t cvalue;
   // checks
-  assert(testelem!=NULL);
   // determining the type
   rvalue = dynamic_cast<const jfGenericFanfic2*>(testelem);
   cvalue = rvalue->GetWordcount();

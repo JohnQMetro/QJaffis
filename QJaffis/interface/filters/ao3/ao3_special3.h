@@ -3,7 +3,7 @@ Name    :   ao3_special3.h
 Author  :   John Q Metro
 Purpose :   Declares some interface panels for some AO3 Filters
 Created :   May 14, 2014
-Updated :   August 5, 2015
+Updated :   April 16, 2023
 ******************************************************************************/
 #ifndef AO3_SPECIAL3_H
 #define AO3_SPECIAL3_H
@@ -31,12 +31,12 @@ class jfAO3FandomFilterEditor : public jfBaseFilterEditor {
     Q_OBJECT
   public:
     // constructor
-      jfAO3FandomFilterEditor(const jfAO3FandomFilter* infilt, const jfFilterMap* infmap, QWidget* parent = NULL);
+      jfAO3FandomFilterEditor(const jfAO3FandomFilter* infilt , QWidget* parent = NULL);
     // implemented virtual methods
-      virtual void LoadFilter(const jfBaseFilter* infilter);
-      virtual jfBaseFilter* GetFilter();
+      virtual void LoadFilter(const jfFilterBase* infilter) override;
+      virtual jfFilterBase* GetFilter() override;
     // checking
-      bool GeneralCheck() const;
+      virtual bool GeneralCheck(const jfFilterMap* infmap) const override;
   signals:
       void SendCrossCheck(bool value);
   public slots:
@@ -59,11 +59,12 @@ class jfAO3FandomFilterEditor : public jfBaseFilterEditor {
       const jfAO3FandomFilter* typed_fpointer;
 };
 //==============================================================================
-// the actual kudo count filter editor, a specialization of jfZeroToMaxFilterEditor
+// the actual kudo/favs count filter editor, a specialization of jfZeroToMaxFilterEditor
+// NOTE: for now, I will keep the separate edtors
 class jfAO3KudoFilterEditor : public jfZeroToMaxFilterEditor {
   public:
     // the default constructor
-    jfAO3KudoFilterEditor(const jfFilterMap* infmap, const jfAO3KudoFilter* infilt, QWidget* parent = NULL);
+    jfAO3KudoFilterEditor(const jfFavKudoFilter* infilt, QWidget* parent = NULL);
   private:
     virtual jfMinMaxUFilter* MakeTypedMinMax() const;
 };

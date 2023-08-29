@@ -30,27 +30,30 @@
 //----------------------------------------------
 #include <assert.h>
 //*************************************************************************
-const QString jfFFNItemCore::FFN_CORE_TYPE_ID = QString("FFN_Core_Fanfic");
+const QString& IdForFFNItemCore() {
+    static QString FFN_CORE_TYPE_ID = QString("FFN_Core_Fanfic");
+    return FFN_CORE_TYPE_ID;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // constructors
 //---------------------------------------
 jfFFNItemCore::jfFFNItemCore():jfGenericFanfic3() {
-    type_labels.append(FANFIC_PAIRS_TYPE_ID);
-    type_labels.append(FFN_CORE_TYPE_ID);
+    type_labels.append(IdForFanficPairs());
+    type_labels.append(IdForFFNItemCore());
     favs = 0;
     isupdated = false;
 }
 // -----------------------------
 jfFFNItemCore::jfFFNItemCore(const jfSearchResultItemData& init_data):jfGenericFanfic3(init_data) {
-    type_labels.append(FANFIC_PAIRS_TYPE_ID);
-    type_labels.append(FFN_CORE_TYPE_ID);
+    type_labels.append(IdForFanficPairs());
+    type_labels.append(IdForFFNItemCore());
     favs = 0;
     isupdated = false;
 }
 // ----------------------------
 jfFFNItemCore::jfFFNItemCore(const jfFFNItemCore& src):jfGenericFanfic3(src) {
-    type_labels.append(FANFIC_PAIRS_TYPE_ID);
-    type_labels.append(FFN_CORE_TYPE_ID);
+    type_labels.append(IdForFanficPairs());
+    type_labels.append(IdForFFNItemCore());
     language = src.language;
     isupdated = src.isupdated;
     published = src.published;
@@ -189,21 +192,24 @@ bool jfFFNItemCore::ReadMoreExtraStuff(jfFileReader* infile) {
 }
 // ===============================================================================
 // ================================================================================
-const QString jfFFNItem::FFN_ITEM_TYPE_ID = QString("FFNItem");
+const QString& IdForFFNItem() {
+    static QString FFN_ITEM_TYPE_ID = QString("FFNItem");
+    return FFN_ITEM_TYPE_ID;
+}
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 jfFFNItem::jfFFNItem():jfFFNItemCore() {
-    type_labels.append(FFN_ITEM_TYPE_ID);
+    type_labels.append(IdForFFNItem());
     cat_link = NULL;
 }
 // ---------------------------------
 jfFFNItem::jfFFNItem(const jfSearchResultItemData& init_data):jfFFNItemCore(init_data) {
-    type_labels.append(FFN_ITEM_TYPE_ID);
+    type_labels.append(IdForFFNItem());
     cat_link = NULL;
 }
 //-------------------------------------------------------------------
 // copy constructor
 jfFFNItem::jfFFNItem(const jfFFNItem& src):jfFFNItemCore(src) {
-    type_labels.append(FFN_ITEM_TYPE_ID);
+    type_labels.append(IdForFFNItem());
     cat_link = src.cat_link;
 }
 

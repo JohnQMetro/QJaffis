@@ -127,7 +127,6 @@ class jfFFN_CrossoverSection : public jfBaseObj {
     QStringList* GetCrossList(const QString& catx) const;
     QStringList* GetCatNames() const;
     QString NameAtIndex(bool addcross) const;
-    QString NameAtUrlIndex() const;
     int StoryCountAtIndex() const;
     int EstStoryCount(const QString& hcross_name) const;
     bool GetDoUpdateAtIndex() const;

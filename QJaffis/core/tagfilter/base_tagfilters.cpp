@@ -3,7 +3,7 @@
 // Author :     John Q Metro
 // Purpose :    The base tag filters
 // Created:     August 20, 2022
-// Updated:     August 26, 2022
+// Updated:     April 8, 2023 (Rebasing)
 //***************************************************************************
 
 #include "base_tagfilters.h"
@@ -15,47 +15,24 @@
 #include <QStringList>
 #include <assert.h>
 //***************************************************************************
-
 // base filter where a single match in a list counts
-jfMatchOneTagFilterBase::jfMatchOneTagFilterBase(const jfGeneralTagListsGroup* in_source_list):jfMultiMatchBaseFilter() {
-    assert(in_source_list != NULL);
-    source_list = in_source_list;
+
+jfMatchOneTagFilterBase::jfMatchOneTagFilterBase(const QString& filter_name):jfMatchTagFilterBase(filter_name) {
 }
-// -----------------------------------
-bool jfMatchOneTagFilterBase::ChangeSourceList(const jfGeneralTagListsGroup* in_source_list) {
-    if (in_source_list == NULL) return false;
-    source_list = in_source_list;
-    return true;
+// ------------------------------------------------
+jfMatchOneTagFilterBase::jfMatchOneTagFilterBase(const QString& filter_name,
+            const jfGeneralTagListsGroup* in_source_list):jfMatchTagFilterBase(filter_name, in_source_list) {
+
 }
-// ----------------------------------------
-bool jfMatchOneTagFilterBase::SetFromSource(jfMultiMatchSource* in_source) {
-    if (main == NULL) main = new jfMatchFilterCore();
-    else main->Clear();
-    main->SetFromSource(in_source, (*source_list));
-    validdata = !(main->BadExpression());
-    return validdata;
+// ------------------------------------------------
+jfMatchOneTagFilterBase::jfMatchOneTagFilterBase(QString&& filter_name,
+            const jfGeneralTagListsGroup* in_source_list):jfMatchTagFilterBase(filter_name, in_source_list) {
+
 }
 // ++++++++++++++++++++++++++++++++++
 // implemented methods
-bool jfMatchOneTagFilterBase::isEmpty() const {
+bool jfMatchOneTagFilterBase::IsEmpty() const {
     return (main == NULL) || (main->IsEmpty());
-}
-// --------------------------------------
-bool jfMatchOneTagFilterBase::FromString(const QString& sourcedata) {
-    // splitting
-    jfLineParse* lparser = new jfLineParse(sourcedata);
-    if (lparser->NNotX(2)) {
-        delete lparser;
-        return false;
-    }
-    QString csv = lparser->UnEscStrE(0);
-    QString exp = lparser->UnEscStrE(1);
-    delete lparser;
-    // creating main
-    if (main == NULL) main = new jfMatchFilterCore();
-    main->SetFromRawParts(csv, exp, (*source_list));
-    validdata = !(main->BadExpression());
-    return validdata;
 }
 // --------------------------------------
 QString jfMatchOneTagFilterBase::ToString() const {
@@ -65,12 +42,34 @@ QString jfMatchOneTagFilterBase::ToString() const {
 }
 // ---------------------------------------
 bool jfMatchOneTagFilterBase::IsUsable() const {
-    if (main == NULL) return false;
+    if ((main == NULL) || (source_list == NULL)) return false;
     else return main->IsUsable();
 }
 // ++++++++++++++++++++++++++++++++++
 jfMatchOneTagFilterBase::~jfMatchOneTagFilterBase() {
-    source_list = NULL;
+}
+// +++++++++++++++++++++++++++++++++++
+bool jfMatchOneTagFilterBase::FromStringInner(const QString& sourcedata, QString& error_out) {
+    assert(source_list != NULL);
+    // splitting
+    jfLineParse* lparser = new jfLineParse(sourcedata);
+    if (lparser->NNotX(2)) {
+        delete lparser;
+        error_out = "Source does not have 2 fields!";
+        return false;
+    }
+    QString csv = lparser->UnEscStrE(0);
+    QString exp = lparser->UnEscStrE(1);
+    delete lparser;
+
+    // creating main
+    jfMatchFilterCore* new_main = FromStringsHelper(csv, exp, error_out);
+    if (new_main == NULL) return false;
+
+    // replacing
+    if (main != NULL) delete main;
+    main = new_main;
+    return true;
 }
 // ++++++++++++++++++++++++++++++++++
 bool jfMatchOneTagFilterBase::InternalMatch(const QStringList& incheck) const {
@@ -83,31 +82,24 @@ bool jfMatchOneTagFilterBase::InternalMatch(const QStringList& incheck) const {
 // base percentage tag match filter
 
 // the constructors
-// -------------------------
-jfMatchPercentTagFilterBase::jfMatchPercentTagFilterBase(const jfGeneralTagListsGroup* in_source_list):jfMultiMatchBaseFilter() {
-    assert(in_source_list != NULL);
-    source_list = in_source_list;
+// ---------------------------------
+jfMatchPercentTagFilterBase::jfMatchPercentTagFilterBase(const QString& filter_name):jfMatchTagFilterBase(filter_name) {
     min_percentage = 0;
     match_empty = true;
 }
-// -------------------------
-bool jfMatchPercentTagFilterBase::ChangeSourceList(const jfGeneralTagListsGroup* in_source_list) {
-    if (in_source_list == NULL) return false;
-    source_list = in_source_list;
-    return true;
+// ---------------------------------
+jfMatchPercentTagFilterBase::jfMatchPercentTagFilterBase(const QString& filter_name,
+        const jfGeneralTagListsGroup* in_source_list):jfMatchTagFilterBase(filter_name, in_source_list) {
+    min_percentage = 0;
+    match_empty = true;
 }
-const jfGeneralTagListsGroup* jfMatchPercentTagFilterBase::GetSourceList() const {
-    return source_list;
+// ---------------------------------
+jfMatchPercentTagFilterBase::jfMatchPercentTagFilterBase(QString&& filter_name,
+        const jfGeneralTagListsGroup* in_source_list):jfMatchTagFilterBase(filter_name, in_source_list) {
+    min_percentage = 0;
+    match_empty = true;
 }
-// -------------------------
-bool jfMatchPercentTagFilterBase::SetFromSource(jfMultiMatchSource* in_source) {
-    if (main == NULL) main = new jfMatchFilterCore();
-    else main->Clear();
-    main->SetFromSource(in_source, (*source_list));
-    validdata = !(main->BadExpression());
-    return validdata;
-}
-// -------------------------
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 bool jfMatchPercentTagFilterBase::SetPercent(size_t in_min_percentage, bool in_match_empty) {
     if (in_min_percentage > 100) return false;
     min_percentage = in_min_percentage;
@@ -124,38 +116,8 @@ bool jfMatchPercentTagFilterBase::GetMatchEmpty() const {
 }
 // ++++++++++++++++++++++++++++++++++++
 // implemented methods
-bool jfMatchPercentTagFilterBase::isEmpty() const {
+bool jfMatchPercentTagFilterBase::IsEmpty() const {
     return match_empty && ((main == NULL) || main->IsEmpty());
-}
-// -------------------------
-bool jfMatchPercentTagFilterBase::FromString(const QString& sourcedata) {
-    jfLineParse* lparser = new jfLineParse(sourcedata);
-    if (lparser->NNotX(4)) {
-        delete lparser;
-        return false;
-    }
-    // parsing the percentage and match empty
-    QString oerr;
-    size_t pct;
-    if (!lparser->SBoundVal(0,100,pct,oerr)) {
-        delete lparser;
-        return false;
-    }
-    bool me;
-    if (!lparser->BoolVal(1,me)) {
-        delete lparser;
-        return false;
-    }
-    // the list names and expression
-    QString csv = lparser->UnEscStrE(2);
-    QString exp = lparser->UnEscStrE(3);
-    delete lparser;
-
-    // creating main
-    if (main == NULL) main = new jfMatchFilterCore();
-    main->SetFromRawParts(csv, exp, (*source_list));
-    validdata = !(main->BadExpression());
-    return validdata;
 }
 // -------------------------
 QString jfMatchPercentTagFilterBase::ToString() const {
@@ -173,12 +135,48 @@ bool jfMatchPercentTagFilterBase::IsUsable() const {
 }
 // ++++++++++++++++++++++++++++++++++++
 jfMatchPercentTagFilterBase::~jfMatchPercentTagFilterBase() {
-    source_list = NULL;
+
 }
 // ++++++++++++++++++++++++++++++++++++
+bool jfMatchPercentTagFilterBase::FromStringInner(const QString& sourcedata, QString& error_out) {
+    jfLineParse* lparser = new jfLineParse(sourcedata);
+    if (lparser->NNotX(4)) {
+        delete lparser;
+        return false;
+    }
+    // parsing the percentage and match empty
+    QString oerr;
+    size_t pct;
+    if (!lparser->SBoundVal(0,100,pct,oerr)) {
+        delete lparser;
+        error_out = "% field was not a valid 0 to 100 integer!";
+        return false;
+    }
+    bool me;
+    if (!lparser->BoolVal(1,me)) {
+        delete lparser;
+        error_out = "The match empty field was neither true nor false!";
+        return false;
+    }
+    // the list names and expression
+    QString csv = lparser->UnEscStrE(2);
+    QString exp = lparser->UnEscStrE(3);
+    delete lparser;
+
+    // creating main
+    jfMatchFilterCore* new_main = FromStringsHelper(csv, exp, error_out);
+    if (new_main == NULL) return false;
+
+    // replacing the contents
+    if (main != NULL) delete main;
+    main = new_main;
+    min_percentage = pct;
+    match_empty = me;
+    return true;
+}
+// ---------------------------------------------
 bool jfMatchPercentTagFilterBase::InternalMatch(const QStringList& incheck) const {
-    if (validdata == false) return false; // no matter what
-    else if (incheck.isEmpty()) {
+    if (incheck.isEmpty()) {
         return match_empty;
     }
     else if (main != NULL) {
@@ -199,36 +197,31 @@ void jfMatchPercentTagFilterBase::CoreCopy(const jfMatchPercentTagFilterBase& mm
     min_percentage = mm_source.min_percentage;
     match_empty = mm_source.match_empty;
 }
+
 // ==========================================================================================
 // base percentage tag match filter
 // the constructors
-jfMatchFilteredPercentTagFilterBase::jfMatchFilteredPercentTagFilterBase(const jfGeneralTagListsGroup* in_source_list):jfMultiMatchBaseFilter() {
-    assert(in_source_list != NULL);
-    source_list = in_source_list;
+jfMatchFilteredPercentTagFilterBase::jfMatchFilteredPercentTagFilterBase(const QString& filter_name):jfMatchTagFilterBase(filter_name) {
     prefilter = NULL;
     min_percentage = 0;
     match_empty = true;
 }
-// -----------------------------------
-bool jfMatchFilteredPercentTagFilterBase::ChangeSourceList(const jfGeneralTagListsGroup* in_source_list) {
-    if (in_source_list == NULL) return false;
-    source_list = in_source_list;
-    return true;
+//-----------------------------------------------------
+jfMatchFilteredPercentTagFilterBase::jfMatchFilteredPercentTagFilterBase(const QString& filter_name,
+        const jfGeneralTagListsGroup* in_source_list):jfMatchTagFilterBase(filter_name, in_source_list) {
+    prefilter = NULL;
+    min_percentage = 0;
+    match_empty = true;
 }
-const jfGeneralTagListsGroup* jfMatchFilteredPercentTagFilterBase::GetSourceList() const {
-    return source_list;
+//-----------------------------------------------------
+jfMatchFilteredPercentTagFilterBase::jfMatchFilteredPercentTagFilterBase(QString&& filter_name,
+        const jfGeneralTagListsGroup* in_source_list):jfMatchTagFilterBase(filter_name, in_source_list) {
+    prefilter = NULL;
+    min_percentage = 0;
+    match_empty = true;
 }
-// -----------------------------------
-bool jfMatchFilteredPercentTagFilterBase::SetMainFromSource(jfMultiMatchSource* in_source) {
-    if (main == NULL) main = new jfMatchFilterCore();
-    else main->Clear();
-    main->SetFromSource(in_source, (*source_list));
-    bool main_valid = !main->BadExpression();
-    bool pre_valid_or_empty = (prefilter == NULL) || prefilter->IsEmpty() || !(prefilter->BadExpression());
-    validdata = main_valid && pre_valid_or_empty;
-    return main_valid;
-}
-// -----------------------------
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 bool jfMatchFilteredPercentTagFilterBase::SetPercent(size_t in_min_percentage, bool in_match_empty) {
     if (in_min_percentage > 100) return false;
     min_percentage = in_min_percentage;
@@ -246,50 +239,8 @@ bool jfMatchFilteredPercentTagFilterBase::GetMatchEmpty() const {
 }
 // +++++++++++++++++++++++++++++++++++++++++
 // implemented methods
-bool jfMatchFilteredPercentTagFilterBase::isEmpty() const {
+bool jfMatchFilteredPercentTagFilterBase::IsEmpty() const {
     return (main == NULL) || main->IsEmpty();
-}
-//--------------------------------------------
-bool jfMatchFilteredPercentTagFilterBase::FromString(const QString& sourcedata) {
-    jfLineParse* lparser = new jfLineParse(sourcedata);
-    if (lparser->NNotX(6)) {
-        delete lparser;
-        return false;
-    }
-    // parsing the percentage and match empty
-    QString oerr;
-    size_t pct;
-    if (!lparser->SBoundVal(0,100,pct,oerr)) {
-        delete lparser;
-        return false;
-    }
-    bool me;
-    if (!lparser->BoolVal(1,me)) {
-        delete lparser;
-        return false;
-    }
-    min_percentage = pct;
-    match_empty = me;
-    // the list names and expression
-    QString main_csv = lparser->UnEscStrE(2);
-    QString main_exp = lparser->UnEscStrE(3);
-    QString pre_csv = lparser->UnEscStrE(4);
-    QString pre_exp = lparser->UnEscStrE(5);
-    delete lparser;
-    // main convert
-    if (main == NULL) main = new jfMatchFilterCore();
-    else main->Clear();
-    main->SetFromRawParts(main_csv, main_exp, (*source_list));
-
-    // pre-filter convert
-    if (prefilter == NULL) prefilter = new jfMatchFilterCore();
-    else prefilter->Clear();
-    prefilter->SetFromRawParts(pre_csv, pre_exp, (*source_list));
-
-    // determining validity
-    bool any_bad = (main->BadExpression()) || (prefilter->BadExpression());
-    validdata = !any_bad;
-    return validdata;
 }
 //--------------------------------------------
 QString jfMatchFilteredPercentTagFilterBase::ToString() const {
@@ -317,12 +268,28 @@ bool jfMatchFilteredPercentTagFilterBase::IsUsable() const {
 // +++++++++++++++++++++++++++++++++++++++++
 // the pre-filter
 bool jfMatchFilteredPercentTagFilterBase::SetPreFilterFromSource(jfMultiMatchSource* in_source) {
-    if (prefilter == NULL) prefilter = new jfMatchFilterCore();
-    else prefilter->Clear();
-    prefilter->SetFromSource(in_source, (*source_list));
-    bool pre_valid = !prefilter->BadExpression();
-    validdata = validdata && pre_valid;
-    return pre_valid;
+    if (in_source == NULL) {
+        ClearPreFilter();
+        return true;
+    }
+
+
+    jfMatchFilterCore* new_prefilter = new jfMatchFilterCore();
+    new_prefilter->SetFromSource(in_source, (*source_list));
+    if (new_prefilter->BadExpression()) {
+        delete new_prefilter;
+        return false;
+    }
+    if (prefilter != NULL) delete prefilter;
+    prefilter = new_prefilter;
+    return true;
+}
+// -----------------------------
+void jfMatchFilteredPercentTagFilterBase::ClearPreFilter() {
+    if (prefilter != NULL) {
+        delete prefilter;
+        prefilter = NULL;
+    }
 }
 // -----------------------------
 QString jfMatchFilteredPercentTagFilterBase::PreFilterExpression() const {
@@ -336,26 +303,68 @@ QStringList jfMatchFilteredPercentTagFilterBase::PreFilterListNames() const {
 }
 // +++++++++++++++++++++++++++++++++++++++++
 jfMatchFilteredPercentTagFilterBase::~jfMatchFilteredPercentTagFilterBase() {
-    if (prefilter == NULL) {
-        delete prefilter;
-        prefilter = NULL;
+    ClearPreFilter();
+}
+// +++++++++++++++++++++++++++++++++++++++++
+bool jfMatchFilteredPercentTagFilterBase::FromStringInner(const QString& sourcedata, QString& error_out) {
+
+    jfLineParse* lparser = new jfLineParse(sourcedata);
+    if (lparser->NNotX(6)) {
+        delete lparser;
+        return false;
     }
-    source_list = NULL;
+    // parsing the percentage and match empty
+    QString oerr;
+    size_t pct;
+    if (!lparser->SBoundVal(0,100,pct,oerr)) {
+        delete lparser;
+        return false;
+    }
+    bool me;
+    if (!lparser->BoolVal(1,me)) {
+        delete lparser;
+        return false;
+    }
+
+    // the list names and expression
+    QString main_csv = lparser->UnEscStrE(2);
+    QString main_exp = lparser->UnEscStrE(3);
+    QString pre_csv = lparser->UnEscStrE(4);
+    QString pre_exp = lparser->UnEscStrE(5);
+    delete lparser;
+
+    // main convert
+    jfMatchFilterCore* main_core = FromStringsHelper(main_csv, main_exp, error_out);
+    if (main_core == NULL) return false;
+
+    // pre-filter convert
+    jfMatchFilterCore* prefilter_core = FromStringsHelper(pre_csv, pre_exp, error_out);
+    if (prefilter_core == NULL) {
+        delete main_core;
+        return false;
+    }
+
+    // finishing off
+    min_percentage = pct;
+    match_empty = me;
+    if (main != NULL) delete main;
+    main = main_core;
+    if (prefilter != NULL) delete prefilter;
+    prefilter = (prefilter_core->IsEmpty()) ? NULL : prefilter_core;
+
+    return true;
 }
 // +++++++++++++++++++++++++++++++++++++++++
 bool jfMatchFilteredPercentTagFilterBase::InternalMatch(const QStringList& incheck) const {
-    if (validdata == false) return false; // no matter what
-    else if (incheck.isEmpty()) {
+    if (incheck.isEmpty()) {
         return match_empty;
     }
     else if (main != NULL) {
-        if (main->BadExpression()) return false;
-        else if (main->IsEmpty()) return true;
+        if (main->IsEmpty()) return true;
         else {
             QStringList ncheck = incheck;
             // double checking the pre-filter
             if (prefilter != NULL) {
-                if (prefilter->BadExpression()) return false;
                 if (!prefilter->IsEmpty()) {
                     prefilter->matcher->FilterList(ncheck, true);
                     if (ncheck.isEmpty()) return match_empty;

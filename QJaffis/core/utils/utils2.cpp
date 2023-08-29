@@ -4,7 +4,7 @@ Basic   : Defines some more utility functions and things used in the other files
 Author  : John Q Metro
 Started : May 13, 2009
 Conversion to QT started : February 23, 2013
-Updated : August 20, 2022
+Updated : August 25, 2023
 Notes   :
 
 ******************************************************************************/
@@ -502,6 +502,19 @@ bool jfFileReader::ReadParseLine(size_t fmin, size_t fmax, const QString& finnam
   if (lp.Num()<fmin) return BuildError("The line has more than " + QString::number(fmax) + " fields!");
   return true;
 }
+// --------------------------------------------------
+// we use the internal 'oldline' without reading a new one. Useful if you need to try and parse a line more than twice
+bool jfFileReader::ParseOldSLine(size_t fcount, const QString& finname) {
+    if (!finname.isEmpty()) func_name = finname;
+    QString oline = oldline;
+    if (oline.left(3)!="###") {
+        return BuildError("Line does not start with ###! "+oline);
+    }
+    else {
+        oline = oline.mid(3);
+        return SetParse(oline,fcount);
+    }
+}
 //------------------------------
 bool jfFileReader::ReadLast(const QString& finname) {
   if (!finname.isEmpty()) func_name = finname;
@@ -526,6 +539,11 @@ bool jfFileReader::GetType(QString& outtype, const QString& finname) {
     if (lp.Num()==0) return BuildError("No Fields!");
     outtype = lp.UnEscStr(0);
     if (outtype.isEmpty()) return BuildError("Type is empty!");
+    // the new format has 'Fil' is position 0, the actual type is in position 1
+    else if (outtype == "Fil") {
+        outtype = lp.UnEscStr(1);
+        if (outtype.isEmpty()) return BuildError("Type is empty!");
+    }
     return true;
   }
 }

@@ -3,7 +3,7 @@ Name    :   ffn_filteredit1.cpp
 Author  :   John Q Metro
 Purpose :   Defines some custom FNN Filter Editors
 Created :   July 8, 2016 (classes taken from other files)
-Updated :   July 8, 2016
+Updated :   August 22, 2023
 ******************************************************************************/
 #ifndef FFN_FILTEREDIT1_H
   #include "ffn_filteredit1.h"
@@ -15,20 +15,20 @@ Updated :   July 8, 2016
 #include <assert.h>
 /*****************************************************************************/
 // the default constructor
-jfFFN_CategoryFilterEditor::jfFFN_CategoryFilterEditor(const jfFilterMap* infmap,
-        const jfFFN_CategoryExprFilter* infilt, QWidget* parent):jfSimpleSFilterEditor(infmap,infilt,parent) {
+jfFFN_CategoryFilterEditor::jfFFN_CategoryFilterEditor(const jfFFN_CategoryExprFilter* infilt,
+                                   QWidget* parent):jfSimpleSFilterEditor(infilt,parent) {
   // most things are handled by the parent constructor
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // creating a filter from a simple expression
 jfSimpleExpFilterCore* jfFFN_CategoryFilterEditor::MakeTypedFilter(jfSimpleExpr* inpval) {
-  jfFFN_CategoryExprFilter* result = new jfFFN_CategoryExprFilter(inpval);
+  jfFFN_CategoryExprFilter* result = new jfFFN_CategoryExprFilter(namedesc_edit->TryGetName(),inpval);
   return result;
 }
 //===============================================================================
 // the default constructor
-jfFFNGenresFilterEditor::jfFFNGenresFilterEditor(const jfFilterMap* infmap, const jfFFNGenresFilter* infilt,
-                  QWidget* parent): jfTagFilterEditor(infmap,infilt,parent) {
+jfFFNGenresFilterEditor::jfFFNGenresFilterEditor(const jfFFNGenresFilter* infilt,
+                                    QWidget* parent): jfTagFilterEditor(infilt,parent) {
   // starting
   CompleteConstruction("Genres",infilt);
   if (infilt==NULL) LoadBlank();
@@ -38,7 +38,7 @@ jfFFNGenresFilterEditor::jfFFNGenresFilterEditor(const jfFilterMap* infmap, cons
 //---------------------------
 jfTagFilterCore* jfFFNGenresFilterEditor::GetTagFilter() {
   jfFFNGenresFilter* result;
-  result = new jfFFNGenresFilter();
+  result = new jfFFNGenresFilter(namedesc_edit->TryGetName());
   result->SetToEmpty();
   return result;
 }
@@ -52,8 +52,8 @@ bool jfFFNGenresFilterEditor::isListLong() const {
 }
 //============================================================================
 // constructor
-jfFFN_RatingEditPanel::jfFFN_RatingEditPanel(bool horizontal,
-            const jfFFNRatingFilter* invalue, QWidget* parent):QWidget(parent) {
+jfFFN_RatingEditPanel::jfFFN_RatingEditPanel(bool horizontal, const jfFFNRatingFilter* invalue,
+                                             QWidget* parent):QWidget(parent) {
   // creating gui elemnts
   kch = new QCheckBox("K");
   kpch = new QCheckBox("K+");
@@ -107,14 +107,14 @@ bool jfFFN_RatingEditPanel::LoadValue(const jfFFNRatingFilter* getfrom) {
   return true;
 }
 //--------------------------------------------------------------
-jfFFNRatingFilter* jfFFN_RatingEditPanel::GetValue() const {
-  jfFFNRatingFilter* resval = new jfFFNRatingFilter();
+jfFFNRatingFilter* jfFFN_RatingEditPanel::GetValue(const QString& name) const {
+  jfFFNRatingFilter* resval = new jfFFNRatingFilter(name);
   StoreValue(resval);
   return resval;
 }
 /*****************************************************************************/
-jfFFN_RatingFilterEditor::jfFFN_RatingFilterEditor(const jfBaseFilter* infilt, const jfFilterMap* infmap,
-        QWidget* parent):jfBaseFilterEditor(infmap,infilt,parent) {
+jfFFN_RatingFilterEditor::jfFFN_RatingFilterEditor(const jfFFNRatingFilter* infilt,
+                                QWidget* parent):jfBaseFilterEditor(infilt,parent) {
   // we start...
   // we create the insert.. the *actual*  editor
   insert_panel = new jfFFN_RatingEditPanel(false,dynamic_cast<const jfFFNRatingFilter*>(infilt));
@@ -128,76 +128,22 @@ jfFFN_RatingFilterEditor::jfFFN_RatingFilterEditor(const jfBaseFilter* infilt, c
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // implemented virtual methods
 //-------------------------------------
-void jfFFN_RatingFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
+void jfFFN_RatingFilterEditor::LoadFilter(const jfFilterBase* infilter) {
   assert(infilter!=NULL);
   filt_pointer = infilter;
   insert_panel->LoadValue(dynamic_cast<const jfFFNRatingFilter*>(filt_pointer));
   NameLoad();
 }
 //-------------------------------------
-jfBaseFilter* jfFFN_RatingFilterEditor::GetFilter() {
-  jfFFNRatingFilter* result = insert_panel->GetValue();
-  namedesc_edit->ChangeObj(result);
+jfFilterBase* jfFFN_RatingFilterEditor::GetFilter() {
+  jfFFNRatingFilter* result = insert_panel->GetValue(namedesc_edit->TryGetName());
+  namedesc_edit->ChangeFilter(result);
   return result;
 }
 //--------------------------------------------------------------
-bool jfFFN_RatingFilterEditor::GeneralCheck() const {
-  return true;
+
+bool jfFFN_RatingFilterEditor::GeneralCheck(const jfFilterMap* filter_group) const {
+    if (NameNUniq(filter_group)) return false;
+    else return true;
 }
 //****************************************************************************
-jfFavsCountPanel::jfFavsCountPanel(bool wrapped, QWidget* parent):jfMinMaxEditor("Favs",wrapped,false,true,parent) {
-  // setting some critical values
-  SetRange(0,500); // anymore than 500 favs is a must-read
-  zeromaxokay = true;
-  SetMinMax(0,0);
-}
-
-//===========================================================================
-jfFFNFavsFilterEditor::jfFFNFavsFilterEditor(const jfFilterMap* infmap, const jfFFNFavsFilter* infilt,
-                     QWidget* parent):jfBaseFilterEditor(infmap, infilt,parent) {
-  // most things are handled by the parent constructor
-  // we create the insert.. the *actual* expression editor
-  insert_panel = new jfFavsCountPanel(false);
-  if (filt_pointer!=NULL) {
-    insert_panel->SetMin(infilt->GetMin());
-    insert_panel->SetMax(infilt->GetMax());
-  }
-  // finalizing things
-  insert = new QBoxLayout(QBoxLayout::TopToBottom);
-  insert->addWidget(insert_panel,0);
-  insert->addStretch(1);
-  // calling the sizers
-  ArrangeSizers();
-}
-//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-void jfFFNFavsFilterEditor::LoadFilter(const jfBaseFilter* infilter) {
-  const QString fname = "jfFFNFavsFilterEditor::LoadFilter";
-  assert(infilter!=NULL);
-  const jfFFNFavsFilter* tpointer;
-  // loading the data
-  filt_pointer = infilter;
-  tpointer = dynamic_cast<const jfFFNFavsFilter*>(filt_pointer);
-  insert_panel->SetMin(tpointer->GetMin());
-  insert_panel->SetMax(tpointer->GetMax());
-  NameLoad();
-}
-//------------------------------------------------------------------------------
-jfBaseFilter* jfFFNFavsFilterEditor::GetFilter() {
-  jfFFNFavsFilter* toutput;
-  // checking
-  if (!(insert_panel->CheckMessage())) return NULL;
-  // creating and loading the output filter
-  toutput = new jfFFNFavsFilter();
-  size_t min = insert_panel->GetMin();
-  toutput->SetValues(min,insert_panel->GetMax());
-  namedesc_edit->ChangeObj(toutput);
-  // done
-  return toutput;
-}
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// checks if the contents are ok, returns false if they are not
-bool jfFFNFavsFilterEditor::GeneralCheck() const {
-  return insert_panel->Check();
-}
-/*****************************************************************************/
-

@@ -1,14 +1,15 @@
 /******************************************************************************
 Name    :   filter_editor.h
 Author  :   John Q Metro
-Purpose :   Declares the interface for a local and global filter editor
+Purpose :   Declares the interface for a local filter editor
 Created :   August 13, 2009
 Conversion to Qt Started Oct 24, 2013
-Updated :   July 24, 2022
+Updated :   April 9, 2023
 ******************************************************************************/
 #ifndef FILTER_EDITOR_H_INCLUDED
 #define FILTER_EDITOR_H_INCLUDED
 #endif // FILTER_EDITOR_H_INCLUDED
+
 #ifndef FILTER_WIDGETS_H_INCLUDED
   #include "filter_picker.h"
 #endif // FILTER_WIDGETS_H_INCLUDED
@@ -21,6 +22,8 @@ Updated :   July 24, 2022
 #ifndef JFILTERGROUPS
   #include "../../core/filters/filter_groups.h"
 #endif
+
+#include "../../core/filters/base/basefilter.h"
 //--------------------------------------------------------------------------------
 #include <QComboBox>
 #include <QGroupBox>
@@ -36,10 +39,10 @@ class jfFilterPicker2 : public jfFilterPickerBase {
     // the constructor
     jfFilterPicker2(QWidget* parent);
     // item manipulation
-    bool InsertAtIndex(const size_t& nindex, const jfBaseFilter* infilt);
-    bool ReplaceSelected(const size_t& nindex, const jfBaseFilter* infilt);
+    bool InsertAtIndex(const size_t& nindex, const jfFilterBase* infilt);
+    bool ReplaceSelected(const size_t& nindex, const jfFilterBase* infilt);
     bool RenameItem(size_t oldindex, size_t newindex, QString newname);
-    bool ReplaceAtIndex(size_t oldindex, size_t newindex, const jfBaseFilter* infilt);
+    bool ReplaceAtIndex(size_t oldindex, size_t newindex, const jfFilterBase* infilt);
   protected:
 };
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -95,6 +98,7 @@ class jfFilterMapEditor : public QWidget {
     bool LoadSelected();
     QString MakeName(const QString& nfbase) const;
     void BtnEnable(bool enable);
+
     // gui elements
     QPushButton* new_button;
     QPushButton* del_button;
@@ -109,6 +113,7 @@ class jfFilterMapEditor : public QWidget {
     QVBoxLayout* side_sizer;
     QHBoxLayout* btn_sizer;
     QVBoxLayout* edit_stack;
+
     // other data
     jfFilterMap* fdata;
     QString oldtype;
@@ -117,72 +122,5 @@ class jfFilterMapEditor : public QWidget {
     // external link
     const QStringList* pflist;
 };
-//==============================================================================
-/* Used in Global filter editor, a panel including a name editor and a local
-filter editor */
-class jfMapEditPanel : public QWidget {
-    Q_OBJECT
-  public:
-    // the constructor
-    jfMapEditPanel(jfFilterMap* inlink, QWidget* parent = NULL);
-    // accessible methods
-    bool ChangeMap(jfFilterMap* inlink);
-    QString GetName();
-    QString GetDescription() const;
-    void ChangeBoxName(QString newname);
-  public slots:
-    void CatchSaved(bool cval);
-  signals:
-    void ThrowSaved();
-  protected:
-    // gui elements
-    jfNameDescEditor* ndesce;
-    QPushButton* save_name;
-    jfFilterMapEditor* map_editor;
-    // sizers
-    QGroupBox* wrapper;
-    QVBoxLayout *innerl, *outerl;
-    // internal data
-    bool mappset;
-    jfFilterMap* itemlink;
-};
-//==============================================================================
-/* the global filter editor, which has a list of maps, a map editor, two buttons
-for adding and deleting maps, and an editor for the map name+desc
-*/
-class jfGlobalFilterEditor : public QWidget {
-    Q_OBJECT
-  public:
-    // the constructor
-    jfGlobalFilterEditor(jfMapOfFiltermaps* inlink, QWidget* parent = NULL);
-    // methods
-    void SetNoMap();
-    bool LoadSelectedMap();
-    bool ChangeMap(const size_t& index);
-  public slots:
-    //event handlers
-    void NewPressed(bool inval);
-    void DeletePressed(bool inval);
-    void SavePressed();
-    void MapPicked();
-  protected:
-    // helper methods
-    size_t MakeDefaultMap(QString thename);
-    // gui elemts
-    QPushButton* add_btn;
-    QPushButton* dele_btn;
-    QListWidget* map_list;
-    QWidget* blank_panel;
-    jfMapEditPanel* main_mapedit;
-    bool isblank;
-    // sizers
-    QHBoxLayout* btn_sizer;
-    QVBoxLayout* side_sizer;
-    QHBoxLayout* top_sizer;
-    // internal data
-    jfMapOfFiltermaps* maindata;
-    size_t selindex;
-    QString selname;
-    jfFilterMap* selmap;
-};
+
 /******************************************************************************/

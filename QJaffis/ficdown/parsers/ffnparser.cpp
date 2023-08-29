@@ -69,6 +69,10 @@ bool jfFFN_FicPartParser::testIncomplete(const QString *page) const {
   if (page->contains(footer1)) return true;
   else return page->contains(footer2);
 }
+//------------------------------------
+bool jfFFN_FicPartParser::testRatelimit(const QString *page) const {
+    return true;
+}
 //--------------------------------------
 QString jfFFN_FicPartParser::getCookie() const{
   return "";

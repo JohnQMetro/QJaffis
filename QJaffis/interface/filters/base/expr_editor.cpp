@@ -65,7 +65,7 @@ jfExpressionFilter* jfExpressionEditor::CheckFilter(QString& outmessage) {
   // empty expresssions
   if (dstring.isEmpty()) {
     outmessage = "Empty expressions match everything.";
-    result_expression = new jfExpressionFilter();
+    result_expression = new jfExpressionFilter("expression");
     result_expression->EmptyFilter();
     result_expression->SetFiltermapLink(local_fmap);
     SetStatus(0);
@@ -73,10 +73,9 @@ jfExpressionFilter* jfExpressionEditor::CheckFilter(QString& outmessage) {
   }
   // non-empty expressions
   else {
-    result_expression = new jfExpressionFilter();
+    result_expression = new jfExpressionFilter("expression");
     result_expression->SetFiltermapLink(local_fmap);
-    if (!result_expression->FromString(dstring) ) {
-      outmessage = result_expression->parse_error;
+    if (!result_expression->FromString(dstring, outmessage) ) {
       delete result_expression;
       SetStatus(2);
       return NULL;
@@ -100,40 +99,39 @@ jfExpressionFilter* jfExpressionEditor::CheckFilter(QString& outmessage) {
 /* This method treats in input string as an expression and reports on it's
 validity */
 bool jfExpressionEditor::CheckExpr(const QString& inexpr,bool& outempty,QString& outmessage) const {
-  // local variables
-  jfNameVerif* verifier;
-  jfExpressionFilter *result_expression;
-  // starting...
-  QString tinexpr = inexpr.trimmed();
-  // empty expresssions
-  if (tinexpr.isEmpty()) {
-    outmessage = "Empty expressions match everything.";
-    outempty = true;
-    return true;
-  }
-  // non-empty expressions
-  else {
-    outempty = false;
-    result_expression = new jfExpressionFilter();
-    result_expression->SetFiltermapLink(local_fmap);
-    if (!result_expression->FromString(tinexpr)) {
-      outmessage = result_expression->parse_error;
-      delete result_expression;
-      return false;
+    // local variables
+    jfNameVerif* verifier;
+    jfExpressionFilter *result_expression;
+    // starting...
+    QString tinexpr = inexpr.trimmed();
+    // empty expresssions
+    if (tinexpr.isEmpty()) {
+        outmessage = "Empty expressions match everything.";
+        outempty = true;
+        return true;
     }
-    // we check for validity
-    verifier = new jfNameVerif();
-    if (!(result_expression->VerifyNames(verifier,map_nomap))) {
-      outmessage = verifier->GetError();
-      delete result_expression;
-      return false;
-    }
+    // non-empty expressions
     else {
-      outmessage="No errors detected.";
-      delete result_expression;
-      return true;
+        outempty = false;
+        result_expression = new jfExpressionFilter("expression");
+        result_expression->SetFiltermapLink(local_fmap);
+        if (!result_expression->FromString(tinexpr, outmessage)) {
+            delete result_expression;
+            return false;
+        }
+        // we check for validity
+        verifier = new jfNameVerif();
+        if (!(result_expression->VerifyNames(verifier,map_nomap))) {
+            outmessage = verifier->GetError();
+            delete result_expression;
+            return false;
+        }
+        else {
+            outmessage="No errors detected.";
+            delete result_expression;
+            return true;
+        }
     }
-  }
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 void jfExpressionEditor::PressPickFilter(bool checked) {
